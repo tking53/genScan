@@ -1,7 +1,7 @@
 #utkscan will be more verbose in its output
-if (GENSCAN_UTKSCAN_VERBOSE)
+if (GENSCAN_VERBOSE)
     add_definitions(-D VERBOSE)
-endif (GENSCAN_UTKSCAN_VERBOSE)
+endif (GENSCAN_VERBOSE)
 
 #------------------------------------------------------------------------------
 
@@ -22,8 +22,12 @@ endif (GENSCAN_UTKSCAN_VERBOSE)
 #------------------------------------------------------------------------------
 
 set(EXE_NAME scan_all_things)
-add_executable(${EXE_NAME} genscan.cxx) 
-# target_link_libraries(${EXE_NAME ${HRIBF_LIBRARIES})
+set(EXE_SOURCES GeneralConfigData.cxx configXMLparser.cxx Messenger.cpp )
+add_executable(${EXE_NAME} genscan.cxx  ${EXE_SOURCES}) 
+target_include_directories(${EXE_NAME} PUBLIC )
+target_link_libraries(${EXE_NAME} pugixml)
+
+
 
 # target_link_libraries(${SCAN_NAME} ${LIBS} PaassRootStruct PaassScanStatic ResourceStatic PaassCoreStatic PugixmlStatic PaassResourceStatic )
 # target_link_libraries(${SCAN_NAME} ${ROOT_LIBRARIES} PaassRootStruct)

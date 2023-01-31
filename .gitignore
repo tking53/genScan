@@ -37,3 +37,6 @@ build/*
 # IDE / editor folders
 vscode*
 .vscode*
+.vim*
+#ignore clangs
+clangd.log

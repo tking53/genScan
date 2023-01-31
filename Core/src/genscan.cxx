@@ -1,4 +1,5 @@
 #include "genscan.h"
+#include "ConfigXMLparser.hpp"
 #include <getopt.h>
 
 int main(int argc, char *argv[]) {
