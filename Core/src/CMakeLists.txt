@@ -22,7 +22,7 @@ endif (GENSCAN_VERBOSE)
 #------------------------------------------------------------------------------
 
 set(EXE_NAME scan_all_things)
-set(EXE_SOURCES genscan.cpp ArgParser.cpp GeneralConfigData.cpp ConfigXMLparser.cpp Messenger.cpp )
+set(EXE_SOURCES genscan.cpp CompassROOTUnpacker.cpp Unpacker.cpp ArgParser.cpp GeneralConfigData.cpp ConfigXMLparser.cpp Messenger.cpp )
 add_executable(${EXE_NAME} scanmain.cpp  ${EXE_SOURCES}) 
 target_include_directories(${EXE_NAME} PUBLIC )
 target_link_libraries(${EXE_NAME} pugixml)
