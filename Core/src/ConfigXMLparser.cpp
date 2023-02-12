@@ -39,7 +39,7 @@ configXMLparser::configXMLparser(const string &XMLfile){
     }
 
 
-};
+}
 /** Instance is created upon first call */
 configXMLparser *configXMLparser::get() {
     if (!instance_)
@@ -89,7 +89,7 @@ void configXMLparser::ParseRootNode(const pugi::xml_node &root) {
         throw invalid_argument(CriticalNodeMessage("Global"));
         WarnOfUnknownChildren(root, knownChildren);
     };
-};
+}
 
 void configXMLparser::ParseGlobalNode(const pugi::xml_node & globalNode, GeneralConfigData *gencfgdata){
 
