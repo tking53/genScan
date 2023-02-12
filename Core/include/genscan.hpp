@@ -5,28 +5,19 @@
 #include <thread>
 #include <utility>
 #include <map>
-#include <string.h>
+#include <string>
 
 #include <sys/stat.h> //For directory manipulation
 
-using namespace std;
-
 class genscan{
-    public:
-        genscan() {};
+	public:
+		genscan();
+		~genscan() = default;
+		void SetCfgFile(std::string);
 
-        ~genscan() = default;
+	private:
+		std::string cfgFile;
 
-
-        const double i = 10;
-
-    void SetCfgFile(string a){
-        cfgFile = a;
-    }
-
-    private:
-        string cfgFile;
-        
 
 };
 #endif
