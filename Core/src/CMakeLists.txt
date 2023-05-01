@@ -25,7 +25,11 @@ set(EXE_NAME scan_all_things)
 set(EXE_SOURCES genscan.cpp CompassROOTUnpacker.cpp Unpacker.cpp ArgParser.cpp GeneralConfigData.cpp ConfigXMLparser.cpp Messenger.cpp )
 add_executable(${EXE_NAME} scanmain.cpp  ${EXE_SOURCES}) 
 target_include_directories(${EXE_NAME} PUBLIC )
+#need spdlog and fmt for pretty logging and printing because fuck the original messenger class
 target_link_libraries(${EXE_NAME} pugixml)
+if( USE_SPDLOG )
+	target_link_libraries(${EXE_NAME}  spdlog::spdlog_header_only fmt::fmt )
+endif()
 
 
 

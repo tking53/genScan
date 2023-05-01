@@ -21,26 +21,58 @@ std::vector<ArgParser::Argument*>* ArgParser::GetArguments(){
 }
 
 void ArgParser::ShowUsage(char* progname){
-	std::cout << progname;
+	#ifdef USE_SPDLOG
+		std::string message(progname);
+	#else
+		std::cout << progname;
+	#endif
 	for( auto& arg : ArgList ){
 		if( arg->type == ArgType::no_argument ){
-			std::cout << " " << arg->sname << "/" << arg->lname << " " << arg->description;
+			#ifdef USE_SPDLOG
+				message +=  " " + arg->sname + "/" + arg->lname + " " + arg->description;
+			#else
+				std::cout << " " << arg->sname << "/" << arg->lname << " " << arg->description;
+			#endif
 		}else if( arg->type == ArgType::required_argument ){
-			std::cout << " " << arg->sname << "/" << arg->lname << " [required_argument] " << arg->description;
+			#ifdef USE_SPDLOG
+				message +=  " " + arg->sname + "/" + arg->lname + "[required_argument]" + arg->description;
+			#else
+				std::cout << " " << arg->sname << "/" << arg->lname << " [required_argument] " << arg->description;
+			#endif
 		}else if( arg->type == ArgType::optional_argument ){
-			std::cout << " " << arg->sname << "/" << arg->lname << " [optional_argument]" << arg->description;
+			#ifdef USE_SPDLOG
+				message +=  " " + arg->sname + "/" + arg->lname + "[optional_argument]" + arg->description;
+			#else
+				std::cout << " " << arg->sname << "/" << arg->lname << " [optional_argument]" << arg->description;
+			#endif
 		}else{
 			//how did we get here?
 		}
 	}
-	std::cout << std::endl;
+	#ifdef USE_SPDLOG
+		spdlog::get("console")->info(message);
+	#else
+		std::cout << std::endl;
+	#endif
 	for( auto& arg : ArgList ){
 		if( arg->type == ArgType::no_argument ){
-			std::cout << arg->sname << "/" << arg->lname << " " << arg->description << std::endl;
+			#ifdef USE_SPDLOG
+				spdlog::get("console")->info(" {}/{} {}",arg->sname,arg->lname,arg->description);
+			#else
+				std::cout << arg->sname << "/" << arg->lname << " " << arg->description << std::endl;
+			#endif
 		}else if( arg->type == ArgType::required_argument ){
-			std::cout << arg->sname << "/" << arg->lname << " [required_argument] " << arg->description << std::endl;
+			#ifdef USE_SPDLOG
+				spdlog::get("console")->info(" {}/{} [required_argument] {}",arg->sname,arg->lname,arg->description);
+			#else
+				std::cout << arg->sname << "/" << arg->lname << " [required_argument] " << arg->description << std::endl;
+			#endif
 		}else if( arg->type == ArgType::optional_argument ){
-			std::cout << arg->sname << "/" << arg->lname << " [optional_argument]" << arg->description << std::endl;
+			#ifdef USE_SPDLOG
+				spdlog::get("console")->info(" {}/{} [optional_argument] {}",arg->sname,arg->lname,arg->description);
+			#else
+				std::cout << arg->sname << "/" << arg->lname << " [optional_argument]" << arg->description << std::endl;
+			#endif
 		}else{
 			//how did we get here?
 		}
@@ -58,6 +90,9 @@ void ArgParser::ParseArgs(int argc,char* argv[]){
 			arg = GetArgument(flag);
 		}catch(...){
 			std::string message = "Error Unknown flag : \"" + flag + "\" parsing option position " + std::to_string(ii) + " / " + std::to_string(argc);
+			#ifdef USE_SPDLOG
+				spdlog::get("console")->error("message");
+			#endif
 			throw message;
 		}
 		type = arg->type;
@@ -94,6 +129,9 @@ void ArgParser::ParseArgs(int argc,char* argv[]){
 		if( arg->type == ArgType::required_argument and arg->value == nullptr ){
 			ShowUsage(argv[0]);
 			std::string message = "Missing Required Argument : " + arg->sname + " " + arg->lname;
+			#ifdef USE_SPDLOG
+				spdlog::get("console")->error("message");
+			#endif
 			throw message;
 		}
 	}
@@ -121,6 +159,9 @@ std::string* ArgParser::GetArgumentValueShortName(std::string sname){
 		return arg->value;
 	}catch(...){
 		std::string message = "Bad name in ArgParser::GetArgumentValueShortName : " + sname;
+		#ifdef USE_SPDLOG
+			spdlog::get("console")->error("message");
+		#endif
 		throw message;
 	}
 }
@@ -131,6 +172,9 @@ std::string* ArgParser::GetArgumentValueLongName(std::string lname){
 		return arg->value;
 	}catch(...){
 		std::string message = "Bad name in ArgParser::GetArgumentValueLongName : " + lname;
+		#ifdef USE_SPDLOG
+			spdlog::get("console")->error("message");
+		#endif
 		throw message;
 	}
 }
@@ -141,6 +185,9 @@ bool ArgParser::GetArgumentIsEnabledShortName(std::string sname){
 		return arg->isenabled;
 	}catch(...){
 		std::string message = "Bad name in ArgParser::GetArgumentIsEnabledShortName : " + sname;
+		#ifdef USE_SPDLOG
+			spdlog::get("console")->error("message");
+		#endif
 		throw message;
 	}
 }
@@ -151,6 +198,9 @@ bool ArgParser::GetArgumentIsEnabledLongName(std::string lname){
 		return arg->isenabled;
 	}catch(...){
 		std::string message = "Bad name in ArgParser::GetArgumentIsEnabledLongName : " + lname;
+		#ifdef USE_SPDLOG
+			spdlog::get("console")->error("message");
+		#endif
 		throw message;
 	}
 }

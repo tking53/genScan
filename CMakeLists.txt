@@ -148,6 +148,12 @@ link_directories(${ROOT_LIBRARY_DIR})
 #------------------------------------------------------------------------------
 
 find_package(Pugixml REQUIRED)
+option(USE_SPDLOG "Use either spdlog or messenger class" ON)
+if( USE_SPDLOG )
+	find_package(fmt REQUIRED)
+	find_package(spdlog REQUIRED)
+	add_compile_definitions(USE_SPDLOG)
+endif()
 include_directories(Core/include)
 add_subdirectory(Core)
 

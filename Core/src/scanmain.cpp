@@ -4,7 +4,20 @@
 #include "genscan.hpp"
 #include "ArgParser.hpp"
 
+#ifdef USE_SPDLOG
+	#include <spdlog/spdlog.h>
+	#include <spdlog/cfg/env.h>
+	#include <spdlog/fmt/ostr.h>
+	#include <spdlog/sinks/basic_file_sink.h>
+	#include <spdlog/sinks/stdout_color_sinks.h>
+#endif
+
+
 int main(int argc, char *argv[]) {
+	#ifdef USE_SPDLOG
+		auto console = spdlog::stdout_color_mt("console");
+		//spdlog::register_logger(console);
+	#endif
 
 	ArgParser* cmdArgs = new ArgParser();
 	cmdArgs->AddArgument("c","configfile",ArgType::required_argument,"config filename");
@@ -21,7 +34,11 @@ int main(int argc, char *argv[]) {
 	try{
 		cmdArgs->ParseArgs(argc,argv);
 	}catch( std::string& e ){
-		std::cout << e << std::endl;
+		#ifdef USE_SPDLOG 
+			console->error(e);
+		#else
+			std::cout << e << std::endl;
+		#endif
 		return 1;
 	}
 
