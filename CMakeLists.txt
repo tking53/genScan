@@ -154,6 +154,6 @@ if( USE_SPDLOG )
 	find_package(spdlog REQUIRED)
 	add_compile_definitions(USE_SPDLOG)
 endif()
-include_directories(Core/include)
-add_subdirectory(Core)
+include_directories(core/include)
+add_subdirectory(core)
 
