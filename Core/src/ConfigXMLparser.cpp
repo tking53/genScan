@@ -13,7 +13,7 @@ configXMLparser::configXMLparser(const string &XMLfile){
 	pugi::xml_parse_result result = cfgXML.load_file(XMLfile.c_str());
 	#ifdef USE_SPDLOG
 		LogFile = spdlog::basic_logger_mt("configXMLparser","configXMLparser.log",true);
-		LogFile->set_pattern("%v");
+		//LogFile->set_pattern("%v");
 	#endif
 
 	if (!result) {
@@ -29,32 +29,25 @@ configXMLparser::configXMLparser(const string &XMLfile){
 		throw std::invalid_argument(ss.str());
 	}
 
-	std::cout << "configXMLparser - Successfully loaded \"" << XMLfile
-		<< "\" into memory." << std::endl;
 	#ifdef USE_SPDLOG 
 		LogFile->info("configXMLparser - Successfully loaded {} into memory.",XMLfile);
+	#else
+		std::cout << "configXMLparser - Successfully loaded \"" << XMLfile
+			<< "\" into memory." << std::endl;
 	#endif 
 
 	stringstream ss;
 	Messenger m;
 
-	m.start("Parsing cfgXML");
 	#ifdef USE_SPDLOG 
 		LogFile->info("Parsing cfgXML");
+	#else
+		m.start("Parsing cfgXML");
 	#endif 
 
 	const pugi::xml_node rootNode_ = GetDocument()->child("Configuration");
+	WarnOfUnknownChildren(rootNode_, RootKnownChildren);
 	ParseRootNode(rootNode_);
-
-	if (! rootNode_.child("Description").empty() ){
-		string DescriptText = rootNode_.child("Description").text().get();
-		m.detail("Experiment Summary : " + DescriptText);
-		#ifdef USE_SPDLOG 
-			LogFile->critical("Experiment Summary : " + DescriptText);
-		#endif 
-	}
-
-
 }
 /** Instance is created upon first call */
 configXMLparser *configXMLparser::get() {
@@ -90,31 +83,45 @@ string configXMLparser::CriticalAttributeMessage(const std::string &message) {
 void configXMLparser::WarnOfUnknownChildren(const pugi::xml_node &node, const set<string> &knownChildren) {
 	for (pugi::xml_node_iterator it = node.begin(); it != node.end(); ++it)
 		if (knownChildren.find(it->name()) == knownChildren.end()){
-			cout << "Unknown parameter in " << it->path() << ".  This information is ignored by the program." << endl;
 			#ifdef USE_SPDLOG 
 				LogFile->critical("Unknown parameter in {}. This information is ignored by the program.",it->path());
+			#else
+				cout << "Unknown parameter in " << it->path() << ".  This information is ignored by the program." << endl;
 			#endif 
 		}
 }
 
 void configXMLparser::ParseRootNode(const pugi::xml_node &root) {
 	if (!root) {
-		throw invalid_argument("The root node \"/Configuration\" does not exist. No configuration can be loaded.");
+		throw std::invalid_argument("The root node \"/Configuration\" does not exist. No configuration can be loaded.");
 	} else {
-		set<string> knownChildren = {"Author", "Description", "Global", "Map"};
+
+		if (!root.child("Description").empty() ){
+			string DescriptText = root.child("Description").text().get();
+			#ifdef USE_SPDLOG 
+				LogFile->critical("Experiment Summary : " + DescriptText);
+			#else
+				m.detail("Experiment Summary : " + DescriptText);
+			#endif 
+		}
+
 		if (root.child("Map").empty()){
 			#ifdef USE_SPDLOG 
 				LogFile->error(CriticalNodeMessage("Map"));
 			#endif 
-			throw invalid_argument(CriticalNodeMessage("Map"));
+			throw std::invalid_argument(CriticalNodeMessage("Map"));
+		}else{
+			WarnOfUnknownChildren(root.child("Map"),MapKnownChildren);
 		}
+
 		if (root.child("Global").empty()) {
 			#ifdef USE_SPDLOG 
 				LogFile->error(CriticalNodeMessage("Global"));
 			#endif 
-			throw invalid_argument(CriticalNodeMessage("Global"));
+			throw std::invalid_argument(CriticalNodeMessage("Global"));
+		}else{
+			WarnOfUnknownChildren(root.child("Global"),GlobalKnownChildren);
 		}
-		WarnOfUnknownChildren(root, knownChildren);
 	};
 }
 
@@ -127,19 +134,23 @@ void configXMLparser::ParseGlobalNode(const pugi::xml_node & globalNode, General
 		#ifdef USE_SPDLOG 
 			LogFile->error("ConfigXmlParser::ParseGlobal - The Digitizer style is missing. We know CAEN or XIA. \"");
 		#endif 
-		throw invalid_argument("ConfigXmlParser::ParseGlobal - The Digitizer style is missing. We know CAEN or XIA. \"");
+		throw std::invalid_argument("ConfigXmlParser::ParseGlobal - The Digitizer style is missing. We know CAEN or XIA. \"");
 	}
 	if (!globalNode.child("EventWidth").empty()) {
 		double eventLength = globalNode.child("EventWidth").attribute("value").as_double(0);
 
 		gencfgdata->SetEventLength(eventLength);
-		sstream_ << "Event width: " << eventLength  << " s" ;
-		messenger_.detail(sstream_.str());
-		sstream_.str("");
+		#ifdef USE_SPDLOG
+			LogFile->info("EventWidth : {} s",eventLength);
+		#else
+			sstream_ << "Event width: " << eventLength  << " s" ;
+			messenger_.detail(sstream_.str());
+			sstream_.str("");
+		#endif
 	} else {
 		#ifdef USE_SPDLOG 
 			LogFile->error(CriticalNodeMessage("EventWidth"));
 		#endif 
-		throw invalid_argument(CriticalNodeMessage("EventWidth"));
+		throw std::invalid_argument(CriticalNodeMessage("EventWidth"));
 	}
 }

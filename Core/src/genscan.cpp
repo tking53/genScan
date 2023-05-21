@@ -44,4 +44,11 @@ void genscan::DoScan(){
 	#else
 		std::cout << "Current File : " << *(unpacker->GetCurrFile()) << std::endl;
 	#endif
+	
+	try{
+		configParser = configXMLparser::get(*cfgFile);
+	}catch(std::invalid_argument const& e){
+		spdlog::get("genscan")->error(e.what());
+		exit(EXIT_FAILURE);
+	}
 }

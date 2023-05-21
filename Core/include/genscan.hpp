@@ -9,6 +9,7 @@
 
 #include <sys/stat.h> //For directory manipulation
 
+#include "ConfigXMLparser.hpp"
 #include "Unpacker.hpp"
 
 #ifdef USE_SPDLOG
@@ -45,5 +46,6 @@ class genscan{
 		#endif
 
 		Unpacker* unpacker;
+		configXMLparser* configParser;
 };
 #endif

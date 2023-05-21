@@ -59,6 +59,14 @@ class configXMLparser{
 		void WarnOfUnknownChildren(const pugi::xml_node &node, const std::set<std::string> &knownChildren);
 
 		static configXMLparser *instance_;  // instance
+
+		std::set<std::string> RootKnownChildren = {"Author", "Description", "Global", "Map","DetectorDriver"};
+		std::set<std::string> MapKnownChildren = {"Channel"};
+		std::set<std::string> ChannelKnownChildren = {"Calibration"};
+		std::set<std::string> GlobalKnownChildren = {"Revision","EventWidth","HasRaw"};
+		std::set<std::string> AuthorKnownChildren = {"Name","Email","Date"};
+		std::set<std::string> DetectorDriverKnownChildren = {"Processor","Analyzer"};
+
 		pugi::xml_document cfgXML;
 		//An instance of the messenger class so that we can output pretty info
 		Messenger messenger_;
