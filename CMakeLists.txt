@@ -67,17 +67,19 @@ include(CMakeDependentOption)
 # mark_as_advanced(PAASS_USE_DAMM)
 # mark_as_advanced(PAASS_USE_ROOT)
 
-option(GENSCAN_EXPORT_COMPILE_COMMANDS "CMAKE_EXPORT_COMPILE_COMMANDS WRAPPER" ON)
-mark_as_advanced(GENSCAN_EXPORT_COMPILE_COMMANDS)
 
-#Generate the compile_commands.json file which is used by VSCode (among others) to generate the clang autocomplete
-#Needs the PAASS_EXPORT_COMPILE_COMMANDS wrapper because of the "FORCE" which is required to even set the var from CMakeList.txt,
-#while maintaining the ability to toggle it on/off without wiping the build dir
-if(GENSCAN_EXPORT_COMPILE_COMMANDS)
-    set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE BOOL "Generates compile_commands.json, needed for some IDEs among other things" FORCE)
-else ()
-    set(CMAKE_EXPORT_COMPILE_COMMANDS OFF CACHE BOOL "Generates compile_commands.json, needed for some IDEs among other things" FORCE)   
-endif (GENSCAN_EXPORT_COMPILE_COMMANDS)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE BOOL "Generates compile_commands.json, needed for some IDEs among other things" FORCE)
+#option(GENSCAN_EXPORT_COMPILE_COMMANDS "CMAKE_EXPORT_COMPILE_COMMANDS WRAPPER" ON)
+#mark_as_advanced(GENSCAN_EXPORT_COMPILE_COMMANDS)
+#
+##Generate the compile_commands.json file which is used by VSCode (among others) to generate the clang autocomplete
+##Needs the PAASS_EXPORT_COMPILE_COMMANDS wrapper because of the "FORCE" which is required to even set the var from CMakeList.txt,
+##while maintaining the ability to toggle it on/off without wiping the build dir
+#if(GENSCAN_EXPORT_COMPILE_COMMANDS)
+#    set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE BOOL "Generates compile_commands.json, needed for some IDEs among other things" FORCE)
+#else ()
+#    set(CMAKE_EXPORT_COMPILE_COMMANDS OFF CACHE BOOL "Generates compile_commands.json, needed for some IDEs among other things" FORCE)   
+#endif (GENSCAN_EXPORT_COMPILE_COMMANDS)
 
 #------------------------------------------------------------------------------
 
@@ -149,11 +151,15 @@ link_directories(${ROOT_LIBRARY_DIR})
 
 find_package(Pugixml REQUIRED)
 option(USE_SPDLOG "Use either spdlog or messenger class" ON)
-if( USE_SPDLOG )
-	find_package(fmt REQUIRED)
-	find_package(spdlog REQUIRED)
-	add_compile_definitions(USE_SPDLOG)
-endif()
-include_directories(core/include)
+
+find_package(fmt REQUIRED)
+find_package(spdlog REQUIRED)
+add_compile_definitions(USE_SPDLOG)
+
+add_subdirectory(utility)
 add_subdirectory(core)
 
+add_executable(GenScanor scanmain.cpp)
+
+#include_directories(${PROJECT_SOURCE_DIR}/utility/include)
+target_link_libraries(GenScanor PRIVATE CORE_LIB UTILITY_LIB spdlog::spdlog_header_only fmt::fmt)

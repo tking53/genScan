@@ -6,13 +6,11 @@
 #include <map>
 #include <functional>
 
-#ifdef USE_SPDLOG
-	#include <spdlog/spdlog.h>
-	#include <spdlog/cfg/env.h>
-	#include <spdlog/fmt/ostr.h>
-	#include <spdlog/sinks/basic_file_sink.h>
-	#include <spdlog/sinks/stdout_color_sinks.h>
-#endif
+#include <spdlog/spdlog.h>
+#include <spdlog/cfg/env.h>
+#include <spdlog/fmt/ostr.h>
+#include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 
 enum ArgType{
 	bad_argument,
