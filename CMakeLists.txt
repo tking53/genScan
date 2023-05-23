@@ -158,8 +158,9 @@ add_compile_definitions(USE_SPDLOG)
 
 add_subdirectory(utility)
 add_subdirectory(core)
+add_subdirectory(processors)
 
 add_executable(GenScanor scanmain.cpp)
 
 #include_directories(${PROJECT_SOURCE_DIR}/utility/include)
-target_link_libraries(GenScanor PRIVATE CORE_LIB UTILITY_LIB spdlog::spdlog_header_only fmt::fmt)
+target_link_libraries(GenScanor PRIVATE PROCESSOR_LIB CORE_LIB UTILITY_LIB spdlog::spdlog_header_only fmt::fmt)

@@ -10,6 +10,7 @@
 
 #include "ArgParser.hpp"
 #include "ConfigParser.hpp"
+#include "ProcessorList.hpp"
 
 int main(int argc, char *argv[]) {
 	spdlog::set_level(spdlog::level::debug);
@@ -68,17 +69,13 @@ int main(int argc, char *argv[]) {
 		console->error(e.what());
 	}
 
-	//console->error("Fake Error");
-	//console->debug("Fake Debug");
-	//console->warn("Fake Warn");
-	//console->critical("Fake Critical");
-
-	//scan->SetCfgFile(configfile);
-	//scan->SetOutputFile(outputfile);
-	//scan->SetInputFile(inputfile);
-	//scan->SetEvtBuild(evtbuild);
-
-	//scan->DoScan();
+	auto processorlist = ProcessorList::Get();
+	try{
+		processorlist->InitializeProcessors(cfgparser->GetProcessors());
+		processorlist->InitializeAnalyzers(cfgparser->GetAnalyzers());
+	}catch(std::runtime_error const& e){
+		console->error(e.what());
+	}
 
 	return 0;
 }

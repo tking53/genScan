@@ -125,9 +125,56 @@ void ConfigParser::ParseDetectorDriver(){
 	this->DetectorDriver = this->Configuration.child("DetectorDriver");
 	if( this->DetectorDriver ){
 		//loop through list of analyzers and processors
+		pugi::xml_node processor = this->DetectorDriver.child("Processor");
+		pugi::xml_node analyzer = this->DetectorDriver.child("Analyzer");
+		if( (!processor) and (!analyzer) ){
+			std::stringstream ss;
+			ss << "ConfigParser::ParseDetectorDriver() : config file named \""
+			   << *(this->XMLName) 
+			   << "\" is malformed. No Processors or Analyzers listed.";
+			throw std::runtime_error(ss.str());
+		}
+
+		for(; processor; processor = processor.next_sibling("Processor")){
+			std::string name = processor.attribute("name").as_string("");
+			if( name.compare("") == 0 ){
+				std::stringstream ss;
+				ss << "ConfigParser::ParseDetectorDriver() : config file named \""
+				   << *(this->XMLName) 
+				   << "\" is malformed and one of the Processor tags in missing the \"name\" attribute.";
+				throw std::runtime_error(ss.str());
+			}else{
+				this->ProcessorNames[name] = processor;
+			}
+		}
+		for(; analyzer; analyzer = analyzer.next_sibling("Analyzer")){
+			std::string name = analyzer.attribute("name").as_string("");
+			if( name.compare("") == 0 ){
+				std::stringstream ss;
+				ss << "ConfigParser::ParseDetectorDriver() : config file named \""
+				   << *(this->XMLName) 
+				   << "\" is malformed and one of the Analyzer tags in missing the \"name\" attribute.";
+				throw std::runtime_error(ss.str());
+			}else{
+				this->AnalyzerNames[name] = analyzer;
+			}
+		}
 	}else{
 		//just make raw coincidences but warn/critical????
+		std::stringstream ss;
+		ss << "ConfigParser::ParseDetectorDriver() : config file named \""
+		   << *(this->XMLName) 
+		   << "\" is malformed because DetectorDriver tag is missing.";
+		throw std::runtime_error(ss.str());
 	}
+}
+
+std::map<std::string,pugi::xml_node>& ConfigParser::GetProcessors(){
+	return ProcessorNames;
+}
+
+std::map<std::string,pugi::xml_node>& ConfigParser::GetAnalyzers(){
+	return AnalyzerNames;
 }
 
 void ConfigParser::ParseMap(){

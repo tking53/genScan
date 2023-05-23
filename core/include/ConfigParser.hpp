@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 #include <pugixml.hpp>
 #include <pugiconfig.hpp>
@@ -12,6 +13,8 @@ class ConfigParser{
 		static ConfigParser* Get();
 		void SetConfigFile(std::string*);
 		void Parse();
+		std::map<std::string,pugi::xml_node>& GetAnalyzers();
+		std::map<std::string,pugi::xml_node>& GetProcessors();
 	private:
 		ConfigParser();
 		
@@ -39,8 +42,8 @@ class ConfigParser{
 		double GlobalEventWidthInS;
 
 		pugi::xml_node DetectorDriver;
-		std::vector<std::string> DetectorDriverProcessorNames;
-		std::vector<std::string> DetectorDriverAnalyzerNames;
+		std::map<std::string,pugi::xml_node> ProcessorNames;
+		std::map<std::string,pugi::xml_node> AnalyzerNames;
 
 		pugi::xml_node Map;
 };
