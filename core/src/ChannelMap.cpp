@@ -40,6 +40,10 @@ ChannelNode::ChannelNode(unsigned long long board_id,unsigned long long channel_
 		unique_id += ":" + t;
 }
 
+double ChannelNode::GetCalibratedEnergy(double& erg){
+	return calibrator->Calibrate(erg);
+}
+
 BoardNode::BoardNode(unsigned long long board_id,std::string firmware,int frequency,int tracedelay){
 	id = board_id;
 	Firmware = firmware;
@@ -72,6 +76,10 @@ ChannelNode* BoardNode::GetSingleChannel(unsigned long long cid){
 
 std::vector<ChannelNode*> BoardNode::GetChannels(){
 	return Channels;
+}
+
+double BoardNode::GetCalibratedEnergy(unsigned long& cid,double& erg){
+	return Channels.at(cid)->GetCalibratedEnergy(erg);
 }
 
 bool ChannelMap::AddChannel(unsigned long long bid,unsigned long long cid,std::string t,std::string st,std::string g,std::vector<std::string> ts){
@@ -112,6 +120,11 @@ void ChannelMap::GenerateLookupTables(){
 		}
 	}
 }
+
+double ChannelMap::GetCalibratedEnergy(unsigned long& bid,unsigned long& cid,double& erg){
+	return Boards.at(bid)->GetCalibratedEnergy(cid,erg);
+}
+
 std::map<std::string,std::vector<ChannelNode*>> ChannelMap::GetTypeLookupChart(){
 	return TypeLookupChart;
 }

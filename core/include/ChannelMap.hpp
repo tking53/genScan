@@ -5,9 +5,12 @@
 #include <vector>
 #include <map>
 
+#include "Calibration.hpp"
+
 class ChannelNode{
 	public:
 		ChannelNode(unsigned long long,unsigned long long,std::string,std::string,std::string,std::vector<std::string>);
+		double GetCalibratedEnergy(double&);
 
 		template<typename OStream>
 		friend OStream& operator<<(OStream& os, const ChannelNode& c){
@@ -26,6 +29,7 @@ class ChannelNode{
 		std::string group;
 		std::vector<std::string> tags;
 		std::string unique_id;
+		Calibration* calibrator;
 };
 
 class BoardNode{
@@ -35,6 +39,8 @@ class BoardNode{
 		size_t GetNumChannels() const;
 		ChannelNode* GetSingleChannel(unsigned long long);
 		std::vector<ChannelNode*> GetChannels();
+		
+		double GetCalibratedEnergy(unsigned long&,double&);
 
 		template<typename OStream>
 		friend OStream& operator<<(OStream& os,const BoardNode& b){
@@ -56,6 +62,8 @@ class ChannelMap{
 		ChannelNode* GetSingleChannel(unsigned long long bid,unsigned long long cid);
 		std::vector<BoardNode*> GetBoards();
 		size_t GetNumBoards() const;
+
+		double GetCalibratedEnergy(unsigned long&,unsigned long&,double&);
 
 		void GenerateLookupTables();
 		std::map<std::string,std::vector<ChannelNode*>> GetTypeLookupChart();

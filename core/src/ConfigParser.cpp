@@ -12,6 +12,16 @@
 #include "ConfigParser.hpp"
 #include "ChannelMap.hpp"
 
+#include "Calibration.hpp"
+#include "LinearCalibration.hpp"
+#include "QuadraticCalibration.hpp"
+#include "CubicCalibration.hpp"
+#include "PolyCalibration.hpp"
+#include "LinearExpoCalibration.hpp"
+#include "QuadraticExpoCalibration.hpp"
+#include "CubicExpoCalibration.hpp"
+#include "PolyExpoCalibration.hpp"
+
 ConfigParser* ConfigParser::instance = nullptr;
 
 ConfigParser* ConfigParser::Get(){
@@ -182,6 +192,18 @@ void ConfigParser::ParseMap(){
 	if( this->Map ){
 		//create the channel map object that will be used for lookups. Make it global instanced
 		auto cmap = ChannelMap::Get();
+		//lambda function to parse out string text into individual entries
+		auto parse_cal_string = [](std::string calstring,std::vector<double>& vals){
+			double curr;
+			std::stringstream ss;
+			ss << calstring;
+			do{
+				ss >> curr;
+				vals.push_back(curr);
+			}while(ss);
+			vals.pop_back();
+		};
+
 		pugi::xml_node board = this->Map.child("Module");
 		if( !board ){
 			std::stringstream ss;
@@ -302,6 +324,148 @@ void ConfigParser::ParseMap(){
 						   << cid << "\" are detected in module with number=\""
 						   << bid << "\"";
 						throw std::runtime_error(ss.str());
+					}
+				
+					pugi::xml_node calibration = channel.child("Calibration");
+					if( !calibration ){
+						std::stringstream ss;
+						ss << "ConfigParser::ParseMap() : config file named \""
+						   << *(this->XMLName) 
+						   << "\" is malformed. Because no Calibration tag exists for channel with number=\""
+						   << cid << "\" in module with number=\""
+						   << bid << "\"";
+						throw std::runtime_error(ss.str());
+					}else{
+						std::string cal_type = calibration.attribute("model").as_string("");
+						if( cal_type.compare("") == 0 ){
+							std::stringstream ss;
+							ss << "ConfigParser::ParseMap() : config file named \""
+							   << *(this->XMLName) 
+							   << "\" is malformed. Because Calibration tag for channel with number=\""
+							   << cid << "\" in module with number=\""
+							   << bid << "\" is missing the \"model\" attribute";
+							throw std::runtime_error(ss.str());
+						}
+						
+						std::vector<double> params;
+						std::string calstring = calibration.text().get();
+						parse_cal_string(calstring,params);
+						if( params.size() == 0 ){
+							std::stringstream ss;
+							ss << "ConfigParser::ParseMap() : config file named \""
+							   << *(this->XMLName) 
+							   << "\" is malformed. Because Calibration tag for channel with number=\""
+							   << cid << "\" in module with number=\""
+							   << bid << "\" is missing the \"text\" containing the calibration parameters";
+							throw std::runtime_error(ss.str());
+						}
+
+						if (cal_type.compare("linear") == 0 ){
+							if( params.size() != 2 ){
+								std::stringstream ss;
+								ss << "ConfigParser::ParseMap() : config file named \""
+								   << *(this->XMLName) 
+								   << "\" is malformed. Because Calibration tag for channel with number=\""
+								   << cid << "\" in module with number=\""
+								   << bid << "\" is model=\"linear\" which expects 2 parameters but has "
+								   << params.size() << " listed.";
+								throw std::runtime_error(ss.str());
+							}
+							cmap->GetSingleChannel(bid,cid)->calibrator = new LinearCalibration(params);
+						}else if (cal_type.compare("quadratic") == 0 ){
+							if( params.size() != 3 ){
+								std::stringstream ss;
+								ss << "ConfigParser::ParseMap() : config file named \""
+								   << *(this->XMLName) 
+								   << "\" is malformed. Because Calibration tag for channel with number=\""
+								   << cid << "\" in module with number=\""
+								   << bid << "\" is model=\"quadratic\" which expects 3 parameters but has "
+								   << params.size() << " listed.";
+								throw std::runtime_error(ss.str());
+							}
+							cmap->GetSingleChannel(bid,cid)->calibrator = new QuadraticCalibration(params);
+						}else if (cal_type.compare("cubic") == 0 ){
+							if( params.size() != 4 ){
+								std::stringstream ss;
+								ss << "ConfigParser::ParseMap() : config file named \""
+								   << *(this->XMLName) 
+								   << "\" is malformed. Because Calibration tag for channel with number=\""
+								   << cid << "\" in module with number=\""
+								   << bid << "\" is model=\"cubic\" which expects 4 parameters but has "
+								   << params.size() << " listed.";
+								throw std::runtime_error(ss.str());
+							}
+							cmap->GetSingleChannel(bid,cid)->calibrator = new CubicCalibration(params);
+						}else if (cal_type.compare("poly") == 0 ){
+							if( params.size() <= 4 ){
+								std::stringstream ss;
+								ss << "ConfigParser::ParseMap() : config file named \""
+								   << *(this->XMLName) 
+								   << "\" is malformed. Because Calibration tag for channel with number=\""
+								   << cid << "\" in module with number=\""
+								   << bid << "\" is model=\"poly\" which expects more than 4 parameters but has "
+								   << params.size() << " listed.";
+								throw std::runtime_error(ss.str());
+							}
+							cmap->GetSingleChannel(bid,cid)->calibrator = new PolyCalibration(params);
+						}else if (cal_type.compare("linear_expo") == 0 ){
+							if( params.size() != 2 ){
+								std::stringstream ss;
+								ss << "ConfigParser::ParseMap() : config file named \""
+								   << *(this->XMLName) 
+								   << "\" is malformed. Because Calibration tag for channel with number=\""
+								   << cid << "\" in module with number=\""
+								   << bid << "\" is model=\"linear_expo\" which expects 2 parameters but has "
+								   << params.size() << " listed.";
+								throw std::runtime_error(ss.str());
+							}
+							cmap->GetSingleChannel(bid,cid)->calibrator = new LinearExpoCalibration(params);
+						}else if (cal_type.compare("quadratic_expo") == 0 ){
+							if( params.size() != 3 ){
+								std::stringstream ss;
+								ss << "ConfigParser::ParseMap() : config file named \""
+								   << *(this->XMLName) 
+								   << "\" is malformed. Because Calibration tag for channel with number=\""
+								   << cid << "\" in module with number=\""
+								   << bid << "\" is model=\"quadratic_expo\" which expects 3 parameters but has "
+								   << params.size() << " listed.";
+								throw std::runtime_error(ss.str());
+							}
+							cmap->GetSingleChannel(bid,cid)->calibrator = new QuadraticExpoCalibration(params);
+						}else if (cal_type.compare("cubic_expo") == 0 ){
+							if( params.size() != 4 ){
+								std::stringstream ss;
+								ss << "ConfigParser::ParseMap() : config file named \""
+								   << *(this->XMLName) 
+								   << "\" is malformed. Because Calibration tag for channel with number=\""
+								   << cid << "\" in module with number=\""
+								   << bid << "\" is model=\"cubic_expo\" which expects 4 parameters but has "
+								   << params.size() << " listed.";
+								throw std::runtime_error(ss.str());
+							}
+							cmap->GetSingleChannel(bid,cid)->calibrator = new CubicExpoCalibration(params);
+						}else if (cal_type.compare("poly_expo") == 0 ){
+							if( params.size() <= 4 ){
+								std::stringstream ss;
+								ss << "ConfigParser::ParseMap() : config file named \""
+								   << *(this->XMLName) 
+								   << "\" is malformed. Because Calibration tag for channel with number=\""
+								   << cid << "\" in module with number=\""
+								   << bid << "\" is model=\"poly_expo\" which expects more than 4 parameters but has "
+								   << params.size() << " listed.";
+								throw std::runtime_error(ss.str());
+							}
+							cmap->GetSingleChannel(bid,cid)->calibrator = new PolyExpoCalibration(params);
+						}else{
+							std::stringstream ss;
+							ss << "ConfigParser::ParseMap() : config file named \""
+							   << *(this->XMLName) 
+							   << "\" is malformed. Because Calibration tag for channel with number=\""
+							   << cid << "\" in module with number=\""
+							   << bid << "\" has calibration type of model=\""
+							   << cal_type << "\"";
+							throw std::runtime_error(ss.str());
+						}
 					}
 				}
 			}
