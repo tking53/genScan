@@ -10,6 +10,8 @@
 
 #include "ArgParser.hpp"
 #include "ConfigParser.hpp"
+#include "HistogramManager.hpp"
+#include "ChannelMap.hpp"
 #include "ProcessorList.hpp"
 
 int main(int argc, char *argv[]) {
@@ -68,6 +70,15 @@ int main(int argc, char *argv[]) {
 	}catch(std::runtime_error const& e){
 		console->error(e.what());
 	}
+	
+	try{
+		HistogramManager::Initialize();
+	}catch(std::runtime_error const& e){
+		console->error(e.what());
+	}
+
+	auto cmap = ChannelMap::Get();
+	cmap->InitializeRawHistograms();
 
 	auto processorlist = ProcessorList::Get();
 	try{
