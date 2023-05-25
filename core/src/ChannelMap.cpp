@@ -1,5 +1,5 @@
 #include "ChannelMap.hpp"
-
+#include "HistogramManager.hpp"
 
 ChannelMap* ChannelMap::instance = nullptr; 
 
@@ -82,6 +82,10 @@ double BoardNode::GetCalibratedEnergy(unsigned long& cid,double& erg){
 	return Channels.at(cid)->GetCalibratedEnergy(erg);
 }
 
+unsigned long long BoardNode::GetFlatID(unsigned long long& cid){
+	return Channels.at(cid)->fid;
+}
+
 bool ChannelMap::AddChannel(unsigned long long bid,unsigned long long cid,std::string t,std::string st,std::string g,std::vector<std::string> ts){
 	return Boards.at(bid)->AddChannel(cid,t,st,g,ts);
 }
@@ -98,10 +102,13 @@ std::vector<BoardNode*> ChannelMap::GetBoards(){
 	return Boards;
 }
 
-void ChannelMap::GenerateLookupTables(){
+unsigned long long ChannelMap::GenerateLookupTables(){
+	unsigned long long flat_id = 0;
 	for( auto& b : Boards ){
 		for( auto& c : b->GetChannels() ){
 			if( c != nullptr ){
+				c->fid = flat_id;
+				++flat_id;
 				TypeLookupChart[c->type].push_back(nullptr);
 				TypeLookupChart[c->type].back() = c;
 
@@ -119,6 +126,8 @@ void ChannelMap::GenerateLookupTables(){
 			}
 		}
 	}
+	max_flatid = flat_id;
+	return max_flatid;
 }
 
 double ChannelMap::GetCalibratedEnergy(unsigned long& bid,unsigned long& cid,double& erg){
@@ -139,4 +148,14 @@ std::map<std::string,std::vector<ChannelNode*>> ChannelMap::GetGroupLookupChart(
 
 std::map<std::string,std::vector<ChannelNode*>> ChannelMap::GetTagLookupChart(){
 	return TagLookupChart;
+}
+
+unsigned long long ChannelMap::GetFlatID(unsigned long long& bid,unsigned long long& cid){
+	return Boards.at(bid)->GetFlatID(cid);
+}
+
+void ChannelMap::InitializeRawHistograms(){
+	HistogramManager::DeclareHistogramTH2F(0,"Raw","Raw Energy; Energy (channel); Flat ChannelID; events/channel",max_flatid,0,max_flatid+1,16384,0.0,16384.0);
+	HistogramManager::DeclareHistogramTH2F(1,"Scalar","Scalar; time (s); Flat ChannelID; events/s",max_flatid,0,max_flatid+1,16384,0.0,16384.0);
+	HistogramManager::DeclareHistogramTH2F(2,"Cal","Calibrated Energy; Energy (keV); Flat ChannelID; events/keV",max_flatid,0,max_flatid+1,16384,0.0,16384.0);
 }

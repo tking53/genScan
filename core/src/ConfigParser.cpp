@@ -471,7 +471,7 @@ void ConfigParser::ParseMap(){
 			}
 		}
 		spdlog::get("genscan")->info("Generating Map Lookup Tables");
-		cmap->GenerateLookupTables();
+		auto max_flat = cmap->GenerateLookupTables();
 		spdlog::get("genscan")->info("Found the following Modules [module_id Firmware Frequency TraceDelay]");
 		spdlog::get("genscan")->info("Found the following Channels [module_id channel_id type subtype group tags..]");
 		for( auto& b : cmap->GetBoards() ){
@@ -482,6 +482,7 @@ void ConfigParser::ParseMap(){
 				}
 			}
 		}
+		spdlog::get("genscan")->info("Flattened channel map resulted in {} channels",max_flat);
 	}else{
 		//throw error
 		std::stringstream ss;
