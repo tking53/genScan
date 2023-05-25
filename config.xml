@@ -5,79 +5,1984 @@
 	</Description>
 	<Global EventWidth="5.0e-7" EventWidthUnit="s"/>
 	<DetectorDriver>
-		<Processor name="Generic"/>
-		<Analyzer name="Generic"/>
+		<Processor name="GenericProcessor"/>
+		<Analyzer name="GenericAnalyzer"/>
 	</DetectorDriver>
 	<Map>
 		<Module number="0" Frequency="100" Firmware="PHA" TraceDelay="264">
 			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
 			</Channel>
 			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
 			</Channel>
 			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
 			</Channel>
 			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
 			</Channel>
 			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
 			</Channel>
 			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
 			</Channel>
 			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
 			</Channel>
 			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
 			</Channel>
 			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
 			</Channel>
 			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
 			</Channel>
 			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
 			</Channel>
 			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
 			</Channel>
 			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
 			</Channel>
 			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
-			</Channel>
-			<Channel number="14" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
 			</Channel>
 			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
 			</Channel>
 		</Module>
 		<Module number="1" Frequency="100" Firmware="PHA" TraceDelay="264">
 			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
 			</Channel>
 			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
 			</Channel>
 			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
 			</Channel>
 			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
 			</Channel>
 			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
 			</Channel>
 			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
 			</Channel>
 			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
 			</Channel>
 			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
 			</Channel>
 			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
 			</Channel>
 			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
 			</Channel>
 			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
 			</Channel>
 			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
 			</Channel>
 			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
 			</Channel>
 			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
-			</Channel>
-			<Channel number="14" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
 			</Channel>
 			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
 			</Channel>
 		</Module>
-
+		<Module number="2" Frequency="100" Firmware="PHA" TraceDelay="264">
+			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+		</Module>
+		<Module number="3" Frequency="100" Firmware="PHA" TraceDelay="264">
+			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+		</Module>
+		<Module number="4" Frequency="100" Firmware="PHA" TraceDelay="264">
+			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+		</Module>
+		<Module number="5" Frequency="100" Firmware="PHA" TraceDelay="264">
+			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+		</Module>
+		<Module number="6" Frequency="100" Firmware="PHA" TraceDelay="264">
+			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+		</Module>
+		<Module number="7" Frequency="100" Firmware="PHA" TraceDelay="264">
+			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+		</Module>
+		<Module number="8" Frequency="100" Firmware="PHA" TraceDelay="264">
+			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+		</Module>
+		<Module number="9" Frequency="100" Firmware="PHA" TraceDelay="264">
+			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+		</Module>
+		<Module number="10" Frequency="100" Firmware="PHA" TraceDelay="264">
+			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+		</Module>
+		<Module number="11" Frequency="100" Firmware="PHA" TraceDelay="264">
+			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+		</Module>
+		<Module number="12" Frequency="100" Firmware="PHA" TraceDelay="264">
+			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+		</Module>
+		<Module number="13" Frequency="100" Firmware="PHA" TraceDelay="264">
+			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+		</Module>
+		<Module number="14" Frequency="100" Firmware="PHA" TraceDelay="264">
+			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+		</Module>
+		<Module number="15" Frequency="100" Firmware="PHA" TraceDelay="264">
+			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+		</Module>
+		<Module number="16" Frequency="100" Firmware="PHA" TraceDelay="264">
+			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+		</Module>
+		<Module number="17" Frequency="100" Firmware="PHA" TraceDelay="264">
+			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+		</Module>
+		<Module number="18" Frequency="100" Firmware="PHA" TraceDelay="264">
+			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+		</Module>
+		<Module number="19" Frequency="100" Firmware="PHA" TraceDelay="264">
+			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+		</Module>
+		<Module number="20" Frequency="100" Firmware="PHA" TraceDelay="264">
+			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+		</Module>
+		<Module number="21" Frequency="100" Firmware="PHA" TraceDelay="264">
+			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+		</Module>
+		<Module number="22" Frequency="100" Firmware="PHA" TraceDelay="264">
+			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+		</Module>
+		<Module number="23" Frequency="100" Firmware="PHA" TraceDelay="264">
+			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+		</Module>
+		<Module number="24" Frequency="100" Firmware="PHA" TraceDelay="264">
+			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+		</Module>
+		<Module number="25" Frequency="100" Firmware="PHA" TraceDelay="264">
+			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+		</Module>
+		<Module number="26" Frequency="100" Firmware="PHA" TraceDelay="264">
+			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+		</Module>
+		<Module number="27" Frequency="100" Firmware="PHA" TraceDelay="264">
+			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+		</Module>
+		<Module number="28" Frequency="100" Firmware="PHA" TraceDelay="264">
+			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+		</Module>
+		<Module number="29" Frequency="100" Firmware="PHA" TraceDelay="264">
+			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+		</Module>
+		<Module number="30" Frequency="100" Firmware="PHA" TraceDelay="264">
+			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+		</Module>
+		<Module number="31" Frequency="100" Firmware="PHA" TraceDelay="264">
+			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+		</Module>
+		<Module number="32" Frequency="100" Firmware="PHA" TraceDelay="264">
+			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+		</Module>
+		<Module number="33" Frequency="100" Firmware="PHA" TraceDelay="264">
+			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+		</Module>
+		<Module number="34" Frequency="100" Firmware="PHA" TraceDelay="264">
+			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+		</Module>
+		<Module number="35" Frequency="100" Firmware="PHA" TraceDelay="264">
+			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+		</Module>
+		<Module number="36" Frequency="100" Firmware="PHA" TraceDelay="264">
+			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+		</Module>
+		<Module number="37" Frequency="100" Firmware="PHA" TraceDelay="264">
+			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+		</Module>
+		<Module number="38" Frequency="100" Firmware="PHA" TraceDelay="264">
+			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+		</Module>
+		<Module number="39" Frequency="100" Firmware="PHA" TraceDelay="264">
+			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+		</Module>
+		<Module number="40" Frequency="100" Firmware="PHA" TraceDelay="264">
+			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+		</Module>
+		<Module number="41" Frequency="100" Firmware="PHA" TraceDelay="264">
+			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="1" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="2" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="3" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="4" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="5" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="6" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="7" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="8" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="9" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="10" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="11" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="12" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="13" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+			<Channel number="15" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+				<Calibration model="linear">0.0 1.0</Calibration>
+			</Channel>
+		</Module>
 	</Map>
 	<Notice/>
 </Configuration>
