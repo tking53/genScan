@@ -13,10 +13,11 @@ class ArgParser{
 		static ArgParser* Get(char*);	
 		void ShowUsage();
 		void ParseArgs(int,char*[]);
-		std::string GetConfigFile() const;
-		std::string GetOutputFile() const;
-		std::vector<std::string> GetInputFiles() const;
-		bool GetEvtBuild() const;
+		std::string* GetConfigFile() const;
+		std::string* GetOutputFile() const;
+		std::vector<std::string>* GetInputFiles() const;
+		bool* GetEvtBuild() const;
+		int* GetLimit() const;
 	private:
 		ArgParser(char*);
 
@@ -26,6 +27,7 @@ class ArgParser{
 		std::shared_ptr<ArgValue<std::string>> OutputFile;
 		std::shared_ptr<ArgValue<bool>> EvtBuild;
 		std::shared_ptr<ArgValue<std::vector<std::string>>> FileNames;
+		std::shared_ptr<ArgValue<int>> Limit;
 		std::shared_ptr<ArgValue<bool>> Help;
 
 		static ArgParser* instance;

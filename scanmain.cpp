@@ -1,7 +1,8 @@
-#include <spdlog/common.h>
 #include <string>
+#include <memory>
 #include <iostream>
 
+#include <spdlog/common.h>
 #include <spdlog/spdlog.h>
 #include <spdlog/cfg/env.h>
 #include <spdlog/fmt/ostr.h>
@@ -33,18 +34,7 @@ int main(int argc, char *argv[]) {
 	//spdlog::register_logger(console);
 	spdlog::initialize_logger(console);
 
-	ArgParser* cmdArgs = new ArgParser();
-	cmdArgs->AddArgument("c","configfile",ArgType::required_argument,"config filename");
-	cmdArgs->AddArgument("o","outputfile",ArgType::required_argument,"output filename");
-	cmdArgs->AddArgument("i","inputfile",ArgType::required_argument,"input filename");
-	cmdArgs->AddArgument("e","evtbuild",ArgType::no_argument,"build events");
-	cmdArgs->AddArgument("h","help",ArgType::no_argument,"show this message");
-
-	if( argc <= 2 ){
-		cmdArgs->ShowUsage(argv[0]);
-		exit(EXIT_FAILURE);
-	}
-
+	auto cmdArgs = ArgParser::Get(argv[0]);
 	try{
 		cmdArgs->ParseArgs(argc,argv);
 	}catch( std::runtime_error const& e ){
@@ -52,15 +42,18 @@ int main(int argc, char *argv[]) {
 		exit(EXIT_FAILURE);
 	}
 
-	if( cmdArgs->GetArgumentIsEnabledLongName("help") ){
-		cmdArgs->ShowUsage(argv[0]);
-		exit(EXIT_SUCCESS);
-	}
+	auto configfile = cmdArgs->GetConfigFile();
+	auto outputfile = cmdArgs->GetOutputFile();
+	auto limit = *(cmdArgs->GetLimit());
+	auto FileNames = cmdArgs->GetInputFiles();
+	auto evtbuild = *(cmdArgs->GetEvtBuild());
 
-	std::string* configfile = cmdArgs->GetArgumentValueLongName("configfile");
-	std::string* outputfile = cmdArgs->GetArgumentValueLongName("outputfile");
-	std::string* inputfile = cmdArgs->GetArgumentValueLongName("inputfile");
-	bool evtbuild = cmdArgs->GetArgumentIsEnabledLongName("evtbuild");
+	const int lower_limit = 10000;
+
+	if( limit < lower_limit ){
+		console->warn("limit of {} is less than lower_limit of {}. Using lower_limit instead",limit,lower_limit);
+		limit = lower_limit;
+	}
 
 	console->info("Begin parsing Config File");
 	auto cfgparser = ConfigParser::Get();
@@ -87,6 +80,45 @@ int main(int argc, char *argv[]) {
 	}catch(std::runtime_error const& e){
 		console->error(e.what());
 	}
+
+	sleep(30);
+	//try{
+	// 	while(Parse(inputfile_list)){
+	// 		Correlate();
+	//
+	// 		try{
+	// 			processorlist->PreAnalyze();
+	// 			processorlist->PreProcess();
+	//
+	// 			processorlist->Analyze();
+	// 			processorlist->Process();
+	//
+	// 			processorlist->PostAnalyze();
+	// 			processorlist->PostProcess();
+	// 		}catch(std::runtime_error const& e){
+	// 			console->error(e.what());
+	// 		}
+	// 	}
+	//}catch(std::runtime_error const& e){
+	// 	console->error(e.what());
+	//}
+	//
+	//void ProcessorList::(Pre//Post)(Analyze/Process)(){
+	// 	for( auto& (a/p) : (Analyzers/Processors) )
+	// 		(a/p)->(Pre//Post)(Analyze/Process)();
+	//}
+
+	//parse portion of the data, 
+	// 	either set a limit of how much memory is being used, 
+	// 	read in certain number of entries, or 
+	// 	read until outside correlation window
+	//
+	//Correlate events
+	//
+	//Run correlated events through Analyzers
+	//Run correlated events through Processors 
+	//
+	//Write correlated events to disk
 
 	return 0;
 }

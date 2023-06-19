@@ -36,7 +36,7 @@ ArgParser::ArgParser(char* name){
 	EvtBuild = std::make_shared<ArgValue<bool>>("e","evtbuild","event build only",false);
 	FileNames = std::make_shared<ArgValue<std::vector<std::string>>>("f","filenames","[file1 file2 file3 ...] list of files used for input",std::vector<std::string>());
 	Help = std::make_shared<ArgValue<bool>>("h","help","show this message",false);
-
+	Limit = std::make_shared<ArgValue<int>>("l","limit","limit of coincidence queue",100000);
 
 }
 
@@ -47,6 +47,7 @@ void ArgParser::ShowUsage(){
 	spdlog::get("genscan")->info("{}/{} {}",EvtBuild->GetShortOptName(),EvtBuild->GetLongOptName(),EvtBuild->GetDescription());
 	spdlog::get("genscan")->info("{}/{} {}",FileNames->GetShortOptName(),FileNames->GetLongOptName(),FileNames->GetDescription());
 	spdlog::get("genscan")->info("{}/{} {}",Help->GetShortOptName(),Help->GetLongOptName(),Help->GetDescription());
+	spdlog::get("genscan")->info("{}/{} {}",Limit->GetShortOptName(),Limit->GetLongOptName(),Limit->GetDescription());
 }
 
 void ArgParser::ParseArgs(int argc,char* argv[]){
@@ -74,7 +75,7 @@ void ArgParser::ParseArgs(int argc,char* argv[]){
 		auto end = fullargv.size();
 		if( ii < options.size() - 1 )
 			end = options.at(ii+1).position(0);
-		auto optarg = fullargv.substr(start+opt.size(),(end-(start+opt.size())));
+		auto optarg = fullargv.substr(start+opt.size(),(end-(start+opt.size()+1)));
 		optarg = optarg.substr(1,optarg.size()-1);
 		if( Help->MatchesShortName(opt) or Help->MatchesLongName(opt) ){
 			if( optarg.size() > 0 ){
@@ -89,6 +90,14 @@ void ArgParser::ParseArgs(int argc,char* argv[]){
 				throw std::runtime_error(msg);
 			}else{
 				EvtBuild->UpdateValue(true);
+			}
+		}else if( Limit->MatchesShortName(opt) or Limit->MatchesLongName(opt) ){
+			if( optarg.size() > 0 ){
+				std::string msg = "Option : "+opt+" doesn't take an argument but, "+optarg+" was passed";
+				throw std::runtime_error(msg);
+			}else{
+				auto val = std::stoi(optarg);
+				Limit->UpdateValue(val);
 			}
 		}else if( OutputFile->MatchesShortName(opt) or OutputFile->MatchesLongName(opt) ){
 			if( optarg.size() == 0 ){
@@ -144,18 +153,22 @@ void ArgParser::ParseArgs(int argc,char* argv[]){
 	}
 }
 
-std::string ArgParser::GetConfigFile() const{
-	return *(ConfigFile->GetValue());
+std::string* ArgParser::GetConfigFile() const{
+	return ConfigFile->GetValue();
 }
 
-std::string ArgParser::GetOutputFile() const{
-	return *(OutputFile->GetValue());
+std::string* ArgParser::GetOutputFile() const{
+	return OutputFile->GetValue();
 }
 
-std::vector<std::string> ArgParser::GetInputFiles() const{
-	return *(FileNames->GetValue());
+std::vector<std::string>* ArgParser::GetInputFiles() const{
+	return FileNames->GetValue();
 }
 
-bool ArgParser::GetEvtBuild() const{
-	return *(EvtBuild->GetValue());
+bool* ArgParser::GetEvtBuild() const{
+	return EvtBuild->GetValue();
+}
+
+int* ArgParser::GetLimit() const{
+	return Limit->GetValue();
 }

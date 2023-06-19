@@ -48,7 +48,7 @@ void ConfigParser::Parse(){
 
 	if( !result ){
 		std::stringstream ss;
-		ss << "ConfigParser::Parse() : Unable to open xml file named\""
+		ss << "ConfigParser::Parse() : Unable to open xml file named \""
 		   << *(this->XMLName) 
 		   << "\". pugixml reports : "
 		   << result.description();
