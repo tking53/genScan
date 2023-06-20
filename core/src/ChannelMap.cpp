@@ -51,7 +51,7 @@ int ChannelMap::GetFid(int& bid,int& cid) const{
 }
 
 void ChannelMap::SetParams(int& bid,int& cid,std::string t,std::string st,std::string g,std::vector<std::string> tg,CalType c,std::vector<double>& p){
-	if( p.size() > MAX_CAL_PARAMS_PER_CHANNEL ){
+	if( static_cast<int>(p.size()) > MAX_CAL_PARAMS_PER_CHANNEL ){
 		throw std::runtime_error("Trying to assign more calibration parameters than allowed");
 	}else{
 		auto fid = GetFid(bid,cid);
@@ -64,7 +64,7 @@ void ChannelMap::SetParams(int& bid,int& cid,std::string t,std::string st,std::s
 		for( auto& tt : tags.at(fid) )
 			unique_id.at(fid) += ":" + tt;
 
-		for( int ii = 0; ii < p.size(); ++ii ){
+		for( int ii = 0; ii < static_cast<int>(p.size()); ++ii ){
 			Params.at(fid*3 + ii) = p.at(ii);
 		}
 	}
