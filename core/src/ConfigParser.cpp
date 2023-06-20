@@ -12,16 +12,6 @@
 #include "ConfigParser.hpp"
 #include "ChannelMap.hpp"
 
-#include "Calibration.hpp"
-#include "LinearCalibration.hpp"
-#include "QuadraticCalibration.hpp"
-#include "CubicCalibration.hpp"
-#include "PolyCalibration.hpp"
-#include "LinearExpoCalibration.hpp"
-#include "QuadraticExpoCalibration.hpp"
-#include "CubicExpoCalibration.hpp"
-#include "PolyExpoCalibration.hpp"
-
 ConfigParser* ConfigParser::instance = nullptr;
 
 ConfigParser* ConfigParser::Get(){
@@ -213,8 +203,8 @@ void ConfigParser::ParseMap(){
 			throw std::runtime_error(ss.str());
 		}
 		for(; board; board = board.next_sibling("Module") ){
-			unsigned long long bid = board.attribute("number").as_ullong(std::numeric_limits<unsigned long long>::max());
-			if( bid == std::numeric_limits<unsigned long long>::max() ){
+			int bid = board.attribute("number").as_ullong(std::numeric_limits<int>::max());
+			if( bid == std::numeric_limits<int>::max() ){
 				std::stringstream ss;
 				ss << "ConfigParser::ParseMap() : config file named \""
 				   << *(this->XMLName) 
@@ -248,14 +238,7 @@ void ConfigParser::ParseMap(){
 				   << bid << "\" is either missing TraceDelay attribute or is negative";
 				throw std::runtime_error(ss.str());
 			}
-			if( !cmap->AddBoardInfo(bid,firmware,frequency,TraceDelay) ){
-				std::stringstream ss;
-				ss << "ConfigParser::ParseMap() : config file named \""
-				   << *(this->XMLName) 
-				   << "\" is most malformed, because module with number \""
-				   << bid << "\" is included multiple times";
-				throw std::runtime_error(ss.str());
-			}
+			cmap->SetBoardInfo(bid,firmware,frequency,TraceDelay);
 
 			pugi::xml_node channel = board.child("Channel");
 			if( !channel ){
@@ -267,8 +250,8 @@ void ConfigParser::ParseMap(){
 				throw std::runtime_error(ss.str());
 			}
 			for(; channel; channel = channel.next_sibling("Channel") ){
-				unsigned long long cid = channel.attribute("number").as_ullong(std::numeric_limits<unsigned long long>::max());
-				if( cid == std::numeric_limits<unsigned long long>::max() ){
+				int cid = channel.attribute("number").as_ullong(std::numeric_limits<int>::max());
+				if( cid == std::numeric_limits<int>::max() ){
 					std::stringstream ss;
 					ss << "ConfigParser::ParseMap() : config file named \""
 					   << *(this->XMLName) 
@@ -316,15 +299,6 @@ void ConfigParser::ParseMap(){
 						std::smatch match = *i;
 						taglist.push_back(match.str());
 					}
-					if( !cmap->AddChannel(bid,cid,type,subtype,group,taglist) ){
-						std::stringstream ss;
-						ss << "ConfigParser::ParseMap() : config file named \""
-						   << *(this->XMLName) 
-						   << "\" is most likely malformed, because duplicate channels with number=\""
-						   << cid << "\" are detected in module with number=\""
-						   << bid << "\"";
-						throw std::runtime_error(ss.str());
-					}
 				
 					pugi::xml_node calibration = channel.child("Calibration");
 					if( !calibration ){
@@ -349,6 +323,7 @@ void ConfigParser::ParseMap(){
 						
 						std::vector<double> params;
 						std::string calstring = calibration.text().get();
+						ChannelMap::CalType ct = ChannelMap::CalType::Unknown;
 						parse_cal_string(calstring,params);
 						if( params.size() == 0 ){
 							std::stringstream ss;
@@ -371,7 +346,7 @@ void ConfigParser::ParseMap(){
 								   << params.size() << " listed.";
 								throw std::runtime_error(ss.str());
 							}
-							cmap->GetSingleChannel(bid,cid)->calibrator = new LinearCalibration(params);
+							ct = ChannelMap::CalType::Linear;
 						}else if (cal_type.compare("quadratic") == 0 ){
 							if( params.size() != 3 ){
 								std::stringstream ss;
@@ -383,7 +358,7 @@ void ConfigParser::ParseMap(){
 								   << params.size() << " listed.";
 								throw std::runtime_error(ss.str());
 							}
-							cmap->GetSingleChannel(bid,cid)->calibrator = new QuadraticCalibration(params);
+							ct = ChannelMap::CalType::Quadratic;
 						}else if (cal_type.compare("cubic") == 0 ){
 							if( params.size() != 4 ){
 								std::stringstream ss;
@@ -395,19 +370,7 @@ void ConfigParser::ParseMap(){
 								   << params.size() << " listed.";
 								throw std::runtime_error(ss.str());
 							}
-							cmap->GetSingleChannel(bid,cid)->calibrator = new CubicCalibration(params);
-						}else if (cal_type.compare("poly") == 0 ){
-							if( params.size() <= 4 ){
-								std::stringstream ss;
-								ss << "ConfigParser::ParseMap() : config file named \""
-								   << *(this->XMLName) 
-								   << "\" is malformed. Because Calibration tag for channel with number=\""
-								   << cid << "\" in module with number=\""
-								   << bid << "\" is model=\"poly\" which expects more than 4 parameters but has "
-								   << params.size() << " listed.";
-								throw std::runtime_error(ss.str());
-							}
-							cmap->GetSingleChannel(bid,cid)->calibrator = new PolyCalibration(params);
+							ct = ChannelMap::CalType::Cubic;
 						}else if (cal_type.compare("linear_expo") == 0 ){
 							if( params.size() != 2 ){
 								std::stringstream ss;
@@ -419,7 +382,7 @@ void ConfigParser::ParseMap(){
 								   << params.size() << " listed.";
 								throw std::runtime_error(ss.str());
 							}
-							cmap->GetSingleChannel(bid,cid)->calibrator = new LinearExpoCalibration(params);
+							ct = ChannelMap::CalType::LinearExpo;
 						}else if (cal_type.compare("quadratic_expo") == 0 ){
 							if( params.size() != 3 ){
 								std::stringstream ss;
@@ -431,7 +394,7 @@ void ConfigParser::ParseMap(){
 								   << params.size() << " listed.";
 								throw std::runtime_error(ss.str());
 							}
-							cmap->GetSingleChannel(bid,cid)->calibrator = new QuadraticExpoCalibration(params);
+							ct = ChannelMap::CalType::QuadraticExpo;
 						}else if (cal_type.compare("cubic_expo") == 0 ){
 							if( params.size() != 4 ){
 								std::stringstream ss;
@@ -443,19 +406,7 @@ void ConfigParser::ParseMap(){
 								   << params.size() << " listed.";
 								throw std::runtime_error(ss.str());
 							}
-							cmap->GetSingleChannel(bid,cid)->calibrator = new CubicExpoCalibration(params);
-						}else if (cal_type.compare("poly_expo") == 0 ){
-							if( params.size() <= 4 ){
-								std::stringstream ss;
-								ss << "ConfigParser::ParseMap() : config file named \""
-								   << *(this->XMLName) 
-								   << "\" is malformed. Because Calibration tag for channel with number=\""
-								   << cid << "\" in module with number=\""
-								   << bid << "\" is model=\"poly_expo\" which expects more than 4 parameters but has "
-								   << params.size() << " listed.";
-								throw std::runtime_error(ss.str());
-							}
-							cmap->GetSingleChannel(bid,cid)->calibrator = new PolyExpoCalibration(params);
+							ct = ChannelMap::CalType::CubicExpo;
 						}else{
 							std::stringstream ss;
 							ss << "ConfigParser::ParseMap() : config file named \""
@@ -466,23 +417,26 @@ void ConfigParser::ParseMap(){
 							   << cal_type << "\"";
 							throw std::runtime_error(ss.str());
 						}
+						cmap->SetParams(bid,cid,type,subtype,group,taglist,ct,params); 
 					}
 				}
 			}
 		}
-		spdlog::get("genscan")->info("Generating Map Lookup Tables");
-		auto max_flat = cmap->GenerateLookupTables();
-		spdlog::get("genscan")->info("Found the following Modules [module_id Firmware Frequency TraceDelay]");
-		spdlog::get("genscan")->info("Found the following Channels [module_id channel_id type subtype group tags..]");
-		for( auto& b : cmap->GetBoards() ){
-			spdlog::get("genscan")->info("Found Board with Info [{}]",*b);
-			for( auto& c : b->GetChannels() ){
-				if( c != nullptr ){
-					spdlog::get("genscan")->info("Found Channel with Info : [{}]",*c);
+		spdlog::get("genscan")->info("Here is the ChannelMap Info we were able to parse");
+		for( int ii = 0; ii < cmap->GetNumBoards(); ++ii ){
+			auto freq = cmap->GetBoardFrequency(ii);
+			auto firm = cmap->GetBoardFirmware(ii);
+			auto tdelay = cmap->GetBoardTraceDelay(ii);
+			if( freq > 0 ){
+				spdlog::get("genscan")->info("Found Board with Info : [Board Number : {},Frequency : {}, Firmware : {}, TraceDelay : {}]",ii,freq,firm,tdelay);
+				for( int jj = 0; jj < cmap->GetNumChannelsPerBoard(); ++jj ){
+					auto ct = cmap->GetCalType(ii,jj);
+					if( ct != ChannelMap::CalType::Unknown ){
+						spdlog::get("genscan")->info("Found Channel With Info : [Board Number : {}, Channel Number : {},CalType : {}]",ii,jj,ct);
+					}
 				}
 			}
 		}
-		spdlog::get("genscan")->info("Flattened channel map resulted in {} channels",max_flat);
 	}else{
 		//throw error
 		std::stringstream ss;

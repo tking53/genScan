@@ -1,161 +1,129 @@
-#include "ChannelMap.hpp"
-#include "HistogramManager.hpp"
+#include <exception>
+#include <cmath>
 
-ChannelMap* ChannelMap::instance = nullptr; 
+#include "ChannelMap.hpp"
+
+ChannelMap* ChannelMap::instance = nullptr;
 
 ChannelMap* ChannelMap::Get(){
 	if( instance == nullptr ){
-		instance = new ChannelMap();
+		throw std::runtime_error("ChannelMap::Get() ChannelMap is not initialized yet");
 	}
 	return instance;
 }
 
-ChannelMap::ChannelMap(){
+ChannelMap* ChannelMap::Get(int mc,int mbpc,int mcpb, int mcppc){
+	if( instance == nullptr ){
+		instance = new ChannelMap(mc,mbpc,mcpb,mcppc);
+	}
+	return instance;
 }
 
-bool ChannelMap::AddBoardInfo(unsigned long long bid,std::string firmware,int frequency,int tracedelay){
-	if( bid >= Boards.size() ){
-		//board does not exist but don't want to overwrite already read in boards
-		for( size_t ii = Boards.size(); ii < bid+1; ++ii ){
-			Boards.push_back(nullptr);
-		}
+ChannelMap::ChannelMap(int mc,int mbpc,int mcpb,int mcppc){
+	MAX_CRATES = mc;
+	MAX_BOARDS_PER_CRATE = mbpc;
+	MAX_BOARDS = MAX_BOARDS_PER_CRATE*MAX_CRATES;
+
+	MAX_CHANNELS_PER_BOARD = mcpb;
+	MAX_CHANNELS = MAX_CHANNELS_PER_BOARD*MAX_BOARDS;
+
+	if( mcppc < 4 ){
+		throw std::runtime_error("ChannelMap::ChannelMap() supplied with less than 4 calibration parameters per channel");
 	}
-	if( Boards.at(bid) == nullptr ){
-		Boards.at(bid) = new BoardNode(bid,firmware,frequency,tracedelay);
-		return true;
+	MAX_CAL_PARAMS_PER_CHANNEL = mcppc;
+	MAX_CAL_PARAMS = MAX_CAL_PARAMS_PER_CHANNEL*MAX_CHANNELS;
+
+	Calibration = std::vector<CalType>(MAX_CHANNELS,CalType::Unknown);
+	type = std::vector<std::string>(MAX_CHANNELS,"THIS IS A LONG STRING TO PREVENT OPTIMIZATION");
+	subtype = std::vector<std::string>(MAX_CHANNELS,"THIS IS A LONG STRING TO PREVENT OPTIMIZATION");
+	group = std::vector<std::string>(MAX_CHANNELS,"THIS IS A LONG STRING TO PREVENT OPTIMIZATION");
+	tags = std::vector<std::vector<std::string>>(MAX_CHANNELS,{"THIS IS A LONG STRING TO PREVENT OPTIMIZATION","THIS IS A LONG STRING TO PREVENT OPTIMIZATION"});
+	unique_id = std::vector<std::string>(MAX_CHANNELS,"THIS IS A LONG STRING TO PREVENT OPTIMIZATION");
+	Params = std::vector<double>(MAX_CAL_PARAMS,0.0);
+
+	Firmware = std::vector<std::string>(MAX_BOARDS,"THIS IS A LONG STRING TO PREVENT OPTIMIZATION");
+	Frequency = std::vector<int>(MAX_BOARDS,-1);
+	TraceDelay = std::vector<int>(MAX_BOARDS,-1);
+}
+
+int ChannelMap::GetFid(int& bid,int& cid) const{
+	return bid*MAX_CHANNELS_PER_BOARD + cid;
+}
+
+void ChannelMap::SetParams(int& bid,int& cid,std::string t,std::string st,std::string g,std::vector<std::string> tg,CalType c,std::vector<double>& p){
+	if( p.size() > MAX_CAL_PARAMS_PER_CHANNEL ){
+		throw std::runtime_error("Trying to assign more calibration parameters than allowed");
 	}else{
-		return false;
-	}
-}
+		auto fid = GetFid(bid,cid);
+		Calibration.at(fid) = c;
+		type.at(fid) = t;
+		subtype.at(fid) = st;
+		group.at(fid) = g;
+		tags.at(fid) = tg;
+		unique_id.at(fid) = type.at(fid) + ":" + subtype.at(fid) + ":" + group.at(fid);
+		for( auto& tt : tags.at(fid) )
+			unique_id.at(fid) += ":" + tt;
 
-ChannelNode::ChannelNode(unsigned long long board_id,unsigned long long channel_id, std::string det_type,std::string det_subtype,std::string det_group,std::vector<std::string> det_tags){
-	bid = board_id;
-	cid = channel_id;
-	type = det_type;
-	subtype = det_subtype;
-	group = det_group;
-	tags = det_tags;
-	unique_id = type + ":" + subtype + ":" + group;
-	for( auto& t : tags )
-		unique_id += ":" + t;
-}
-
-double ChannelNode::GetCalibratedEnergy(double& erg){
-	return calibrator->Calibrate(erg);
-}
-
-BoardNode::BoardNode(unsigned long long board_id,std::string firmware,int frequency,int tracedelay){
-	id = board_id;
-	Firmware = firmware;
-	Frequency = frequency;
-	TraceDelay = tracedelay;
-}
-
-bool BoardNode::AddChannel(unsigned long long cid,std::string t,std::string st,std::string g,std::vector<std::string> ts){
-	if( cid >= Channels.size() ){
-		//channel does not exist but don't want to overwrite already existing ones
-		for( size_t ii = Channels.size(); ii < cid+1; ++ii ){
-			Channels.push_back(nullptr);
+		for( int ii = 0; ii < p.size(); ++ii ){
+			Params.at(fid*3 + ii) = p.at(ii);
 		}
 	}
-	if( Channels.at(cid) != nullptr ){
-		return false;
-	}else{
-		Channels.at(cid) = new ChannelNode(id,cid,t,st,g,ts);
-		return true;
+}
+double ChannelMap::GetCalibratedEnergy(int& bid,int& cid,double& erg){
+	auto fid = GetFid(bid,cid);
+	auto c = Calibration.at(fid);
+	switch(c){
+		case Linear:
+			return Params.at(fid*MAX_CAL_PARAMS_PER_CHANNEL) + Params.at(fid*MAX_CAL_PARAMS_PER_CHANNEL + 1)*erg; 
+			break;
+		case Quadratic:
+			return Params.at(fid*MAX_CAL_PARAMS_PER_CHANNEL) + Params.at(fid*MAX_CAL_PARAMS_PER_CHANNEL + 1)*erg + Params.at(fid*MAX_CAL_PARAMS_PER_CHANNEL + 2)*erg*erg; 
+			break;
+		case Cubic:
+			return Params.at(fid*MAX_CAL_PARAMS_PER_CHANNEL) + Params.at(fid*MAX_CAL_PARAMS_PER_CHANNEL + 1)*erg + Params.at(fid*MAX_CAL_PARAMS_PER_CHANNEL + 2)*erg*erg + Params.at(fid*MAX_CAL_PARAMS_PER_CHANNEL + 3)*erg*erg*erg; 
+			break;
+		case LinearExpo:
+			return std::exp(Params.at(fid*MAX_CAL_PARAMS_PER_CHANNEL) + Params.at(fid*MAX_CAL_PARAMS_PER_CHANNEL + 1)*erg); 
+			break;
+		case QuadraticExpo:
+			return std::exp(Params.at(fid*MAX_CAL_PARAMS_PER_CHANNEL) + Params.at(fid*MAX_CAL_PARAMS_PER_CHANNEL + 1)*erg + Params.at(fid*MAX_CAL_PARAMS_PER_CHANNEL + 2)*erg*erg); 
+			break;
+		case CubicExpo:
+			return std::exp(Params.at(fid*MAX_CAL_PARAMS_PER_CHANNEL) + Params.at(fid*MAX_CAL_PARAMS_PER_CHANNEL + 1)*erg + Params.at(fid*MAX_CAL_PARAMS_PER_CHANNEL + 2)*erg*erg + Params.at(fid*MAX_CAL_PARAMS_PER_CHANNEL + 3)*erg*erg*erg); 
+			break;
+		case Unknown:
+		default:
+			throw std::runtime_error("Unused channel");
+			break;
 	}
 }
 
-size_t BoardNode::GetNumChannels() const{
-	return Channels.size();
+void ChannelMap::SetBoardInfo(int& bid,std::string firm,int freq,int tdelay){
+	Firmware.at(bid) = firm;
+	Frequency.at(bid) = freq;
+	TraceDelay.at(bid) = tdelay;
 }
 
-ChannelNode* BoardNode::GetSingleChannel(unsigned long long cid){
-	return Channels.at(cid);
+int ChannelMap::GetNumBoards() const{
+	return MAX_BOARDS;
 }
 
-std::vector<ChannelNode*> BoardNode::GetChannels(){
-	return Channels;
+int ChannelMap::GetNumChannelsPerBoard() const{
+	return MAX_CHANNELS_PER_BOARD;
 }
 
-double BoardNode::GetCalibratedEnergy(unsigned long& cid,double& erg){
-	return Channels.at(cid)->GetCalibratedEnergy(erg);
+ChannelMap::CalType ChannelMap::GetCalType(int& bid,int& cid) const{
+	return Calibration.at(GetFid(bid,cid));
+}
+		
+int ChannelMap::GetBoardFrequency(int& bid) const{
+	return Frequency.at(bid);
 }
 
-unsigned long long BoardNode::GetFlatID(unsigned long long& cid){
-	return Channels.at(cid)->fid;
+int ChannelMap::GetBoardTraceDelay(int& bid) const{
+	return TraceDelay.at(bid);
 }
 
-bool ChannelMap::AddChannel(unsigned long long bid,unsigned long long cid,std::string t,std::string st,std::string g,std::vector<std::string> ts){
-	return Boards.at(bid)->AddChannel(cid,t,st,g,ts);
-}
-
-ChannelNode* ChannelMap::GetSingleChannel(unsigned long long bid,unsigned long long cid){
-	return Boards.at(bid)->GetSingleChannel(cid);
-}
-
-size_t ChannelMap::GetNumBoards() const{
-	return Boards.size();
-}
-
-std::vector<BoardNode*> ChannelMap::GetBoards(){
-	return Boards;
-}
-
-unsigned long long ChannelMap::GenerateLookupTables(){
-	unsigned long long flat_id = 0;
-	for( auto& b : Boards ){
-		for( auto& c : b->GetChannels() ){
-			if( c != nullptr ){
-				c->fid = flat_id;
-				++flat_id;
-				TypeLookupChart[c->type].push_back(nullptr);
-				TypeLookupChart[c->type].back() = c;
-
-				SubTypeLookupChart[c->subtype].push_back(nullptr);
-				SubTypeLookupChart[c->subtype].back() = c;
-
-				GroupLookupChart[c->group].push_back(nullptr);
-				GroupLookupChart[c->group].back() = c;
-
-				for( auto& t : c->tags ){
-					TagLookupChart[t].push_back(nullptr);
-					TagLookupChart[t].back() = c;
-				}
-
-			}
-		}
-	}
-	max_flatid = flat_id;
-	return max_flatid;
-}
-
-double ChannelMap::GetCalibratedEnergy(unsigned long& bid,unsigned long& cid,double& erg){
-	return Boards.at(bid)->GetCalibratedEnergy(cid,erg);
-}
-
-std::map<std::string,std::vector<ChannelNode*>> ChannelMap::GetTypeLookupChart(){
-	return TypeLookupChart;
-}
-
-std::map<std::string,std::vector<ChannelNode*>> ChannelMap::GetSubTypeLookupChart(){
-	return SubTypeLookupChart;
-}
-
-std::map<std::string,std::vector<ChannelNode*>> ChannelMap::GetGroupLookupChart(){
-	return GroupLookupChart;
-}
-
-std::map<std::string,std::vector<ChannelNode*>> ChannelMap::GetTagLookupChart(){
-	return TagLookupChart;
-}
-
-unsigned long long ChannelMap::GetFlatID(unsigned long long& bid,unsigned long long& cid){
-	return Boards.at(bid)->GetFlatID(cid);
-}
-
-void ChannelMap::InitializeRawHistograms(){
-	HistogramManager::DeclareHistogramTH2F(0,"Raw","Raw Energy; Energy (channel); Flat ChannelID; events/channel",max_flatid,0,max_flatid+1,16384,0.0,16384.0);
-	HistogramManager::DeclareHistogramTH2F(1,"Scalar","Scalar; time (s); Flat ChannelID; events/s",max_flatid,0,max_flatid+1,16384,0.0,16384.0);
-	HistogramManager::DeclareHistogramTH2F(2,"Cal","Calibrated Energy; Energy (keV); Flat ChannelID; events/keV",max_flatid,0,max_flatid+1,16384,0.0,16384.0);
+std::string ChannelMap::GetBoardFirmware(int& bid) const{
+	return Firmware.at(bid);
 }
