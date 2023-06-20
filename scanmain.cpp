@@ -14,6 +14,7 @@
 #include "HistogramManager.hpp"
 #include "ChannelMap.hpp"
 #include "ProcessorList.hpp"
+#include "DataParser.hpp"
 
 int main(int argc, char *argv[]) {
 	const int MAX_CRATES = 5;
@@ -22,7 +23,6 @@ int main(int argc, char *argv[]) {
 	const int MAX_CHANNELS_PER_BOARD = 32;
 	const int MAX_CHANNELS = MAX_CHANNELS_PER_BOARD*MAX_BOARDS;
 	const int MAX_CAL_PARAMS_PER_CHANNEL = 4;
-	const int MAX_CAL_PARAMS = MAX_CAL_PARAMS_PER_CHANNEL*MAX_CHANNELS;
 
 	spdlog::set_level(spdlog::level::debug);
 	std::shared_ptr<spdlog::sinks::basic_file_sink_mt> LogFileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("genscan.log",true);
@@ -55,6 +55,7 @@ int main(int argc, char *argv[]) {
 	auto limit = *(cmdArgs->GetLimit());
 	auto FileNames = cmdArgs->GetInputFiles();
 	auto evtbuild = *(cmdArgs->GetEvtBuild());
+	auto dataformat = cmdArgs->GetDataFileType();
 
 	const int lower_limit = 10000;
 
@@ -63,11 +64,32 @@ int main(int argc, char *argv[]) {
 		limit = lower_limit;
 	}
 
+	auto parser = DataParser::Get();
+	try{ 
+		if( dataformat->compare("evt") == 0 ){
+			parser = DataParser::Get(DataParser::DataFileType::EVT);
+		}else if( dataformat->compare("ldf") == 0 ){
+			parser = DataParser::Get(DataParser::DataFileType::LDF);
+		}else if( dataformat->compare("pld") == 0 ){
+			parser = DataParser::Get(DataParser::DataFileType::PLD);
+		}else if( dataformat->compare("caen_root") == 0 ){
+			parser = DataParser::Get(DataParser::DataFileType::CAEN_ROOT);
+		}else if( dataformat->compare("caen_bin") == 0 ){
+			parser = DataParser::Get(DataParser::DataFileType::CAEN_BIN);
+		}else{
+			throw std::runtime_error("Unknown file format, supported types are evt,ldf,pld,caen_root,caen_bin");
+		}
+	}catch(std::runtime_error const& e){
+		console->error(e.what());
+		exit(EXIT_FAILURE);
+	}
+
 	console->info("Allocating memory for the ChannelMap");
 	try{
 		auto cmap = ChannelMap::Get(MAX_CRATES,MAX_CARDS_PER_CRATE,MAX_CHANNELS_PER_BOARD,MAX_CAL_PARAMS_PER_CHANNEL);
 	}catch(std::runtime_error const& e ){
 		console->error(e.what());
+		exit(EXIT_FAILURE);
 	}
 
 	console->info("Begin parsing Config File");
@@ -77,21 +99,24 @@ int main(int argc, char *argv[]) {
 		cfgparser->Parse();
 	}catch(std::runtime_error const& e){
 		console->error(e.what());
+		exit(EXIT_FAILURE);
 	}
-	
-	//try{
-	//	HistogramManager::Initialize();
-	//}catch(std::runtime_error const& e){
-	//	console->error(e.what());
-	//}
 
-	//auto processorlist = ProcessorList::Get();
-	//try{
-	//	processorlist->InitializeProcessors(cfgparser->GetProcessors());
-	//	processorlist->InitializeAnalyzers(cfgparser->GetAnalyzers());
-	//}catch(std::runtime_error const& e){
-	//	console->error(e.what());
-	//}
+	try{
+		HistogramManager::Initialize();
+	}catch(std::runtime_error const& e){
+		console->error(e.what());
+		exit(EXIT_FAILURE);
+	}
+
+	auto processorlist = ProcessorList::Get();
+	try{
+		processorlist->InitializeProcessors(cfgparser->GetProcessors());
+		processorlist->InitializeAnalyzers(cfgparser->GetAnalyzers());
+	}catch(std::runtime_error const& e){
+		console->error(e.what());
+		exit(EXIT_FAILURE);
+	}
 
 	sleep(30);
 	//try{
