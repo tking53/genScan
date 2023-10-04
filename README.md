@@ -1,11 +1,9 @@
 # genScan
 
 ## Required Dependencies
--spdlog
-
--pugixml
-
--ROOT
+- spdlog
+- pugixml
+- ROOT
 
 ## ROOT 
 CERN's root is required, typically it is best to build this from source yourself
