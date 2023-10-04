@@ -25,7 +25,7 @@ Where <tag_name> is the particular version you want (i.e. v6-28-06)
 easily build and installed from https://github.com/gabime/spdlog
 This does force one to use a C++17 compliant compiler due to conflicts with ROOT in string_view
 
-##pugixml
+## pugixml
 pugixml needs to be installed externally (usually via package)
 
 MacOS 
