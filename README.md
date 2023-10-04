@@ -38,14 +38,16 @@ Ubuntu/Debian
 Providing GenScanor with no arguments will have it print the help message
 
 ### Currently supported options
-```./GenScanor \
-    -c/--configfile [filename] filename for channel map \
-    -o/--outputfile [filename] filename for output \ 
-    -e/--evtbuild event build only \
-    -f/--filenames [file1 file2 file3 ...] list of files used for input \
-    -h/--help show this message \
-    -l/--limit limit of coincidence queue \
-    -x/--fileformat [file_format] format of the data file (evt,ldf,pld,caen_root,caen_bin)```
+``` 
+./GenScanor \
+-c/--configfile [filename] filename for channel map \
+-o/--outputfile [filename] filename for output \ 
+-e/--evtbuild event build only \
+-f/--filenames [file1 file2 file3 ...] list of files used for input \
+-h/--help show this message \
+-l/--limit limit of coincidence queue \
+-x/--fileformat [file_format] format of the data file (evt,ldf,pld,caen_root,caen_bin) \
+```
 
 ### Currently supported file formats
 - PLD (UTK Pixie16)
