@@ -5,7 +5,7 @@
 - pugixml
 - ROOT
 
-## ROOT 
+### ROOT 
 CERN's root is required, typically it is best to build this from source yourself
 The root dependencies can be found here https://root.cern/install/dependencies/
 While the release packages can be found here https://root.cern/install/all_releases/
@@ -21,11 +21,11 @@ Then checkout the particular tag you want
 Where <tag_name> is the particular version you want (i.e. v6-28-06)
 
 
-## spdlog
+### spdlog
 easily build and installed from https://github.com/gabime/spdlog
 This does force one to use a C++17 compliant compiler due to conflicts with ROOT in string_view
 
-## pugixml
+### pugixml
 pugixml needs to be installed externally (usually via package)
 
 MacOS 
@@ -34,4 +34,23 @@ MacOS
 Ubuntu/Debian
 ``` apt install libpugixml-dev```
 
+## Usage (GenScanor)
+Providing GenScanor with no arguments will have it print the help message
 
+### Currently supported options
+```./GenScanor \
+    -c/--configfile [filename] filename for channel map \
+    -o/--outputfile [filename] filename for output \ 
+    -e/--evtbuild event build only \
+    -f/--filenames [file1 file2 file3 ...] list of files used for input \
+    -h/--help show this message \
+    -l/--limit limit of coincidence queue \
+    -x/--fileformat [file_format] format of the data file (evt,ldf,pld,caen_root,caen_bin)```
+
+### Currently supported file formats
+- PLD (UTK Pixie16)
+- LDF (UTK Pixie16)
+- CAEN (ROOT)
+- CAEN (Single Binary File)
+- CAEN (Multiple Binary File)
+- EVT (NSCLDaq)
