@@ -1,11 +1,11 @@
 # genScan
 
-##Required Dependencies
+## Required Dependencies
 -spdlog
 -pugixml
 -ROOT
 
-##ROOT 
+## ROOT 
 CERN's root is required, typically it is best to build this from source yourself
 The root dependencies can be found here https://root.cern/install/dependencies/
 While the release packages can be found here https://root.cern/install/all_releases/
@@ -21,7 +21,7 @@ Then checkout the particular tag you want
 Where <tag_name> is the particular version you want (i.e. v6-28-06)
 
 
-##spdlog
+## spdlog
 easily build and installed from https://github.com/gabime/spdlog
 This does force one to use a C++17 compliant compiler due to conflicts with ROOT in string_view
 
