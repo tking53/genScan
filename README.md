@@ -49,6 +49,29 @@ Providing GenScanor with no arguments will have it print the help message
 -x/--fileformat [file_format] format of the data file (evt,ldf,pld,caen_root,caen_bin) \
 ```
 
+### Output Files
+In addition to the root file output, three more files are created.
+
+- genscan.log this is a log and contains information about when things occur during the program runtime a sample is shown below
+```
+INSERT EXAMPLE OF LOG
+```
+
+- genscan.dbg this contains the same information as genscan.log, but also contains debugging information for when things go awry, a sample is show below
+```
+INSERT EXAMPLE OF DEBUG
+```
+
+- genscan.err this contains any errors that occured during runtime and should be empty in almost all use cases, but an example is shown below
+```
+INSERT EXAMPLE OF ERROR
+```
+
+The output root file contains the correlated events stored as 
+```
+INSERT FORMAT HERE
+```
+
 ### Currently supported file formats
 - PLD (UTK Pixie16)
 - LDF (UTK Pixie16)
