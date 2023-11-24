@@ -11,13 +11,19 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 #include "StringManipFunctions.hpp"
+
 #include "GenScanorArgParser.hpp"
+
 #include "ConfigParser.hpp"
 #include "XMLConfigParser.hpp"
 #include "YAMLConfigParser.hpp"
-#include "HistogramManager.hpp"
+#include "JSONConfigParser.hpp"
 #include "ChannelMap.hpp"
+
+#include "HistogramManager.hpp"
+
 #include "ProcessorList.hpp"
+
 #include "DataParser.hpp"
 
 int main(int argc, char *argv[]) {
@@ -105,8 +111,10 @@ int main(int argc, char *argv[]) {
 	auto config_extension = StringManip::GetFileExtension(*configfile);
 	if( config_extension == "xml" ){
 		cfgparser.reset(new XMLConfigParser(logname));
-	}else if( config_extension == "yaml" ){
+	}else if( config_extension == "yaml" or config_extension == "yml" ){
 		cfgparser.reset(new YAMLConfigParser(logname));
+	}else if( config_extension == "json" ){
+		cfgparser.reset(new JSONConfigParser(logname));
 	}else{
 		console->error("unknown file extension of {}, supported extensions are xml, yaml, json",config_extension);
 		exit(EXIT_FAILURE);
