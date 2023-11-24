@@ -132,6 +132,7 @@ set(_LOG_OPTIONS
 	LOG_CONFIGURE TRUE
 	LOG_BUILD TRUE
 	LOG_INSTALL TRUE
+	LOG_PATCH TRUE
 	LOG_OUTPUT_ON_FAILURE TRUE
 	)
 
@@ -140,9 +141,11 @@ if( USE_SYSTEM_PUGIXML )
 	find_package(Pugixml REQUIRED)
 else()
 	set(PUGI_EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external/pugi)
+	set(PUGI_VERSION v1.13 CACHE STRING "Version of pugixml you want to get from git" )
+	mark_as_advanced(PUGI_VERSION)
 	ExternalProject_Add(PugixmlProject
 		GIT_REPOSITORY https://github.com/zeux/pugixml
-		GIT_TAG v1.13
+		GIT_TAG ${PUGI_VERSION}
 		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${PUGI_EXTERNAL_INSTALL_LOCATION} -DCMAKE_VERBOSE_MAKEFILE=OFF -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
 		BUILD_COMMAND make -s
 		INSTALL_COMMAND make -s install
@@ -157,9 +160,11 @@ if( USE_SYSTEM_YAMLCPP )
 	find_package(yaml-cpp REQUIRED)
 else()
 	set(YAML_EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external/yaml-cpp)
+	set(YAML_VERSION yaml-cpp-0.6.3 CACHE STRING "Version of yaml-cpp you want to get from git" )
+	mark_as_advanced(YAML_VERSION)
 	ExternalProject_Add(yaml-cppProject
 		GIT_REPOSITORY https://github.com/jbeder/yaml-cpp
-		GIT_TAG yaml-cpp-0.6.3
+		GIT_TAG ${YAML_VERSION}
 		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${YAML_EXTERNAL_INSTALL_LOCATION} -DCMAKE_VERBOSE_MAKEFILE=OFF -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DYAML_CPP_BUILD_CONTRIB=OFF -DYAML_CPP_BUILD_TESTS=OFF -DYAML_CPP_BUILD_TOOLS=OFF
 		BUILD_COMMAND make -s
 		INSTALL_COMMAND make -s install
@@ -169,15 +174,17 @@ else()
 	link_directories(${YAML_EXTERNAL_INSTALL_LOCATION}/lib)
 endif()
 	
-option(USE_SYSTEM_NLOHMANNJSON "Use the system installed yaml-cpp, if not then we will download one and use that one" OFF)
-if( USE_SYSTEM_NLOHMANNJSON )
-	find_package(nlohmann_json REQUIRED)
+option(USE_SYSTEM_JSONCPP "Use the system installed jsoncpp, if not then we will download one and use that one" OFF)
+if( USE_SYSTEM_JSONCPP )
+	find_package(jsoncpp REQUIRED)
 else()
-	set(JSON_EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external/nlhomann-json)
-	ExternalProject_Add(nlohmann_jsonProject
-		GIT_REPOSITORY https://github.com/nlohmann/json
-		GIT_TAG v3.11.2
-		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${JSON_EXTERNAL_INSTALL_LOCATION} -DCMAKE_VERBOSE_MAKEFILE=OFF -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DJSON_BuildTests=OFF -DBUILD_TESTING=OFF
+	set(JSON_EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external/jsoncpp)
+	set(JSON_VERSION 1.9.5 CACHE STRING "Version of jsoncpp you want to get from git" )
+	mark_as_advanced(JSON_VERSION)
+	ExternalProject_Add(jsoncppProject
+		GIT_REPOSITORY https://github.com/open-source-parsers/jsoncpp
+		GIT_TAG ${JSON_VERSION}
+		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${JSON_EXTERNAL_INSTALL_LOCATION} -DCMAKE_VERBOSE_MAKEFILE=OFF -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DJSONCPP_WITH_TESTS=OFF
 		BUILD_COMMAND make -s
 		INSTALL_COMMAND make -s install
 		${_LOG_OPTIONS}
@@ -192,10 +199,12 @@ if( USE_SYSTEM_FMT )
 	set(_FMT_NAME fmt)
 else()
 	set(FMT_EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external/fmt)
+	set(FMT_VERSION 8.1.1 CACHE STRING "Version of fmt you want to get from git" )
+	mark_as_advanced(FMT_VERSION)
 	set(_FMT_NAME fmtProject)
 	ExternalProject_Add(fmtProject
 		GIT_REPOSITORY https://github.com/fmtlib/fmt
-		GIT_TAG 8.1.1 
+		GIT_TAG ${FMT_VERSION}
 		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${FMT_EXTERNAL_INSTALL_LOCATION} -DCMAKE_VERBOSE_MAKEFILE=OFF -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
 		BUILD_COMMAND make -s
 		INSTALL_COMMAND make -s install
@@ -210,9 +219,11 @@ if( USE_SYSTEM_SPDLOG )
 	find_package(spdlog REQUIRED)
 else()
 	set(SPDLOG_EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external/spdlog)
+	set(SPDLOG_VERSION v1.9.2 CACHE STRING "Version of spdlog you want to get from git" )
+	mark_as_advanced(SPDLOG_VERSION)
 	ExternalProject_Add(spdlogProject
 		GIT_REPOSITORY https://github.com/gabime/spdlog
-		GIT_TAG v1.9.2 
+		GIT_TAG ${SPDLOG_VERSION}
 		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${SPDLOG_EXTERNAL_INSTALL_LOCATION} -DCMAKE_VERBOSE_MAKEFILE=OFF -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
 		BUILD_COMMAND make -s
 		INSTALL_COMMAND make -s install

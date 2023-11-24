@@ -1,8 +1,11 @@
 # genScan
 
 ## Required Dependencies
+- fmt
 - spdlog
 - pugixml
+- jsoncpp
+- yaml-cpp
 - ROOT
 
 ### ROOT 
@@ -22,8 +25,40 @@ Where <tag_name> is the particular version you want (i.e. v6-28-06)
 
 
 ### spdlog
-easily build and installed from https://github.com/gabime/spdlog
-This does force one to use a C++17 compliant compiler due to conflicts with ROOT in string_view
+spdlog needs to be installed externally (usually via package)
+
+MacOS 
+```brew install spdlog```
+
+Ubuntu/Debian
+``` apt install libspdlog-dev```
+
+If one does not wish to install it externally, we will download a compatible version from https://github.com/gabime/spdlog 
+Below is the current compatibility list, if you need a specific one tested let us know.
+
+|version | Compatibility |
+|:-------|:-------------:|
+|v1.9.2   | Yes | 
+
+
+
+### fmt
+fmt needs to be installed externally (usually via package)
+
+MacOS 
+```brew install fmt```
+
+Ubuntu/Debian
+``` apt install libfmt-dev```
+
+If one does not wish to install it externally, we will download a compatible version from https://github.com/fmtlib/fmt
+Below is the current compatibility list, if you need a specific one tested let us know.
+
+|version | Compatibility |
+|:-------|:-------------:|
+|v8.1.1   | Yes | 
+
+
 
 ### pugixml
 pugixml needs to be installed externally (usually via package)
@@ -33,6 +68,48 @@ MacOS
 
 Ubuntu/Debian
 ``` apt install libpugixml-dev```
+
+If one does not wish to install it externally, we will download a compatible version from https://github.com/zeux/pugixml
+Below is the current compatibility list, if you need a specific one tested let us know.
+
+|version | Compatibility |
+|:-------|:-------------:|
+|v1.13   | Yes | 
+
+### jsoncpp
+jsoncpp needs to be installed externally (usually via package)
+
+MacOS 
+```brew install jsoncpp```
+
+Ubuntu/Debian
+``` apt install libjsoncpp-dev```
+
+If one does not wish to install it externally, we will download a compatible version from https://github.com/open-source-parsers/jsoncpp 
+Below is the current compatibility list, if you need a specific one tested let us know.
+
+|version | Compatibility |
+|:-------|:-------------:|
+|1.9.5   | Yes | 
+
+### jsoncpp
+### 
+yaml-cpp needs to be installed externally (usually via package)
+
+MacOS 
+```brew install yaml-cpp```
+
+Ubuntu/Debian
+``` apt install libyaml-cpp-dev```
+
+If one does not wish to install it externally, we will download a compatible version from https://github.com/jbeder/yaml-cpp 
+Below is the current compatibility list, if you need a specific one tested let us know.
+
+|version | Compatibility |
+|:-------|:-------------:|
+|yaml-cpp-0.6.3   | Yes | 
+
+### jsoncpp
 
 ## Usage (GenScanor)
 Providing GenScanor with no arguments will have it print the help message
