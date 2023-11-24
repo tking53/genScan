@@ -9,7 +9,7 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-#include "ArgParser.hpp"
+#include "GenScanorArgParser.hpp"
 #include "ConfigParser.hpp"
 #include "HistogramManager.hpp"
 #include "ChannelMap.hpp"
@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
 	//spdlog::register_logger(console);
 	spdlog::initialize_logger(console);
 
-	auto cmdArgs = ArgParser::Get(argv[0]);
+	auto cmdArgs = GenScanorArgParser::Get(argv[0]);
 	try{
 		cmdArgs->ParseArgs(argc,argv);
 	}catch( std::runtime_error const& e ){
