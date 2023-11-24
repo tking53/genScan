@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <string>
 #include <memory>
 #include <iostream>
@@ -9,8 +10,11 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
+#include "StringManipFunctions.hpp"
 #include "GenScanorArgParser.hpp"
 #include "ConfigParser.hpp"
+#include "XMLConfigParser.hpp"
+#include "YAMLConfigParser.hpp"
 #include "HistogramManager.hpp"
 #include "ChannelMap.hpp"
 #include "ProcessorList.hpp"
@@ -24,22 +28,26 @@ int main(int argc, char *argv[]) {
 	const int MAX_CHANNELS = MAX_CHANNELS_PER_BOARD*MAX_BOARDS;
 	const int MAX_CAL_PARAMS_PER_CHANNEL = 4;
 
+	std::string logname = "genscan";
+	std::string logfilename = logname+".log";
+	std::string errfilename = logname+".err";
+	std::string dbgfilename = logname+".dbg";
+
 	spdlog::set_level(spdlog::level::debug);
-	std::shared_ptr<spdlog::sinks::basic_file_sink_mt> LogFileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("genscan.log",true);
+	std::shared_ptr<spdlog::sinks::basic_file_sink_mt> LogFileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(logfilename,true);
 	LogFileSink->set_level(spdlog::level::info);
 
-	std::shared_ptr<spdlog::sinks::basic_file_sink_mt> ErrorFileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("genscan.err",true);
+	std::shared_ptr<spdlog::sinks::basic_file_sink_mt> ErrorFileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(errfilename,true);
 	ErrorFileSink->set_level(spdlog::level::err);
 
-	std::shared_ptr<spdlog::sinks::basic_file_sink_mt> DebugFileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("genscan.dbg",true);
+	std::shared_ptr<spdlog::sinks::basic_file_sink_mt> DebugFileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(dbgfilename,true);
 	DebugFileSink->set_level(spdlog::level::debug);
 
 	std::shared_ptr<spdlog::sinks::stdout_color_sink_mt> LogFileConsole = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
 	LogFileConsole->set_level(spdlog::level::info);
 
 	std::vector<spdlog::sink_ptr> sinks {DebugFileSink,LogFileSink,ErrorFileSink,LogFileConsole};
-	auto console = std::make_shared<spdlog::logger>("genscan",sinks.begin(),sinks.end());
-	//spdlog::register_logger(console);
+	auto console = std::make_shared<spdlog::logger>(logname,sinks.begin(),sinks.end());
 	spdlog::initialize_logger(console);
 
 	auto cmdArgs = GenScanorArgParser::Get(argv[0]);
@@ -93,7 +101,16 @@ int main(int argc, char *argv[]) {
 	}
 
 	console->info("Begin parsing Config File");
-	auto cfgparser = ConfigParser::Get();
+	std::unique_ptr<ConfigParser> cfgparser;
+	auto config_extension = StringManip::GetFileExtension(*configfile);
+	if( config_extension == "xml" ){
+		cfgparser.reset(new XMLConfigParser(logname));
+	}else if( config_extension == "yaml" ){
+		cfgparser.reset(new YAMLConfigParser(logname));
+	}else{
+		console->error("unknown file extension of {}, supported extensions are xml, yaml, json",config_extension);
+		exit(EXIT_FAILURE);
+	}
 	cfgparser->SetConfigFile(configfile);
 	try{
 		cfgparser->Parse();
@@ -109,14 +126,14 @@ int main(int argc, char *argv[]) {
 		exit(EXIT_FAILURE);
 	}
 
-	auto processorlist = ProcessorList::Get();
-	try{
-		processorlist->InitializeProcessors(cfgparser->GetProcessors());
-		processorlist->InitializeAnalyzers(cfgparser->GetAnalyzers());
-	}catch(std::runtime_error const& e){
-		console->error(e.what());
-		exit(EXIT_FAILURE);
-	}
+	//auto processorlist = ProcessorList::Get();
+	//try{
+	//	processorlist->InitializeProcessors(cfgparser->GetProcessors());
+	//	processorlist->InitializeAnalyzers(cfgparser->GetAnalyzers());
+	//}catch(std::runtime_error const& e){
+	//	console->error(e.what());
+	//	exit(EXIT_FAILURE);
+	//}
 
 	sleep(30);
 	//try{

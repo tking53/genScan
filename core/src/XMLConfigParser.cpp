@@ -9,37 +9,23 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-#include "ConfigParser.hpp"
+#include "XMLConfigParser.hpp"
 #include "ChannelMap.hpp"
 
-ConfigParser* ConfigParser::instance = nullptr;
-
-ConfigParser* ConfigParser::Get(){
-	if( instance == nullptr ){
-		instance = new ConfigParser();
-	}
-	return instance;
+XMLConfigParser::XMLConfigParser(std::string& log) : ConfigParser(log){
 }
 
-ConfigParser::ConfigParser(){
-	this->XMLName = nullptr;
-}
-
-void ConfigParser::SetConfigFile(std::string* filename){
-	this->XMLName = filename;
-}
-
-void ConfigParser::Parse(){
-	if( this->XMLName == nullptr ){
-		throw std::runtime_error("ConfigParser::Parse() SetConfigFile() has not been called");
+void XMLConfigParser::Parse(){
+	if( this->ConfigName == nullptr ){
+		throw std::runtime_error("XMLConfigParser::Parse() SetConfigFile() has not been called");
 	}
 
-	pugi::xml_parse_result result = this->XMLDoc.load_file(this->XMLName->c_str());
+	pugi::xml_parse_result result = this->XMLDoc.load_file(this->ConfigName->c_str());
 
 	if( !result ){
 		std::stringstream ss;
-		ss << "ConfigParser::Parse() : Unable to open xml file named \""
-		   << *(this->XMLName) 
+		ss << "XMLConfigParser::Parse() : Unable to open xml file named \""
+		   << *(this->ConfigName) 
 		   << "\". pugixml reports : "
 		   << result.description();
 		throw std::runtime_error(ss.str());
@@ -47,51 +33,51 @@ void ConfigParser::Parse(){
 	this->Configuration = this->XMLDoc.child("Configuration");
 	if( !this->Configuration ){
 		std::stringstream ss;
-		ss << "ConfigParser::Parse() : config file named \""
-		   << *(this->XMLName) 
+		ss << "XMLConfigParser::Parse() : config file named \""
+		   << *(this->ConfigName) 
 		   << "\" is malformed and there is no Configuration node.";
 		throw std::runtime_error(ss.str());
 	}
 
-	spdlog::get("genscan")->info("Parsing Description tag");
+	spdlog::get(this->LogName)->info("Parsing Description tag");
 	ParseDescription();
-	spdlog::get("genscan")->info("Parsing Author tag");
+	spdlog::get(this->LogName)->info("Parsing Author tag");
 	ParseAuthor();
-	spdlog::get("genscan")->info("Parsing Global tag");
+	spdlog::get(this->LogName)->info("Parsing Global tag");
 	ParseGlobal();
-	spdlog::get("genscan")->info("Parsing DetectorDriver tag");
+	spdlog::get(this->LogName)->info("Parsing DetectorDriver tag");
 	ParseDetectorDriver();
-	spdlog::get("genscan")->info("Parsing Map tag");
+	spdlog::get(this->LogName)->info("Parsing Map tag");
 	ParseMap();
 }
 		
-void ConfigParser::ParseDescription(){
+void XMLConfigParser::ParseDescription(){
 	this->Description = this->Configuration.child("Description");
 	if( this->Description ){
-		this->DescriptionText = new std::string(this->Description.text().get());
+		this->DescriptionText.reset(new std::string(this->Description.text().get()));
 	}
 }
 
-void ConfigParser::ParseAuthor(){
+void XMLConfigParser::ParseAuthor(){
 	this->Author = this->Configuration.child("Author");
 	if( this->Author ){
 		if( this->Author.child("Name") )
-			AuthorNameText = new std::string(this->Author.child("Name").text().get());
+			this->AuthorNameText.reset(new std::string(this->Author.child("Name").text().get()));
 		if( this->Author.child("Email") )
-			AuthorEmailText = new std::string(this->Author.child("Email").text().get());
+			this->AuthorEmailText.reset(new std::string(this->Author.child("Email").text().get()));
 		if( this->Author.child("Date") )
-			AuthorDateText = new std::string(this->Author.child("Date").text().get());
+			this->AuthorDateText.reset(new std::string(this->Author.child("Date").text().get()));
 	}
 }
 
-void ConfigParser::ParseGlobal(){
+void XMLConfigParser::ParseGlobal(){
 	this->Global = this->Configuration.child("Global");
 	if( this->Global ){
 		GlobalEventWidthInS = this->Global.attribute("EventWidth").as_double(-1.0);
 		if( GlobalEventWidthInS < 0.0 ){
 			std::stringstream ss;
-			ss << "ConfigParser::ParseGlobal() : config file named \""
-		   	   << *(this->XMLName) 
+			ss << "XMLConfigParser::ParseGlobal() : config file named \""
+		   	   << *(this->ConfigName) 
 		   	   << "\" is malformed and Global node is missing EventWidth attribute. expect positive number";
 			throw std::runtime_error(ss.str());
 		}
@@ -107,21 +93,21 @@ void ConfigParser::ParseGlobal(){
 			GlobalEventWidthInS *= 1.0;
 		}else{
 				std::stringstream ss;
-				ss << "ConfigParser::ParseGlobal() : config file named \""
-		   		   << *(this->XMLName) 
+				ss << "XMLConfigParser::ParseGlobal() : config file named \""
+		   		   << *(this->ConfigName) 
 		   		   << "\" is malformed and Global node is missing EventWidthUnit attribute. (s,ns,us,ms) are valid";
 				throw std::runtime_error(ss.str());
 		}
 	}else{
 		std::stringstream ss;
-		ss << "ConfigParser::ParseGlobal() : config file named \""
-		   << *(this->XMLName) 
+		ss << "XMLConfigParser::ParseGlobal() : config file named \""
+		   << *(this->ConfigName) 
 		   << "\" is malformed and Global node is missing.";
 		throw std::runtime_error(ss.str());
 	}
 }
 
-void ConfigParser::ParseDetectorDriver(){
+void XMLConfigParser::ParseDetectorDriver(){
 	this->DetectorDriver = this->Configuration.child("DetectorDriver");
 	if( this->DetectorDriver ){
 		//loop through list of analyzers and processors
@@ -129,8 +115,8 @@ void ConfigParser::ParseDetectorDriver(){
 		pugi::xml_node analyzer = this->DetectorDriver.child("Analyzer");
 		if( (!processor) and (!analyzer) ){
 			std::stringstream ss;
-			ss << "ConfigParser::ParseDetectorDriver() : config file named \""
-			   << *(this->XMLName) 
+			ss << "XMLConfigParser::ParseDetectorDriver() : config file named \""
+			   << *(this->ConfigName) 
 			   << "\" is malformed. No Processors or Analyzers listed.";
 			throw std::runtime_error(ss.str());
 		}
@@ -139,8 +125,8 @@ void ConfigParser::ParseDetectorDriver(){
 			std::string name = processor.attribute("name").as_string("");
 			if( name.compare("") == 0 ){
 				std::stringstream ss;
-				ss << "ConfigParser::ParseDetectorDriver() : config file named \""
-				   << *(this->XMLName) 
+				ss << "XMLConfigParser::ParseDetectorDriver() : config file named \""
+				   << *(this->ConfigName) 
 				   << "\" is malformed and one of the Processor tags in missing the \"name\" attribute.";
 				throw std::runtime_error(ss.str());
 			}else{
@@ -151,8 +137,8 @@ void ConfigParser::ParseDetectorDriver(){
 			std::string name = analyzer.attribute("name").as_string("");
 			if( name.compare("") == 0 ){
 				std::stringstream ss;
-				ss << "ConfigParser::ParseDetectorDriver() : config file named \""
-				   << *(this->XMLName) 
+				ss << "XMLConfigParser::ParseDetectorDriver() : config file named \""
+				   << *(this->ConfigName) 
 				   << "\" is malformed and one of the Analyzer tags in missing the \"name\" attribute.";
 				throw std::runtime_error(ss.str());
 			}else{
@@ -162,22 +148,22 @@ void ConfigParser::ParseDetectorDriver(){
 	}else{
 		//just make raw coincidences but warn/critical????
 		std::stringstream ss;
-		ss << "ConfigParser::ParseDetectorDriver() : config file named \""
-		   << *(this->XMLName) 
+		ss << "XMLConfigParser::ParseDetectorDriver() : config file named \""
+		   << *(this->ConfigName) 
 		   << "\" is malformed because DetectorDriver tag is missing.";
 		throw std::runtime_error(ss.str());
 	}
 }
 
-std::map<std::string,pugi::xml_node>& ConfigParser::GetProcessors(){
+std::map<std::string,pugi::xml_node>& XMLConfigParser::GetProcessors(){
 	return ProcessorNames;
 }
 
-std::map<std::string,pugi::xml_node>& ConfigParser::GetAnalyzers(){
+std::map<std::string,pugi::xml_node>& XMLConfigParser::GetAnalyzers(){
 	return AnalyzerNames;
 }
 
-void ConfigParser::ParseMap(){
+void XMLConfigParser::ParseMap(){
 	this->Map = this->Configuration.child("Map");
 	if( this->Map ){
 		//create the channel map object that will be used for lookups. Make it global instanced
@@ -197,8 +183,8 @@ void ConfigParser::ParseMap(){
 		pugi::xml_node board = this->Map.child("Module");
 		if( !board ){
 			std::stringstream ss;
-			ss << "ConfigParser::ParseMap() : config file named \""
-			   << *(this->XMLName) 
+			ss << "XMLConfigParser::ParseMap() : config file named \""
+			   << *(this->ConfigName) 
 			   << "\" is most likely malformed, because there are no Module tags";
 			throw std::runtime_error(ss.str());
 		}
@@ -206,16 +192,16 @@ void ConfigParser::ParseMap(){
 			int bid = board.attribute("number").as_ullong(std::numeric_limits<int>::max());
 			if( bid == std::numeric_limits<int>::max() ){
 				std::stringstream ss;
-				ss << "ConfigParser::ParseMap() : config file named \""
-				   << *(this->XMLName) 
+				ss << "XMLConfigParser::ParseMap() : config file named \""
+				   << *(this->ConfigName) 
 				   << "\" is most likely malformed, because one of the Module tags is missing the \"number\" attribute.";
 				throw std::runtime_error(ss.str());
 			}
 			std::string firmware = board.attribute("Firmware").as_string("");
 			if( firmware.compare("") == 0 ){
 				std::stringstream ss;
-				ss << "ConfigParser::ParseMap() : config file named \""
-				   << *(this->XMLName) 
+				ss << "XMLConfigParser::ParseMap() : config file named \""
+				   << *(this->ConfigName) 
 				   << "\" is most likely malformed, because module with number \""
 				   << bid << "\" is missing firmware attribute.";
 				throw std::runtime_error(ss.str());
@@ -223,8 +209,8 @@ void ConfigParser::ParseMap(){
 			int frequency = board.attribute("Frequency").as_int(-1);
 			if( frequency < 0  ){
 				std::stringstream ss;
-				ss << "ConfigParser::ParseMap() : config file named \""
-				   << *(this->XMLName) 
+				ss << "XMLConfigParser::ParseMap() : config file named \""
+				   << *(this->ConfigName) 
 				   << "\" is most likely malformed, because module with number \""
 				   << bid << "\" is either missing Frequency attribute or is negative";
 				throw std::runtime_error(ss.str());
@@ -232,8 +218,8 @@ void ConfigParser::ParseMap(){
 			int TraceDelay = board.attribute("TraceDelay").as_int(-1);
 			if( TraceDelay < 0 ){
 				std::stringstream ss;
-				ss << "ConfigParser::ParseMap() : config file named \""
-				   << *(this->XMLName) 
+				ss << "XMLConfigParser::ParseMap() : config file named \""
+				   << *(this->ConfigName) 
 				   << "\" is most likely malformed, because module with number \""
 				   << bid << "\" is either missing TraceDelay attribute or is negative";
 				throw std::runtime_error(ss.str());
@@ -243,8 +229,8 @@ void ConfigParser::ParseMap(){
 			pugi::xml_node channel = board.child("Channel");
 			if( !channel ){
 				std::stringstream ss;
-				ss << "ConfigParser::ParseMap() : config file named \""
-				   << *(this->XMLName) 
+				ss << "XMLConfigParser::ParseMap() : config file named \""
+				   << *(this->ConfigName) 
 				   << "\" is most likely malformed, because There are no Channel tags in Board : "
 				   << bid;
 				throw std::runtime_error(ss.str());
@@ -253,8 +239,8 @@ void ConfigParser::ParseMap(){
 				int cid = channel.attribute("number").as_ullong(std::numeric_limits<int>::max());
 				if( cid == std::numeric_limits<int>::max() ){
 					std::stringstream ss;
-					ss << "ConfigParser::ParseMap() : config file named \""
-					   << *(this->XMLName) 
+					ss << "XMLConfigParser::ParseMap() : config file named \""
+					   << *(this->ConfigName) 
 					   << "\" is most likely malformed, because one of the Channel tags in Board : "
 					   << bid << " is missing the \"number\" attribute.";
 					throw std::runtime_error(ss.str());
@@ -262,8 +248,8 @@ void ConfigParser::ParseMap(){
 					std::string type = channel.attribute("type").as_string("");
 					if( type.compare("") == 0 ){
 						std::stringstream ss;
-						ss << "ConfigParser::ParseMap() : config file named \""
-						   << *(this->XMLName) 
+						ss << "XMLConfigParser::ParseMap() : config file named \""
+						   << *(this->ConfigName) 
 						   << "\" is most likely malformed, because no type is listed for channel with number=\""
 						   << cid << "\" in module with number=\""
 						   << bid << "\"";
@@ -272,8 +258,8 @@ void ConfigParser::ParseMap(){
 					std::string subtype = channel.attribute("subtype").as_string("");
 					if( subtype.compare("") == 0 ){
 						std::stringstream ss;
-						ss << "ConfigParser::ParseMap() : config file named \""
-						   << *(this->XMLName) 
+						ss << "XMLConfigParser::ParseMap() : config file named \""
+						   << *(this->ConfigName) 
 						   << "\" is most likely malformed, because no subtype is listed for channel with number=\""
 						   << cid << "\" in module with number=\""
 						   << bid << "\"";
@@ -282,8 +268,8 @@ void ConfigParser::ParseMap(){
 					std::string group = channel.attribute("group").as_string("");
 					if( group.compare("") == 0 ){
 						std::stringstream ss;
-						ss << "ConfigParser::ParseMap() : config file named \""
-						   << *(this->XMLName) 
+						ss << "XMLConfigParser::ParseMap() : config file named \""
+						   << *(this->ConfigName) 
 						   << "\" is most likely malformed, because no group is listed for channel with number=\""
 						   << cid << "\" in module with number=\""
 						   << bid << "\"";
@@ -303,8 +289,8 @@ void ConfigParser::ParseMap(){
 					pugi::xml_node calibration = channel.child("Calibration");
 					if( !calibration ){
 						std::stringstream ss;
-						ss << "ConfigParser::ParseMap() : config file named \""
-						   << *(this->XMLName) 
+						ss << "XMLConfigParser::ParseMap() : config file named \""
+						   << *(this->ConfigName) 
 						   << "\" is malformed. Because no Calibration tag exists for channel with number=\""
 						   << cid << "\" in module with number=\""
 						   << bid << "\"";
@@ -313,8 +299,8 @@ void ConfigParser::ParseMap(){
 						std::string cal_type = calibration.attribute("model").as_string("");
 						if( cal_type.compare("") == 0 ){
 							std::stringstream ss;
-							ss << "ConfigParser::ParseMap() : config file named \""
-							   << *(this->XMLName) 
+							ss << "XMLConfigParser::ParseMap() : config file named \""
+							   << *(this->ConfigName) 
 							   << "\" is malformed. Because Calibration tag for channel with number=\""
 							   << cid << "\" in module with number=\""
 							   << bid << "\" is missing the \"model\" attribute";
@@ -327,8 +313,8 @@ void ConfigParser::ParseMap(){
 						parse_cal_string(calstring,params);
 						if( params.size() == 0 ){
 							std::stringstream ss;
-							ss << "ConfigParser::ParseMap() : config file named \""
-							   << *(this->XMLName) 
+							ss << "XMLConfigParser::ParseMap() : config file named \""
+							   << *(this->ConfigName) 
 							   << "\" is malformed. Because Calibration tag for channel with number=\""
 							   << cid << "\" in module with number=\""
 							   << bid << "\" is missing the \"text\" containing the calibration parameters";
@@ -338,8 +324,8 @@ void ConfigParser::ParseMap(){
 						if (cal_type.compare("linear") == 0 ){
 							if( params.size() != 2 ){
 								std::stringstream ss;
-								ss << "ConfigParser::ParseMap() : config file named \""
-								   << *(this->XMLName) 
+								ss << "XMLConfigParser::ParseMap() : config file named \""
+								   << *(this->ConfigName) 
 								   << "\" is malformed. Because Calibration tag for channel with number=\""
 								   << cid << "\" in module with number=\""
 								   << bid << "\" is model=\"linear\" which expects 2 parameters but has "
@@ -350,8 +336,8 @@ void ConfigParser::ParseMap(){
 						}else if (cal_type.compare("quadratic") == 0 ){
 							if( params.size() != 3 ){
 								std::stringstream ss;
-								ss << "ConfigParser::ParseMap() : config file named \""
-								   << *(this->XMLName) 
+								ss << "XMLConfigParser::ParseMap() : config file named \""
+								   << *(this->ConfigName) 
 								   << "\" is malformed. Because Calibration tag for channel with number=\""
 								   << cid << "\" in module with number=\""
 								   << bid << "\" is model=\"quadratic\" which expects 3 parameters but has "
@@ -362,8 +348,8 @@ void ConfigParser::ParseMap(){
 						}else if (cal_type.compare("cubic") == 0 ){
 							if( params.size() != 4 ){
 								std::stringstream ss;
-								ss << "ConfigParser::ParseMap() : config file named \""
-								   << *(this->XMLName) 
+								ss << "XMLConfigParser::ParseMap() : config file named \""
+								   << *(this->ConfigName) 
 								   << "\" is malformed. Because Calibration tag for channel with number=\""
 								   << cid << "\" in module with number=\""
 								   << bid << "\" is model=\"cubic\" which expects 4 parameters but has "
@@ -374,8 +360,8 @@ void ConfigParser::ParseMap(){
 						}else if (cal_type.compare("linear_expo") == 0 ){
 							if( params.size() != 2 ){
 								std::stringstream ss;
-								ss << "ConfigParser::ParseMap() : config file named \""
-								   << *(this->XMLName) 
+								ss << "XMLConfigParser::ParseMap() : config file named \""
+								   << *(this->ConfigName) 
 								   << "\" is malformed. Because Calibration tag for channel with number=\""
 								   << cid << "\" in module with number=\""
 								   << bid << "\" is model=\"linear_expo\" which expects 2 parameters but has "
@@ -386,8 +372,8 @@ void ConfigParser::ParseMap(){
 						}else if (cal_type.compare("quadratic_expo") == 0 ){
 							if( params.size() != 3 ){
 								std::stringstream ss;
-								ss << "ConfigParser::ParseMap() : config file named \""
-								   << *(this->XMLName) 
+								ss << "XMLConfigParser::ParseMap() : config file named \""
+								   << *(this->ConfigName) 
 								   << "\" is malformed. Because Calibration tag for channel with number=\""
 								   << cid << "\" in module with number=\""
 								   << bid << "\" is model=\"quadratic_expo\" which expects 3 parameters but has "
@@ -398,8 +384,8 @@ void ConfigParser::ParseMap(){
 						}else if (cal_type.compare("cubic_expo") == 0 ){
 							if( params.size() != 4 ){
 								std::stringstream ss;
-								ss << "ConfigParser::ParseMap() : config file named \""
-								   << *(this->XMLName) 
+								ss << "XMLConfigParser::ParseMap() : config file named \""
+								   << *(this->ConfigName) 
 								   << "\" is malformed. Because Calibration tag for channel with number=\""
 								   << cid << "\" in module with number=\""
 								   << bid << "\" is model=\"cubic_expo\" which expects 4 parameters but has "
@@ -409,8 +395,8 @@ void ConfigParser::ParseMap(){
 							ct = ChannelMap::CalType::CubicExpo;
 						}else{
 							std::stringstream ss;
-							ss << "ConfigParser::ParseMap() : config file named \""
-							   << *(this->XMLName) 
+							ss << "XMLConfigParser::ParseMap() : config file named \""
+							   << *(this->ConfigName) 
 							   << "\" is malformed. Because Calibration tag for channel with number=\""
 							   << cid << "\" in module with number=\""
 							   << bid << "\" has calibration type of model=\""
@@ -422,17 +408,17 @@ void ConfigParser::ParseMap(){
 				}
 			}
 		}
-		spdlog::get("genscan")->info("Here is the ChannelMap Info we were able to parse");
+		spdlog::get(this->LogName)->info("Here is the ChannelMap Info we were able to parse");
 		for( int ii = 0; ii < cmap->GetNumBoards(); ++ii ){
 			auto freq = cmap->GetBoardFrequency(ii);
 			auto firm = cmap->GetBoardFirmware(ii);
 			auto tdelay = cmap->GetBoardTraceDelay(ii);
 			if( freq > 0 ){
-				spdlog::get("genscan")->info("Found Board with Info : [Board Number : {},Frequency : {}, Firmware : {}, TraceDelay : {}]",ii,freq,firm,tdelay);
+				spdlog::get(this->LogName)->info("Found Board with Info : [Board Number : {},Frequency : {}, Firmware : {}, TraceDelay : {}]",ii,freq,firm,tdelay);
 				for( int jj = 0; jj < cmap->GetNumChannelsPerBoard(); ++jj ){
 					auto ct = cmap->GetCalType(ii,jj);
 					if( ct != ChannelMap::CalType::Unknown ){
-						spdlog::get("genscan")->info("Found Channel With Info : [Board Number : {}, Channel Number : {},CalType : {}]",ii,jj,ct);
+						spdlog::get(this->LogName)->info("Found Channel With Info : [Board Number : {}, Channel Number : {},CalType : {}]",ii,jj,ct);
 					}
 				}
 			}
@@ -440,8 +426,8 @@ void ConfigParser::ParseMap(){
 	}else{
 		//throw error
 		std::stringstream ss;
-		ss << "ConfigParser::ParseMap() : config file named \""
-		   << *(this->XMLName) 
+		ss << "XMLConfigParser::ParseMap() : config file named \""
+		   << *(this->ConfigName) 
 		   << "\" is malformed. Map node is missing.";
 		throw std::runtime_error(ss.str());
 	}
