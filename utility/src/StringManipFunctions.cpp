@@ -1,3 +1,5 @@
+#include <sstream>
+
 #include "StringManipFunctions.hpp"
 
 namespace StringManip{
@@ -16,5 +18,17 @@ namespace StringManip{
 
 	std::string GetFilePath(const std::string& File){
 		return File.substr(0,File.find_last_of("/\\")+1);
+	}
+	
+	void ParseCalString(const std::string& calstring,std::vector<double>& vals){
+		double curr;
+		std::stringstream ss;
+		ss << calstring;
+		do{
+			ss >> curr;
+			vals.push_back(curr);
+		}while(ss);
+		vals.pop_back();
+
 	}
 }
