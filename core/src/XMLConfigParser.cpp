@@ -11,6 +11,7 @@
 
 #include "XMLConfigParser.hpp"
 #include "ChannelMap.hpp"
+#include "StringManipFunctions.hpp"
 
 XMLConfigParser::XMLConfigParser(std::string& log) : ConfigParser(log){
 }
@@ -169,16 +170,6 @@ void XMLConfigParser::ParseMap(){
 		//create the channel map object that will be used for lookups. Make it global instanced
 		auto cmap = ChannelMap::Get();
 		//lambda function to parse out string text into individual entries
-		auto parse_cal_string = [](std::string calstring,std::vector<double>& vals){
-			double curr;
-			std::stringstream ss;
-			ss << calstring;
-			do{
-				ss >> curr;
-				vals.push_back(curr);
-			}while(ss);
-			vals.pop_back();
-		};
 
 		pugi::xml_node board = this->Map.child("Module");
 		if( !board ){
@@ -310,7 +301,7 @@ void XMLConfigParser::ParseMap(){
 						std::vector<double> params;
 						std::string calstring = calibration.text().get();
 						ChannelMap::CalType ct = ChannelMap::CalType::Unknown;
-						parse_cal_string(calstring,params);
+						StringManip::ParseCalString(calstring,params);
 						if( params.size() == 0 ){
 							std::stringstream ss;
 							ss << "XMLConfigParser::ParseMap() : config file named \""
