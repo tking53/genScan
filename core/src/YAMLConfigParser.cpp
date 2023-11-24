@@ -70,7 +70,6 @@ void YAMLConfigParser::ParseAuthor(){
 		if( this->Author["Date"] )
 			this->AuthorDateText.reset(new std::string(this->Author["Date"].as<std::string>()));
 	}
-
 }
 
 void YAMLConfigParser::ParseGlobal(){
@@ -142,7 +141,6 @@ void YAMLConfigParser::ParseDetectorDriver(){
 		   << "\" is malformed because DetectorDriver tag is missing.";
 		throw std::runtime_error(ss.str());
 	}
-
 }
 
 void YAMLConfigParser::ParseMap(){
