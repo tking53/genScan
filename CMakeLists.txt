@@ -249,3 +249,6 @@ endif()
 if( USE_SYSTEM_SPDLOG )
 	target_link_libraries(GenScanor PRIVATE spdlog::spdlog_header_only)
 endif()
+
+add_executable(GenConfig configmain.cpp)
+target_link_libraries(GenConfig PRIVATE UTILITY_LIB)
