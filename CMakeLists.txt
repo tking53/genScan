@@ -124,10 +124,20 @@ link_directories(${ROOT_LIBRARY_DIR})
 
 include(ExternalProject)
 
+set(_LOG_OPTIONS 
+	LOG_DOWNLOAD TRUE
+	LOG_UPDATE TRUE
+	LOG_TEST FALSE
+	GIT_PROGRESS TRUE
+	LOG_CONFIGURE TRUE
+	LOG_BUILD TRUE
+	LOG_INSTALL TRUE
+	LOG_OUTPUT_ON_FAILURE TRUE
+	)
+
 option(USE_SYSTEM_PUGIXML "Use the system installed pugixml, if not then we will download one and use that one" OFF)
 if( USE_SYSTEM_PUGIXML )
 	find_package(Pugixml REQUIRED)
-	message(FOUND PUGIXML AT ${Pugixml_DIR})
 else()
 	set(PUGI_EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external/pugi)
 	ExternalProject_Add(PugixmlProject
@@ -136,23 +146,60 @@ else()
 		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${PUGI_EXTERNAL_INSTALL_LOCATION} -DCMAKE_VERBOSE_MAKEFILE=OFF -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
 		BUILD_COMMAND make -s
 		INSTALL_COMMAND make -s install
+		${_LOG_OPTIONS}
 		)
 	include_directories(${PUGI_EXTERNAL_INSTALL_LOCATION}/include)
 	link_directories(${PUGI_EXTERNAL_INSTALL_LOCATION}/lib)
 endif()
 	
+option(USE_SYSTEM_YAMLCPP "Use the system installed yaml-cpp, if not then we will download one and use that one" OFF)
+if( USE_SYSTEM_YAMLCPP )
+	find_package(yaml-cpp REQUIRED)
+else()
+	set(YAML_EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external/yaml-cpp)
+	ExternalProject_Add(yaml-cppProject
+		GIT_REPOSITORY https://github.com/jbeder/yaml-cpp
+		GIT_TAG yaml-cpp-0.6.3
+		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${YAML_EXTERNAL_INSTALL_LOCATION} -DCMAKE_VERBOSE_MAKEFILE=OFF -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DYAML_CPP_BUILD_CONTRIB=OFF -DYAML_CPP_BUILD_TESTS=OFF -DYAML_CPP_BUILD_TOOLS=OFF
+		BUILD_COMMAND make -s
+		INSTALL_COMMAND make -s install
+		${_LOG_OPTIONS}
+		)
+	include_directories(${YAML_EXTERNAL_INSTALL_LOCATION}/include)
+	link_directories(${YAML_EXTERNAL_INSTALL_LOCATION}/lib)
+endif()
+	
+option(USE_SYSTEM_NLOHMANNJSON "Use the system installed yaml-cpp, if not then we will download one and use that one" OFF)
+if( USE_SYSTEM_NLOHMANNJSON )
+	find_package(nlohmann_json REQUIRED)
+else()
+	set(JSON_EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external/nlhomann-json)
+	ExternalProject_Add(nlohmann_jsonProject
+		GIT_REPOSITORY https://github.com/nlohmann/json
+		GIT_TAG v3.11.2
+		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${JSON_EXTERNAL_INSTALL_LOCATION} -DCMAKE_VERBOSE_MAKEFILE=OFF -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DJSON_BuildTests=OFF -DBUILD_TESTING=OFF
+		BUILD_COMMAND make -s
+		INSTALL_COMMAND make -s install
+		${_LOG_OPTIONS}
+		)
+	include_directories(${JSON_EXTERNAL_INSTALL_LOCATION}/include)
+	link_directories(${JSON_EXTERNAL_INSTALL_LOCATION}/lib)
+endif()
+	
 option(USE_SYSTEM_FMT "Use the system fmt library, if not then we will download and use that one" OFF)
 if( USE_SYSTEM_FMT )
 	find_package(fmt REQUIRED)
-	message(FOUND FMT AT ${fmt_DIR})
+	set(_FMT_NAME fmt)
 else()
 	set(FMT_EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external/fmt)
+	set(_FMT_NAME fmtProject)
 	ExternalProject_Add(fmtProject
 		GIT_REPOSITORY https://github.com/fmtlib/fmt
 		GIT_TAG 8.1.1 
 		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${FMT_EXTERNAL_INSTALL_LOCATION} -DCMAKE_VERBOSE_MAKEFILE=OFF -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
 		BUILD_COMMAND make -s
 		INSTALL_COMMAND make -s install
+		${_LOG_OPTIONS}
 		)
 	include_directories(${FMT_EXTERNAL_INSTALL_LOCATION}/include)
 	link_directories(${FMT_EXTERNAL_INSTALL_LOCATION}/lib)
@@ -161,7 +208,6 @@ endif()
 option(USE_SYSTEM_SPDLOG "Use either spdlog or messenger class" OFF)
 if( USE_SYSTEM_SPDLOG )
 	find_package(spdlog REQUIRED)
-	message(FOUND SPDLOG AT ${spdlog_DIR})
 else()
 	set(SPDLOG_EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external/spdlog)
 	ExternalProject_Add(spdlogProject
@@ -170,6 +216,8 @@ else()
 		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${SPDLOG_EXTERNAL_INSTALL_LOCATION} -DCMAKE_VERBOSE_MAKEFILE=OFF -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
 		BUILD_COMMAND make -s
 		INSTALL_COMMAND make -s install
+		${_LOG_OPTIONS}
+		DEPENDS ${_FMT_NAME}
 		)
 	include_directories(${SPDLOG_EXTERNAL_INSTALL_LOCATION}/include)
 	link_directories(${SPDLOG_EXTERNAL_INSTALL_LOCATION}/lib)
