@@ -11,36 +11,34 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 #include "ArgParser.hpp"
+#include "GenScanorArgParser.hpp"
 
-ArgParser* ArgParser::instance = nullptr;
+GenScanorArgParser* GenScanorArgParser::instance = nullptr;
 
-ArgParser* ArgParser::Get(char* name){
+GenScanorArgParser* GenScanorArgParser::Get(char* name){
 	if( instance == nullptr ){
-		instance = new ArgParser(name);
+		instance = new GenScanorArgParser(name);
 	}
 	return instance;
 }
 
-ArgParser* ArgParser::Get(){
+GenScanorArgParser* GenScanorArgParser::Get(){
 	if( instance == nullptr ){
-		throw std::runtime_error("ArgParser is not initialized");
+		throw std::runtime_error("GenScanorArgParser is not initialized");
 	}
 	return instance;
 }
 
-ArgParser::ArgParser(char* name){
-	ProgName = std::string(name);
-
+GenScanorArgParser::GenScanorArgParser(char* name) : ArgParser(name){
 	ConfigFile = std::make_shared<ArgValue<std::string>>("c","configfile","[filename] filename for channel map","default.txt");	
 	OutputFile = std::make_shared<ArgValue<std::string>>("o","outputfile","[filename] filename for output","default.txt");	
 	EvtBuild = std::make_shared<ArgValue<bool>>("e","evtbuild","event build only",false);
 	FileNames = std::make_shared<ArgValue<std::vector<std::string>>>("f","filenames","[file1 file2 file3 ...] list of files used for input",std::vector<std::string>());
-	Help = std::make_shared<ArgValue<bool>>("h","help","show this message",false);
 	Limit = std::make_shared<ArgValue<int>>("l","limit","limit of coincidence queue",100000);
 	DataFileType = std::make_shared<ArgValue<std::string>>("x","fileformat","[file_format] format of the data file (evt,ldf,pld,caen_root,caen_bin)","unknown");
 }
 
-void ArgParser::ShowUsage(){
+void GenScanorArgParser::ShowUsage(){
 	spdlog::get("genscan")->info("{}",ProgName);
 	spdlog::get("genscan")->info("{}/{} {}",ConfigFile->GetShortOptName(),ConfigFile->GetLongOptName(),ConfigFile->GetDescription());
 	spdlog::get("genscan")->info("{}/{} {}",OutputFile->GetShortOptName(),OutputFile->GetLongOptName(),OutputFile->GetDescription());
@@ -51,24 +49,13 @@ void ArgParser::ShowUsage(){
 	spdlog::get("genscan")->info("{}/{} {}",DataFileType->GetShortOptName(),DataFileType->GetLongOptName(),DataFileType->GetDescription());
 }
 
-void ArgParser::ParseArgs(int argc,char* argv[]){
+void GenScanorArgParser::ParseArgs(int argc,char* argv[]){
 	if( argc < 2){
 		ShowUsage();
 		exit(EXIT_SUCCESS);
 	}
 
-	std::string fullargv;
-	for( int ii = 1; ii < argc; ++ii ){
-		fullargv += std::string(argv[ii]) + " ";
-	}
-
-	std::regex option_regex("(-{1,2}\\w+)");
-	std::vector<std::smatch> options;
-	for( std::sregex_iterator it =  std::sregex_iterator(fullargv.begin(), fullargv.end(), option_regex); it !=  std::sregex_iterator(); it++) {
-		std::smatch match;
-		match = *it;
-		options.push_back(match);
-	}
+	auto options = ParseOptions(argc,argv);
 
 	for( size_t ii = 0; ii < options.size(); ++ii ){
 		auto opt = options.at(ii).str(0);
@@ -167,26 +154,26 @@ void ArgParser::ParseArgs(int argc,char* argv[]){
 	}
 }
 
-std::string* ArgParser::GetConfigFile() const{
+std::string* GenScanorArgParser::GetConfigFile() const{
 	return ConfigFile->GetValue();
 }
 
-std::string* ArgParser::GetOutputFile() const{
+std::string* GenScanorArgParser::GetOutputFile() const{
 	return OutputFile->GetValue();
 }
 
-std::vector<std::string>* ArgParser::GetInputFiles() const{
+std::vector<std::string>* GenScanorArgParser::GetInputFiles() const{
 	return FileNames->GetValue();
 }
 
-std::string* ArgParser::GetDataFileType() const{
+std::string* GenScanorArgParser::GetDataFileType() const{
 	return DataFileType->GetValue();
 }
 
-bool* ArgParser::GetEvtBuild() const{
+bool* GenScanorArgParser::GetEvtBuild() const{
 	return EvtBuild->GetValue();
 }
 
-int* ArgParser::GetLimit() const{
+int* GenScanorArgParser::GetLimit() const{
 	return Limit->GetValue();
 }

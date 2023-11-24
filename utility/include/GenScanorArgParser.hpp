@@ -1,16 +1,17 @@
-#ifndef __ARG_PARSER_HPP__
-#define __ARG_PARSER_HPP__
+#ifndef __GENSCANOR_ARG_PARSER_HPP__
+#define __GENSCANOR_ARG_PARSER_HPP__
 
 #include <memory>
 #include <string>
 #include <vector>
 
 #include "ArgValue.hpp"
+#include "ArgParser.hpp"
 
-class ArgParser{
+class GenScanorArgParser : private ArgParser{
 	public:
-		static ArgParser* Get();	
-		static ArgParser* Get(char*);	
+		static GenScanorArgParser* Get();	
+		static GenScanorArgParser* Get(char*);	
 		void ShowUsage();
 		void ParseArgs(int,char*[]);
 		std::string* GetConfigFile() const;
@@ -20,19 +21,16 @@ class ArgParser{
 		bool* GetEvtBuild() const;
 		int* GetLimit() const;
 	private:
-		ArgParser(char*);
-
-		std::string ProgName;
+		GenScanorArgParser(char*);
 
 		std::shared_ptr<ArgValue<std::string>> ConfigFile;
 		std::shared_ptr<ArgValue<std::string>> OutputFile;
 		std::shared_ptr<ArgValue<bool>> EvtBuild;
 		std::shared_ptr<ArgValue<std::vector<std::string>>> FileNames;
 		std::shared_ptr<ArgValue<int>> Limit;
-		std::shared_ptr<ArgValue<bool>> Help;
 		std::shared_ptr<ArgValue<std::string>> DataFileType;
 
-		static ArgParser* instance;
+		static GenScanorArgParser* instance;
 };
 
 #endif
