@@ -4,8 +4,12 @@ cmake_minimum_required(VERSION 3.1)
 
 project(GENSCAN C CXX )
 
-#Set the C++ standard to c++11.
-set(CMAKE_CXX_STANDARD 17)
+#Set the C++ standard to c++20.
+if(NOT CMAKE_CXX_STANDARD)
+	set(CMAKE_CXX_STANDARD 17)
+	set(CMAKE_CXX_STANDARD_REQUIRED ON)
+endif()
+
 
 #Use rpath on Mac OS
 set(CMAKE_MACOSX_RPATH TRUE)
@@ -32,19 +36,16 @@ if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 endif ()
 message(STATUS "Installing to ${CMAKE_INSTALL_PREFIX}")
 
-#Define the default build type to be Release
-# if (NOT CMAKE_BUILD_TYPE)
-#     set(CMAKE_BUILD_TYPE Release CACHE STRING
-#             "Build type, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
-#     message(STATUS "Build type not defined, using default: ${CMAKE_BUILD_TYPE}")
-# endif (NOT CMAKE_BUILD_TYPE)
-# message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
-
 #Add additional CXX flags if we use the Debug option
-# if (CMAKE_BUILD_TYPE MATCHES "Debug")
 set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg")
-message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
+if(NOT CMAKE_BUILD_TYPE)
+	set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build (Debug, Release, RelWithDebInfo, MinSizeRel)" FORCE)
+	message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
+endif()
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo" ) 
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg")
+endif()
 # endif (CMAKE_BUILD_TYPE MATCHES "Debug")
 
 #------------------------------------------------------------------------------
@@ -52,35 +53,7 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 #when setting all of the following options.
 include(CMakeDependentOption)
 
-#Install options
-# option(PAASS_BUILD_ACQ "Build and install Acquisition software" ON)
-# option(PAASS_BUILD_SCAN_UTILITIES "Build and install the Analysis Utilities" ON)
-# option(PAASS_BUILD_SETUP "Include the older setup programs in installation" OFF)
-# option(PAASS_BUILD_SHARED_LIBS "Install only scan libraries" ON)
-# option(PAASS_BUILD_TESTS "Builds programs designed to test the package. Including UnitTest++ test." OFF)
-# option(PAASS_BUILD_UTKSCAN "Build utkscan" OFF)
-# option(PAASS_USE_DAMM "Use DAMM for MCA" ON)
-# option(PAASS_USE_NCURSES "Use ncurses for terminal" ON)
-# option(PAASS_USE_ROOT "Use ROOT (Currently REQUIRED!!)" ON)
-
-# mark_as_advanced(PAASS_USE_NCURSES)
-# mark_as_advanced(PAASS_USE_DAMM)
-# mark_as_advanced(PAASS_USE_ROOT)
-
-
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE BOOL "Generates compile_commands.json, needed for some IDEs among other things" FORCE)
-#option(GENSCAN_EXPORT_COMPILE_COMMANDS "CMAKE_EXPORT_COMPILE_COMMANDS WRAPPER" ON)
-#mark_as_advanced(GENSCAN_EXPORT_COMPILE_COMMANDS)
-#
-##Generate the compile_commands.json file which is used by VSCode (among others) to generate the clang autocomplete
-##Needs the PAASS_EXPORT_COMPILE_COMMANDS wrapper because of the "FORCE" which is required to even set the var from CMakeList.txt,
-##while maintaining the ability to toggle it on/off without wiping the build dir
-#if(GENSCAN_EXPORT_COMPILE_COMMANDS)
-#    set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE BOOL "Generates compile_commands.json, needed for some IDEs among other things" FORCE)
-#else ()
-#    set(CMAKE_EXPORT_COMPILE_COMMANDS OFF CACHE BOOL "Generates compile_commands.json, needed for some IDEs among other things" FORCE)   
-#endif (GENSCAN_EXPORT_COMPILE_COMMANDS)
-
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
@@ -149,12 +122,58 @@ include_directories(${ROOT_INCLUDE_DIR})
 link_directories(${ROOT_LIBRARY_DIR})
 #------------------------------------------------------------------------------
 
-find_package(Pugixml REQUIRED)
-option(USE_SPDLOG "Use either spdlog or messenger class" ON)
+include(ExternalProject)
 
-find_package(fmt REQUIRED)
-find_package(spdlog REQUIRED)
-add_compile_definitions(USE_SPDLOG)
+option(USE_SYSTEM_PUGIXML "Use the system installed pugixml, if not then we will download one and use that one" OFF)
+if( USE_SYSTEM_PUGIXML )
+	find_package(Pugixml REQUIRED)
+	message(FOUND PUGIXML AT ${Pugixml_DIR})
+else()
+	set(PUGI_EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external/pugi)
+	ExternalProject_Add(PugixmlProject
+		GIT_REPOSITORY https://github.com/zeux/pugixml
+		GIT_TAG v1.13
+		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${PUGI_EXTERNAL_INSTALL_LOCATION} -DCMAKE_VERBOSE_MAKEFILE=OFF -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+		BUILD_COMMAND make -s
+		INSTALL_COMMAND make -s install
+		)
+	include_directories(${PUGI_EXTERNAL_INSTALL_LOCATION}/include)
+	link_directories(${PUGI_EXTERNAL_INSTALL_LOCATION}/lib)
+endif()
+	
+option(USE_SYSTEM_FMT "Use the system fmt library, if not then we will download and use that one" OFF)
+if( USE_SYSTEM_FMT )
+	find_package(fmt REQUIRED)
+	message(FOUND FMT AT ${fmt_DIR})
+else()
+	set(FMT_EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external/fmt)
+	ExternalProject_Add(fmtProject
+		GIT_REPOSITORY https://github.com/fmtlib/fmt
+		GIT_TAG 8.1.1 
+		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${FMT_EXTERNAL_INSTALL_LOCATION} -DCMAKE_VERBOSE_MAKEFILE=OFF -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+		BUILD_COMMAND make -s
+		INSTALL_COMMAND make -s install
+		)
+	include_directories(${FMT_EXTERNAL_INSTALL_LOCATION}/include)
+	link_directories(${FMT_EXTERNAL_INSTALL_LOCATION}/lib)
+endif()
+
+option(USE_SYSTEM_SPDLOG "Use either spdlog or messenger class" OFF)
+if( USE_SYSTEM_SPDLOG )
+	find_package(spdlog REQUIRED)
+	message(FOUND SPDLOG AT ${spdlog_DIR})
+else()
+	set(SPDLOG_EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external/spdlog)
+	ExternalProject_Add(spdlogProject
+		GIT_REPOSITORY https://github.com/gabime/spdlog
+		GIT_TAG v1.9.2 
+		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${SPDLOG_EXTERNAL_INSTALL_LOCATION} -DCMAKE_VERBOSE_MAKEFILE=OFF -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+		BUILD_COMMAND make -s
+		INSTALL_COMMAND make -s install
+		)
+	include_directories(${SPDLOG_EXTERNAL_INSTALL_LOCATION}/include)
+	link_directories(${SPDLOG_EXTERNAL_INSTALL_LOCATION}/lib)
+endif()
 
 add_subdirectory(utility)
 add_subdirectory(core)
@@ -164,4 +183,10 @@ add_subdirectory(parsers)
 add_executable(GenScanor scanmain.cpp)
 
 #include_directories(${PROJECT_SOURCE_DIR}/utility/include)
-target_link_libraries(GenScanor PRIVATE PARSER_LIB PROCESSOR_LIB CORE_LIB UTILITY_LIB spdlog::spdlog_header_only fmt::fmt)
+target_link_libraries(GenScanor PRIVATE PARSER_LIB PROCESSOR_LIB CORE_LIB UTILITY_LIB)
+if( USE_SYSTEM_FMT )
+	target_link_libraries(GenScanor PRIVATE fmt::fmt)
+endif()
+if( USE_SYSTEM_SPDLOG )
+	target_link_libraries(GenScanor PRIVATE spdlog::spdlog_header_only)
+endif()
