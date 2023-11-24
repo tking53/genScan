@@ -149,3 +149,26 @@ INSERT FORMAT HERE
 - CAEN (Single Binary File)
 - CAEN (Multiple Binary File)
 - EVT (NSCLDaq)
+
+### TODO LIST/NOTES
+- doxygen tags in everything
+- split out the configparser into the xml, yaml, and json versions (at least on the parsing side)
+- complete PLD format
+- Add in rest of the formats 
+- Write the correlator 
+- Write the base processors 
+    - processors composed of 4 functions (Init, preprocess, process, postprocess)
+    - None of the functions should be allowed to modify the incoming data to enfore the ability to parallelize the processing 
+    - In preprocess they will generate the data that only they need/know 
+    - In process the experiment processors will have access to the information of their member processes
+    - In postprocess any extra cleanup will take place
+- Move to the experiment paradigm of processors instead of just raw processors like in paass
+    - Design paradigm will be a set of DetectorProcessors that will typically only have a preprocess function where they generate their base information
+        - i.e. MTASProcessor will generate the segment information as well as the totals
+    - The ExperimentProcessors will be composed of one or more DetectorProcessors. It will handle the calling of preprocess for each of those DetectorProcessors.
+    - The ExperimentProcessors will then generate the correlated information inside it's process call.
+        - i.e. FDSiTASProcessor will be composed of MTASProcessor, PIDProcessor, MTASSIPMImplantProcessor
+        - It will call all of the above mentioned preprocess
+        - During it's process call, it will generate the MTAS-Beta gated spectra and energies related to the appropriate PID
+    - This design paradigm should be more extensible and cause less repetition among the code base unlike paass, and it will also allow each ExperimentProcessor to determine the appropriate parallel processing
+- Move the correlation/processing/writing to the Observer design pattern to allow for better asynchronous processing 
