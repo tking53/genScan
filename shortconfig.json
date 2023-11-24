@@ -6,17 +6,51 @@
       "EventWidthUnit": "s"
     },
     "DetectorDriver": {
-      "Processor": {
-        "name": "GenericProcessor"
-      },
-      "Analyzer": {
-        "name": "GenericAnalyzer"
-      }
+      "Processor": [
+        {
+          "name": "GenericProcessor",
+          "alpha": 1.0,
+          "beta": 2.0,
+          "gamma": 4.0
+        },
+        {
+          "name": "GenericProcessor2",
+          "delta": "epsilon"
+        }
+      ],
+      "Analyzer": [
+        {
+          "name": "GenericAnalyzer",
+          "eta": "1,2,3"
+        },
+        {
+          "name": "GenericAnalyzer2"
+        }
+      ]
     },
     "Map": {
       "Module": [
         {
           "number": 0,
+          "Frequency": 100,
+          "Firmware": "PHA",
+          "TraceDelay": 264,
+          "Channel": [
+            {
+              "number": 0,
+              "type": "generic",
+              "subtype": "none",
+              "group": "none",
+              "tags": "alpha,beta:gamma.delta*epsilon",
+              "Calibration": {
+                "model": "linear",
+                "value": "0.0 1.0"
+              }
+            }
+          ]
+        },
+        {
+          "number": 1,
           "Frequency": 100,
           "Firmware": "PHA",
           "TraceDelay": 264,
