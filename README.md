@@ -40,8 +40,6 @@ Below is the current compatibility list, if you need a specific one tested let u
 |:-------|:-------------:|
 |v1.9.2   | Yes | 
 
-
-
 ### fmt
 fmt needs to be installed externally (usually via package)
 
@@ -57,8 +55,6 @@ Below is the current compatibility list, if you need a specific one tested let u
 |version | Compatibility |
 |:-------|:-------------:|
 |v8.1.1   | Yes | 
-
-
 
 ### pugixml
 pugixml needs to be installed externally (usually via package)
@@ -92,8 +88,7 @@ Below is the current compatibility list, if you need a specific one tested let u
 |:-------|:-------------:|
 |1.9.5   | Yes | 
 
-### jsoncpp
-### 
+### yaml-cpp
 yaml-cpp needs to be installed externally (usually via package)
 
 MacOS 
@@ -108,8 +103,6 @@ Below is the current compatibility list, if you need a specific one tested let u
 |version | Compatibility |
 |:-------|:-------------:|
 |yaml-cpp-0.6.3   | Yes | 
-
-### jsoncpp
 
 ## Usage (GenScanor)
 Providing GenScanor with no arguments will have it print the help message
