@@ -160,7 +160,7 @@ if( USE_SYSTEM_YAMLCPP )
 	find_package(yaml-cpp REQUIRED)
 else()
 	set(YAML_EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external/yaml-cpp)
-	set(YAML_VERSION yaml-cpp-0.6.3 CACHE STRING "Version of yaml-cpp you want to get from git" )
+	set(YAML_VERSION 0.8.0 CACHE STRING "Version of yaml-cpp you want to get from git" )
 	mark_as_advanced(YAML_VERSION)
 	ExternalProject_Add(yaml-cppProject
 		GIT_REPOSITORY https://github.com/jbeder/yaml-cpp
