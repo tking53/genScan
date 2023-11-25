@@ -11,13 +11,14 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 #include "ArgParser.hpp"
+#include "ArgValue.hpp"
 #include "GenScanorArgParser.hpp"
 
 GenScanorArgParser* GenScanorArgParser::instance = nullptr;
 
-GenScanorArgParser* GenScanorArgParser::Get(char* name){
+GenScanorArgParser* GenScanorArgParser::Get(char* name,const std::string& log){
 	if( instance == nullptr ){
-		instance = new GenScanorArgParser(name);
+		instance = new GenScanorArgParser(name,log);
 	}
 	return instance;
 }
@@ -29,24 +30,26 @@ GenScanorArgParser* GenScanorArgParser::Get(){
 	return instance;
 }
 
-GenScanorArgParser::GenScanorArgParser(char* name) : ArgParser(name){
+GenScanorArgParser::GenScanorArgParser(char* name,const std::string& log) : ArgParser(name,log){
 	ConfigFile = std::make_shared<ArgValue<std::string>>("c","configfile","[filename] filename for channel map","default.txt");	
 	OutputFile = std::make_shared<ArgValue<std::string>>("o","outputfile","[filename] filename for output","default.txt");	
 	EvtBuild = std::make_shared<ArgValue<bool>>("e","evtbuild","event build only",false);
 	FileNames = std::make_shared<ArgValue<std::vector<std::string>>>("f","filenames","[file1 file2 file3 ...] list of files used for input",std::vector<std::string>());
 	Limit = std::make_shared<ArgValue<int>>("l","limit","limit of coincidence queue",100000);
 	DataFileType = std::make_shared<ArgValue<std::string>>("x","fileformat","[file_format] format of the data file (evt,ldf,pld,caen_root,caen_bin)","unknown");
+	Port = std::make_shared<ArgValue<int>>("p","port","[portid] port to listen/send on for the live histogramming",9090);
 }
 
 void GenScanorArgParser::ShowUsage(){
-	spdlog::get("genscan")->info("{}",ProgName);
-	spdlog::get("genscan")->info("{}/{} {}",ConfigFile->GetShortOptName(),ConfigFile->GetLongOptName(),ConfigFile->GetDescription());
-	spdlog::get("genscan")->info("{}/{} {}",OutputFile->GetShortOptName(),OutputFile->GetLongOptName(),OutputFile->GetDescription());
-	spdlog::get("genscan")->info("{}/{} {}",EvtBuild->GetShortOptName(),EvtBuild->GetLongOptName(),EvtBuild->GetDescription());
-	spdlog::get("genscan")->info("{}/{} {}",FileNames->GetShortOptName(),FileNames->GetLongOptName(),FileNames->GetDescription());
-	spdlog::get("genscan")->info("{}/{} {}",Help->GetShortOptName(),Help->GetLongOptName(),Help->GetDescription());
-	spdlog::get("genscan")->info("{}/{} {}",Limit->GetShortOptName(),Limit->GetLongOptName(),Limit->GetDescription());
-	spdlog::get("genscan")->info("{}/{} {}",DataFileType->GetShortOptName(),DataFileType->GetLongOptName(),DataFileType->GetDescription());
+	spdlog::get(this->LogName)->info("{}",ProgName);
+	spdlog::get(this->LogName)->info("{}/{} {}",ConfigFile->GetShortOptName(),ConfigFile->GetLongOptName(),ConfigFile->GetDescription());
+	spdlog::get(this->LogName)->info("{}/{} {}",OutputFile->GetShortOptName(),OutputFile->GetLongOptName(),OutputFile->GetDescription());
+	spdlog::get(this->LogName)->info("{}/{} {}",EvtBuild->GetShortOptName(),EvtBuild->GetLongOptName(),EvtBuild->GetDescription());
+	spdlog::get(this->LogName)->info("{}/{} {}",FileNames->GetShortOptName(),FileNames->GetLongOptName(),FileNames->GetDescription());
+	spdlog::get(this->LogName)->info("{}/{} {}",Help->GetShortOptName(),Help->GetLongOptName(),Help->GetDescription());
+	spdlog::get(this->LogName)->info("{}/{} {}",Limit->GetShortOptName(),Limit->GetLongOptName(),Limit->GetDescription());
+	spdlog::get(this->LogName)->info("{}/{} {}",DataFileType->GetShortOptName(),DataFileType->GetLongOptName(),DataFileType->GetDescription());
+	spdlog::get(this->LogName)->info("{}/{} {}",Port->GetShortOptName(),Port->GetLongOptName(),Port->GetDescription());
 }
 
 void GenScanorArgParser::ParseArgs(int argc,char* argv[]){
@@ -87,6 +90,14 @@ void GenScanorArgParser::ParseArgs(int argc,char* argv[]){
 			}else{
 				auto val = std::stoi(optarg);
 				Limit->UpdateValue(val);
+			}
+		}else if( Port->MatchesShortName(opt) or Port->MatchesLongName(opt) ){
+			if( optarg.size() > 0 ){
+				std::string msg = "Option : "+opt+" doesn't take an argument but, "+optarg+" was passed";
+				throw std::runtime_error(msg);
+			}else{
+				auto val = std::stoi(optarg);
+				Port->UpdateValue(val);
 			}
 		}else if( OutputFile->MatchesShortName(opt) or OutputFile->MatchesLongName(opt) ){
 			if( optarg.size() == 0 ){
@@ -176,4 +187,8 @@ bool* GenScanorArgParser::GetEvtBuild() const{
 
 int* GenScanorArgParser::GetLimit() const{
 	return Limit->GetValue();
+}
+
+int* GenScanorArgParser::GetPort() const{
+	return Port->GetValue();
 }

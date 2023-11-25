@@ -11,7 +11,7 @@
 class GenScanorArgParser : private ArgParser{
 	public:
 		static GenScanorArgParser* Get();	
-		static GenScanorArgParser* Get(char*);	
+		static GenScanorArgParser* Get(char*,const std::string&);	
 		void ShowUsage();
 		void ParseArgs(int,char*[]);
 		std::string* GetConfigFile() const;
@@ -20,8 +20,9 @@ class GenScanorArgParser : private ArgParser{
 		std::vector<std::string>* GetInputFiles() const;
 		bool* GetEvtBuild() const;
 		int* GetLimit() const;
+		int* GetPort() const;
 	private:
-		GenScanorArgParser(char*);
+		GenScanorArgParser(char*,const std::string&);
 
 		std::shared_ptr<ArgValue<std::string>> ConfigFile;
 		std::shared_ptr<ArgValue<std::string>> OutputFile;
@@ -29,6 +30,7 @@ class GenScanorArgParser : private ArgParser{
 		std::shared_ptr<ArgValue<std::vector<std::string>>> FileNames;
 		std::shared_ptr<ArgValue<int>> Limit;
 		std::shared_ptr<ArgValue<std::string>> DataFileType;
+		std::shared_ptr<ArgValue<int>> Port;
 
 		static GenScanorArgParser* instance;
 };
