@@ -152,7 +152,9 @@ INSERT FORMAT HERE
 
 ### TODO LIST/NOTES
 - doxygen tags in everything
-- split out the configparser into the xml, yaml, and json versions (at least on the parsing side)
+- change the ChannelMap to not be a singleton, but rather something we pass around a shared_ptr of to most everything
+- Determine a way to track the size of the HistogramManager as it could get unweildy depending on what is asked for
+- Need to also have the HistogramManager act as the SpyServe and to write the Spy program so that you can get live histogramming
 - complete PLD format
 - Add in rest of the formats 
 - Write the correlator 
