@@ -41,6 +41,7 @@ class ChannelMap{
 		int MAX_CHANNELS;
 		int MAX_CAL_PARAMS_PER_CHANNEL;
 		int MAX_CAL_PARAMS;
+		int MAX_FID;
 		std::vector<std::string> type;
 		std::vector<std::string> subtype;
 		std::vector<std::string> group;

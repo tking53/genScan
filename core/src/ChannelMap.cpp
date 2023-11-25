@@ -1,5 +1,7 @@
 #include <exception>
 #include <cmath>
+#include <stdexcept>
+#include <string>
 
 #include "ChannelMap.hpp"
 
@@ -26,6 +28,7 @@ ChannelMap::ChannelMap(int mc,int mbpc,int mcpb,int mcppc){
 
 	MAX_CHANNELS_PER_BOARD = mcpb;
 	MAX_CHANNELS = MAX_CHANNELS_PER_BOARD*MAX_BOARDS;
+	MAX_FID = GetFid(MAX_BOARDS,MAX_CHANNELS_PER_BOARD);
 
 	if( mcppc < 4 ){
 		throw std::runtime_error("ChannelMap::ChannelMap() supplied with less than 4 calibration parameters per channel");
@@ -55,6 +58,10 @@ void ChannelMap::SetParams(int& bid,int& cid,std::string t,std::string st,std::s
 		throw std::runtime_error("Trying to assign more calibration parameters than allowed");
 	}else{
 		auto fid = GetFid(bid,cid);
+		if( (fid >= MAX_FID) or (bid >= MAX_BOARDS) or (cid >= MAX_CHANNELS_PER_BOARD) ){
+			std::string mess = "Invalid config file, Board : "+std::to_string(bid)+" Channel : "+std::to_string(cid)+" Is Invalid";
+			throw std::runtime_error(mess);
+		}
 		Calibration.at(fid) = c;
 		type.at(fid) = t;
 		subtype.at(fid) = st;
@@ -71,6 +78,10 @@ void ChannelMap::SetParams(int& bid,int& cid,std::string t,std::string st,std::s
 }
 double ChannelMap::GetCalibratedEnergy(int& bid,int& cid,double& erg){
 	auto fid = GetFid(bid,cid);
+	if( (fid >= MAX_FID) or (bid >= MAX_BOARDS) or (cid >= MAX_CHANNELS_PER_BOARD) ){
+		std::string mess = "Invalid config file, Board : "+std::to_string(bid)+" Channel : "+std::to_string(cid)+" Is Invalid";
+		throw std::runtime_error(mess);
+	}
 	auto c = Calibration.at(fid);
 	switch(c){
 		case Linear:
@@ -99,9 +110,14 @@ double ChannelMap::GetCalibratedEnergy(int& bid,int& cid,double& erg){
 }
 
 void ChannelMap::SetBoardInfo(int& bid,std::string firm,int freq,int tdelay){
-	Firmware.at(bid) = firm;
-	Frequency.at(bid) = freq;
-	TraceDelay.at(bid) = tdelay;
+	if( bid >= MAX_BOARDS ){
+		std::string mess = "Board ID : "+std::to_string(bid)+" exceeds the maximum number of boards : "+std::to_string(MAX_BOARDS);
+		throw std::runtime_error(mess);
+	}else{
+		Firmware.at(bid) = firm;
+		Frequency.at(bid) = freq;
+		TraceDelay.at(bid) = tdelay;
+	}
 }
 
 int ChannelMap::GetNumBoards() const{
@@ -113,17 +129,34 @@ int ChannelMap::GetNumChannelsPerBoard() const{
 }
 
 ChannelMap::CalType ChannelMap::GetCalType(int& bid,int& cid) const{
-	return Calibration.at(GetFid(bid,cid));
+	auto fid = GetFid(bid,cid);
+	if( (fid >= MAX_FID) or (bid >= MAX_BOARDS) or (cid >= MAX_CHANNELS_PER_BOARD) ){
+		std::string mess = "Invalid config file, Board : "+std::to_string(bid)+" Channel : "+std::to_string(cid)+" Is Invalid";
+		throw std::runtime_error(mess);
+	}
+	return Calibration.at(fid);
 }
 		
 int ChannelMap::GetBoardFrequency(int& bid) const{
+	if( bid >= MAX_BOARDS ){
+		std::string mess = "Board ID : "+std::to_string(bid)+" exceeds the maximum number of boards : "+std::to_string(MAX_BOARDS);
+		throw std::runtime_error(mess);
+	}
 	return Frequency.at(bid);
 }
 
 int ChannelMap::GetBoardTraceDelay(int& bid) const{
+	if( bid >= MAX_BOARDS ){
+		std::string mess = "Board ID : "+std::to_string(bid)+" exceeds the maximum number of boards : "+std::to_string(MAX_BOARDS);
+		throw std::runtime_error(mess);
+	}
 	return TraceDelay.at(bid);
 }
 
 std::string ChannelMap::GetBoardFirmware(int& bid) const{
+	if( bid >= MAX_BOARDS ){
+		std::string mess = "Board ID : "+std::to_string(bid)+" exceeds the maximum number of boards : "+std::to_string(MAX_BOARDS);
+		throw std::runtime_error(mess);
+	}
 	return Firmware.at(bid);
 }
