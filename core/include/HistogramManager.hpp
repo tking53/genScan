@@ -1,6 +1,8 @@
 #ifndef __HISTOGRAM_MANAGER_HPP__
 #define __HISTOGRAM_MANAGER_HPP__
 
+#include <memory>
+#include <stdexcept>
 #include <unordered_map>
 #include <regex>
 #include <string>
@@ -17,6 +19,17 @@
 
 #include "TH1.h"
 #include "TH2.h"
+#include "TProfile.h"
+#include "TCanvas.h"
+#include "TFrame.h"
+#include "TSocket.h"
+#include "TServerSocket.h"
+#include "TMonitor.h"
+#include "TMessage.h"
+#include "TRandom.h"
+#include "TList.h"
+#include "TError.h"
+#include "TROOT.h"
 
 namespace PLOTS{
 	const int S0 = 1;
@@ -39,8 +52,94 @@ namespace PLOTS{
 	
 	class PlotRegistry{
 		public:
-			PlotRegistry(const std::string& log){
+			PlotRegistry(const std::string& log,const std::string oup,int PORT=9090){
 				this->LogName = log;
+				this->outputprefix = oup;
+				fServ = std::make_shared<TServerSocket>(PORT,true);
+				if( not fServ->IsValid() ){
+					std::string mess = "Unable to open Port : "+std::to_string(PORT)+" Bailing out";
+					throw std::runtime_error(mess);
+				}
+				KeepListen = true;
+
+				fMon = std::make_shared<TMonitor>();
+				fMon->Add(fServ.get());
+
+				fSockets = std::make_shared<TList>();
+
+				fCanvas = std::make_shared<TCanvas>(log.c_str(),log.c_str(),600,600);
+				fCanvas->SetFillColor(42);
+				fCanvas->GetFrame()->SetFillColor(21);
+				fCanvas->GetFrame()->SetBorderSize(6);
+				fCanvas->GetFrame()->SetBorderMode(-1);
+			}
+
+			void HandleSocket(TSocket* s){
+				if (s->IsA() == TServerSocket::Class()) {
+					// accept new connection from spy
+					TSocket *sock = ((TServerSocket*)s)->Accept();
+					fMon->Add(sock);
+					fSockets->Add(sock);
+					spdlog::get(this->LogName)->info("Accepted Connection from {}",sock->GetInetAddress().GetHostName());
+				} else {
+					// we only get string based requests from the spy
+					char request[64];
+					if (s->Recv(request, sizeof(request)) <= 0) {
+						fMon->Remove(s);
+						fSockets->Remove(s);
+						spdlog::get(this->LogName)->info("Closed Connection from {}",s->GetInetAddress().GetHostName());
+						delete s;
+						return;
+					}
+
+					// send requested object back
+					TMessage answer(kMESS_OBJECT);
+					std::string hisname(request);
+					if( Plot1DExist(hisname) ){
+						answer.WriteObject(this->Plots_1D[hisname]);
+					}else if( Plot2DExist(hisname) ){
+						answer.WriteObject(this->Plots_2D[hisname]);
+					}else{
+						Error("SpyServ::HandleSocket", "unexpected message");
+					}
+					s->Send(answer);
+				}
+			}
+
+			void KillListen(){
+				KeepListen = false;
+			}
+
+			void RandFill(){
+				const Int_t kUPDATE = 1000;
+				float px, py;
+				for (Int_t i = 0; ; i++) {
+					gRandom->Rannor(px,py);
+					Fill("Raw",px,py);
+					gRandom->Rannor(px,py);
+					Fill("Scalar",px,py);
+					gRandom->Rannor(px,py);
+					Fill("Cal",px,py);
+					if( not KeepListen )
+						break;
+				}
+			}
+
+			void HandleSocketHelper(){
+				while(KeepListen){
+					//std::this_thread::sleep_for(std::chrono::seconds(20));
+					//spdlog::info("Update");
+					fCanvas->Modified();
+					fCanvas->Update();
+
+					TSocket *s;
+					if ((s = fMon->Select(20)) != (TSocket*)-1)
+						HandleSocket(s);
+					if (ROOT::Detail::HasBeenDeleted(fCanvas.get()))
+						break;
+					if (gROOT->IsInterrupted())
+						break;
+				}
 			}
 
 			void Initialize(const int& numchannels,const int& ergsize,const int& scalarsize){
@@ -196,7 +295,7 @@ namespace PLOTS{
 			}
 
 			void WriteInfo(){
-				std::ofstream output(this->LogName+".list");
+				std::ofstream output(this->outputprefix+".list");
 				output << "name \t title \t nbinsx \t xmin \t xmax \t nbinsy \t ymin \t ymax" << std::endl;
 				for( auto& name : PlotIDs ){
 					output << name << '\t';
@@ -242,6 +341,15 @@ namespace PLOTS{
 			std::unordered_map<std::string,TH1*> Plots_1D;
 			std::unordered_map<std::string,TH2*> Plots_2D;
 			std::string LogName;
+			std::string outputprefix;
+
+			bool KeepListen;
+
+			//info needed for live histogramming
+			std::shared_ptr<TCanvas> fCanvas;
+			std::shared_ptr<TServerSocket> fServ;
+			std::shared_ptr<TMonitor> fMon;
+			std::shared_ptr<TList> fSockets;
 	};
 
 }
