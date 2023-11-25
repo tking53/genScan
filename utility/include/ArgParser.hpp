@@ -10,13 +10,14 @@
 
 class ArgParser{
 	public:
-		ArgParser(char*);
+		ArgParser(char*,const std::string&);
 		virtual void ShowUsage();
 		virtual void ParseArgs(int,char*[]);
 	protected:
 
 		std::string ProgName;
 		std::string fullargv;
+		std::string LogName;
 		std::vector<std::smatch> ParseOptions(int,char*[]);
 		std::shared_ptr<ArgValue<bool>> Help;
 };

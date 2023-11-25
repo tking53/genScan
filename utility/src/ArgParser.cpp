@@ -13,8 +13,9 @@
 
 #include "ArgParser.hpp"
 
-ArgParser::ArgParser(char* name){
+ArgParser::ArgParser(char* name,const std::string& log){
 	ProgName = std::string(name);
+	LogName = log; 
 	Help = std::make_shared<ArgValue<bool>>("h","help","show this message",false);
 }
 
