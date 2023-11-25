@@ -127,12 +127,8 @@ int main(int argc, char *argv[]) {
 		exit(EXIT_FAILURE);
 	}
 
-	try{
-		HistogramManager::Initialize();
-	}catch(std::runtime_error const& e){
-		console->error(e.what());
-		exit(EXIT_FAILURE);
-	}
+	std::shared_ptr<PLOTS::PlotRegistry> HistogramManager(new PLOTS::PlotRegistry(StringManip::GetFileBaseName(*outputfile)));
+	HistogramManager->Initialize(MAX_CHANNELS,PLOTS::SE,PLOTS::SE);
 
 	//auto processorlist = ProcessorList::Get();
 	//try{
@@ -142,6 +138,10 @@ int main(int argc, char *argv[]) {
 	//	console->error(e.what());
 	//	exit(EXIT_FAILURE);
 	//}
+	
+	//Init the processors/analyzers
+	
+	HistogramManager->WriteInfo();
 
 	sleep(30);
 	//try{
