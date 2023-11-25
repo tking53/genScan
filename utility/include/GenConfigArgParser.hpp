@@ -11,13 +11,13 @@
 class GenConfigArgParser : private ArgParser{
 	public:
 		static GenConfigArgParser* Get();	
-		static GenConfigArgParser* Get(char*);	
+		static GenConfigArgParser* Get(char*,const std::string&);	
 		void ShowUsage();
 		void ParseArgs(int,char*[]);
 		std::string* GetConfigFile() const;
 		std::string* GetOutputFile() const;
 	private:
-		GenConfigArgParser(char*);
+		GenConfigArgParser(char*,const std::string&);
 
 		std::shared_ptr<ArgValue<std::string>> ConfigFile;
 		std::shared_ptr<ArgValue<std::string>> OutputFile;

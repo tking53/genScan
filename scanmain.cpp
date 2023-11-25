@@ -2,6 +2,7 @@
 #include <string>
 #include <memory>
 #include <iostream>
+#include <thread>
 
 #include <spdlog/common.h>
 #include <spdlog/spdlog.h>
@@ -56,7 +57,7 @@ int main(int argc, char *argv[]) {
 	auto console = std::make_shared<spdlog::logger>(logname,sinks.begin(),sinks.end());
 	spdlog::initialize_logger(console);
 
-	auto cmdArgs = GenScanorArgParser::Get(argv[0]);
+	auto cmdArgs = GenScanorArgParser::Get(argv[0],logname);
 	try{
 		cmdArgs->ParseArgs(argc,argv);
 	}catch( std::runtime_error const& e ){
@@ -70,6 +71,7 @@ int main(int argc, char *argv[]) {
 	auto FileNames = cmdArgs->GetInputFiles();
 	auto evtbuild = *(cmdArgs->GetEvtBuild());
 	auto dataformat = cmdArgs->GetDataFileType();
+	auto port = *(cmdArgs->GetPort());
 
 	const int lower_limit = 10000;
 
@@ -127,7 +129,7 @@ int main(int argc, char *argv[]) {
 		exit(EXIT_FAILURE);
 	}
 
-	std::shared_ptr<PLOTS::PlotRegistry> HistogramManager(new PLOTS::PlotRegistry(StringManip::GetFileBaseName(*outputfile)));
+	std::shared_ptr<PLOTS::PlotRegistry> HistogramManager(new PLOTS::PlotRegistry(logname,StringManip::GetFileBaseName(*outputfile)));
 	HistogramManager->Initialize(MAX_CHANNELS,PLOTS::SE,PLOTS::SE);
 
 	//auto processorlist = ProcessorList::Get();
@@ -142,8 +144,10 @@ int main(int argc, char *argv[]) {
 	//Init the processors/analyzers
 	
 	HistogramManager->WriteInfo();
+	std::thread plotter(&PLOTS::PlotRegistry::HandleSocketHelper,HistogramManager.get());
+	std::thread filler(&PLOTS::PlotRegistry::RandFill,HistogramManager.get());
 
-	sleep(30);
+	std::this_thread::sleep_for(std::chrono::seconds(300));
 	//try{
 	// 	while(Parse(inputfile_list)){
 	// 		Correlate();
@@ -181,6 +185,9 @@ int main(int argc, char *argv[]) {
 	//Run correlated events through Processors 
 	//
 	//Write correlated events to disk
+	HistogramManager->KillListen();
+	filler.join();
+	plotter.join();
 
 	return 0;
 }

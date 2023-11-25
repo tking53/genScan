@@ -15,9 +15,9 @@
 
 GenConfigArgParser* GenConfigArgParser::instance = nullptr;
 
-GenConfigArgParser* GenConfigArgParser::Get(char* name){
+GenConfigArgParser* GenConfigArgParser::Get(char* name,const std::string& log){
 	if( instance == nullptr ){
-		instance = new GenConfigArgParser(name);
+		instance = new GenConfigArgParser(name,log);
 	}
 	return instance;
 }
@@ -29,16 +29,16 @@ GenConfigArgParser* GenConfigArgParser::Get(){
 	return instance;
 }
 
-GenConfigArgParser::GenConfigArgParser(char* name) : ArgParser(name){
+GenConfigArgParser::GenConfigArgParser(char* name,const std::string& log) : ArgParser(name,log){
 	ConfigFile = std::make_shared<ArgValue<std::string>>("c","configfile","[filename] filename for channel map","default.txt");	
 	OutputFile = std::make_shared<ArgValue<std::string>>("o","outputfile","[filename] filename for output","default.txt");	
 }
 
 void GenConfigArgParser::ShowUsage(){
-	spdlog::get("genconfig")->info("{}",ProgName);
-	spdlog::get("genconfig")->info("{}/{} {}",ConfigFile->GetShortOptName(),ConfigFile->GetLongOptName(),ConfigFile->GetDescription());
-	spdlog::get("genconfig")->info("{}/{} {}",OutputFile->GetShortOptName(),OutputFile->GetLongOptName(),OutputFile->GetDescription());
-	spdlog::get("genconfig")->info("{}/{} {}",Help->GetShortOptName(),Help->GetLongOptName(),Help->GetDescription());
+	spdlog::get(this->LogName)->info("{}",ProgName);
+	spdlog::get(this->LogName)->info("{}/{} {}",ConfigFile->GetShortOptName(),ConfigFile->GetLongOptName(),ConfigFile->GetDescription());
+	spdlog::get(this->LogName)->info("{}/{} {}",OutputFile->GetShortOptName(),OutputFile->GetLongOptName(),OutputFile->GetDescription());
+	spdlog::get(this->LogName)->info("{}/{} {}",Help->GetShortOptName(),Help->GetLongOptName(),Help->GetDescription());
 }
 
 void GenConfigArgParser::ParseArgs(int argc,char* argv[]){
