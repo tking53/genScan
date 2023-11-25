@@ -129,7 +129,7 @@ int main(int argc, char *argv[]) {
 		exit(EXIT_FAILURE);
 	}
 
-	std::shared_ptr<PLOTS::PlotRegistry> HistogramManager(new PLOTS::PlotRegistry(logname,StringManip::GetFileBaseName(*outputfile)));
+	std::shared_ptr<PLOTS::PlotRegistry> HistogramManager(new PLOTS::PlotRegistry(logname,StringManip::GetFileBaseName(*outputfile),port));
 	HistogramManager->Initialize(MAX_CHANNELS,PLOTS::SE,PLOTS::SE);
 
 	//auto processorlist = ProcessorList::Get();
