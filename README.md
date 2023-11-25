@@ -151,6 +151,8 @@ INSERT FORMAT HERE
 - EVT (NSCLDaq)
 
 ### TODO LIST/NOTES
+- Add in signal handling so that way we get output for our log/err/dbg/list files
+- Also need to make sure that all the currently processed data is dumped to disk as well
 - doxygen tags in everything
 - change the ChannelMap to not be a singleton, but rather something we pass around a shared_ptr of to most everything
 - Determine a way to track the size of the HistogramManager as it could get unweildy depending on what is asked for
