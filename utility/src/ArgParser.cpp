@@ -20,8 +20,8 @@ ArgParser::ArgParser(char* name,const std::string& log){
 }
 
 void ArgParser::ShowUsage(){
-	spdlog::get("genscan")->info("{}",ProgName);
-	spdlog::get("genscan")->info("{}/{} {}",Help->GetShortOptName(),Help->GetLongOptName(),Help->GetDescription());
+	spdlog::get(this->LogName)->info("{}",ProgName);
+	spdlog::get(this->LogName)->info("{}/{} {}",Help->GetShortOptName(),Help->GetLongOptName(),Help->GetDescription());
 }
 
 std::vector<std::smatch> ArgParser::ParseOptions(int argc,char* argv[]){
