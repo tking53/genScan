@@ -249,6 +249,13 @@ endif()
 if( USE_SYSTEM_SPDLOG )
 	target_link_libraries(GenScanor PRIVATE spdlog::spdlog_header_only)
 endif()
+if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+	target_compile_definitions(GenScanor PRIVATE DEBUG_MODE)
+endif()
 
 add_executable(GenConfig configmain.cpp)
 target_link_libraries(GenConfig PRIVATE UTILITY_LIB)
+if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+	target_compile_definitions(GenConfig PRIVATE DEBUG_MODE)
+endif()
+
