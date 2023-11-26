@@ -90,3 +90,18 @@ std::string* ConfigParser::GetAuthorDateText() const{
 std::string* ConfigParser::GetAuthorEmailText() const{
 	return this->AuthorEmailText.get();
 }
+
+std::vector<std::string> ConfigParser::GetProcessorNames() const{
+	return ProcessorNames;
+}
+
+std::vector<std::string> ConfigParser::GetAnalyzerNames() const{
+	return AnalyzerNames;
+}
+
+void ConfigParser::AddProcessorName(const std::string& name){
+	ProcessorNames.push_back(name);
+}
+void ConfigParser::AddAnalyzerName(const std::string& name){
+	AnalyzerNames.push_back(name);
+}

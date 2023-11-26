@@ -126,11 +126,13 @@ void YAMLConfigParser::ParseDetectorDriver(){
 		for( size_t ii = 0; ii < processor.size(); ++ii ){
 			std::string name = processor[ii]["name"].as<std::string>();
 			this->ProcessorNames[name] = processor[ii];
+			AddProcessorName(name);
 		}
 
 		for( size_t ii = 0; ii < analyzer.size(); ++ii ){
 			std::string name = analyzer[ii]["name"].as<std::string>();
 			this->AnalyzerNames[name] = analyzer[ii];
+			AddAnalyzerName(name);
 		}
 
 
@@ -397,4 +399,12 @@ void YAMLConfigParser::ParseMap(ChannelMap* cmap){
 		   << "\" is malformed. Map node is missing.";
 		throw std::runtime_error(ss.str());
 	}
+}
+
+YAML::Node YAMLConfigParser::GetProcessorYAMLInfo(const std::string& name) const{
+	return this->ProcessorNames.at(name);
+}
+
+YAML::Node YAMLConfigParser::GetAnalyzerYAMLInfo(const std::string& name) const{
+	return this->AnalyzerNames.at(name);
 }

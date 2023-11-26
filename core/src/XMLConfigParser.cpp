@@ -132,6 +132,7 @@ void XMLConfigParser::ParseDetectorDriver(){
 				throw std::runtime_error(ss.str());
 			}else{
 				this->ProcessorNames[name] = processor;
+				AddProcessorName(name);
 			}
 		}
 		for(; analyzer; analyzer = analyzer.next_sibling("Analyzer")){
@@ -144,6 +145,7 @@ void XMLConfigParser::ParseDetectorDriver(){
 				throw std::runtime_error(ss.str());
 			}else{
 				this->AnalyzerNames[name] = analyzer;
+				AddAnalyzerName(name);
 			}
 		}
 	}else{
@@ -156,12 +158,12 @@ void XMLConfigParser::ParseDetectorDriver(){
 	}
 }
 
-std::map<std::string,pugi::xml_node>& XMLConfigParser::GetProcessors(){
-	return ProcessorNames;
+pugi::xml_node XMLConfigParser::GetProcessorXMLInfo(const std::string& name) const{
+	return ProcessorNames.at(name);
 }
 
-std::map<std::string,pugi::xml_node>& XMLConfigParser::GetAnalyzers(){
-	return AnalyzerNames;
+pugi::xml_node XMLConfigParser::GetAnalyzerXMLInfo(const std::string& name) const{
+	return AnalyzerNames.at(name);
 }
 
 void XMLConfigParser::ParseMap(ChannelMap* cmap){

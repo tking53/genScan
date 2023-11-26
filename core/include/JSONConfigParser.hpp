@@ -15,6 +15,9 @@ class JSONConfigParser : public ConfigParser{
 	public:
 		JSONConfigParser(const std::string&);
 		virtual void Parse(ChannelMap*);
+
+		Json::Value GetProcessorJSONInfo(const std::string&) const;
+		Json::Value GetAnalyzerJSONInfo(const std::string&) const;
 	protected:
 		virtual void ParseDescription();
 		virtual void ParseAuthor();

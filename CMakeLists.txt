@@ -235,9 +235,11 @@ else()
 endif()
 
 add_subdirectory(utility)
-add_subdirectory(core)
 add_subdirectory(processors)
+add_subdirectory(core)
 add_subdirectory(parsers)
+
+target_include_directories(PROCESSOR_LIB PUBLIC core/include)
 
 add_executable(GenScanor scanmain.cpp)
 

@@ -127,11 +127,13 @@ void JSONConfigParser::ParseDetectorDriver(){
 		for(const auto& proc : processor ){
 			std::string name = proc["name"].asString();
 			this->ProcessorNames[name] = proc;
+			AddProcessorName(name);
 		}
 
 		for(const auto& proc : analyzer ){
 			std::string name = proc["name"].asString();
 			this->AnalyzerNames[name] = proc;
+			AddAnalyzerName(name);
 		}
 	}else{
 		std::stringstream ss;
@@ -396,4 +398,12 @@ void JSONConfigParser::ParseMap(ChannelMap* cmap){
 		   << "\" is malformed. Map node is missing.";
 		throw std::runtime_error(ss.str());
 	}
+}
+
+Json::Value JSONConfigParser::GetProcessorJSONInfo(const std::string& name) const{
+	return this->ProcessorNames.at(name);
+}
+
+Json::Value JSONConfigParser::GetAnalyzerJSONInfo(const std::string& name) const{
+	return this->AnalyzerNames.at(name);
 }

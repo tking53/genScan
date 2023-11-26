@@ -15,8 +15,9 @@ class XMLConfigParser : public ConfigParser{
 	public:
 		XMLConfigParser(const std::string&);
 		virtual void Parse(ChannelMap*);
-		std::map<std::string,pugi::xml_node>& GetAnalyzers();
-		std::map<std::string,pugi::xml_node>& GetProcessors();
+		
+		pugi::xml_node GetAnalyzerXMLInfo(const std::string&) const;
+		pugi::xml_node GetProcessorXMLInfo(const std::string&) const;
 	protected:
 		virtual void ParseDescription();
 		virtual void ParseAuthor();

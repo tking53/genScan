@@ -5,21 +5,42 @@
 #include <map>
 #include <string>
 
-#include <pugiconfig.hpp>
-#include <pugixml.hpp>
+#include "ConfigParser.hpp"
+#include "HistogramManager.hpp"
+#include "XMLConfigParser.hpp"
+#include "YAMLConfigParser.hpp"
+#include "JSONConfigParser.hpp"
 
-class Processor;
-class Analyzer;
+#include "Processor.hpp"
+#include "Analyzer.hpp"
 
 class ProcessorList{
 	public:
-		static ProcessorList* Get();
-		void InitializeProcessors(std::map<std::string,pugi::xml_node>&);
-		void InitializeAnalyzers(std::map<std::string,pugi::xml_node>&);
-	private:
-		ProcessorList();
+		ProcessorList(const std::string&);
 
-		static ProcessorList* instance;
+		void InitializeProcessors(XMLConfigParser*);
+		void InitializeAnalyzers(XMLConfigParser*);
+		
+		void InitializeProcessors(YAMLConfigParser*);
+		void InitializeAnalyzers(YAMLConfigParser*);
+		
+		void InitializeProcessors(JSONConfigParser*);
+		void InitializeAnalyzers(JSONConfigParser*);
+
+		void PreAnalyze();
+		void PreProcess();
+		
+		void Analyze();
+		void Process();
+
+		void PostAnalyze();
+		void PostProcess();
+
+		void DeclarePlots(PLOTS::PlotRegistry*) const;
+
+		~ProcessorList();
+	private:
+		std::string LogName;
 		std::vector<Processor*> processors;
 		std::vector<Analyzer*> analyzers;
 };

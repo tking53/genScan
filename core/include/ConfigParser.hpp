@@ -6,6 +6,14 @@
 #include <map>
 #include <memory>
 
+#include <pugiconfig.hpp>
+#include <pugixml.hpp>
+
+#include <yaml-cpp/yaml.h>
+
+#include <json/json.h>
+
+
 #include "ChannelMap.hpp"
 
 class ConfigParser{
@@ -27,12 +35,20 @@ class ConfigParser{
 		std::string* GetAuthorDateText() const;
 		std::string* GetAuthorEmailText() const;
 
+		std::vector<std::string> GetProcessorNames() const;
+		std::vector<std::string> GetAnalyzerNames() const;
+
+		void AddProcessorName(const std::string&);
+		void AddAnalyzerName(const std::string&);
 	protected:
 		virtual void ParseDescription();
 		virtual void ParseAuthor();
 		virtual void ParseGlobal();
 		virtual void ParseDetectorDriver();
 		virtual void ParseMap(ChannelMap*);
+
+		std::vector<std::string> ProcessorNames;
+		std::vector<std::string> AnalyzerNames;
 		
 		std::string LogName;
 

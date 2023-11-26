@@ -11,6 +11,7 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
+#include "Processor.hpp"
 #include "StringManipFunctions.hpp"
 
 #include "GenScanorArgParser.hpp"
@@ -139,14 +140,26 @@ int main(int argc, char *argv[]) {
 	HistogramManager->Initialize(MAX_CHANNELS,ebins,sbins);
 	console->info("Generated Raw, Scalar, and Cal plots for {} Channels, There are {} bins for Raw and Cal, and {} bins for Scalar",MAX_CHANNELS,ebins,sbins);
 
-	//auto processorlist = ProcessorList::Get();
-	//try{
-	//	processorlist->InitializeProcessors(cfgparser->GetProcessors());
-	//	processorlist->InitializeAnalyzers(cfgparser->GetAnalyzers());
-	//}catch(std::runtime_error const& e){
-	//	console->error(e.what());
-	//	exit(EXIT_FAILURE);
-	//}
+	std::shared_ptr<ProcessorList> processorlist = std::make_shared<ProcessorList>(logname);
+	try{
+		if( config_extension == "xml" ){
+			processorlist->InitializeProcessors(reinterpret_cast<XMLConfigParser*>(cfgparser.get()));
+			processorlist->InitializeAnalyzers(reinterpret_cast<XMLConfigParser*>(cfgparser.get()));
+		}else if( config_extension == "yaml" or config_extension == "yml" ){
+			processorlist->InitializeProcessors(reinterpret_cast<YAMLConfigParser*>(cfgparser.get()));
+			processorlist->InitializeAnalyzers(reinterpret_cast<YAMLConfigParser*>(cfgparser.get()));
+		}else if( config_extension == "json" ){
+			processorlist->InitializeProcessors(reinterpret_cast<JSONConfigParser*>(cfgparser.get()));
+			processorlist->InitializeAnalyzers(reinterpret_cast<JSONConfigParser*>(cfgparser.get()));
+		}else{
+			console->error("unknown file extension of {}, supported extensions are xml, yaml, json",config_extension);
+			exit(EXIT_FAILURE);
+		}
+		processorlist->DeclarePlots(HistogramManager.get());
+	}catch(std::runtime_error const& e){
+		console->error(e.what());
+		exit(EXIT_FAILURE);
+	}
 	
 	//Init the processors/analyzers
 	
@@ -157,7 +170,17 @@ int main(int argc, char *argv[]) {
 	#ifdef DEBUG_MODE
 		console->info("Beginning plotting");
 		std::thread filler(&PLOTS::PlotRegistry::RandFill,HistogramManager.get());
-		std::this_thread::sleep_for(std::chrono::seconds(300));
+		std::this_thread::sleep_for(std::chrono::seconds(3));
+		for( int ii = 0; ii < 1000000; ++ii ){
+			processorlist->PreProcess();
+			processorlist->PreAnalyze();
+	
+			processorlist->Process();
+			processorlist->Analyze();
+	
+			processorlist->PostProcess();
+			processorlist->PostAnalyze();
+		}
 	#endif
 	//try{
 	// 	while(Parse(inputfile_list)){
