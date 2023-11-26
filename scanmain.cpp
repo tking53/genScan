@@ -35,10 +35,10 @@ int main(int argc, char *argv[]) {
 	const int MAX_CHANNELS = MAX_CHANNELS_PER_BOARD*MAX_BOARDS;
 	const int MAX_CAL_PARAMS_PER_CHANNEL = 4;
 
-	std::string logname = "genscan";
-	std::string logfilename = logname+".log";
-	std::string errfilename = logname+".err";
-	std::string dbgfilename = logname+".dbg";
+	const std::string logname = "genscan";
+	const std::string logfilename = logname+".log";
+	const std::string errfilename = logname+".err";
+	const std::string dbgfilename = logname+".dbg";
 
 	spdlog::set_level(spdlog::level::debug);
 	std::shared_ptr<spdlog::sinks::basic_file_sink_mt> LogFileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(logfilename,true);
@@ -56,6 +56,7 @@ int main(int argc, char *argv[]) {
 	std::vector<spdlog::sink_ptr> sinks {DebugFileSink,LogFileSink,ErrorFileSink,LogFileConsole};
 	auto console = std::make_shared<spdlog::logger>(logname,sinks.begin(),sinks.end());
 	spdlog::initialize_logger(console);
+	console->flush_on(spdlog::level::info);
 
 	auto cmdArgs = GenScanorArgParser::Get(argv[0],logname);
 	try{
