@@ -5,22 +5,6 @@
 
 #include "ChannelMap.hpp"
 
-ChannelMap* ChannelMap::instance = nullptr;
-
-ChannelMap* ChannelMap::Get(){
-	if( instance == nullptr ){
-		throw std::runtime_error("ChannelMap::Get() ChannelMap is not initialized yet");
-	}
-	return instance;
-}
-
-ChannelMap* ChannelMap::Get(int mc,int mbpc,int mcpb, int mcppc){
-	if( instance == nullptr ){
-		instance = new ChannelMap(mc,mbpc,mcpb,mcppc);
-	}
-	return instance;
-}
-
 ChannelMap::ChannelMap(int mc,int mbpc,int mcpb,int mcppc){
 	MAX_CRATES = mc;
 	MAX_BOARDS_PER_CRATE = mbpc;

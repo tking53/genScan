@@ -21,7 +21,7 @@
 YAMLConfigParser::YAMLConfigParser(const std::string& log) : ConfigParser(log){
 }
 
-void YAMLConfigParser::Parse(){
+void YAMLConfigParser::Parse(ChannelMap* cmap){
 	if( this->ConfigName == nullptr ){
 		throw std::runtime_error("YAMLConfigParser::Parse() SetConfigFile() has not been called");
 	}
@@ -50,7 +50,7 @@ void YAMLConfigParser::Parse(){
 	spdlog::get(this->LogName)->info("Parsing DetectorDriver tag");
 	ParseDetectorDriver();
 	spdlog::get(this->LogName)->info("Parsing Map tag");
-	ParseMap();
+	ParseMap(cmap);
 }
 		
 void YAMLConfigParser::ParseDescription(){
@@ -143,12 +143,9 @@ void YAMLConfigParser::ParseDetectorDriver(){
 	}
 }
 
-void YAMLConfigParser::ParseMap(){
+void YAMLConfigParser::ParseMap(ChannelMap* cmap){
 	this->Map = this->Configuration["Map"];
 	if( this->Map ){
-		//create the channel map object that will be used for lookups. Make it global instanced
-		auto cmap = ChannelMap::Get();
-
 		YAML::Node board = this->Map["Module"];
 		if( !board ){
 			std::stringstream ss;

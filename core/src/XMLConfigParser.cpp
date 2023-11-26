@@ -16,7 +16,7 @@
 XMLConfigParser::XMLConfigParser(const std::string& log) : ConfigParser(log){
 }
 
-void XMLConfigParser::Parse(){
+void XMLConfigParser::Parse(ChannelMap* cmap){
 	if( this->ConfigName == nullptr ){
 		throw std::runtime_error("XMLConfigParser::Parse() SetConfigFile() has not been called");
 	}
@@ -49,7 +49,7 @@ void XMLConfigParser::Parse(){
 	spdlog::get(this->LogName)->info("Parsing DetectorDriver tag");
 	ParseDetectorDriver();
 	spdlog::get(this->LogName)->info("Parsing Map tag");
-	ParseMap();
+	ParseMap(cmap);
 }
 		
 void XMLConfigParser::ParseDescription(){
@@ -164,13 +164,9 @@ std::map<std::string,pugi::xml_node>& XMLConfigParser::GetAnalyzers(){
 	return AnalyzerNames;
 }
 
-void XMLConfigParser::ParseMap(){
+void XMLConfigParser::ParseMap(ChannelMap* cmap){
 	this->Map = this->Configuration.child("Map");
 	if( this->Map ){
-		//create the channel map object that will be used for lookups. Make it global instanced
-		auto cmap = ChannelMap::Get();
-		//lambda function to parse out string text into individual entries
-
 		pugi::xml_node board = this->Map.child("Module");
 		if( !board ){
 			std::stringstream ss;

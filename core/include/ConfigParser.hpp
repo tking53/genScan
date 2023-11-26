@@ -6,10 +6,12 @@
 #include <map>
 #include <memory>
 
+#include "ChannelMap.hpp"
+
 class ConfigParser{
 	public:
 		ConfigParser(const std::string&);
-		virtual void Parse();
+		virtual void Parse(ChannelMap*);
 
 		void SetGlobalEventWidthInS(double);
 		void SetConfigFile(std::string*);
@@ -30,7 +32,7 @@ class ConfigParser{
 		virtual void ParseAuthor();
 		virtual void ParseGlobal();
 		virtual void ParseDetectorDriver();
-		virtual void ParseMap();
+		virtual void ParseMap(ChannelMap*);
 		
 		std::string LogName;
 

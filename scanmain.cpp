@@ -102,14 +102,15 @@ int main(int argc, char *argv[]) {
 	}
 
 	console->info("Allocating memory for the ChannelMap");
+	std::shared_ptr<ChannelMap> cmap;
 	try{
-		auto cmap = ChannelMap::Get(MAX_CRATES,MAX_CARDS_PER_CRATE,MAX_CHANNELS_PER_BOARD,MAX_CAL_PARAMS_PER_CHANNEL);
+		cmap = std::make_shared<ChannelMap>(MAX_CRATES,MAX_CARDS_PER_CRATE,MAX_CHANNELS_PER_BOARD,MAX_CAL_PARAMS_PER_CHANNEL);
 	}catch(std::runtime_error const& e ){
 		console->error(e.what());
 		exit(EXIT_FAILURE);
 	}
 
-	console->info("Begin parsing Config File");
+	console->info("Begin parsing Config File : {}",*(configfile));
 	std::unique_ptr<ConfigParser> cfgparser;
 	auto config_extension = StringManip::GetFileExtension(*configfile);
 	if( config_extension == "xml" ){
@@ -124,14 +125,19 @@ int main(int argc, char *argv[]) {
 	}
 	cfgparser->SetConfigFile(configfile);
 	try{
-		cfgparser->Parse();
+		cfgparser->Parse(cmap.get());
 	}catch(std::runtime_error const& e){
 		console->error(e.what());
 		exit(EXIT_FAILURE);
 	}
+	console->info("Completed parsing Config File : {}",*(configfile));
 
+	console->info("Generating Plot Registry");
 	std::shared_ptr<PLOTS::PlotRegistry> HistogramManager(new PLOTS::PlotRegistry(logname,StringManip::GetFileBaseName(*outputfile),port));
-	HistogramManager->Initialize(MAX_CHANNELS,PLOTS::SE,PLOTS::SE);
+	auto ebins = PLOTS::SE;
+	auto sbins = PLOTS::SE;
+	HistogramManager->Initialize(MAX_CHANNELS,ebins,sbins);
+	console->info("Generated Raw, Scalar, and Cal plots for {} Channels, There are {} bins for Raw and Cal, and {} bins for Scalar",MAX_CHANNELS,ebins,sbins);
 
 	//auto processorlist = ProcessorList::Get();
 	//try{
@@ -144,11 +150,15 @@ int main(int argc, char *argv[]) {
 	
 	//Init the processors/analyzers
 	
+	console->info("Generating {}.list file that contains all the declared histograms",logname);
 	HistogramManager->WriteInfo();
 	std::thread plotter(&PLOTS::PlotRegistry::HandleSocketHelper,HistogramManager.get());
-	std::thread filler(&PLOTS::PlotRegistry::RandFill,HistogramManager.get());
 
-	std::this_thread::sleep_for(std::chrono::seconds(300));
+	#ifdef DEBUG_MODE
+		console->info("Beginning plotting");
+		std::thread filler(&PLOTS::PlotRegistry::RandFill,HistogramManager.get());
+		std::this_thread::sleep_for(std::chrono::seconds(300));
+	#endif
 	//try{
 	// 	while(Parse(inputfile_list)){
 	// 		Correlate();
@@ -187,7 +197,10 @@ int main(int argc, char *argv[]) {
 	//
 	//Write correlated events to disk
 	HistogramManager->KillListen();
-	filler.join();
+	#ifdef DEBUG_MODE
+		console->info("Ending plotting");
+		filler.join();
+	#endif
 	plotter.join();
 
 	return 0;

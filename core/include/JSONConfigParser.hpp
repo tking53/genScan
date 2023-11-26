@@ -9,17 +9,18 @@
 #include <json/json.h>
 
 #include "ConfigParser.hpp"
+#include "ChannelMap.hpp"
 
 class JSONConfigParser : public ConfigParser{
 	public:
 		JSONConfigParser(const std::string&);
-		virtual void Parse();
+		virtual void Parse(ChannelMap*);
 	protected:
 		virtual void ParseDescription();
 		virtual void ParseAuthor();
 		virtual void ParseGlobal();
 		virtual void ParseDetectorDriver();
-		virtual void ParseMap();
+		virtual void ParseMap(ChannelMap*);
 	private:
 		std::ifstream finput;
 

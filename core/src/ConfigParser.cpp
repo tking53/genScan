@@ -41,8 +41,9 @@ void ConfigParser::SetAuthorEmailText(std::string* txt){
 	this->AuthorEmailText.reset(txt);
 }
 
-void ConfigParser::Parse(){
+void ConfigParser::Parse(ChannelMap* cmap){
 	throw std::runtime_error("ConfigParser::Parse() Should not be called");
+	(void) cmap;
 }
 		
 void ConfigParser::ParseDescription(){
@@ -61,8 +62,9 @@ void ConfigParser::ParseDetectorDriver(){
 	throw std::runtime_error("ConfigParser::ParseDetectorDriver() Should not be called");
 }
 
-void ConfigParser::ParseMap(){
+void ConfigParser::ParseMap(ChannelMap* cmap){
 	throw std::runtime_error("ConfigParser::ParseMap() Should not be called");
+	(void) cmap;
 }
 		
 double ConfigParser::GetGlobalEventWidth() const{

@@ -17,7 +17,7 @@
 JSONConfigParser::JSONConfigParser(const std::string& log) : ConfigParser(log){
 }
 
-void JSONConfigParser::Parse(){
+void JSONConfigParser::Parse(ChannelMap* cmap){
 	if( this->ConfigName == nullptr ){
 		throw std::runtime_error("JSONConfigParser::Parse() SetConfigFile() has not been called");
 	}
@@ -51,7 +51,7 @@ void JSONConfigParser::Parse(){
 	spdlog::get(this->LogName)->info("Parsing DetectorDriver tag");
 	ParseDetectorDriver();
 	spdlog::get(this->LogName)->info("Parsing Map tag");
-	ParseMap();
+	ParseMap(cmap);
 }
 		
 void JSONConfigParser::ParseDescription(){
@@ -142,12 +142,9 @@ void JSONConfigParser::ParseDetectorDriver(){
 	}
 }
 
-void JSONConfigParser::ParseMap(){
+void JSONConfigParser::ParseMap(ChannelMap* cmap){
 	this->Map = this->Configuration["Map"];
 	if( this->Map ){
-		//create the channel map object that will be used for lookups. Make it global instanced
-		auto cmap = ChannelMap::Get();
-
 		Json::Value board = this->Map["Module"];
 		if( !board ){
 			std::stringstream ss;

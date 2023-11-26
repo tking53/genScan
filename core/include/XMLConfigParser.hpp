@@ -9,11 +9,12 @@
 #include <pugiconfig.hpp>
 
 #include "ConfigParser.hpp"
+#include "ChannelMap.hpp"
 
 class XMLConfigParser : public ConfigParser{
 	public:
 		XMLConfigParser(const std::string&);
-		virtual void Parse();
+		virtual void Parse(ChannelMap*);
 		std::map<std::string,pugi::xml_node>& GetAnalyzers();
 		std::map<std::string,pugi::xml_node>& GetProcessors();
 	protected:
@@ -21,7 +22,7 @@ class XMLConfigParser : public ConfigParser{
 		virtual void ParseAuthor();
 		virtual void ParseGlobal();
 		virtual void ParseDetectorDriver();
-		virtual void ParseMap();
+		virtual void ParseMap(ChannelMap*);
 	private:
 		pugi::xml_document XMLDoc;
 

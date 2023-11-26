@@ -16,6 +16,7 @@ class ChannelMap{
 			QuadraticExpo,
 			CubicExpo
 		};
+		ChannelMap(int mc,int mbpc,int mcpb,int mcppc);
 
 		int GetFid(int&,int&) const;
 		int GetNumBoards() const;
@@ -27,9 +28,6 @@ class ChannelMap{
 		void SetParams(int&,int&,std::string,std::string,std::string,std::vector<std::string>,CalType,std::vector<double>&);
 		void SetBoardInfo(int&,std::string,int,int);
 		double GetCalibratedEnergy(int&,int&,double&);
-		static ChannelMap* Get();
-		static ChannelMap* Get(int,int,int,int);
-
 	private:
 
 		std::vector<CalType> Calibration;
@@ -51,10 +49,6 @@ class ChannelMap{
 		std::vector<std::string> Firmware;
 		std::vector<int> Frequency;
 		std::vector<int> TraceDelay;
-
-		ChannelMap(int mc,int mbpc,int mcpb,int mcppc);
-
-		static ChannelMap* instance;
 };
 
 #endif

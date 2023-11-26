@@ -7,18 +7,19 @@
 
 #include <yaml-cpp/yaml.h>
 
+#include "ChannelMap.hpp"
 #include "ConfigParser.hpp"
 
 class YAMLConfigParser : public ConfigParser{
 	public:
 		YAMLConfigParser(const std::string&);
-		virtual void Parse();
+		virtual void Parse(ChannelMap*);
 	protected:
 		virtual void ParseDescription();
 		virtual void ParseAuthor();
 		virtual void ParseGlobal();
 		virtual void ParseDetectorDriver();
-		virtual void ParseMap();
+		virtual void ParseMap(ChannelMap*);
 	private:
 		YAML::Node YAMLDoc;
 		YAML::Node Configuration;
