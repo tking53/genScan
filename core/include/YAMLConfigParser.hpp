@@ -11,7 +11,7 @@
 
 class YAMLConfigParser : public ConfigParser{
 	public:
-		YAMLConfigParser(std::string&);
+		YAMLConfigParser(const std::string&);
 		virtual void Parse();
 	protected:
 		virtual void ParseDescription();

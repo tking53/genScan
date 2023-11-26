@@ -13,7 +13,7 @@
 #include "ConfigParser.hpp"
 #include "ChannelMap.hpp"
 
-ConfigParser::ConfigParser(std::string& log){
+ConfigParser::ConfigParser(const std::string& log){
 	this->LogName = log;
 }
 

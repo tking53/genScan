@@ -12,7 +12,7 @@
 
 class JSONConfigParser : public ConfigParser{
 	public:
-		JSONConfigParser(std::string&);
+		JSONConfigParser(const std::string&);
 		virtual void Parse();
 	protected:
 		virtual void ParseDescription();

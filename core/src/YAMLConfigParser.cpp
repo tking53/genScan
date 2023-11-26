@@ -18,7 +18,7 @@
 #include "ChannelMap.hpp"
 #include "StringManipFunctions.hpp"
 
-YAMLConfigParser::YAMLConfigParser(std::string& log) : ConfigParser(log){
+YAMLConfigParser::YAMLConfigParser(const std::string& log) : ConfigParser(log){
 }
 
 void YAMLConfigParser::Parse(){

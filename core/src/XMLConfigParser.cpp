@@ -13,7 +13,7 @@
 #include "ChannelMap.hpp"
 #include "StringManipFunctions.hpp"
 
-XMLConfigParser::XMLConfigParser(std::string& log) : ConfigParser(log){
+XMLConfigParser::XMLConfigParser(const std::string& log) : ConfigParser(log){
 }
 
 void XMLConfigParser::Parse(){

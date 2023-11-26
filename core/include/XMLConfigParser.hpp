@@ -12,7 +12,7 @@
 
 class XMLConfigParser : public ConfigParser{
 	public:
-		XMLConfigParser(std::string&);
+		XMLConfigParser(const std::string&);
 		virtual void Parse();
 		std::map<std::string,pugi::xml_node>& GetAnalyzers();
 		std::map<std::string,pugi::xml_node>& GetProcessors();

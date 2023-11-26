@@ -8,7 +8,7 @@
 
 class ConfigParser{
 	public:
-		ConfigParser(std::string&);
+		ConfigParser(const std::string&);
 		virtual void Parse();
 
 		void SetGlobalEventWidthInS(double);

@@ -14,7 +14,7 @@
 #include "ChannelMap.hpp"
 #include "StringManipFunctions.hpp"
 
-JSONConfigParser::JSONConfigParser(std::string& log) : ConfigParser(log){
+JSONConfigParser::JSONConfigParser(const std::string& log) : ConfigParser(log){
 }
 
 void JSONConfigParser::Parse(){
