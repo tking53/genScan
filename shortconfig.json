@@ -12,19 +12,12 @@
           "alpha": 1.0,
           "beta": 2.0,
           "gamma": 4.0
-        },
-        {
-          "name": "GenericProcessor2",
-          "delta": "epsilon"
         }
       ],
       "Analyzer": [
         {
           "name": "GenericAnalyzer",
           "eta": "1,2,3"
-        },
-        {
-          "name": "GenericAnalyzer2"
         }
       ]
     },

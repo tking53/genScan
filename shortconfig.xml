@@ -6,11 +6,7 @@
 	<Global EventWidth="5.0e-7" EventWidthUnit="s"/>
 	<DetectorDriver>
 		<Processor name="GenericProcessor" alpha="1.0" beta="2.0" gamma="4.0"/>
-		<Processor name="GenericProcessor2"/>
-		<Processor name="GenericProcessor3"/>
 		<Analyzer name="GenericAnalyzer"/>
-		<Analyzer name="GenericAnalyzer2"/>
-		<Analyzer name="GenericAnalyzer3"/>
 	</DetectorDriver>
 	<Map>
 		<Module number="0" Frequency="100" Firmware="PHA" TraceDelay="264">
