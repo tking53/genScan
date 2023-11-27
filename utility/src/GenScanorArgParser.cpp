@@ -41,15 +41,15 @@ GenScanorArgParser::GenScanorArgParser(char* name,const std::string& log) : ArgP
 }
 
 void GenScanorArgParser::ShowUsage(){
-	spdlog::get(this->LogName)->info("{}",ProgName);
-	spdlog::get(this->LogName)->info("{}/{} {}",ConfigFile->GetShortOptName(),ConfigFile->GetLongOptName(),ConfigFile->GetDescription());
-	spdlog::get(this->LogName)->info("{}/{} {}",OutputFile->GetShortOptName(),OutputFile->GetLongOptName(),OutputFile->GetDescription());
-	spdlog::get(this->LogName)->info("{}/{} {}",EvtBuild->GetShortOptName(),EvtBuild->GetLongOptName(),EvtBuild->GetDescription());
-	spdlog::get(this->LogName)->info("{}/{} {}",FileNames->GetShortOptName(),FileNames->GetLongOptName(),FileNames->GetDescription());
-	spdlog::get(this->LogName)->info("{}/{} {}",Help->GetShortOptName(),Help->GetLongOptName(),Help->GetDescription());
-	spdlog::get(this->LogName)->info("{}/{} {}",Limit->GetShortOptName(),Limit->GetLongOptName(),Limit->GetDescription());
-	spdlog::get(this->LogName)->info("{}/{} {}",DataFileType->GetShortOptName(),DataFileType->GetLongOptName(),DataFileType->GetDescription());
-	spdlog::get(this->LogName)->info("{}/{} {}",Port->GetShortOptName(),Port->GetLongOptName(),Port->GetDescription());
+	spdlog::info("{}",ProgName);
+	spdlog::info("{}/{} {}",ConfigFile->GetShortOptName(),ConfigFile->GetLongOptName(),ConfigFile->GetDescription());
+	spdlog::info("{}/{} {}",OutputFile->GetShortOptName(),OutputFile->GetLongOptName(),OutputFile->GetDescription());
+	spdlog::info("{}/{} {}",EvtBuild->GetShortOptName(),EvtBuild->GetLongOptName(),EvtBuild->GetDescription());
+	spdlog::info("{}/{} {}",FileNames->GetShortOptName(),FileNames->GetLongOptName(),FileNames->GetDescription());
+	spdlog::info("{}/{} {}",Help->GetShortOptName(),Help->GetLongOptName(),Help->GetDescription());
+	spdlog::info("{}/{} {}",Limit->GetShortOptName(),Limit->GetLongOptName(),Limit->GetDescription());
+	spdlog::info("{}/{} {}",DataFileType->GetShortOptName(),DataFileType->GetLongOptName(),DataFileType->GetDescription());
+	spdlog::info("{}/{} {}",Port->GetShortOptName(),Port->GetLongOptName(),Port->GetDescription());
 }
 
 void GenScanorArgParser::ParseArgs(int argc,char* argv[]){

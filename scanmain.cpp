@@ -29,6 +29,25 @@
 #include "DataParser.hpp"
 
 int main(int argc, char *argv[]) {
+	const std::string logname = "genscan";
+	auto cmdArgs = GenScanorArgParser::Get(argv[0],logname);
+	try{
+		cmdArgs->ParseArgs(argc,argv);
+	}catch( std::runtime_error const& e ){
+		spdlog::error(e.what());
+		exit(EXIT_FAILURE);
+	}
+
+	auto configfile = cmdArgs->GetConfigFile();
+	auto outputfile = cmdArgs->GetOutputFile();
+	auto limit = *(cmdArgs->GetLimit());
+	auto FileNames = cmdArgs->GetInputFiles();
+	auto evtbuild = *(cmdArgs->GetEvtBuild());
+	auto dataformat = cmdArgs->GetDataFileType();
+	auto port = *(cmdArgs->GetPort());
+
+	const int lower_limit = 10000;
+
 	const int MAX_CRATES = 5;
 	const int MAX_CARDS_PER_CRATE = 13;
 	const int MAX_BOARDS = MAX_CARDS_PER_CRATE*MAX_CRATES;
@@ -36,10 +55,9 @@ int main(int argc, char *argv[]) {
 	const int MAX_CHANNELS = MAX_CHANNELS_PER_BOARD*MAX_BOARDS;
 	const int MAX_CAL_PARAMS_PER_CHANNEL = 4;
 
-	const std::string logname = "genscan";
-	const std::string logfilename = logname+".log";
-	const std::string errfilename = logname+".err";
-	const std::string dbgfilename = logname+".dbg";
+	const std::string logfilename = (*outputfile)+".log";
+	const std::string errfilename = (*outputfile)+".err";
+	const std::string dbgfilename = (*outputfile)+".dbg";
 
 	spdlog::set_level(spdlog::level::debug);
 	std::shared_ptr<spdlog::sinks::basic_file_sink_mt> LogFileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(logfilename,true);
@@ -59,28 +77,12 @@ int main(int argc, char *argv[]) {
 	spdlog::initialize_logger(console);
 	console->flush_on(spdlog::level::info);
 
-	auto cmdArgs = GenScanorArgParser::Get(argv[0],logname);
-	try{
-		cmdArgs->ParseArgs(argc,argv);
-	}catch( std::runtime_error const& e ){
-		console->error(e.what());
-		exit(EXIT_FAILURE);
-	}
-
-	auto configfile = cmdArgs->GetConfigFile();
-	auto outputfile = cmdArgs->GetOutputFile();
-	auto limit = *(cmdArgs->GetLimit());
-	auto FileNames = cmdArgs->GetInputFiles();
-	auto evtbuild = *(cmdArgs->GetEvtBuild());
-	auto dataformat = cmdArgs->GetDataFileType();
-	auto port = *(cmdArgs->GetPort());
-
-	const int lower_limit = 10000;
-
 	if( limit < lower_limit ){
 		console->warn("limit of {} is less than lower_limit of {}. Using lower_limit instead",limit,lower_limit);
 		limit = lower_limit;
 	}
+
+
 
 	auto parser = DataParser::Get();
 	try{ 
@@ -170,8 +172,8 @@ int main(int argc, char *argv[]) {
 	#ifdef DEBUG_MODE
 		console->info("Beginning plotting");
 		std::thread filler(&PLOTS::PlotRegistry::RandFill,HistogramManager.get());
-		std::this_thread::sleep_for(std::chrono::seconds(3));
-		for( int ii = 0; ii < 1000000; ++ii ){
+		//std::this_thread::sleep_for(std::chrono::seconds(3));
+		for( int ii = 0; ii < 1000000; ++ii ) [[likely]] {
 			processorlist->PreProcess();
 			processorlist->PreAnalyze();
 	

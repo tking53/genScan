@@ -14,7 +14,6 @@ class ArgParser{
 		virtual void ShowUsage();
 		virtual void ParseArgs(int,char*[]);
 	protected:
-
 		std::string ProgName;
 		std::string fullargv;
 		std::string LogName;

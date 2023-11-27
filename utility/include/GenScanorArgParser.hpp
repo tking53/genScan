@@ -8,12 +8,12 @@
 #include "ArgValue.hpp"
 #include "ArgParser.hpp"
 
-class GenScanorArgParser : private ArgParser{
+class GenScanorArgParser : public ArgParser{
 	public:
 		static GenScanorArgParser* Get();	
 		static GenScanorArgParser* Get(char*,const std::string&);	
-		void ShowUsage();
-		void ParseArgs(int,char*[]);
+		void ShowUsage() override;
+		void ParseArgs(int,char*[]) override;
 		std::string* GetConfigFile() const;
 		std::string* GetOutputFile() const;
 		std::string* GetDataFileType() const;
@@ -21,7 +21,7 @@ class GenScanorArgParser : private ArgParser{
 		bool* GetEvtBuild() const;
 		int* GetLimit() const;
 		int* GetPort() const;
-	private:
+	protected:
 		GenScanorArgParser(char*,const std::string&);
 
 		std::shared_ptr<ArgValue<std::string>> ConfigFile;

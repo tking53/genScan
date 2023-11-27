@@ -2,6 +2,7 @@
 #include <pthread.h>
 #include <regex>
 #include <sstream>
+#include <iostream>
 
 #include <spdlog/common.h>
 #include <spdlog/spdlog.h>
@@ -35,10 +36,10 @@ GenConfigArgParser::GenConfigArgParser(char* name,const std::string& log) : ArgP
 }
 
 void GenConfigArgParser::ShowUsage(){
-	spdlog::get(this->LogName)->info("{}",ProgName);
-	spdlog::get(this->LogName)->info("{}/{} {}",ConfigFile->GetShortOptName(),ConfigFile->GetLongOptName(),ConfigFile->GetDescription());
-	spdlog::get(this->LogName)->info("{}/{} {}",OutputFile->GetShortOptName(),OutputFile->GetLongOptName(),OutputFile->GetDescription());
-	spdlog::get(this->LogName)->info("{}/{} {}",Help->GetShortOptName(),Help->GetLongOptName(),Help->GetDescription());
+	spdlog::info("{}",ProgName);
+	spdlog::info("{}/{} {}",ConfigFile->GetShortOptName(),ConfigFile->GetLongOptName(),ConfigFile->GetDescription());
+	spdlog::info("{}/{} {}",OutputFile->GetShortOptName(),OutputFile->GetLongOptName(),OutputFile->GetDescription());
+	spdlog::info("{}/{} {}",Help->GetShortOptName(),Help->GetLongOptName(),Help->GetDescription());
 }
 
 void GenConfigArgParser::ParseArgs(int argc,char* argv[]){
