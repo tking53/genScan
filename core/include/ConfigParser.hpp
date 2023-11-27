@@ -19,7 +19,8 @@
 class ConfigParser{
 	public:
 		ConfigParser(const std::string&);
-		virtual void Parse(ChannelMap*);
+		[[noreturn]] virtual void Parse([[maybe_unused]] ChannelMap*);
+		virtual ~ConfigParser();
 
 		void SetGlobalEventWidthInS(double);
 		void SetConfigFile(std::string*);
@@ -41,11 +42,11 @@ class ConfigParser{
 		void AddProcessorName(const std::string&);
 		void AddAnalyzerName(const std::string&);
 	protected:
-		virtual void ParseDescription();
-		virtual void ParseAuthor();
-		virtual void ParseGlobal();
-		virtual void ParseDetectorDriver();
-		virtual void ParseMap(ChannelMap*);
+		[[noreturn]] virtual void ParseDescription();
+		[[noreturn]] virtual void ParseAuthor();
+		[[noreturn]] virtual void ParseGlobal();
+		[[noreturn]] virtual void ParseDetectorDriver();
+		[[noreturn]] virtual void ParseMap([[maybe_unused]] ChannelMap*);
 
 		std::vector<std::string> ProcessorNames;
 		std::vector<std::string> AnalyzerNames;

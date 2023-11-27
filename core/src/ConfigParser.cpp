@@ -17,6 +17,8 @@ ConfigParser::ConfigParser(const std::string& log){
 	this->LogName = log;
 }
 
+ConfigParser::~ConfigParser() = default;
+
 void ConfigParser::SetGlobalEventWidthInS(double width){
 	GlobalEventWidthInS = width;
 }
@@ -41,30 +43,28 @@ void ConfigParser::SetAuthorEmailText(std::string* txt){
 	this->AuthorEmailText.reset(txt);
 }
 
-void ConfigParser::Parse(ChannelMap* cmap){
+[[noreturn]] void ConfigParser::Parse([[maybe_unused]] ChannelMap* cmap){
 	throw std::runtime_error("ConfigParser::Parse() Should not be called");
-	(void) cmap;
 }
 		
-void ConfigParser::ParseDescription(){
+[[noreturn]] void ConfigParser::ParseDescription(){
 	throw std::runtime_error("ConfigParser::ParseDescription() Should not be called");
 }
 
-void ConfigParser::ParseAuthor(){
+[[noreturn]] void ConfigParser::ParseAuthor(){
 	throw std::runtime_error("ConfigParser::ParseAuthor() Should not be called");
 }
 
-void ConfigParser::ParseGlobal(){
+[[noreturn]] void ConfigParser::ParseGlobal(){
 	throw std::runtime_error("ConfigParser::ParseGlobal() Should not be called");
 }
 
-void ConfigParser::ParseDetectorDriver(){
+[[noreturn]] void ConfigParser::ParseDetectorDriver(){
 	throw std::runtime_error("ConfigParser::ParseDetectorDriver() Should not be called");
 }
 
-void ConfigParser::ParseMap(ChannelMap* cmap){
+[[noreturn]] void ConfigParser::ParseMap([[maybe_unused]] ChannelMap* cmap){
 	throw std::runtime_error("ConfigParser::ParseMap() Should not be called");
-	(void) cmap;
 }
 		
 double ConfigParser::GetGlobalEventWidth() const{

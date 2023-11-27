@@ -14,6 +14,7 @@ class YAMLConfigParser : public ConfigParser{
 	public:
 		YAMLConfigParser(const std::string&);
 		virtual void Parse(ChannelMap*);
+		~YAMLConfigParser() = default;
 
 		YAML::Node GetProcessorYAMLInfo(const std::string&) const;
 		YAML::Node GetAnalyzerYAMLInfo(const std::string&) const;

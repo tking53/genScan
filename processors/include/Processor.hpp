@@ -29,17 +29,17 @@
 class Processor{
 	public:
 		Processor(const std::string&,const std::string&);
-		virtual bool PreProcess();
-		virtual bool Process();
-		virtual bool PostProcess();
-		virtual void EndProcess();
+		[[maybe_unused]] virtual bool PreProcess();
+		[[maybe_unused]] virtual bool Process();
+		[[maybe_unused]] virtual bool PostProcess();
+		[[maybe_unused]] virtual void EndProcess();
 		virtual ~Processor();
 
-		virtual void DeclarePlots(PLOTS::PlotRegistry*) const;
+		[[noreturn]] virtual void Init([[maybe_unused]] const pugi::xml_node&);
+		[[noreturn]] virtual void Init([[maybe_unused]] const YAML::Node&);
+		[[noreturn]] virtual void Init([[maybe_unused]] const Json::Value&);
 
-		virtual void Init(const pugi::xml_node&);
-		virtual void Init(const YAML::Node&);
-		virtual void Init(const Json::Value&);
+		[[noreturn]] virtual void DeclarePlots([[maybe_unused]] PLOTS::PlotRegistry*) const;
 	protected:
 		enum STEP{
 			PREPROCESS,

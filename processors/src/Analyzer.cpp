@@ -28,20 +28,17 @@ Analyzer::~Analyzer(){
 	console->info("PreProcess : {:.3f}ms Process: {:.3f}ms PostProcess : {:.3f}ms",preprocesstime,processtime,postprocesstime);
 }
 
-void Analyzer::Init(const Json::Value& node){
-	(void) node;
+[[noreturn]] void Analyzer::Init([[maybe_unused]] const Json::Value& node){
 	console->error("Called Analyzer::Init(Json::Value& node), not the overload");
 	throw std::runtime_error("Called Analyzer::Init(Json::Value& node), not the overload");
 }
 
-void Analyzer::Init(const YAML::Node& node){
-	(void) node;
+[[noreturn]] void Analyzer::Init([[maybe_unused]] const YAML::Node& node){
 	console->error("Called Analyzer::Init(YAML::Node& node), not the overload");
 	throw std::runtime_error("Called Analyzer::Init(YAML::Node& node), not the overload");
 }
 
-void Analyzer::Init(const pugi::xml_node& node){
-	(void) node;
+[[noreturn]] void Analyzer::Init([[maybe_unused]] const pugi::xml_node& node){
 	console->error("Called Analyzer::Init(pugi::xml_node& node), not the overload");
 	throw std::runtime_error("Called Analyzer::Init(pugi::xml_node& node), not the overload");
 }
@@ -80,13 +77,12 @@ void Analyzer::EndProcess(){
 		case STEP::POSTPROCESS:
 			postprocesstime += dur.count();
 			break;
-		default:
+		[[unlikely]] default:
 			break;
 	}
 }
 
-void Analyzer::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
-	(void) hismanager;
+[[noreturn]] void Analyzer::DeclarePlots([[maybe_unused]] PLOTS::PlotRegistry* hismanager) const{
 	console->error("Called Analyzer::DeclarePlots(PLOTS::PlotRegistry* hismanager), not the overload");
 	throw std::runtime_error("Called Analyzer::DeclarePlots(PLOTS::PlotRegistry* hismanager), not the overload");
 }

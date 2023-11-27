@@ -111,7 +111,6 @@ namespace PLOTS{
 			}
 
 			void RandFill(){
-				const Int_t kUPDATE = 1000;
 				float px, py;
 				for (Int_t i = 0; ; i++) {
 					gRandom->Rannor(px,py);
@@ -144,7 +143,7 @@ namespace PLOTS{
 
 			void Initialize(const int& numchannels,const int& ergsize,const int& scalarsize){
 				RegisterPlot<TH2F>("Raw","Raw Energy; Energy (channel); Channel (arb.);",ergsize,0.0,ergsize,numchannels,0,numchannels);
-				RegisterPlot<TH2F>("Scalar","Scalar Rate; Time (s); Channel (arb.);",ergsize,0.0,ergsize,numchannels,0,numchannels);
+				RegisterPlot<TH2F>("Scalar","Scalar Rate; Time (s); Channel (arb.);",scalarsize,0.0,scalarsize,numchannels,0,numchannels);
 				RegisterPlot<TH2F>("Cal","Cal. Energy; Energy (keV); Channel (arb.);",ergsize,0.0,ergsize,numchannels,0,numchannels);
 			}
 

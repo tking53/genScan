@@ -29,39 +29,36 @@ Processor::~Processor(){
 	console->info("PreProcess : {:.3f}ms Process: {:.3f}ms PostProcess : {:.3f}ms",preprocesstime,processtime,postprocesstime);
 }
 
-void Processor::Init(const Json::Value& node){
-	(void) node;
+[[noreturn]] void Processor::Init([[maybe_unused]] const Json::Value& node){
 	console->error("Called Processor::Init(Json::Value& node), not the overload");
 	throw std::runtime_error("Called Processor::Init(Json::Value& node), not the overload");
 }
 
-void Processor::Init(const YAML::Node& node){
-	(void) node;
+[[noreturn]] void Processor::Init([[maybe_unused]] const YAML::Node& node){
 	console->error("Called Processor::Init(YAML::Node& node), not the overload");
 	throw std::runtime_error("Called Processor::Init(YAML::Node& node), not the overload");
 }
 
-void Processor::Init(const pugi::xml_node& node){
-	(void) node;
+[[noreturn]] void Processor::Init([[maybe_unused]] const pugi::xml_node& node){
 	console->error("Called Processor::Init(pugi::xml_node& node), not the overload");
 	throw std::runtime_error("Called Processor::Init(pugi::xml_node& node), not the overload");
 }
 
-bool Processor::PreProcess(){
+[[maybe_unused]] bool Processor::PreProcess(){
 	start_time = std::chrono::high_resolution_clock::now();
 	currstep = STEP::PREPROCESS;
 	++preprocesscalls;
 	return true;
 }
 
-bool Processor::Process(){
+[[maybe_unused]] bool Processor::Process(){
 	start_time = std::chrono::high_resolution_clock::now();
 	currstep = STEP::PROCESS;
 	++processcalls;
 	return true;
 }
 
-bool Processor::PostProcess(){
+[[maybe_unused]] bool Processor::PostProcess(){
 	start_time = std::chrono::high_resolution_clock::now();
 	currstep = STEP::POSTPROCESS;
 	++postprocesscalls;
@@ -81,14 +78,13 @@ void Processor::EndProcess(){
 		case STEP::POSTPROCESS:
 			postprocesstime += dur.count();
 			break;
-		default:
+		[[unlikely]] default:
 			break;
 	}
 }
 
 		
-void Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
-	(void) hismanager;
+[[noreturn]] void Processor::DeclarePlots([[maybe_unused]] PLOTS::PlotRegistry* hismanager) const{
 	console->error("Called Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager), not the overload");
 	throw std::runtime_error("Called Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager), not the overload");
 }
