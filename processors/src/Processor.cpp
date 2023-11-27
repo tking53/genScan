@@ -1,4 +1,5 @@
 #include <chrono>
+#include <initializer_list>
 #include <stdexcept>
 
 #include "Processor.hpp"
@@ -10,7 +11,7 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-Processor::Processor(const std::string& log,const std::string& proc){
+Processor::Processor(const std::string& log,const std::string& proc,const std::initializer_list<std::string>& types){
 	this->LogName = log;
 	this->ProcessorName = proc;
 	console = spdlog::get(this->LogName)->clone(this->ProcessorName);
@@ -21,12 +22,27 @@ Processor::Processor(const std::string& log,const std::string& proc){
 	processtime = 0.0;
 	postprocesstime = 0.0;
 	currstep = STEP::UNKNOWN;
+	Types = types;
 	console->info("Created Processor : {}",this->ProcessorName);
+	for( const auto& t : Types )
+		console->info("Type : {} has been associated with this Processor",t);
 }
 
 Processor::~Processor(){
 	console->info("PreProcessCalls : {} ProcessCalls : {} PostProcessCalls : {}",preprocesscalls,processcalls,postprocesscalls);
 	console->info("PreProcess : {:.3f}ms Process: {:.3f}ms PostProcess : {:.3f}ms",preprocesstime,processtime,postprocesstime);
+}
+
+std::shared_ptr<Processor> Processor::GetPtr(){
+	return shared_from_this();
+}
+
+[[nodiscard]] bool Processor::ContainsType(const std::string& type) const{
+	if( Types.empty() ){
+		return false;
+	}else{
+		return Types.find(type) != Types.end();
+	}
 }
 
 [[noreturn]] void Processor::Init([[maybe_unused]] const Json::Value& node){

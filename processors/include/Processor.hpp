@@ -5,6 +5,7 @@
 //this will act on every piece of data no matter what, will output to special root tree and make generic
 //histograms inside root
 
+#include <initializer_list>
 #include <string>
 #include <vector>
 #include <memory>
@@ -26,14 +27,18 @@
 
 #include "HistogramManager.hpp"
 
-class Processor{
+class Processor : public std::enable_shared_from_this<Processor> {
 	public:
-		Processor(const std::string&,const std::string&);
+		Processor(const std::string&,const std::string&,const std::initializer_list<std::string>&);
 		[[maybe_unused]] virtual bool PreProcess();
 		[[maybe_unused]] virtual bool Process();
 		[[maybe_unused]] virtual bool PostProcess();
 		[[maybe_unused]] virtual void EndProcess();
 		virtual ~Processor();
+
+		std::shared_ptr<Processor> GetPtr();
+
+		[[nodiscard]] bool ContainsType(const std::string&) const;
 
 		[[noreturn]] virtual void Init([[maybe_unused]] const pugi::xml_node&);
 		[[noreturn]] virtual void Init([[maybe_unused]] const YAML::Node&);
@@ -62,6 +67,8 @@ class Processor{
 
 		std::string ProcessorName;
 		std::string LogName;
+
+		std::set<std::string> Types;
 
 		std::shared_ptr<spdlog::logger> console;
 };

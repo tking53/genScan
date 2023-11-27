@@ -1,7 +1,7 @@
 #include "GenericAnalyzer.hpp"
 #include "Analyzer.hpp"
 
-GenericAnalyzer::GenericAnalyzer(const std::string& log) : Analyzer(log,"GenericAnalyzer"){
+GenericAnalyzer::GenericAnalyzer(const std::string& log) : Analyzer(log,"GenericAnalyzer",{"Generic"}){
 }
 
 bool GenericAnalyzer::PreProcess(){

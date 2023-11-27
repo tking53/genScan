@@ -1,3 +1,4 @@
+#include <initializer_list>
 #include <stdexcept>
 
 #include <spdlog/common.h>
@@ -10,7 +11,7 @@
 
 #include "Analyzer.hpp"
 
-Analyzer::Analyzer(const std::string& log,const std::string& analyzer){
+Analyzer::Analyzer(const std::string& log,const std::string& analyzer,const std::initializer_list<std::string>& types){
 	this->AnalyzerName = analyzer;
 	this->LogName = log;
 	console = spdlog::get(this->LogName)->clone(this->AnalyzerName);
@@ -20,12 +21,27 @@ Analyzer::Analyzer(const std::string& log,const std::string& analyzer){
 	preprocesstime = 0.0;
 	processtime = 0.0;
 	postprocesstime = 0.0;
+	Types = types;
 	console->info("Created AnalyzerName : {}",this->AnalyzerName);
+	for( const auto& t : Types )
+		console->info("Type : {} has been associated with this Analyzer",t);
 }
 
 Analyzer::~Analyzer(){
 	console->info("PreProcessCalls : {} ProcessCalls : {} PostProcessCalls : {}",preprocesscalls,processcalls,postprocesscalls);
 	console->info("PreProcess : {:.3f}ms Process: {:.3f}ms PostProcess : {:.3f}ms",preprocesstime,processtime,postprocesstime);
+}
+
+std::shared_ptr<Analyzer> Analyzer::GetPtr(){
+	return shared_from_this();
+}
+
+[[nodiscard]] bool Analyzer::ContainsType(const std::string& type) const{
+	if( Types.empty() ){
+		return false;
+	}else{
+		return Types.find(type) != Types.end();
+	}
 }
 
 [[noreturn]] void Analyzer::Init([[maybe_unused]] const Json::Value& node){

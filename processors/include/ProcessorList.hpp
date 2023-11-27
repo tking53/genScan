@@ -4,6 +4,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <memory>
 
 #include "ConfigParser.hpp"
 #include "HistogramManager.hpp"
@@ -41,8 +42,8 @@ class ProcessorList{
 		~ProcessorList();
 	private:
 		std::string LogName;
-		std::vector<Processor*> processors;
-		std::vector<Analyzer*> analyzers;
+		std::vector<std::shared_ptr<Processor>> processors;
+		std::vector<std::shared_ptr<Analyzer>> analyzers;
 };
 
 #endif

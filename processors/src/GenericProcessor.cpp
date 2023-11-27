@@ -1,6 +1,6 @@
 #include "GenericProcessor.hpp"
 
-GenericProcessor::GenericProcessor(const std::string& log) : Processor(log,"GenericProcessor"){
+GenericProcessor::GenericProcessor(const std::string& log) : Processor(log,"GenericProcessor",{"Generic"}){
 }
 
 bool GenericProcessor::PreProcess(){

@@ -6,6 +6,7 @@
 //histograms inside root
 
 #include "HistogramManager.hpp"
+#include <initializer_list>
 #include <string>
 #include <vector>
 #include <memory>
@@ -25,14 +26,18 @@
 
 #include <json/json.h>
 
-class Analyzer{
+class Analyzer : public std::enable_shared_from_this<Analyzer>{
 	public:
-		Analyzer(const std::string&,const std::string&);
+		Analyzer(const std::string&,const std::string&,const std::initializer_list<std::string>&);
 		[[maybe_unused]] virtual bool PreProcess();
 		[[maybe_unused]] virtual bool Process();
 		[[maybe_unused]] virtual bool PostProcess();
 		[[maybe_unused]] virtual void EndProcess();
 		virtual ~Analyzer();
+
+		std::shared_ptr<Analyzer> GetPtr();
+
+		[[nodiscard]] bool ContainsType(const std::string&) const;
 
 		[[noreturn]] virtual void Init([[maybe_unused]] const pugi::xml_node&);
 		[[noreturn]] virtual void Init([[maybe_unused]] const YAML::Node&);
@@ -46,7 +51,6 @@ class Analyzer{
 			POSTPROCESS,
 			UNKNOWN
 		};
-
 		STEP currstep;
 
 		std::chrono::time_point<std::chrono::high_resolution_clock> start_time;
@@ -59,6 +63,7 @@ class Analyzer{
 		unsigned long long processcalls;
 		unsigned long long postprocesscalls;
 
+		std::set<std::string> Types;
 
 		std::string AnalyzerName;
 		std::string LogName;
