@@ -237,14 +237,14 @@ endif()
 add_subdirectory(utility)
 add_subdirectory(processors)
 add_subdirectory(core)
-add_subdirectory(parsers)
+add_subdirectory(translators)
 
 target_include_directories(PROCESSOR_LIB PUBLIC core/include)
 
 add_executable(GenScanor scanmain.cpp)
 
 #include_directories(${PROJECT_SOURCE_DIR}/utility/include)
-target_link_libraries(GenScanor PRIVATE PARSER_LIB PROCESSOR_LIB CORE_LIB UTILITY_LIB)
+target_link_libraries(GenScanor PRIVATE TRANSLATOR_LIB PROCESSOR_LIB CORE_LIB UTILITY_LIB)
 if( USE_SYSTEM_FMT )
 	target_link_libraries(GenScanor PRIVATE fmt::fmt)
 endif()
