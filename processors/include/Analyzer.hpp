@@ -36,6 +36,7 @@ class Analyzer : public std::enable_shared_from_this<Analyzer>{
 		virtual ~Analyzer();
 
 		std::shared_ptr<Analyzer> GetPtr();
+		virtual std::string GetAnalyzerName() const;
 
 		[[nodiscard]] bool ContainsType(const std::string&) const;
 

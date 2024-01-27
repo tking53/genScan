@@ -28,6 +28,15 @@ Processor::Processor(const std::string& log,const std::string& proc,const std::i
 		console->info("Type : {} has been associated with this Processor",t);
 }
 
+std::string Processor::GetProcessorName() const{
+	return this->ProcessorName;
+}
+
+TTree* Processor::RegisterTree(){
+	this->OutputTree = nullptr;
+	return this->OutputTree;
+}
+
 Processor::~Processor(){
 	console->info("PreProcessCalls : {} ProcessCalls : {} PostProcessCalls : {}",preprocesscalls,processcalls,postprocesscalls);
 	console->info("PreProcess : {:.3f}ms Process: {:.3f}ms PostProcess : {:.3f}ms",preprocesstime,processtime,postprocesstime);

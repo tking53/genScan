@@ -36,6 +36,10 @@ std::shared_ptr<Analyzer> Analyzer::GetPtr(){
 	return shared_from_this();
 }
 
+std::string Analyzer::GetAnalyzerName() const{
+	return this->AnalyzerName;
+}
+
 [[nodiscard]] bool Analyzer::ContainsType(const std::string& type) const{
 	if( Types.empty() ){
 		return false;

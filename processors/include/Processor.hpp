@@ -25,6 +25,8 @@
 
 #include <json/json.h>
 
+#include "TTree.h"
+
 #include "HistogramManager.hpp"
 
 class Processor : public std::enable_shared_from_this<Processor> {
@@ -37,6 +39,8 @@ class Processor : public std::enable_shared_from_this<Processor> {
 		virtual ~Processor();
 
 		std::shared_ptr<Processor> GetPtr();
+		virtual std::string GetProcessorName() const;
+		virtual TTree* RegisterTree();
 
 		[[nodiscard]] bool ContainsType(const std::string&) const;
 
@@ -71,6 +75,8 @@ class Processor : public std::enable_shared_from_this<Processor> {
 		std::set<std::string> Types;
 
 		std::shared_ptr<spdlog::logger> console;
+
+		TTree* OutputTree;
 };
 
 #endif
