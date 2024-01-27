@@ -140,6 +140,11 @@ void ProcessorList::InitializeAnalyzers(JSONConfigParser* cmap){
 	}
 }
 
+void ProcessorList::RegisterOutputTrees(RootFileManager* rootnamager){
+	for( auto& proc : this->processors )
+		rootnamager->RegisterProcessor(proc.get());
+}
+
 void ProcessorList::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 	for( auto& proc : this->processors )
 		proc->DeclarePlots(hismanager);

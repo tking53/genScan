@@ -8,6 +8,7 @@
 
 #include "ConfigParser.hpp"
 #include "HistogramManager.hpp"
+#include "RootFileManager.hpp"
 #include "XMLConfigParser.hpp"
 #include "YAMLConfigParser.hpp"
 #include "JSONConfigParser.hpp"
@@ -37,6 +38,7 @@ class ProcessorList{
 		void PostAnalyze();
 		void PostProcess();
 
+		void RegisterOutputTrees(RootFileManager*);
 		void DeclarePlots(PLOTS::PlotRegistry*) const;
 
 		~ProcessorList();
