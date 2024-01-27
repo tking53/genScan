@@ -24,6 +24,8 @@
 
 #include "HistogramManager.hpp"
 
+#include "RootFileManager.hpp"
+
 #include "ProcessorList.hpp"
 
 #include "DataParser.hpp"
@@ -84,18 +86,20 @@ int main(int argc, char *argv[]) {
 
 
 
-	auto parser = DataParser::Get();
+	std::unique_ptr<DataParser> dataparser;
 	try{ 
 		if( dataformat->compare("evt") == 0 ){
-			parser = DataParser::Get(DataParser::DataFileType::EVT);
+			dataparser.reset(new DataParser(DataParser::DataFileType::EVT_BUILT,logname));
+		}else if( dataformat->compare("evt-presort") == 0 ){
+			dataparser.reset(new DataParser(DataParser::DataFileType::EVT_PRESORT,logname));
 		}else if( dataformat->compare("ldf") == 0 ){
-			parser = DataParser::Get(DataParser::DataFileType::LDF);
+			dataparser.reset(new DataParser(DataParser::DataFileType::LDF,logname));
 		}else if( dataformat->compare("pld") == 0 ){
-			parser = DataParser::Get(DataParser::DataFileType::PLD);
+			dataparser.reset(new DataParser(DataParser::DataFileType::PLD,logname));
 		}else if( dataformat->compare("caen_root") == 0 ){
-			parser = DataParser::Get(DataParser::DataFileType::CAEN_ROOT);
+			dataparser.reset(new DataParser(DataParser::DataFileType::CAEN_ROOT,logname));
 		}else if( dataformat->compare("caen_bin") == 0 ){
-			parser = DataParser::Get(DataParser::DataFileType::CAEN_BIN);
+			dataparser.reset(new DataParser(DataParser::DataFileType::CAEN_BIN,logname));
 		}else{
 			throw std::runtime_error("Unknown file format, supported types are evt,ldf,pld,caen_root,caen_bin");
 		}
@@ -141,7 +145,11 @@ int main(int argc, char *argv[]) {
 	auto sbins = PLOTS::SE;
 	HistogramManager->Initialize(MAX_CHANNELS,ebins,sbins);
 	console->info("Generated Raw, Scalar, and Cal plots for {} Channels, There are {} bins for Raw and Cal, and {} bins for Scalar",MAX_CHANNELS,ebins,sbins);
+	
+	std::shared_ptr<RootFileManager> RootManager(new RootFileManager(logname,StringManip::GetFileBaseName(*outputfile)));
+	console->info("Created Root File Manager");
 
+	//Init the processors/analyzers
 	std::shared_ptr<ProcessorList> processorlist = std::make_shared<ProcessorList>(logname);
 	try{
 		if( config_extension == "xml" ){
@@ -158,12 +166,11 @@ int main(int argc, char *argv[]) {
 			exit(EXIT_FAILURE);
 		}
 		processorlist->DeclarePlots(HistogramManager.get());
+		processorlist->RegisterOutputTrees(RootManager.get());
 	}catch(std::runtime_error const& e){
 		console->error(e.what());
 		exit(EXIT_FAILURE);
 	}
-	
-	//Init the processors/analyzers
 	
 	console->info("Generating {}.list file that contains all the declared histograms",logname);
 	HistogramManager->WriteInfo();
@@ -227,6 +234,9 @@ int main(int argc, char *argv[]) {
 		filler.join();
 	#endif
 	plotter.join();
+
+	HistogramManager->WriteAllPlots();
+	RootManager->FinalizeTrees();
 
 	return 0;
 }
