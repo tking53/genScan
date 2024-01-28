@@ -214,7 +214,7 @@ else()
 	link_directories(${FMT_EXTERNAL_INSTALL_LOCATION}/lib)
 endif()
 
-option(USE_SYSTEM_SPDLOG "Use either spdlog or messenger class" OFF)
+option(USE_SYSTEM_SPDLOG "Use either spdlog or grab it from github" OFF)
 if( USE_SYSTEM_SPDLOG )
 	find_package(spdlog REQUIRED)
 else()
@@ -232,6 +232,26 @@ else()
 		)
 	include_directories(${SPDLOG_EXTERNAL_INSTALL_LOCATION}/include)
 	link_directories(${SPDLOG_EXTERNAL_INSTALL_LOCATION}/lib)
+endif()
+
+option(USE_SYSTEM_BOOST "Use either system boost or grab one from github" OFF)
+if( USE_SYSTEM_BOOST )
+	find_package(Boost REQUIRED)
+else()
+	set(BOOST_EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external/spdlog)
+	set(BOOST_VERSION boost-1.84.0 CACHE STRING "Version of boost you want to get from git" )
+	mark_as_advanced(BOOST_VERSION)
+	ExternalProject_Add(boostProject
+		GIT_REPOSITORY https://github.com/boostorg/boost
+		GIT_TAG ${BOOST_VERSION}
+		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${BOOST_EXTERNAL_INSTALL_LOCATION} -DCMAKE_VERBOSE_MAKEFILE=OFF -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+		BUILD_COMMAND make -s
+		INSTALL_COMMAND make -s install
+		${_LOG_OPTIONS}
+		DEPENDS ${_FMT_NAME}
+		)
+	include_directories(${BOOST_EXTERNAL_INSTALL_LOCATION}/include)
+	link_directories(${BOOST_EXTERNAL_INSTALL_LOCATION}/lib)
 endif()
 
 add_subdirectory(utility)
