@@ -17,6 +17,7 @@ bool Translator::AddFile(const std::string& filename){
 		file.close();
 		this->InputFiles.push_back(filename);
 		this->console->info("Added File {} to list of files to translate, File Size : {}",this->InputFiles.back(),this->FileSizes.back());
+		return true;
 	}else{
 		return false;
 	}

@@ -27,7 +27,7 @@ class DataParser{
 		};
 		DataParser(DataFileType,const std::string&);
 		~DataParser() = default;
-		virtual void SetInputFiles(std::vector<std::string>&);
+		void SetInputFiles(std::vector<std::string>&);
 		
 		void Parse();
 	private:

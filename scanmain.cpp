@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <stdexcept>
 #include <string>
 #include <memory>
 #include <iostream>
@@ -103,6 +104,12 @@ int main(int argc, char *argv[]) {
 		}else{
 			throw std::runtime_error("Unknown file format, supported types are evt,ldf,pld,caen_root,caen_bin");
 		}
+	}catch(std::runtime_error const& e){
+		console->error(e.what());
+		exit(EXIT_FAILURE);
+	}
+	try{
+		dataparser->SetInputFiles(*FileNames);
 	}catch(std::runtime_error const& e){
 		console->error(e.what());
 		exit(EXIT_FAILURE);
