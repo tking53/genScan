@@ -12,10 +12,11 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
+#include <boost/program_options.hpp>
+#include <boost/container/devector.hpp>
+
 #include "Processor.hpp"
 #include "StringManipFunctions.hpp"
-
-#include "GenScanorArgParser.hpp"
 
 #include "ConfigParser.hpp"
 #include "XMLConfigParser.hpp"
@@ -31,25 +32,59 @@
 
 #include "DataParser.hpp"
 
+#include "PhysicsData.hpp"
+
 int main(int argc, char *argv[]) {
 	const std::string logname = "genscan";
-	auto cmdArgs = GenScanorArgParser::Get(argv[0],logname);
+
+	std::string configfile;
+	std::string outputfile;
+	bool evtbuild;
+	std::vector<std::string> FileNames;
+	int port;
+	int limit;
+	std::string dataformat;
+	
+	boost::program_options::options_description cmdline_options("Generic Options");
+	cmdline_options.add_options()
+		("help,h", "produce help message")
+		("configfile,c",boost::program_options::value<std::string>(&configfile)->default_value("config.xml"),"[filename] filename for channel map")
+		("outputfile,o",boost::program_options::value<std::string>(&outputfile)->default_value("out.txt"),"[filename] filename for output")
+		("evtbuild,e",boost::program_options::value<bool>(&evtbuild)->default_value(false),"event build only")
+		("file,f",boost::program_options::value<std::vector<std::string>>(&FileNames),"[file1 file2 file3 ...] list of files used for input")
+		("limit,l",boost::program_options::value<int>(&limit)->default_value(100000),"limit of coincidence queue")
+		("format,x",boost::program_options::value<std::string>(&dataformat)->default_value("null"),"[file_format] format of the data file (evt,ldf,pld,caen_root,caen_bin)")
+		("port,p",boost::program_options::value<int>(&port)->default_value(9090),"[portid] port to listen/send on for the live histogramming")
+		;
+
+
+	boost::program_options::positional_options_description p;
+        p.add("file", -1);
+
 	try{
-		cmdArgs->ParseArgs(argc,argv);
-	}catch( std::runtime_error const& e ){
+		boost::program_options::variables_map vm;
+		store(boost::program_options::command_line_parser(argc, argv).options(cmdline_options).positional(p).run(), vm);
+        	notify(vm);
+		if( vm.count("help") or argc <= 2 ){
+			spdlog::info(cmdline_options);
+			exit(EXIT_SUCCESS);
+		}
+	}catch( std::exception& e){
 		spdlog::error(e.what());
+		exit(EXIT_FAILURE);
+	}    
+
+	const int lower_limit = 1000;
+	
+	if( limit < lower_limit ){
+		spdlog::error("limit {} passed in is lower than lower_limit of {}",limit,lower_limit);
 		exit(EXIT_FAILURE);
 	}
 
-	auto configfile = cmdArgs->GetConfigFile();
-	auto outputfile = cmdArgs->GetOutputFile();
-	auto limit = *(cmdArgs->GetLimit());
-	auto FileNames = cmdArgs->GetInputFiles();
-	auto evtbuild = *(cmdArgs->GetEvtBuild());
-	auto dataformat = cmdArgs->GetDataFileType();
-	auto port = *(cmdArgs->GetPort());
-
-	const int lower_limit = 10000;
+	if( FileNames.size() == 0 ){
+		spdlog::error("No input files provided");
+		exit(EXIT_FAILURE);
+	}	
 
 	const int MAX_CRATES = 5;
 	const int MAX_CARDS_PER_CRATE = 13;
@@ -58,9 +93,9 @@ int main(int argc, char *argv[]) {
 	const int MAX_CHANNELS = MAX_CHANNELS_PER_BOARD*MAX_BOARDS;
 	const int MAX_CAL_PARAMS_PER_CHANNEL = 4;
 
-	const std::string logfilename = (*outputfile)+".log";
-	const std::string errfilename = (*outputfile)+".err";
-	const std::string dbgfilename = (*outputfile)+".dbg";
+	const std::string logfilename = (outputfile)+".log";
+	const std::string errfilename = (outputfile)+".err";
+	const std::string dbgfilename = (outputfile)+".dbg";
 
 	spdlog::set_level(spdlog::level::debug);
 	std::shared_ptr<spdlog::sinks::basic_file_sink_mt> LogFileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(logfilename,true);
@@ -89,27 +124,27 @@ int main(int argc, char *argv[]) {
 
 	std::unique_ptr<DataParser> dataparser;
 	try{ 
-		if( dataformat->compare("evt") == 0 ){
+		if( dataformat.compare("evt") == 0 ){
 			dataparser.reset(new DataParser(DataParser::DataFileType::EVT_BUILT,logname));
-		}else if( dataformat->compare("evt-presort") == 0 ){
+		}else if( dataformat.compare("evt-presort") == 0 ){
 			dataparser.reset(new DataParser(DataParser::DataFileType::EVT_PRESORT,logname));
-		}else if( dataformat->compare("ldf") == 0 ){
+		}else if( dataformat.compare("ldf") == 0 ){
 			dataparser.reset(new DataParser(DataParser::DataFileType::LDF,logname));
-		}else if( dataformat->compare("pld") == 0 ){
+		}else if( dataformat.compare("pld") == 0 ){
 			dataparser.reset(new DataParser(DataParser::DataFileType::PLD,logname));
-		}else if( dataformat->compare("caen_root") == 0 ){
+		}else if( dataformat.compare("caen_root") == 0 ){
 			dataparser.reset(new DataParser(DataParser::DataFileType::CAEN_ROOT,logname));
-		}else if( dataformat->compare("caen_bin") == 0 ){
+		}else if( dataformat.compare("caen_bin") == 0 ){
 			dataparser.reset(new DataParser(DataParser::DataFileType::CAEN_BIN,logname));
 		}else{
-			throw std::runtime_error("Unknown file format, supported types are evt,ldf,pld,caen_root,caen_bin");
+			throw std::runtime_error("Unknown file format : "+dataformat+", supported types are evt,ldf,pld,caen_root,caen_bin");
 		}
 	}catch(std::runtime_error const& e){
 		console->error(e.what());
 		exit(EXIT_FAILURE);
 	}
 	try{
-		dataparser->SetInputFiles(*FileNames);
+		dataparser->SetInputFiles(FileNames);
 	}catch(std::runtime_error const& e){
 		console->error(e.what());
 		exit(EXIT_FAILURE);
@@ -124,9 +159,9 @@ int main(int argc, char *argv[]) {
 		exit(EXIT_FAILURE);
 	}
 
-	console->info("Begin parsing Config File : {}",*(configfile));
+	console->info("Begin parsing Config File : {}",configfile);
 	std::unique_ptr<ConfigParser> cfgparser;
-	auto config_extension = StringManip::GetFileExtension(*configfile);
+	auto config_extension = StringManip::GetFileExtension(configfile);
 	if( config_extension == "xml" ){
 		cfgparser.reset(new XMLConfigParser(logname));
 	}else if( config_extension == "yaml" or config_extension == "yml" ){
@@ -144,16 +179,16 @@ int main(int argc, char *argv[]) {
 		console->error(e.what());
 		exit(EXIT_FAILURE);
 	}
-	console->info("Completed parsing Config File : {}",*(configfile));
+	console->info("Completed parsing Config File : {}",configfile);
 
 	console->info("Generating Plot Registry");
-	std::shared_ptr<PLOTS::PlotRegistry> HistogramManager(new PLOTS::PlotRegistry(logname,StringManip::GetFileBaseName(*outputfile),port));
+	std::shared_ptr<PLOTS::PlotRegistry> HistogramManager(new PLOTS::PlotRegistry(logname,StringManip::GetFileBaseName(outputfile),port));
 	auto ebins = PLOTS::SE;
 	auto sbins = PLOTS::SE;
 	HistogramManager->Initialize(MAX_CHANNELS,ebins,sbins);
 	console->info("Generated Raw, Scalar, and Cal plots for {} Channels, There are {} bins for Raw and Cal, and {} bins for Scalar",MAX_CHANNELS,ebins,sbins);
 	
-	std::shared_ptr<RootFileManager> RootManager(new RootFileManager(logname,StringManip::GetFileBaseName(*outputfile)));
+	std::shared_ptr<RootFileManager> RootManager(new RootFileManager(logname,StringManip::GetFileBaseName(outputfile)));
 	console->info("Created Root File Manager");
 
 	//Init the processors/analyzers
@@ -198,6 +233,9 @@ int main(int argc, char *argv[]) {
 			processorlist->PostAnalyze();
 		}
 	#endif
+
+	boost::container::devector<PhysicsData> RawEvents;
+	dataparser->Parse(RawEvents);
 	//try{
 	// 	while(Parse(inputfile_list)){
 	// 		Correlate();

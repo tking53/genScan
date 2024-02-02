@@ -23,7 +23,7 @@ class ConfigParser{
 		virtual ~ConfigParser();
 
 		void SetGlobalEventWidthInS(double);
-		void SetConfigFile(std::string*);
+		void SetConfigFile(std::string&);
 		void SetDescriptionText(std::string*);
 		void SetAuthorNameText(std::string*);
 		void SetAuthorDateText(std::string*);

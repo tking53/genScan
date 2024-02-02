@@ -7,8 +7,6 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-#include "GenConfigArgParser.hpp"
-
 int main(int argc, char *argv[]) {
 
 	std::string logname = "genconfig";
@@ -33,13 +31,5 @@ int main(int argc, char *argv[]) {
 	auto console = std::make_shared<spdlog::logger>(logname,sinks.begin(),sinks.end());
 	spdlog::initialize_logger(console);
 
-
-	auto cmdArgs = GenConfigArgParser::Get(argv[0],logname);
-	try{
-		cmdArgs->ParseArgs(argc,argv);
-	}catch( std::runtime_error const& e ){
-		console->error(e.what());
-		exit(EXIT_FAILURE);
-	}
 
 }

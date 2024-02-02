@@ -23,8 +23,8 @@ void ConfigParser::SetGlobalEventWidthInS(double width){
 	GlobalEventWidthInS = width;
 }
 
-void ConfigParser::SetConfigFile(std::string* filename){
-	this->ConfigName.reset(filename);
+void ConfigParser::SetConfigFile(std::string& filename){
+	this->ConfigName.reset(new std::string(filename));
 }
 
 void ConfigParser::SetDescriptionText(std::string* txt){
