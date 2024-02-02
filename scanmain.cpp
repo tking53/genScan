@@ -172,6 +172,7 @@ int main(int argc, char *argv[]) {
 		console->error("unknown file extension of {}, supported extensions are xml, yaml, json",config_extension);
 		exit(EXIT_FAILURE);
 	}
+
 	cfgparser->SetConfigFile(configfile);
 	try{
 		cfgparser->Parse(cmap.get());
@@ -180,6 +181,13 @@ int main(int argc, char *argv[]) {
 		exit(EXIT_FAILURE);
 	}
 	console->info("Completed parsing Config File : {}",configfile);
+
+	try{
+		cmap->FinalizeChannelMap();
+	}catch(std::runtime_error const& e ){
+		console->error(e.what());
+		exit(EXIT_FAILURE);
+	}
 
 	console->info("Generating Plot Registry");
 	std::shared_ptr<PLOTS::PlotRegistry> HistogramManager(new PLOTS::PlotRegistry(logname,StringManip::GetFileBaseName(outputfile),port));

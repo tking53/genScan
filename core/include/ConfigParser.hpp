@@ -13,7 +13,6 @@
 
 #include <json/json.h>
 
-
 #include "ChannelMap.hpp"
 
 class ConfigParser{

@@ -15,31 +15,34 @@ Configuration:
       - name: GenericAnalyzer
         eta: "1,2,3"
   Map:
-    Module:
+    Crate:
       - number: 0
-        Frequency: 100
-        Firmware: PHA
-        TraceDelay: 264
-        Channel:
+        Module:
           - number: 0
-            type: generic
-            subtype: none
-            group: none
-            tags: alpha,beta:gamma.delta*epsilon
-            Calibration:
-              model: linear
-              value: "0.0 1.0"
-      - number: 1 
-        Frequency: 100
-        Firmware: PHA
-        TraceDelay: 264
-        Channel:
-          - number: 0
-            type: generic
-            subtype: none
-            group: none
-            tags: alpha,beta:gamma.delta*epsilon
-            Calibration:
-              model: linear
-              value: "0.0 1.0"
-
+            Frequency: 100
+            Firmware: PHA
+            TraceDelay: 264
+            Revision: "D"
+            Channel:
+              - number: 0
+                type: generic
+                subtype: none
+                group: none
+                tags: alpha,beta:gamma.delta*epsilon
+                Calibration:
+                  model: linear
+                  value: "0.0 1.0"
+          - number: 1 
+            Frequency: 100
+            Firmware: PHA
+            TraceDelay: 264
+            Revision: "D"
+            Channel:
+              - number: 0
+                type: generic
+                subtype: none
+                group: none
+                tags: alpha,beta:gamma.delta*epsilon
+                Calibration:
+                  model: linear
+                  value: "0.0 1.0"

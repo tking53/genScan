@@ -9,10 +9,12 @@
 		<Analyzer name="GenericAnalyzer"/>
 	</DetectorDriver>
 	<Map>
-		<Module number="0" Frequency="100" Firmware="PHA" TraceDelay="264">
-			<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
-				<Calibration model="linear">0.0 1.0</Calibration>
-			</Channel>
-		</Module>
+		<Crate number="0">
+			<Module number="0" Revision="D" Frequency="100" Firmware="PHA" TraceDelay="264">
+				<Channel number="0" type="generic" subtype="none" group="none" tags="alpha,beta:gamma.delta*epsilon">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+			</Module>
+		</Crate>
 	</Map>
 </Configuration>
