@@ -1,3 +1,4 @@
+#include <_types/_uint32_t.h>
 #include <stdexcept>
 
 #include "BitDecoder.hpp"
@@ -59,22 +60,22 @@ int EVTTranslator::ReadHeader(boost::container::devector<PhysicsData>& RawEvents
 	auto FinishCode = (PIXIE::FinishCodeMask(firstWords[0]) != 0);
 
 	auto decoder = CMap->GetXiaDecoder(CrateNumber,ModuleNumber);
+	uint32_t TimeStampLow;
+	uint32_t TimeStampHigh;
+	unsigned int EventEnergy;
+	bool OutOfRange;
 
-	auto TimeStampLow = decoder->DecodeTimeLow(firstWords[1]);
-	auto TimeStampHigh = decoder->DecodeTimeHigh(firstWords[2]);
+	decoder->DecodeFirstWords(firstWords,TimeStampLow,TimeStampHigh,EventEnergy,CurrTraceLength,OutOfRange);
+
 	uint64_t TimeStamp = static_cast<uint64_t>(TimeStampHigh);
 	TimeStamp = TimeStamp<<32;
 	TimeStamp += TimeStampLow;
 
 	//word2 has CFD things
 
-	auto EventEnergy = decoder->DecodeEventEnergy(firstWords[3]);
-	CurrTraceLength = decoder->DecodeTraceLength(firstWords[3]);
-	
 	//note that this assumes that this isn't one of the weird firmwares where this is in wordzero
 	//need to ask Toby if we actually still use those firmware versions anywhere we would want to scan this or if we should support
 	//them anymore
-	bool OutOfRange = static_cast<bool>(decoder->DecodeTraceOutRange(firstWords[3]));
 
 	RawEvents.push_back(PhysicsData(CurrHeaderLength,CrateNumber,ModuleNumber,ChannelNumber,EventEnergy,TimeStamp));
 	RawEvents.back().SetPileup(FinishCode);

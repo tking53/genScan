@@ -279,3 +279,11 @@ unsigned int XiaDecoder::DecodeQDCSums(const unsigned int & val) const {
 double XiaDecoder::GetQDCSize() const{
 	return this->QDCSize;
 }
+
+void XiaDecoder::DecodeFirstWords(const unsigned int* firstFour,uint32_t& tslow,uint32_t& tshigh,unsigned int& erg,unsigned int& tracelen,bool& tracesat) const{
+	tslow = this->DecodeTimeLow(firstFour[1]);
+	tshigh = this->DecodeTimeLow(firstFour[2]);
+	erg = this->DecodeEventEnergy(firstFour[3]);
+	tracelen = this->DecodeTraceLength(firstFour[3]);
+	tracesat = static_cast<bool>(this->DecodeTraceOutRange(firstFour[3]));
+}

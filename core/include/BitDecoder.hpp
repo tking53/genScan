@@ -32,6 +32,8 @@ class XiaDecoder{
 		unsigned int DecodeBaseline(const unsigned int &) const;
 		unsigned int DecodeQDCSums(const unsigned int &) const;
 		double GetQDCSize() const;
+
+		void DecodeFirstWords(const unsigned int*,uint32_t&,uint32_t&,unsigned int&,unsigned int&,bool&) const;
 	private:
 		Mask EventLengthMask;
 		Mask TimeLowMask;
