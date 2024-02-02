@@ -23,37 +23,22 @@ class PhysicsData{
 
 		//Energy
 		void SetEnergy(double);
-		void SetEnergy(const double&);
-		void SetEnergy(double&&);
-
 		double GetEnergy() const;
 
 		//TimeStamp
 		void SetTimeStamp(double);
-		void SetTimeStamp(const double&);
-		void SetTimeStamp(double&&);
-
 		double GetTimeStamp() const;
 
 		//CFD Forced Bit
 		void SetCFDForcedBit(bool);
-		void SetCFDForcedBit(const bool&);
-		void SetCFDForcedBit(bool&&);
-
 		bool GetCFDForcedBit() const;
 
 		//CFD Fraction
 		void SetCFDFraction(double);
-		void SetCFDFraction(const double&);
-		void SetCFDFraction(double&&);
-
 		double GetCFDFraction() const;
 
 		//CFD Source Bit
 		void SetCFDSourceBit(int);
-		void SetCFDSourceBit(const int&);
-		void SetCFDSourceBit(int&&);
-
 		int GetCFDSourceBit() const;
 
 		//Crate
@@ -68,81 +53,78 @@ class PhysicsData{
 		//Location, typically this is crateID*(maxModPerCrate*maxChanPerMod) + modID*(maxChanPerMod) + chanID
 		//but is overridable within the config file
 		void SetLocation(int);
-		void SetLocation(const int&);
-		void SetLocation(int&&);
-
 		int GetLocation() const;
 
 		//Pileup
 		void SetPileup(bool);
-		void SetPileup(const bool&);
-		void SetPileup(bool&&);
-
 		bool GetPileup() const;
 
 		//Saturation/trace out of range
 		void SetSaturation(bool);
-		void SetSaturation(const bool&);
-		void SetSaturation(bool&&);
-
 		bool GetSaturation() const;
 
 		//Phase, need to ask Toby what this means
 		void SetPhase(double);
-		void SetPhase(const double&);
-		void SetPhase(double&&);
-
 		double GetPhase() const;
 
 		//Raw Trace
-		void SetRawTrace(std::vector<unsigned int>);
 		void SetRawTrace(const std::vector<unsigned int>&);
 		void SetRawTrace(std::vector<unsigned int>&&);
 
 		const std::vector<unsigned int>& GetRawTrace() const;
 
 		//QDC Sums
-		void SetQDCSums(std::vector<unsigned int>);
 		void SetQDCSums(const std::vector<unsigned int>&);
 		void SetQDCSums(std::vector<unsigned int>&&);
 
 		const std::vector<unsigned int>& GetQDCSums() const;
 
 		//Type
-		void SetType(std::string);
 		void SetType(const std::string&);
 		void SetType(std::string&&);
 
 		std::string GetType() const;
 
 		//SubType
-		void SetSubType(std::string);
 		void SetSubType(const std::string&);
 		void SetSubType(std::string&&);
 
 		std::string GetSubType() const;
 
 		//Group
-		void SetGroup(std::string);
 		void SetGroup(const std::string&);
 		void SetGroup(std::string&&);
 
 		std::string GetGroup() const;
 
 		//Tags
-		void SetTags(std::string);
 		void SetTags(const std::string&);
 		void SetTags(std::string&&);
 
 		std::string GetTags() const;
 
 		//Tag List
-		void SetTagList(std::set<std::string>);
 		void SetTagList(const std::set<std::string>&); 
 		void SetTagList(std::set<std::string>&&);
 
 		std::set<std::string> GetTagList() const;
 
+		template<typename OStream>
+		friend OStream& operator<<(OStream& os, const PhysicsData& pd) {
+			os << "PhysicsData( Crate: " << pd.CrateNum 
+			   << " Module: " << pd.ModNum
+			   << " Channel: " << pd.ChanNum
+			   << " Location: " << pd.Location
+			   << " RawEnergy: " << pd.RawEnergy
+			   << " Energy: " << pd.Energy
+			   << " RawTimeStamp: " << pd.RawTimeStamp 
+			   << " TimeStamp: " << pd.TimeStamp
+			   << " Saturation: " << pd.Saturation
+			   << " Pileup: " << pd.Pileup
+			   << " TraceLength: " << pd.Trace.GetSize() 
+			   << " )";
+			return os;
+		}
 	private:
 		//this is info decoded from the data files
 		int HeaderLength;	

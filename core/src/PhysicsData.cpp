@@ -9,6 +9,8 @@ PhysicsData::PhysicsData(int headerlength,int cratenum,int modnum,int channum,ui
 	this->RawEnergy = rawerg;
 	this->RawTimeStamp = rawts;
 
+	this->Location = -1;
+
 	this->Energy = 0.0;
 	this->TimeStamp = -1.0;
 	this->CFDForcedBit = false;
@@ -49,12 +51,6 @@ uint64_t PhysicsData::GetRawTimeStamp() const{
 void PhysicsData::SetEnergy(double value){
 	this->Energy = value;
 }
-void PhysicsData::SetEnergy(const double& value){
-	this->Energy = value;
-}
-void PhysicsData::SetEnergy(double&& value){
-	this->Energy = std::move(value);
-}
 
 double PhysicsData::GetEnergy() const{
 	return this->Energy;
@@ -63,12 +59,6 @@ double PhysicsData::GetEnergy() const{
 //TimeStamp
 void PhysicsData::SetTimeStamp(double value){
 	this->TimeStamp = value;
-}
-void PhysicsData::SetTimeStamp(const double& value){
-	this->TimeStamp = value;
-}
-void PhysicsData::SetTimeStamp(double&& value){
-	this->TimeStamp = std::move(value);
 }
 
 double PhysicsData::GetTimeStamp() const{
@@ -79,12 +69,6 @@ double PhysicsData::GetTimeStamp() const{
 void PhysicsData::SetCFDForcedBit(bool value){
 	this->CFDForcedBit = value;
 }
-void PhysicsData::SetCFDForcedBit(const bool& value){
-	this->CFDForcedBit = value;
-}
-void PhysicsData::SetCFDForcedBit(bool&& value){
-	this->CFDForcedBit = std::move(value);
-}
 
 bool PhysicsData::GetCFDForcedBit() const{
 	return this->CFDForcedBit;
@@ -94,12 +78,6 @@ bool PhysicsData::GetCFDForcedBit() const{
 void PhysicsData::SetCFDFraction(double value){
 	this->CFDFraction = value;
 }
-void PhysicsData::SetCFDFraction(const double& value){
-	this->CFDFraction = value;
-}
-void PhysicsData::SetCFDFraction(double&& value){
-	this->CFDFraction = std::move(value);
-}
 
 double PhysicsData::GetCFDFraction() const{
 	return this->CFDFraction;
@@ -108,12 +86,6 @@ double PhysicsData::GetCFDFraction() const{
 //CFD Source Bit
 void PhysicsData::SetCFDSourceBit(int value){
 	this->CFDSourceBit = value;
-}
-void PhysicsData::SetCFDSourceBit(const int& value){
-	this->CFDSourceBit = value;
-}
-void PhysicsData::SetCFDSourceBit(int&& value){
-	this->CFDSourceBit = std::move(value);
 }
 
 int PhysicsData::GetCFDSourceBit() const{
@@ -140,12 +112,6 @@ int PhysicsData::GetChannel() const{
 void PhysicsData::SetLocation(int value){
 	this->Location = value;
 }
-void PhysicsData::SetLocation(const int& value){
-	this->Location = value;
-}
-void PhysicsData::SetLocation(int&& value){
-	this->Location = std::move(value);
-}
 
 int PhysicsData::GetLocation() const{
 	return this->Location;
@@ -154,12 +120,6 @@ int PhysicsData::GetLocation() const{
 //Pileup
 void PhysicsData::SetPileup(bool value){
 	this->Pileup = value;
-}
-void PhysicsData::SetPileup(const bool& value){
-	this->Pileup = value;
-}
-void PhysicsData::SetPileup(bool&& value){
-	this->Pileup = std::move(value);
 }
 
 bool PhysicsData::GetPileup() const{
@@ -170,12 +130,6 @@ bool PhysicsData::GetPileup() const{
 void PhysicsData::SetSaturation(bool value){
 	this->Saturation = value;
 }
-void PhysicsData::SetSaturation(const bool& value){
-	this->Saturation = value;
-}
-void PhysicsData::SetSaturation(bool&& value){
-	this->Saturation = std::move(value);
-}
 
 bool PhysicsData::GetSaturation() const{
 	return this->Saturation;
@@ -185,21 +139,12 @@ bool PhysicsData::GetSaturation() const{
 void PhysicsData::SetPhase(double value){
 	this->Phase = value;
 }
-void PhysicsData::SetPhase(const double& value){
-	this->Phase = value;
-}
-void PhysicsData::SetPhase(double&& value){
-	this->Phase = std::move(value);
-}
 
 double PhysicsData::GetPhase() const{
 	return this->Phase;
 }
 
 //Raw Trace
-void PhysicsData::SetRawTrace(std::vector<unsigned int> value){
-	Trace = TraceHelper<unsigned int,float>(value);
-}
 void PhysicsData::SetRawTrace(const std::vector<unsigned int>& value){
 	Trace = TraceHelper<unsigned int,float>(value);
 }
@@ -212,9 +157,6 @@ const std::vector<unsigned int>& PhysicsData::GetRawTrace() const{
 }
 
 //QDC Sums
-void PhysicsData::SetQDCSums(std::vector<unsigned int> value){
-	this->QDCSums = value;
-}
 void PhysicsData::SetQDCSums(const std::vector<unsigned int>& value){
 	this->QDCSums = value;
 }
@@ -227,9 +169,6 @@ const std::vector<unsigned int>& PhysicsData::GetQDCSums() const{
 }
 
 //Type
-void PhysicsData::SetType(std::string value){
-	this->Type = value;
-}
 void PhysicsData::SetType(const std::string& value){
 	this->Type = value;
 }
@@ -242,9 +181,6 @@ std::string PhysicsData::GetType() const{
 }
 
 //SubType
-void PhysicsData::SetSubType(std::string value){
-	this->SubType = value;
-}
 void PhysicsData::SetSubType(const std::string& value){
 	this->SubType = value;
 }
@@ -257,9 +193,6 @@ std::string PhysicsData::GetSubType() const{
 }
 
 //Group
-void PhysicsData::SetGroup(std::string value){
-	this->Group = value;
-}
 void PhysicsData::SetGroup(const std::string& value){
 	this->Group = value;
 }
@@ -272,9 +205,6 @@ std::string PhysicsData::GetGroup() const{
 }
 
 //Tags
-void PhysicsData::SetTags(std::string value){
-	this->Tags = value;
-}
 void PhysicsData::SetTags(const std::string& value){
 	this->Tags = value;
 }
@@ -287,9 +217,6 @@ std::string PhysicsData::GetTags() const{
 }
 
 //Tag List
-void PhysicsData::SetTagList(std::set<std::string> value){
-	this->TagList = value;
-}
 void PhysicsData::SetTagList(const std::set<std::string>& value){
 	this->TagList = value;
 } 
