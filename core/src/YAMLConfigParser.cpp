@@ -441,14 +441,14 @@ void YAMLConfigParser::ParseMap(ChannelMap* cmap){
 				}
 			}
 		}
-		spdlog::get(this->LogName)->info("Here is the ChannelMap Info we were able to parse");
+		spdlog::get(this->LogName)->debug("Here is the ChannelMap Info we were able to parse");
 		auto boardconfig = cmap->GetBoardConfig();
 		for( const auto& currboard : boardconfig ){
-			spdlog::info("Found Board with this info : [{}]",currboard.second);
+			spdlog::get(this->LogName)->debug("Found Board with this info : [{}]",currboard.second);
 		}
 		auto chanconfig = cmap->GetChannelConfig();
 		for( const auto& currchan : chanconfig ){
-			spdlog::info("Found Channel with this info : [{}]",currchan.second);
+			spdlog::get(this->LogName)->debug("Found Channel with this info : [{}]",currchan.second);
 		}
 	}else{
 		//throw error
