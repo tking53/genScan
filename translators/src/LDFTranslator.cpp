@@ -6,10 +6,10 @@ LDFTranslator::LDFTranslator(const std::string& log,const std::string& translato
 	this->Format = formattype;
 }	
 
-void LDFTranslator::Parse(){
+void LDFTranslator::Parse(boost::container::devector<PhysicsData>& RawEvents){
 	switch(this->Format){
 		case PIXIE:
-			this->ParsePixie();
+			this->ParsePixie(RawEvents);
 			break;
 		default:
 			throw std::runtime_error("Unknown LDF File type, not PIXIE");
@@ -17,5 +17,5 @@ void LDFTranslator::Parse(){
 	}
 }
 
-void LDFTranslator::ParsePixie(){
+void LDFTranslator::ParsePixie(boost::container::devector<PhysicsData>& RawEvents){
 }

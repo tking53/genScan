@@ -3,7 +3,11 @@
 
 #include <string>
 
+#include <boost/container/devector.hpp>
+
 #include "Translator.hpp"
+
+#include "PhysicsData.hpp"
 
 class LDFTranslator : public Translator{
 	public:
@@ -12,10 +16,10 @@ class LDFTranslator : public Translator{
 		};
 		LDFTranslator(const std::string&,const std::string&,LDF_TYPE);
 		~LDFTranslator() = default;
-		void Parse();
+		void Parse(boost::container::devector<PhysicsData>&);
 	private:
 		LDF_TYPE Format;
-		void ParsePixie();
+		void ParsePixie(boost::container::devector<PhysicsData>&);
 };
 
 #endif

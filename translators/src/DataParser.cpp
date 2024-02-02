@@ -63,4 +63,9 @@ void DataParser::SetInputFiles(std::vector<std::string>& filelist){
 			throw std::runtime_error("Unable to Add File : "+file+" to the Translator");
 		}
 	}
+	DataTranslator->FinalizeFiles();
+}
+
+void DataParser::Parse(boost::container::devector<PhysicsData>& RawEvents){
+	DataTranslator->Parse(RawEvents);
 }

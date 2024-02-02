@@ -1,5 +1,7 @@
-#include "Translator.hpp"
+#include <fstream>
 #include <stdexcept>
+
+#include "Translator.hpp"
 
 Translator::Translator(const std::string& log,const std::string& translatorname){
 	this->LogName = log;
@@ -23,7 +25,30 @@ bool Translator::AddFile(const std::string& filename){
 	}
 }
 
-[[noreturn]] void Translator::Parse(){
+[[noreturn]] void Translator::Parse([[maybe_unused]] boost::container::devector<PhysicsData>& RawEvents){
 	console->error("Called Translator::Parse(), not the overload");
 	throw std::runtime_error("Called Translator::Parse(), not the overload");
+}
+
+void Translator::FinalizeFiles(){
+	NumTotalFiles = InputFiles.size();
+	NumFilesRemaining = NumTotalFiles;
+	CurrentFileIndex = 0;
+	FinishedCurrentFile = true;
+}
+
+bool Translator::OpenNextFile(){
+	FinishedCurrentFile = false;
+	if( CurrentFileIndex == 0 ){
+		CurrentFile.open(InputFiles.at(CurrentFileIndex),std::ifstream::binary);
+		return true;
+	}else if(CurrentFileIndex == NumTotalFiles){
+		CurrentFile.close();
+		return false;
+	}else{
+		CurrentFile.close();
+		++CurrentFileIndex;
+		CurrentFile.open(InputFiles.at(CurrentFileIndex),std::ifstream::binary);
+		return true;
+	}
 }

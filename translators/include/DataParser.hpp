@@ -12,7 +12,11 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
+#include <boost/container/devector.hpp>
+
 #include "Translator.hpp"
+
+#include "PhysicsData.hpp"
 
 class DataParser{
 	public:
@@ -29,7 +33,7 @@ class DataParser{
 		~DataParser() = default;
 		void SetInputFiles(std::vector<std::string>&);
 		
-		void Parse();
+		void Parse(boost::container::devector<PhysicsData>&);
 	private:
 		DataFileType DataType;
 		std::shared_ptr<spdlog::logger> console;

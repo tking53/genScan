@@ -3,7 +3,11 @@
 
 #include <string>
 
+#include <boost/container/devector.hpp>
+
 #include "Translator.hpp"
+
+#include "PhysicsData.hpp"
 
 class EVTTranslator : public Translator{
 	public:
@@ -13,11 +17,32 @@ class EVTTranslator : public Translator{
 		};
 		EVTTranslator(const std::string&,const std::string&,EVT_TYPE);
 		~EVTTranslator() = default;
-		void Parse();
+		void Parse(boost::container::devector<PhysicsData>&);
 	private:
+		struct EVT_BUILT_INFO{
+			int rib_size;
+			int ri_size;
+			int ri_type;
+		};
+
+		unsigned int CurrHeaderLength;
+		uint32_t firstWords[4];
+		
 		EVT_TYPE Format;
-		void ParsePresort();
-		void ParseEVTBuilt();
+
+		EVT_BUILT_INFO CurrEVTBuiltInfo;
+
+		void ParsePresort(boost::container::devector<PhysicsData>&);
+		
+		void ParseEVTBuilt(boost::container::devector<PhysicsData>&);
+
+		int ReadRingItemHeader();
+		int ReadRingItemBodyHeader();
+		int ReadRingItemBody();
+		int FindNextFragment();
+		int ReadNextFragment();
+		int ReadHeader(boost::container::devector<PhysicsData>&);
+		int ReadFull(boost::container::devector<PhysicsData>&);
 };
 
 #endif
