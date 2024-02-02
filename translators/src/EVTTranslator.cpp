@@ -58,21 +58,23 @@ int EVTTranslator::ReadHeader(boost::container::devector<PhysicsData>& RawEvents
 	CurrHeaderLength = PIXIE::HeaderLengthMask(firstWords[0]);
 	auto FinishCode = (PIXIE::FinishCodeMask(firstWords[0]) != 0);
 
-	auto TimeStampLow = PIXIE::TimeLowMask(firstWords[1]);
-	auto TimeStampHigh = PIXIE::TimeHighMask(firstWords[2]);
+	auto decoder = CMap->GetXiaDecoder(CrateNumber,ModuleNumber);
+
+	auto TimeStampLow = decoder->DecodeTimeLow(firstWords[1]);
+	auto TimeStampHigh = decoder->DecodeTimeHigh(firstWords[2]);
 	uint64_t TimeStamp = static_cast<uint64_t>(TimeStampHigh);
 	TimeStamp = TimeStamp<<32;
 	TimeStamp += TimeStampLow;
 
 	//word2 has CFD things
 
-	auto EventEnergy = PIXIE::EventEnergyMask(firstWords[3]);
-	CurrTraceLength = PIXIE::TraceLengthMask(firstWords[3]);
+	auto EventEnergy = decoder->DecodeEventEnergy(firstWords[3]);
+	CurrTraceLength = decoder->DecodeTraceLength(firstWords[3]);
 	
 	//note that this assumes that this isn't one of the weird firmwares where this is in wordzero
 	//need to ask Toby if we actually still use those firmware versions anywhere we would want to scan this or if we should support
 	//them anymore
-	bool OutOfRange = static_cast<bool>(PIXIE::TraceOutRangeMask(firstWords[3]));
+	bool OutOfRange = static_cast<bool>(decoder->DecodeTraceOutRange(firstWords[3]));
 
 	RawEvents.push_back(PhysicsData(CurrHeaderLength,CrateNumber,ModuleNumber,ChannelNumber,EventEnergy,TimeStamp));
 	RawEvents.back().SetPileup(FinishCode);

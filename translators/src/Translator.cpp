@@ -52,3 +52,7 @@ bool Translator::OpenNextFile(){
 		return true;
 	}
 }
+
+void Translator::SetChannelMap(const std::shared_ptr<ChannelMap>& cmap){
+	this->CMap = cmap;
+}

@@ -14,6 +14,8 @@
 
 #include <boost/container/devector.hpp>
 
+#include "ChannelMap.hpp"
+
 #include "Translator.hpp"
 
 #include "PhysicsData.hpp"
@@ -34,6 +36,8 @@ class DataParser{
 		void SetInputFiles(std::vector<std::string>&);
 		
 		void Parse(boost::container::devector<PhysicsData>&);
+
+		void SetChannelMap(const std::shared_ptr<ChannelMap>&);
 	private:
 		DataFileType DataType;
 		std::shared_ptr<spdlog::logger> console;
@@ -41,6 +45,7 @@ class DataParser{
 		std::string ParserName;
 
 		std::unique_ptr<Translator> DataTranslator;
+		std::shared_ptr<ChannelMap> CMap;
 };
 
 #endif

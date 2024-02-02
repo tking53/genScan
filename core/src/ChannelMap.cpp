@@ -5,6 +5,8 @@
 
 #include "ChannelMap.hpp"
 
+#include "BitDecoder.hpp"
+
 ChannelMap::ChannelMap(int mc,int mbpc,int mcpb,int mcppc){
 	MAX_CRATES = mc;
 	MAX_BOARDS_PER_CRATE = mbpc;
@@ -207,7 +209,8 @@ bool ChannelMap::SetBoardInfo(int crid,int bid,const char& rev,const std::string
 			.CrateID = crid,
 			.GlobalBoardID = this->GetGlobalBoardID(crid,bid),
 			.TraceDelay = tdelay,
-			.Version = this->CalcFirmwareEnum(firm)	
+			.Version = this->CalcFirmwareEnum(firm),
+			.xiadecoder = new XiaDecoder(this->CalcFirmwareEnum(firm),freq)
 		};
 		auto retval = this->BoardConfigMap.insert_or_assign(CurrInfo.GlobalBoardID,CurrInfo); 
 		return !retval.second;
@@ -278,4 +281,8 @@ void ChannelMap::FinalizeChannelMap(){
 			throw std::runtime_error("Unable to finalize the Channel Map due to duplicate board parameters found in Crate "+std::to_string(currboard.second.CrateID)+" and board "+std::to_string(currboard.second.BoardIDInCrate));
 		}
 	}
+}
+
+XiaDecoder* ChannelMap::GetXiaDecoder(int crid,int bid) const{
+	return this->BoardConfigMap.at(this->GetGlobalBoardID(crid,bid)).xiadecoder;
 }

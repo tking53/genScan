@@ -7,6 +7,8 @@
 
 #include <boost/container/flat_map.hpp>
 
+class XiaDecoder;
+
 class ChannelMap{
 	public:
 		enum CalType{
@@ -42,6 +44,7 @@ class ChannelMap{
 			int GlobalBoardID;
 			int TraceDelay;
 			FirmwareVersion Version;
+			XiaDecoder* xiadecoder;
 
 			template<typename OStream>
 			friend OStream& operator<<(OStream& os, const ChannelMap::BoardInfo& b) {
@@ -184,6 +187,8 @@ class ChannelMap{
 
 		const boost::container::flat_map<int,BoardInfo>& GetBoardConfig() const;
 		const boost::container::flat_map<int,ChannelInfo>& GetChannelConfig() const;
+
+		XiaDecoder* GetXiaDecoder(int,int) const;
 
 		void FinalizeChannelMap();
 

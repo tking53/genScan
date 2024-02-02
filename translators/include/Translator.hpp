@@ -15,6 +15,8 @@
 
 #include <boost/container/devector.hpp>
 
+#include "ChannelMap.hpp"
+
 #include "PhysicsData.hpp"
 
 
@@ -26,6 +28,7 @@ class Translator{
 		[[noreturn]] virtual void Parse([[maybe_unused]] boost::container::devector<PhysicsData>&);
 		virtual void FinalizeFiles();
 		virtual bool OpenNextFile();
+		virtual void SetChannelMap(const std::shared_ptr<ChannelMap>&);
 	protected:
 		std::string LogName;
 		std::string TranslatorName;
@@ -39,6 +42,7 @@ class Translator{
 		bool FinishedCurrentFile;
 
 		std::shared_ptr<spdlog::logger> console;
+		std::shared_ptr<ChannelMap> CMap;
 };
 
 #endif

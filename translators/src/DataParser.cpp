@@ -1,16 +1,18 @@
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
 
+#include "ChannelMap.hpp"
 #include "DataParser.hpp"
 
 #include "EVTTranslator.hpp"
 #include "LDFTranslator.hpp"
 
 DataParser::DataParser(DataParser::DataFileType dft,const std::string& log){
-	DataType = dft;
+	this->DataType = dft;
 	this->LogName = log;
-	switch(DataType){
+	switch(this->DataType){
 		case EVT_BUILT:
 			this->ParserName = "EVT_BUILT";
 			break;
@@ -35,21 +37,21 @@ DataParser::DataParser(DataParser::DataFileType dft,const std::string& log){
 			break;
 	}
 
-	switch(DataType){
+	switch(this->DataType){
 		case EVT_BUILT:
-			console = spdlog::get(this->LogName)->clone("EVT_BUILT_Parser");
-			DataTranslator.reset(new EVTTranslator(this->LogName,this->ParserName,EVTTranslator::EVT_TYPE::EVTBUILT));
+			this->console = spdlog::get(this->LogName)->clone("EVT_BUILT_Parser");
+			this->DataTranslator.reset(new EVTTranslator(this->LogName,this->ParserName,EVTTranslator::EVT_TYPE::EVTBUILT));
 			break;
 		case CAEN_ROOT:
 		case CAEN_BIN:
 		case LDF:
-			console = spdlog::get(this->LogName)->clone("LDF_PIXIE");
-			DataTranslator.reset(new LDFTranslator(this->LogName,this->ParserName,LDFTranslator::LDF_TYPE::PIXIE));
+			this->console = spdlog::get(this->LogName)->clone("LDF_PIXIE");
+			this->DataTranslator.reset(new LDFTranslator(this->LogName,this->ParserName,LDFTranslator::LDF_TYPE::PIXIE));
 			break;
 		case PLD:
 		case EVT_PRESORT:
-			console = spdlog::get(this->LogName)->clone("EVT_Presort_Parser");
-			DataTranslator.reset(new EVTTranslator(this->LogName,this->ParserName,EVTTranslator::EVT_TYPE::PRESORT));
+			this->console = spdlog::get(this->LogName)->clone("EVT_Presort_Parser");
+			this->DataTranslator.reset(new EVTTranslator(this->LogName,this->ParserName,EVTTranslator::EVT_TYPE::PRESORT));
 			break;
 		case Unknown:
 		default:
@@ -59,13 +61,18 @@ DataParser::DataParser(DataParser::DataFileType dft,const std::string& log){
 
 void DataParser::SetInputFiles(std::vector<std::string>& filelist){
 	for(const auto& file : filelist){
-		if( not DataTranslator->AddFile(file) ){
+		if( not this->DataTranslator->AddFile(file) ){
 			throw std::runtime_error("Unable to Add File : "+file+" to the Translator");
 		}
 	}
-	DataTranslator->FinalizeFiles();
+	this->DataTranslator->FinalizeFiles();
 }
 
 void DataParser::Parse(boost::container::devector<PhysicsData>& RawEvents){
-	DataTranslator->Parse(RawEvents);
+	this->DataTranslator->Parse(RawEvents);
+}
+
+void DataParser::SetChannelMap(const std::shared_ptr<ChannelMap>& cmap){
+	this->CMap = cmap;	
+	this->DataTranslator->SetChannelMap(cmap);
 }

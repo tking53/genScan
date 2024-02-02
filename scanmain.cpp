@@ -120,8 +120,6 @@ int main(int argc, char *argv[]) {
 		limit = lower_limit;
 	}
 
-
-
 	std::unique_ptr<DataParser> dataparser;
 	try{ 
 		if( dataformat.compare("evt") == 0 ){
@@ -188,6 +186,8 @@ int main(int argc, char *argv[]) {
 		console->error(e.what());
 		exit(EXIT_FAILURE);
 	}
+
+	dataparser->SetChannelMap(cmap);
 
 	console->info("Generating Plot Registry");
 	std::shared_ptr<PLOTS::PlotRegistry> HistogramManager(new PLOTS::PlotRegistry(logname,StringManip::GetFileBaseName(outputfile),port));
