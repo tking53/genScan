@@ -26,6 +26,7 @@ class EVTTranslator : public Translator{
 		};
 
 		unsigned int CurrHeaderLength;
+		unsigned int CurrTraceLength;
 		uint32_t firstWords[4];
 		
 		EVT_TYPE Format;

@@ -34,6 +34,10 @@ void EVTTranslator::ParsePresort(boost::container::devector<PhysicsData>& RawEve
 void EVTTranslator::ParseEVTBuilt(boost::container::devector<PhysicsData>& RawEvents){
 	this->ReadHeader(RawEvents);
 	this->ReadFull(RawEvents);
+
+	#ifndef NDEBUG
+	this->console->debug("{}",RawEvents.back());
+	#endif
 }
 
 int EVTTranslator::ReadFull(boost::container::devector<PhysicsData>& RawEvents){
@@ -52,7 +56,7 @@ int EVTTranslator::ReadHeader(boost::container::devector<PhysicsData>& RawEvents
 	auto ModuleNumber = PIXIE::ModuleNumberMask(firstWords[0]);
 	auto CrateNumber = PIXIE::CrateNumberMask(firstWords[0]);
 	CurrHeaderLength = PIXIE::HeaderLengthMask(firstWords[0]);
-	auto FinishCode = PIXIE::FinishCodeMask(firstWords[0]);
+	auto FinishCode = (PIXIE::FinishCodeMask(firstWords[0]) != 0);
 
 	auto TimeStampLow = PIXIE::TimeLowMask(firstWords[1]);
 	auto TimeStampHigh = PIXIE::TimeHighMask(firstWords[2]);
@@ -63,14 +67,16 @@ int EVTTranslator::ReadHeader(boost::container::devector<PhysicsData>& RawEvents
 	//word2 has CFD things
 
 	auto EventEnergy = PIXIE::EventEnergyMask(firstWords[3]);
-	auto TraceLength = PIXIE::TraceLengthMask(firstWords[3]);
-	auto OutOfRange = PIXIE::TraceOutRangeMask(firstWords[3]);
+	CurrTraceLength = PIXIE::TraceLengthMask(firstWords[3]);
+	
+	//note that this assumes that this isn't one of the weird firmwares where this is in wordzero
+	//need to ask Toby if we actually still use those firmware versions anywhere we would want to scan this or if we should support
+	//them anymore
+	bool OutOfRange = static_cast<bool>(PIXIE::TraceOutRangeMask(firstWords[3]));
 
-	#ifndef NDEBUG
-	this->console->debug("Crate : {},Module : {},Channel {},Header : {},Finish : {},TimeStampLow : {},TimeStampHigh : {},TimeStamp : {}",CrateNumber,ModuleNumber,ChannelNumber,CurrHeaderLength,FinishCode,TimeStampLow,TimeStampHigh,TimeStamp);
-	this->console->debug("Energy : {},TraceLength : {},TraceOutOfRange : {}",EventEnergy,TraceLength,OutOfRange);
-	#endif
 	RawEvents.push_back(PhysicsData(CurrHeaderLength,CrateNumber,ModuleNumber,ChannelNumber,EventEnergy,TimeStamp));
+	RawEvents.back().SetPileup(FinishCode);
+	RawEvents.back().SetSaturation(OutOfRange);
 
 	return 0;
 }
