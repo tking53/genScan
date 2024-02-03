@@ -1,6 +1,8 @@
 #ifndef __BIT_DECODER_HPP__
 #define __BIT_DECODER_HPP__
 
+#include "PhysicsData.hpp"
+
 #include "ChannelMap.hpp"
 
 struct Mask{
@@ -33,7 +35,9 @@ class XiaDecoder{
 		unsigned int DecodeQDCSums(const unsigned int &) const;
 		double GetQDCSize() const;
 
-		void DecodeFirstWords(const unsigned int*,uint32_t&,uint32_t&,unsigned int&,unsigned int&,bool&) const;
+		void DecodeFirstWords(const unsigned int*,int&,uint32_t&,uint32_t&,unsigned int&,unsigned int&,bool&) const;
+		void DecodeCFDParams(const unsigned int*,PhysicsData&) const;
+		void DecodeOtherWords(const unsigned int*,PhysicsData*) const;
 	private:
 		Mask EventLengthMask;
 		Mask TimeLowMask;

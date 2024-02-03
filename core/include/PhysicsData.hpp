@@ -9,11 +9,14 @@
 
 class PhysicsData{
 	public:
-		PhysicsData(int,int,int,int,uint32_t,uint64_t);
+		PhysicsData(int,int,int,int,int,uint32_t,uint64_t);
 		~PhysicsData() = default;
 
 		//HeaderLength, this is mostly used for pixie data
 		int GetHeaderLength() const;
+
+		//EventLength
+		int GetEventLength() const;
 
 		//RawEnergy
 		uint32_t GetRawEnergy() const;
@@ -63,15 +66,25 @@ class PhysicsData{
 		void SetSaturation(bool);
 		bool GetSaturation() const;
 
+		//ESums
+		void SetESumLeading(unsigned int);
+		unsigned int GetESumLeading() const;
+		void SetESumTrailing(unsigned int);
+		unsigned int GetESumTrailing() const;
+		void SetESumGap(unsigned int);
+		unsigned int GetESumGap() const;
+		void SetESumBaseline(unsigned int);
+		unsigned int GetESumBaseline() const;
+
 		//Phase, need to ask Toby what this means
 		void SetPhase(double);
 		double GetPhase() const;
 
 		//Raw Trace
-		void SetRawTrace(const std::vector<unsigned int>&);
-		void SetRawTrace(std::vector<unsigned int>&&);
+		void SetRawTrace(const std::vector<uint16_t>&);
+		void SetRawTrace(std::vector<uint16_t>&&);
 
-		const std::vector<unsigned int>& GetRawTrace() const;
+		const std::vector<uint16_t>& GetRawTrace() const;
 
 		//QDC Sums
 		void SetQDCSums(const std::vector<unsigned int>&);
@@ -128,6 +141,7 @@ class PhysicsData{
 	private:
 		//this is info decoded from the data files
 		int HeaderLength;	
+		int EventLength;
 		uint32_t RawEnergy;
 		uint64_t RawTimeStamp;
 
@@ -146,8 +160,13 @@ class PhysicsData{
 		bool Pileup;
 		bool Saturation;
 		double Phase;
-		TraceHelper<unsigned int, float> Trace;
+		TraceHelper<uint16_t, float> Trace;
 		std::vector<unsigned int> QDCSums;
+
+		unsigned int ESumTrailing;
+		unsigned int ESumLeading;
+		unsigned int ESumGap;
+		unsigned int ESumBaseLine;
 
 		//this is info derived from the channel map
 		std::string Type;
@@ -158,11 +177,11 @@ class PhysicsData{
 
 		//Trace Helper, should probably hide this from end user though
 		//and only expose what it can determine
-		void SetTraceHelper(TraceHelper<unsigned int, float>);
-		void SetTraceHelper(const TraceHelper<unsigned int, float>&);
-		void SetTraceHelper(TraceHelper<unsigned int, float>&&);
+		void SetTraceHelper(TraceHelper<uint16_t, float>);
+		void SetTraceHelper(const TraceHelper<uint16_t, float>&);
+		void SetTraceHelper(TraceHelper<uint16_t, float>&&);
 
-		TraceHelper<unsigned int,float> GetTraceHelper() const;
+		TraceHelper<uint16_t,float> GetTraceHelper() const;
 };
 
 #endif

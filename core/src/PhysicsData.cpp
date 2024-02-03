@@ -1,8 +1,9 @@
 #include "PhysicsData.hpp"
 #include "TraceHelper.hpp"
 
-PhysicsData::PhysicsData(int headerlength,int cratenum,int modnum,int channum,uint32_t rawerg,uint64_t rawts){
+PhysicsData::PhysicsData(int headerlength,int eventlength,int cratenum,int modnum,int channum,uint32_t rawerg,uint64_t rawts){
 	this->HeaderLength = headerlength;
+	this->EventLength = eventlength;
 	this->CrateNum = cratenum;
 	this->ModNum = modnum;
 	this->ChanNum = channum;
@@ -22,7 +23,7 @@ PhysicsData::PhysicsData(int headerlength,int cratenum,int modnum,int channum,ui
 
 	this->Phase = -1.0;
 
-	this->Trace = TraceHelper<unsigned int,float>();
+	this->Trace = TraceHelper<uint16_t,float>();
 	this->QDCSums = {};
 
 	this->Type = "";
@@ -35,6 +36,10 @@ PhysicsData::PhysicsData(int headerlength,int cratenum,int modnum,int channum,ui
 //HeaderLength, this is mostly used for pixie data
 int PhysicsData::GetHeaderLength() const{
 	return this->HeaderLength;
+}
+
+int PhysicsData::GetEventLength() const{
+	return this->EventLength;
 }
 
 //RawEnergy
@@ -145,14 +150,14 @@ double PhysicsData::GetPhase() const{
 }
 
 //Raw Trace
-void PhysicsData::SetRawTrace(const std::vector<unsigned int>& value){
-	Trace = TraceHelper<unsigned int,float>(value);
+void PhysicsData::SetRawTrace(const std::vector<uint16_t>& value){
+	Trace = TraceHelper<uint16_t,float>(value);
 }
-void PhysicsData::SetRawTrace(std::vector<unsigned int>&& value){
-	Trace = TraceHelper<unsigned int,float>(std::move(value));
+void PhysicsData::SetRawTrace(std::vector<uint16_t>&& value){
+	Trace = TraceHelper<uint16_t,float>(std::move(value));
 }
 
-const std::vector<unsigned int>& PhysicsData::GetRawTrace() const{
+const std::vector<uint16_t>& PhysicsData::GetRawTrace() const{
 	return Trace.GetData(); 
 }
 
@@ -226,4 +231,34 @@ void PhysicsData::SetTagList(std::set<std::string>&& value){
 
 std::set<std::string> PhysicsData::GetTagList() const{
 	return this->TagList;
+}
+
+void PhysicsData::SetESumLeading(unsigned int val){
+	this->ESumLeading = val;
+}
+
+unsigned int PhysicsData::GetESumLeading() const{
+	return this->ESumLeading;
+}
+
+void PhysicsData::SetESumTrailing(unsigned int val){
+	this->ESumTrailing = val;
+}
+
+unsigned int PhysicsData::GetESumTrailing() const{
+	return this->ESumTrailing;
+}
+void PhysicsData::SetESumGap(unsigned int val){
+	this->ESumGap = val;
+}
+
+unsigned int PhysicsData::GetESumGap() const{
+	return this->ESumGap;
+}
+void PhysicsData::SetESumBaseline(unsigned int val){
+	this->ESumBaseLine = val;
+}
+
+unsigned int PhysicsData::GetESumBaseline() const{
+	return this->ESumBaseLine;
 }

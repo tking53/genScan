@@ -15,6 +15,7 @@
 
 #include <boost/container/devector.hpp>
 
+#include "BitDecoder.hpp"
 #include "ChannelMap.hpp"
 
 #include "PhysicsData.hpp"
@@ -43,6 +44,8 @@ class Translator{
 
 		std::shared_ptr<spdlog::logger> console;
 		std::shared_ptr<ChannelMap> CMap;
+
+		XiaDecoder* CurrDecoder;
 };
 
 #endif

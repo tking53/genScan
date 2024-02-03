@@ -1,4 +1,3 @@
-#include <_types/_uint32_t.h>
 #include <stdexcept>
 
 #include "BitDecoder.hpp"
@@ -33,15 +32,35 @@ void EVTTranslator::ParsePresort(boost::container::devector<PhysicsData>& RawEve
 }
 
 void EVTTranslator::ParseEVTBuilt(boost::container::devector<PhysicsData>& RawEvents){
-	this->ReadHeader(RawEvents);
-	this->ReadFull(RawEvents);
-
-	#ifndef NDEBUG
-	this->console->debug("{}",RawEvents.back());
-	#endif
+	for( int ii = 0; ii < 1000 ; ++ii ){
+		if( this->ReadHeader(RawEvents) != -1 ){
+			this->ReadFull(RawEvents);
+			#ifndef NDEBUG
+			this->console->debug("{}",RawEvents.back());
+			#endif
+		}
+	}
 }
 
 int EVTTranslator::ReadFull(boost::container::devector<PhysicsData>& RawEvents){
+	spdlog::info("{}:{}:{}",this->CurrHeaderLength,this->CurrTraceLength,RawEvents.size());
+	if( this->CurrHeaderLength > 4 ){
+		uint32_t otherWords[this->CurrHeaderLength - 4];
+		if( !this->CurrentFile.read(reinterpret_cast<char*>(&otherWords),(this->CurrHeaderLength-4)*4) ){
+			return -1;
+		}
+		CurrDecoder->DecodeOtherWords(otherWords,&(RawEvents.back()));
+	}
+
+	//We have a trace
+	if( (RawEvents.back().GetEventLength() - this->CurrHeaderLength) != 0 ){
+		std::vector<uint16_t> trace(this->CurrTraceLength);
+		if( !(this->CurrentFile.read(reinterpret_cast<char*>(&trace[0]),(this->CurrTraceLength)*2)) ){
+			return -1;
+		}
+		RawEvents.back().SetRawTrace(std::move(trace));
+	}
+
 	return 0;
 }
 
@@ -59,27 +78,29 @@ int EVTTranslator::ReadHeader(boost::container::devector<PhysicsData>& RawEvents
 	CurrHeaderLength = PIXIE::HeaderLengthMask(firstWords[0]);
 	auto FinishCode = (PIXIE::FinishCodeMask(firstWords[0]) != 0);
 
-	auto decoder = CMap->GetXiaDecoder(CrateNumber,ModuleNumber);
+	CurrDecoder = CMap->GetXiaDecoder(CrateNumber,ModuleNumber);
 	uint32_t TimeStampLow;
 	uint32_t TimeStampHigh;
 	unsigned int EventEnergy;
 	bool OutOfRange;
+	int EventLength;
 
-	decoder->DecodeFirstWords(firstWords,TimeStampLow,TimeStampHigh,EventEnergy,CurrTraceLength,OutOfRange);
+	CurrDecoder->DecodeFirstWords(firstWords,EventLength,TimeStampLow,TimeStampHigh,EventEnergy,CurrTraceLength,OutOfRange);
 
 	uint64_t TimeStamp = static_cast<uint64_t>(TimeStampHigh);
 	TimeStamp = TimeStamp<<32;
 	TimeStamp += TimeStampLow;
 
-	//word2 has CFD things
-
 	//note that this assumes that this isn't one of the weird firmwares where this is in wordzero
 	//need to ask Toby if we actually still use those firmware versions anywhere we would want to scan this or if we should support
 	//them anymore
 
-	RawEvents.push_back(PhysicsData(CurrHeaderLength,CrateNumber,ModuleNumber,ChannelNumber,EventEnergy,TimeStamp));
+	RawEvents.push_back(PhysicsData(CurrHeaderLength,EventLength,CrateNumber,ModuleNumber,ChannelNumber,EventEnergy,TimeStamp));
 	RawEvents.back().SetPileup(FinishCode);
 	RawEvents.back().SetSaturation(OutOfRange);
+
+	//word2 has CFD things
+	//CurrDecoder->DecodeCFDParams(firstWords,RawEvents.back());
 
 	return 0;
 }

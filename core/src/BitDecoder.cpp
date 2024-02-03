@@ -280,10 +280,39 @@ double XiaDecoder::GetQDCSize() const{
 	return this->QDCSize;
 }
 
-void XiaDecoder::DecodeFirstWords(const unsigned int* firstFour,uint32_t& tslow,uint32_t& tshigh,unsigned int& erg,unsigned int& tracelen,bool& tracesat) const{
+void XiaDecoder::DecodeFirstWords(const unsigned int* firstFour,int& eventlen,uint32_t& tslow,uint32_t& tshigh,unsigned int& erg,unsigned int& tracelen,bool& tracesat) const{
+	eventlen = this->DecodeEventLength(firstFour[0]);
 	tslow = this->DecodeTimeLow(firstFour[1]);
 	tshigh = this->DecodeTimeLow(firstFour[2]);
 	erg = this->DecodeEventEnergy(firstFour[3]);
 	tracelen = this->DecodeTraceLength(firstFour[3]);
 	tracesat = static_cast<bool>(this->DecodeTraceOutRange(firstFour[3]));
+}
+
+void XiaDecoder::DecodeCFDParams(const unsigned int* firstFour,PhysicsData& pd) const{
+}
+
+void XiaDecoder::DecodeOtherWords(const unsigned int* otherWords,PhysicsData* pd) const{
+	if( pd->GetHeaderLength() == 8 ){
+		pd->SetESumTrailing(this->DecodeESumTrailing(otherWords[0]));
+		pd->SetESumLeading(this->DecodeESumLeading(otherWords[1]));
+		pd->SetESumGap(this->DecodeESumGap(otherWords[2]));
+		pd->SetESumBaseline(this->DecodeBaseline(otherWords[3]));
+	}else if( pd->GetHeaderLength() == 12 ){
+		std::vector<unsigned int> qdcs(8,0);
+		for( int ii = 0; ii < 8; ++ii ){
+			qdcs[ii] = this->DecodeQDCSums(otherWords[ii]);
+		}
+		pd->SetQDCSums(qdcs);
+	}else if( pd->GetHeaderLength() == 16 ){
+		pd->SetESumTrailing(this->DecodeESumTrailing(otherWords[0]));
+		pd->SetESumLeading(this->DecodeESumLeading(otherWords[1]));
+		pd->SetESumGap(this->DecodeESumGap(otherWords[2]));
+		pd->SetESumBaseline(this->DecodeBaseline(otherWords[3]));
+		std::vector<unsigned int> qdcs(8,0);
+		for( int ii = 0; ii < 8; ++ii ){
+			qdcs[ii] = this->DecodeQDCSums(otherWords[ii+4]);
+		}
+		pd->SetQDCSums(qdcs);
+	}
 }
