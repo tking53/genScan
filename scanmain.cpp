@@ -24,6 +24,8 @@
 #include "JSONConfigParser.hpp"
 #include "ChannelMap.hpp"
 
+#include "Correlator.hpp"
+
 #include "HistogramManager.hpp"
 
 #include "RootFileManager.hpp"
@@ -188,6 +190,12 @@ int main(int argc, char *argv[]) {
 	}
 
 	dataparser->SetChannelMap(cmap);
+
+	spdlog::info("event width : {} ns",cfgparser->GetGlobalEventWidthInNS());
+	//std::shared_ptr<Correlator> correlator = std::make_shared<Correlator>(cfgparser->GetGlobalEventWidth());
+	//try{
+	//}catch(std::runtime_error const& e){
+	//}
 
 	console->info("Generating Plot Registry");
 	std::shared_ptr<PLOTS::PlotRegistry> HistogramManager(new PLOTS::PlotRegistry(logname,StringManip::GetFileBaseName(outputfile),port));
