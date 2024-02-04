@@ -70,7 +70,10 @@ void ConfigParser::SetAuthorEmailText(std::string* txt){
 double ConfigParser::GetGlobalEventWidth() const{
 	return this->GlobalEventWidthInS;
 }
-		
+
+double ConfigParser::GetGlobalEventWidthInNS() const{
+	return this->GlobalEventWidthInS*1.0e9;
+}	
 std::string* ConfigParser::GetConfigName() const{
 	return this->ConfigName.get();
 }

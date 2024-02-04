@@ -21,25 +21,27 @@ class ConfigParser{
 		[[noreturn]] virtual void Parse([[maybe_unused]] ChannelMap*);
 		virtual ~ConfigParser();
 
-		void SetGlobalEventWidthInS(double);
-		void SetConfigFile(std::string&);
-		void SetDescriptionText(std::string*);
-		void SetAuthorNameText(std::string*);
-		void SetAuthorDateText(std::string*);
-		void SetAuthorEmailText(std::string*);
+		virtual void SetConfigFile(std::string&);
+		virtual void SetDescriptionText(std::string*);
+		virtual void SetAuthorNameText(std::string*);
+		virtual void SetAuthorDateText(std::string*);
+		virtual void SetAuthorEmailText(std::string*);
 
-		double GetGlobalEventWidth() const;
-		std::string* GetConfigName() const;
-		std::string* GetDescriptionText() const;
-		std::string* GetAuthorNameText() const;
-		std::string* GetAuthorDateText() const;
-		std::string* GetAuthorEmailText() const;
+		virtual double GetGlobalEventWidth() const;
+		virtual double GetGlobalEventWidthInNS() const;
+		virtual void SetGlobalEventWidthInS(double);
 
-		std::vector<std::string> GetProcessorNames() const;
-		std::vector<std::string> GetAnalyzerNames() const;
+		virtual std::string* GetConfigName() const;
+		virtual std::string* GetDescriptionText() const;
+		virtual std::string* GetAuthorNameText() const;
+		virtual std::string* GetAuthorDateText() const;
+		virtual std::string* GetAuthorEmailText() const;
 
-		void AddProcessorName(const std::string&);
-		void AddAnalyzerName(const std::string&);
+		virtual std::vector<std::string> GetProcessorNames() const;
+		virtual std::vector<std::string> GetAnalyzerNames() const;
+
+		virtual void AddProcessorName(const std::string&);
+		virtual void AddAnalyzerName(const std::string&);
 	protected:
 		[[noreturn]] virtual void ParseDescription();
 		[[noreturn]] virtual void ParseAuthor();

@@ -3,7 +3,7 @@
 		Words go here.
 		Testing out the Experiment Summary.
 	</Description>
-	<Global EventWidth="5.0e-7" EventWidthUnit="s"/>
+	<Global EventWidth="5.0e-7" EventWidthUnit="s" CorrelationType="rolling-window" />
 	<DetectorDriver>
 		<Processor name="GenericProcessor" alpha="1.0" beta="2.0" gamma="4.0"/>
 		<Analyzer name="GenericAnalyzer"/>

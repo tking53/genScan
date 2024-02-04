@@ -3,8 +3,9 @@ Configuration:
     Words go here.
     Testing out the Experiment Summary.
   Global:
-    EventWidth: 5.0e-7
-    EventWidthUnit: s
+    EventWidth: 500.0
+    EventWidthUnit: ns
+    CorrelationType: rolling-window
   DetectorDriver:
     Processor:
       - name: GenericProcessor

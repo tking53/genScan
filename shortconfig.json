@@ -3,7 +3,8 @@
     "Description": "Words go here.\nTesting out the Experiment Summary.",
     "Global": {
       "EventWidth": 5.0e-7,
-      "EventWidthUnit": "s"
+      "EventWidthUnit": "s",
+      "CorrelationType": "rolling-window"
     },
     "DetectorDriver": {
       "Processor": [
