@@ -18,6 +18,7 @@
 #include "BitDecoder.hpp"
 #include "ChannelMap.hpp"
 
+#include "Correlator.hpp"
 #include "PhysicsData.hpp"
 
 
@@ -30,6 +31,7 @@ class Translator{
 		virtual void FinalizeFiles();
 		virtual bool OpenNextFile();
 		virtual void SetChannelMap(const std::shared_ptr<ChannelMap>&);
+		virtual void SetCorrelator(const std::shared_ptr<Correlator>&);
 	protected:
 		std::string LogName;
 		std::string TranslatorName;
@@ -42,8 +44,12 @@ class Translator{
 		size_t CurrentFileIndex;
 		bool FinishedCurrentFile;
 
+		bool LastReadEvtWithin;
+		boost::container::devector<PhysicsData> Leftovers;
+
 		std::shared_ptr<spdlog::logger> console;
 		std::shared_ptr<ChannelMap> CMap;
+		std::shared_ptr<Correlator> correlator;
 
 		XiaDecoder* CurrDecoder;
 };

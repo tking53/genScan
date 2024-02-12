@@ -9,6 +9,8 @@ Translator::Translator(const std::string& log,const std::string& translatorname)
 
 	this->console = spdlog::get(this->LogName)->clone(this->TranslatorName);
 	this->console->info("Created Translator [{}]",this->TranslatorName);
+	
+	this->LastReadEvtWithin = false;
 }
 		
 bool Translator::AddFile(const std::string& filename){
@@ -55,4 +57,8 @@ bool Translator::OpenNextFile(){
 
 void Translator::SetChannelMap(const std::shared_ptr<ChannelMap>& cmap){
 	this->CMap = cmap;
+}
+
+void Translator::SetCorrelator(const std::shared_ptr<Correlator>& corr){
+	this->correlator = corr;
 }

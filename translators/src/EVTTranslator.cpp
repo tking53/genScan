@@ -32,18 +32,36 @@ void EVTTranslator::ParsePresort(boost::container::devector<PhysicsData>& RawEve
 }
 
 void EVTTranslator::ParseEVTBuilt(boost::container::devector<PhysicsData>& RawEvents){
-	for( int ii = 0; ii < 1000 ; ++ii ){
+	do{
+		if( !this->Leftovers.empty() ){
+			RawEvents.push_back(this->Leftovers.back());
+			this->Leftovers.pop_back();
+			auto evt = RawEvents.back();
+			auto toss = this->correlator->IsWithinCorrelationWindow(evt.GetRawTimeStamp()*10.0,evt.GetCrate(),evt.GetModule(),evt.GetChannel());
+			(void) toss;
+		}
 		if( this->ReadHeader(RawEvents) != -1 ){
 			this->ReadFull(RawEvents);
 			#ifndef NDEBUG
 			this->console->debug("{}",RawEvents.back());
 			#endif
+			if( !this->LastReadEvtWithin ){
+				this->Leftovers.push_back(RawEvents.back());
+				RawEvents.pop_back();
+				this->correlator->Pop();
+				this->correlator->Clear();
+			}
 		}
-	}
+	}while(this->LastReadEvtWithin);
+	//Clear for now
+	RawEvents.clear();
 }
 
 int EVTTranslator::ReadFull(boost::container::devector<PhysicsData>& RawEvents){
-	spdlog::info("{}:{}:{}",this->CurrHeaderLength,this->CurrTraceLength,RawEvents.size());
+	#ifndef NDEBUG
+	this->console->debug("{}:{}:{}",this->CurrHeaderLength,this->CurrTraceLength,RawEvents.size());
+	this->correlator->DumpSelf();
+	#endif
 	if( this->CurrHeaderLength > 4 ){
 		uint32_t otherWords[this->CurrHeaderLength - 4];
 		if( !this->CurrentFile.read(reinterpret_cast<char*>(&otherWords),(this->CurrHeaderLength-4)*4) ){
@@ -95,6 +113,7 @@ int EVTTranslator::ReadHeader(boost::container::devector<PhysicsData>& RawEvents
 	//need to ask Toby if we actually still use those firmware versions anywhere we would want to scan this or if we should support
 	//them anymore
 
+	this->LastReadEvtWithin = this->correlator->IsWithinCorrelationWindow(10.0*TimeStamp,CrateNumber,ModuleNumber,ChannelNumber);
 	RawEvents.push_back(PhysicsData(CurrHeaderLength,EventLength,CrateNumber,ModuleNumber,ChannelNumber,EventEnergy,TimeStamp));
 	RawEvents.back().SetPileup(FinishCode);
 	RawEvents.back().SetSaturation(OutOfRange);

@@ -108,3 +108,11 @@ void ConfigParser::AddProcessorName(const std::string& name){
 void ConfigParser::AddAnalyzerName(const std::string& name){
 	AnalyzerNames.push_back(name);
 }
+
+std::string* ConfigParser::GetCorrelationType() const{
+	return this->CoincidenceType.get();
+}
+
+void ConfigParser::SetCorrelationType(std::string* val){
+	this->CoincidenceType.reset(val);
+}

@@ -42,6 +42,9 @@ class ConfigParser{
 
 		virtual void AddProcessorName(const std::string&);
 		virtual void AddAnalyzerName(const std::string&);
+
+		virtual std::string* GetCorrelationType() const;
+		virtual void SetCorrelationType(std::string*);
 	protected:
 		[[noreturn]] virtual void ParseDescription();
 		[[noreturn]] virtual void ParseAuthor();
@@ -61,6 +64,8 @@ class ConfigParser{
 		std::unique_ptr<std::string> AuthorNameText;
 		std::unique_ptr<std::string> AuthorEmailText;
 		std::unique_ptr<std::string> AuthorDateText;
+
+		std::unique_ptr<std::string> CoincidenceType;
 
 		double GlobalEventWidthInS;
 };

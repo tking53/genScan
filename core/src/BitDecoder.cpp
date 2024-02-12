@@ -283,7 +283,7 @@ double XiaDecoder::GetQDCSize() const{
 void XiaDecoder::DecodeFirstWords(const unsigned int* firstFour,int& eventlen,uint32_t& tslow,uint32_t& tshigh,unsigned int& erg,unsigned int& tracelen,bool& tracesat) const{
 	eventlen = this->DecodeEventLength(firstFour[0]);
 	tslow = this->DecodeTimeLow(firstFour[1]);
-	tshigh = this->DecodeTimeLow(firstFour[2]);
+	tshigh = this->DecodeTimeHigh(firstFour[2]);
 	erg = this->DecodeEventEnergy(firstFour[3]);
 	tracelen = this->DecodeTraceLength(firstFour[3]);
 	tracesat = static_cast<bool>(this->DecodeTraceOutRange(firstFour[3]));

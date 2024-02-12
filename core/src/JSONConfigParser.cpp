@@ -101,6 +101,7 @@ void JSONConfigParser::ParseGlobal(){
 		   		   << "\" is malformed and Global node is missing EventWidthUnit attribute. (s,ns,us,ms) are valid";
 				throw std::runtime_error(ss.str());
 		}
+		this->CoincidenceType.reset(new std::string(this->Global.get("CorrelationType","rolling-window").asString()));
 	}else{
 		std::stringstream ss;
 		ss << "JSONConfigParser::ParseGlobal() : config file named \""

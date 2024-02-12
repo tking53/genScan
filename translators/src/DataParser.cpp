@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "ChannelMap.hpp"
+#include "Correlator.hpp"
 #include "DataParser.hpp"
 
 #include "EVTTranslator.hpp"
@@ -75,4 +76,9 @@ void DataParser::Parse(boost::container::devector<PhysicsData>& RawEvents){
 void DataParser::SetChannelMap(const std::shared_ptr<ChannelMap>& cmap){
 	this->CMap = cmap;	
 	this->DataTranslator->SetChannelMap(cmap);
+}
+
+void DataParser::SetCorrelator(const std::shared_ptr<Correlator>& corr){
+	this->correlator = corr;
+	this->DataTranslator->SetCorrelator(corr);
 }

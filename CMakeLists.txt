@@ -36,6 +36,9 @@ if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 endif ()
 message(STATUS "Installing to ${CMAKE_INSTALL_PREFIX}")
 
+option(CORRELATOR_DEBUG "Enable debugging the correlator, output will be very slow" OFF)
+set_property(CACHE CORRELATOR_DEBUG PROPERTY ADVANCED OFF)
+
 #Add additional CXX flags if we use the Debug option
 set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
 if(NOT CMAKE_BUILD_TYPE)

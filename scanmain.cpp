@@ -188,14 +188,25 @@ int main(int argc, char *argv[]) {
 		console->error(e.what());
 		exit(EXIT_FAILURE);
 	}
-
 	dataparser->SetChannelMap(cmap);
 
-	spdlog::info("event width : {} ns",cfgparser->GetGlobalEventWidthInNS());
-	//std::shared_ptr<Correlator> correlator = std::make_shared<Correlator>(cfgparser->GetGlobalEventWidth());
-	//try{
-	//}catch(std::runtime_error const& e){
-	//}
+	std::shared_ptr<Correlator> correlator = std::make_shared<Correlator>(logname,cfgparser->GetGlobalEventWidthInNS());
+	try{
+		if( cfgparser->GetCorrelationType()->compare("rolling-window") == 0 ){
+			correlator->SetCorrelationType(Correlator::CORRELATIONWINDOWTYPE::ROLLINGWIDTH);
+		}else if( cfgparser->GetCorrelationType()->compare("rolling-trigger") == 0 ){
+			correlator->SetCorrelationType(Correlator::CORRELATIONWINDOWTYPE::ROLLINGTRIGGER);
+		}else if( cfgparser->GetCorrelationType()->compare("analog") == 0 ){
+			correlator->SetCorrelationType(Correlator::CORRELATIONWINDOWTYPE::ANALOG);
+		}else{
+			throw std::runtime_error("Unknown Correlation Type : "+(*(cfgparser->GetCorrelationType()))+", supported types are rolling-window, rolling,trigger, analog");
+		}
+	}catch(std::runtime_error const& e){
+		console->error(e.what());
+		exit(EXIT_FAILURE);
+	}
+	dataparser->SetCorrelator(correlator);
+	console->info("event width : {:.0f} ns Correlation type : {}",cfgparser->GetGlobalEventWidthInNS(),(*(cfgparser->GetCorrelationType())));
 
 	console->info("Generating Plot Registry");
 	std::shared_ptr<PLOTS::PlotRegistry> HistogramManager(new PLOTS::PlotRegistry(logname,StringManip::GetFileBaseName(outputfile),port));

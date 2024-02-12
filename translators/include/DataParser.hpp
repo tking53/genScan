@@ -16,6 +16,7 @@
 
 #include "ChannelMap.hpp"
 
+#include "Correlator.hpp"
 #include "Translator.hpp"
 
 #include "PhysicsData.hpp"
@@ -38,6 +39,7 @@ class DataParser{
 		void Parse(boost::container::devector<PhysicsData>&);
 
 		void SetChannelMap(const std::shared_ptr<ChannelMap>&);
+		void SetCorrelator(const std::shared_ptr<Correlator>&);
 	private:
 		DataFileType DataType;
 		std::shared_ptr<spdlog::logger> console;
@@ -46,6 +48,7 @@ class DataParser{
 
 		std::unique_ptr<Translator> DataTranslator;
 		std::shared_ptr<ChannelMap> CMap;
+		std::shared_ptr<Correlator> correlator;
 };
 
 #endif

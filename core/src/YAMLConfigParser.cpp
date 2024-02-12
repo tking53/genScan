@@ -100,6 +100,7 @@ void YAMLConfigParser::ParseGlobal(){
 		   		   << "\" is malformed and Global node is missing EventWidthUnit attribute. (s,ns,us,ms) are valid";
 				throw std::runtime_error(ss.str());
 		}
+		this->CoincidenceType.reset(new std::string(this->Global["CorrelationType"].as<std::string>("rolling-window")));
 	}else{
 		std::stringstream ss;
 		ss << "YAMLConfigParser::ParseGlobal() : config file named \""
