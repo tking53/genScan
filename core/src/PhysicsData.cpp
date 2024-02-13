@@ -1,12 +1,13 @@
 #include "PhysicsData.hpp"
 #include "TraceHelper.hpp"
 
-PhysicsData::PhysicsData(int headerlength,int eventlength,int cratenum,int modnum,int channum,uint32_t rawerg,uint64_t rawts){
+PhysicsData::PhysicsData(int headerlength,int eventlength,int cratenum,int modnum,int channum,int gchan,uint32_t rawerg,uint64_t rawts){
 	this->HeaderLength = headerlength;
 	this->EventLength = eventlength;
 	this->CrateNum = cratenum;
 	this->ModNum = modnum;
 	this->ChanNum = channum;
+	this->globalChannelID = gchan;
 	this->RawEnergy = rawerg;
 	this->RawTimeStamp = rawts;
 
@@ -261,4 +262,8 @@ void PhysicsData::SetESumBaseline(unsigned int val){
 
 unsigned int PhysicsData::GetESumBaseline() const{
 	return this->ESumBaseLine;
+}
+
+int PhysicsData::GetGlobalChannelID() const{
+	return this->globalChannelID;
 }

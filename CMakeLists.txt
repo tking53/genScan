@@ -280,7 +280,7 @@ if( USE_SYSTEM_SPDLOG )
 	target_link_libraries(GenScanor PRIVATE spdlog::spdlog_header_only)
 endif()
 if( USE_SYSTEM_BOOST )
-	target_link_libraries(GenScanor PRIVATE Boost::container Boost::program_options)
+	target_link_libraries(GenScanor PRIVATE Boost::container Boost::program_options Boost::sort)
 else()
 	target_link_libraries(GenScanor PRIVATE 
 		${BOOST_EXTERNAL_INSTALL_LOCATION}/lib/libboost_container.a

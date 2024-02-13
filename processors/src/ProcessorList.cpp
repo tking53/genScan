@@ -1,3 +1,4 @@
+#include <random>
 #include <stdexcept>
 #include <sstream>
 
@@ -11,6 +12,11 @@
 
 ProcessorList::ProcessorList(const std::string& log){
 	this->LogName = log;
+	this->console = spdlog::get(this->LogName)->clone("ProcessorList");
+	std::random_device rd;
+	this->randGen = std::mt19937_64(rd());
+	this->randNum = std::uniform_real_distribution<double>(0.0,1.0);
+	this->FirstTimeStamp = -1;
 }
 
 ProcessorList::~ProcessorList() = default;
@@ -150,4 +156,40 @@ void ProcessorList::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 		proc->DeclarePlots(hismanager);
 	for( auto& anal : this->analyzers )
 		anal->DeclarePlots(hismanager);
+}
+
+void ProcessorList::ThreshAndCal(boost::container::devector<PhysicsData>& RawEvents,ChannelMap* cmap){
+	if( this->FirstTimeStamp < 0 ){
+		this->FirstTimeStamp = RawEvents.front().GetTimeStamp();
+	}
+	for( auto& evt : RawEvents ){
+		auto raw = evt.GetRawEnergy();
+		auto erg = raw+this->randNum(this->randGen);
+		auto cal = cmap->GetCalibratedEnergy(evt.GetCrate(),evt.GetModule(),evt.GetChannel(),erg);
+		evt.SetEnergy(cal);
+		#ifndef NDEBUG
+		this->console->info("raw : {}, rand : {}, cal : {}, cr : {}, mod : {} chan : {}, gchan : {}",raw,erg,cal,evt.GetCrate(),evt.GetModule(),evt.GetChannel(),evt.GetGlobalChannelID());
+		#endif
+	}
+}
+
+void ProcessorList::ProcessRaw(boost::container::devector<PhysicsData>& RawEvents,PLOTS::PlotRegistry* HistogramManager){
+	auto evtsize = RawEvents.size();
+	double deltats = 0.0;
+
+	if( evtsize > 1 ){
+		deltats = RawEvents.back().GetTimeStamp()-RawEvents.front().GetTimeStamp();
+	}
+	
+	HistogramManager->Fill("Event_Size",evtsize);
+	HistogramManager->Fill("Event_Width",deltats);
+	HistogramManager->Fill("Event_Scale",deltats,evtsize);
+
+	for( auto& evt : RawEvents ){
+		auto gChanID = evt.GetGlobalChannelID();
+		HistogramManager->Fill("Raw",evt.GetRawEnergy(),gChanID);
+		HistogramManager->Fill("Scalar",1.0e-9*(evt.GetTimeStamp()-this->FirstTimeStamp),gChanID);
+		HistogramManager->Fill("Cal",evt.GetEnergy(),gChanID);
+		HistogramManager->Fill("Event_Mult",gChanID,evtsize);
+	}
 }

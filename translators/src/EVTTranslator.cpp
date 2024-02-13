@@ -40,7 +40,7 @@ Translator::TRANSLATORSTATE EVTTranslator::ParseEVTBuilt(boost::container::devec
 			RawEvents.push_back(this->Leftovers.back());
 			this->Leftovers.pop_back();
 			auto evt = RawEvents.back();
-			auto toss = this->correlator->IsWithinCorrelationWindow(evt.GetRawTimeStamp()*10.0,evt.GetCrate(),evt.GetModule(),evt.GetChannel());
+			auto toss = this->correlator->IsWithinCorrelationWindow(evt.GetTimeStamp(),evt.GetCrate(),evt.GetModule(),evt.GetChannel());
 			(void) toss;
 		}
 		if( this->ReadHeader(RawEvents) != -1 ){
@@ -99,7 +99,7 @@ int EVTTranslator::ReadHeader(boost::container::devector<PhysicsData>& RawEvents
 	}
 	//decode the header
 	auto ChannelNumber = PIXIE::ChannelNumberMask(firstWords[0]);
-	auto ModuleNumber = PIXIE::ModuleNumberMask(firstWords[0]);
+	auto ModuleNumber = PIXIE::ModuleNumberMask(firstWords[0])-2;
 	auto CrateNumber = PIXIE::CrateNumberMask(firstWords[0]);
 	CurrHeaderLength = PIXIE::HeaderLengthMask(firstWords[0]);
 	auto FinishCode = (PIXIE::FinishCodeMask(firstWords[0]) != 0);
@@ -116,15 +116,18 @@ int EVTTranslator::ReadHeader(boost::container::devector<PhysicsData>& RawEvents
 	uint64_t TimeStamp = static_cast<uint64_t>(TimeStampHigh);
 	TimeStamp = TimeStamp<<32;
 	TimeStamp += TimeStampLow;
+	double TimeStampInNS = TimeStamp*(this->CMap->GetModuleADCClockTicksToNS(CrateNumber,ModuleNumber));
 
 	//note that this assumes that this isn't one of the weird firmwares where this is in wordzero
 	//need to ask Toby if we actually still use those firmware versions anywhere we would want to scan this or if we should support
 	//them anymore
 
-	this->LastReadEvtWithin = this->correlator->IsWithinCorrelationWindow(10.0*TimeStamp,CrateNumber,ModuleNumber,ChannelNumber);
-	RawEvents.push_back(PhysicsData(CurrHeaderLength,EventLength,CrateNumber,ModuleNumber,ChannelNumber,EventEnergy,TimeStamp));
+	this->LastReadEvtWithin = this->correlator->IsWithinCorrelationWindow(TimeStampInNS,CrateNumber,ModuleNumber,ChannelNumber);
+	RawEvents.push_back(PhysicsData(CurrHeaderLength,EventLength,CrateNumber,ModuleNumber,ChannelNumber,
+				        this->CMap->GetGlobalChanID(CrateNumber,ModuleNumber,ChannelNumber),EventEnergy,TimeStamp));
 	RawEvents.back().SetPileup(FinishCode);
 	RawEvents.back().SetSaturation(OutOfRange);
+	RawEvents.back().SetTimeStamp(TimeStampInNS);
 
 	//word2 has CFD things
 	//CurrDecoder->DecodeCFDParams(firstWords,RawEvents.back());

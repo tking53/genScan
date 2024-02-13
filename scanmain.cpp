@@ -213,7 +213,9 @@ int main(int argc, char *argv[]) {
 	std::shared_ptr<PLOTS::PlotRegistry> HistogramManager(new PLOTS::PlotRegistry(logname,StringManip::GetFileBaseName(outputfile),port));
 	auto ebins = PLOTS::SE;
 	auto sbins = PLOTS::SE;
-	HistogramManager->Initialize(MAX_CHANNELS,ebins,sbins);
+	auto wbins = PLOTS::SE;
+	auto zbins = PLOTS::SA;
+	HistogramManager->Initialize(MAX_CHANNELS,ebins,sbins,wbins,zbins);
 	console->info("Generated Raw, Scalar, and Cal plots for {} Channels, There are {} bins for Raw and Cal, and {} bins for Scalar",MAX_CHANNELS,ebins,sbins);
 	
 	std::shared_ptr<RootFileManager> RootManager(new RootFileManager(logname,StringManip::GetFileBaseName(outputfile)));
@@ -267,6 +269,17 @@ int main(int argc, char *argv[]) {
 	try{
 		do{
 			CurrState = dataparser->Parse(RawEvents);
+			processorlist->ThreshAndCal(RawEvents,cmap.get());
+			processorlist->ProcessRaw(RawEvents,HistogramManager.get());
+			//processorlist->PreProcess(RawEvents,HistogramManager.get());
+			//processorlist->PreAnalyze(RawEvents,HistogramManager.get());
+	
+			//processorlist->Process(RawEvents,HistogramManager.get());
+			//processorlist->Analyze(RawEvents,HistogramManager.get());
+	
+			//processorlist->PostProcess(RawEvents,HistogramManager.get());
+			//processorlist->PostAnalyze(RawEvents,HistogramManager.get());
+			//RootManager->Fill();
 			RawEvents.clear();
 		}while( CurrState == Translator::TRANSLATORSTATE::PARSING);
 	}catch(std::runtime_error const& e){

@@ -17,6 +17,8 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
+#include <boost/sort/spreadsort/string_sort.hpp>
+
 #include "TH1.h"
 #include "TH2.h"
 #include "TProfile.h"
@@ -141,10 +143,14 @@ namespace PLOTS{
 				}
 			}
 
-			void Initialize(const int& numchannels,const int& ergsize,const int& scalarsize){
+			void Initialize(const int& numchannels,const int& ergsize,const int& scalarsize,const int& width_size,const int& event_size){
 				RegisterPlot<TH2F>("Raw","Raw Energy; Energy (channel); Channel (arb.);",ergsize,0.0,ergsize,numchannels,0,numchannels);
 				RegisterPlot<TH2F>("Scalar","Scalar Rate; Time (s); Channel (arb.);",scalarsize,0.0,scalarsize,numchannels,0,numchannels);
 				RegisterPlot<TH2F>("Cal","Cal. Energy; Energy (keV); Channel (arb.);",ergsize,0.0,ergsize,numchannels,0,numchannels);
+				RegisterPlot<TH1F>("Event_Width","Event Width; Time (ns);",width_size,0.0,width_size);
+				RegisterPlot<TH1F>("Event_Size","Num Hits Event; Event Size (arb.);",event_size,0,event_size);
+				RegisterPlot<TH2F>("Event_Mult","Event Size vs Channel; Channel (arb.); Event Size (arb.);",numchannels,0,numchannels,event_size,0,event_size);
+				RegisterPlot<TH2F>("Event_Scale","Event Size vs Event Width; Time (ns); Event Size (arb.);",width_size,0,width_size,event_size,0,event_size);
 			}
 
 			template<typename T>
@@ -260,34 +266,7 @@ namespace PLOTS{
 			}
 
 			void WriteAllPlots(){
-				std::sort(this->PlotIDs.begin(),this->PlotIDs.end(),[](std::string& a,std::string& b){
-						std::vector<std::string> atokens;
-						std::vector<std::string> btokens;
-						std::regex re("\\d+");
-
-						std::sregex_token_iterator abegin(a.begin(), a.end(), re);
-						std::sregex_token_iterator bbegin(b.begin(), b.end(), re);
-						std::sregex_token_iterator end;
-
-						std::copy(abegin, end, std::back_inserter(atokens));
-						std::copy(bbegin, end, std::back_inserter(btokens));
-
-						std::vector<int> avalues;
-						std::vector<int> bvalues;
-
-						for( auto& t : atokens )
-						avalues.push_back(std::stoi(t));
-
-						for( auto& t : btokens )
-						bvalues.push_back(std::stoi(t));
-
-						for( size_t ii = 0; ii < std::min(avalues.size(),bvalues.size()); ++ii ){
-							if( avalues.at(ii) != bvalues.at(ii) )
-								return avalues.at(ii) < bvalues.at(ii);
-						}
-						return true;
-
-				});
+				boost::sort::spreadsort::string_sort(this->PlotIDs.begin(),this->PlotIDs.end());
 				for( auto& name : this->PlotIDs ){
 					Write(name);
 				}

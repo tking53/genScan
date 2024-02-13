@@ -14,18 +14,18 @@
 Processor::Processor(const std::string& log,const std::string& proc,const std::initializer_list<std::string>& types){
 	this->LogName = log;
 	this->ProcessorName = proc;
-	console = spdlog::get(this->LogName)->clone(this->ProcessorName);
-	preprocesscalls = 0;
-	processcalls = 0;
-	postprocesscalls = 0;
-	preprocesstime = 0.0;
-	processtime = 0.0;
-	postprocesstime = 0.0;
-	currstep = STEP::UNKNOWN;
-	Types = types;
-	console->info("Created Processor : {}",this->ProcessorName);
-	for( const auto& t : Types )
-		console->info("Type : {} has been associated with this Processor",t);
+	this->console = spdlog::get(this->LogName)->clone(this->ProcessorName);
+	this->preprocesscalls = 0;
+	this->processcalls = 0;
+	this->postprocesscalls = 0;
+	this->preprocesstime = 0.0;
+	this->processtime = 0.0;
+	this->postprocesstime = 0.0;
+	this->currstep = STEP::UNKNOWN;
+	this->Types = types;
+	this->console->info("Created Processor : {}",this->ProcessorName);
+	for( const auto& t : this->Types )
+		this->console->info("Type : {} has been associated with this Processor",t);
 }
 
 std::string Processor::GetProcessorName() const{
@@ -38,8 +38,8 @@ TTree* Processor::RegisterTree(){
 }
 
 Processor::~Processor(){
-	console->info("PreProcessCalls : {} ProcessCalls : {} PostProcessCalls : {}",preprocesscalls,processcalls,postprocesscalls);
-	console->info("PreProcess : {:.3f}ms Process: {:.3f}ms PostProcess : {:.3f}ms",preprocesstime,processtime,postprocesstime);
+	this->console->info("PreProcessCalls : {} ProcessCalls : {} PostProcessCalls : {}",this->preprocesscalls,this->processcalls,this->postprocesscalls);
+	this->console->info("PreProcess : {:.3f}ms Process: {:.3f}ms PostProcess : {:.3f}ms",this->preprocesstime,this->processtime,this->postprocesstime);
 }
 
 std::shared_ptr<Processor> Processor::GetPtr(){
@@ -47,61 +47,61 @@ std::shared_ptr<Processor> Processor::GetPtr(){
 }
 
 [[nodiscard]] bool Processor::ContainsType(const std::string& type) const{
-	if( Types.empty() ){
+	if( this->Types.empty() ){
 		return false;
 	}else{
-		return Types.find(type) != Types.end();
+		return this->Types.find(type) != this->Types.end();
 	}
 }
 
 [[noreturn]] void Processor::Init([[maybe_unused]] const Json::Value& node){
-	console->error("Called Processor::Init(Json::Value& node), not the overload");
+	this->console->error("Called Processor::Init(Json::Value& node), not the overload");
 	throw std::runtime_error("Called Processor::Init(Json::Value& node), not the overload");
 }
 
 [[noreturn]] void Processor::Init([[maybe_unused]] const YAML::Node& node){
-	console->error("Called Processor::Init(YAML::Node& node), not the overload");
+	this->console->error("Called Processor::Init(YAML::Node& node), not the overload");
 	throw std::runtime_error("Called Processor::Init(YAML::Node& node), not the overload");
 }
 
 [[noreturn]] void Processor::Init([[maybe_unused]] const pugi::xml_node& node){
-	console->error("Called Processor::Init(pugi::xml_node& node), not the overload");
+	this->console->error("Called Processor::Init(pugi::xml_node& node), not the overload");
 	throw std::runtime_error("Called Processor::Init(pugi::xml_node& node), not the overload");
 }
 
 [[maybe_unused]] bool Processor::PreProcess(){
-	start_time = std::chrono::high_resolution_clock::now();
-	currstep = STEP::PREPROCESS;
-	++preprocesscalls;
+	this->start_time = std::chrono::high_resolution_clock::now();
+	this->currstep = STEP::PREPROCESS;
+	++(this->preprocesscalls);
 	return true;
 }
 
 [[maybe_unused]] bool Processor::Process(){
-	start_time = std::chrono::high_resolution_clock::now();
-	currstep = STEP::PROCESS;
-	++processcalls;
+	this->start_time = std::chrono::high_resolution_clock::now();
+	this->currstep = STEP::PROCESS;
+	++(this->processcalls);
 	return true;
 }
 
 [[maybe_unused]] bool Processor::PostProcess(){
-	start_time = std::chrono::high_resolution_clock::now();
-	currstep = STEP::POSTPROCESS;
-	++postprocesscalls;
+	this->start_time = std::chrono::high_resolution_clock::now();
+	this->currstep = STEP::POSTPROCESS;
+	++(this->postprocesscalls);
 	return true;
 }
 
 void Processor::EndProcess(){
-	stop_time = std::chrono::high_resolution_clock::now();
+	this->stop_time = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double,std::milli> dur = stop_time - start_time;
-	switch (currstep) {
+	switch (this->currstep) {
 		case STEP::PREPROCESS:
-			preprocesstime += dur.count();
+			this->preprocesstime += dur.count();
 			break;
 		case STEP::PROCESS:
-			processtime += dur.count();
+			this->processtime += dur.count();
 			break;
 		case STEP::POSTPROCESS:
-			postprocesstime += dur.count();
+			this->postprocesstime += dur.count();
 			break;
 		[[unlikely]] default:
 			break;
@@ -110,6 +110,6 @@ void Processor::EndProcess(){
 
 		
 [[noreturn]] void Processor::DeclarePlots([[maybe_unused]] PLOTS::PlotRegistry* hismanager) const{
-	console->error("Called Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager), not the overload");
+	this->console->error("Called Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager), not the overload");
 	throw std::runtime_error("Called Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager), not the overload");
 }
