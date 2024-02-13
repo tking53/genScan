@@ -36,11 +36,11 @@ void Correlator::DumpSelf() const{
 	this->console->debug("{}",*this);
 }
 
-void Correlator::AddTriggerChannel(int crateID,int moduleID,int channelID){
+void Correlator::AddTriggerChannel(const int& crateID,const int& moduleID,const int& channelID){
 	this->Triggers.insert({.Crate = crateID, .Module = moduleID, .Channel = channelID});	
 }
 
-bool Correlator::IsWithinCorrelationWindow(double ts,int crateID,int moduleID,int channelID){
+bool Correlator::IsWithinCorrelationWindow(const double& ts,const int& crateID,const int& moduleID,const int& channelID){
 	switch( this->CorrelationType ){
 		case ROLLINGWIDTH:
 			return this->RollingWindowCorrelation(ts);
@@ -58,7 +58,7 @@ bool Correlator::IsWithinCorrelationWindow(double ts,int crateID,int moduleID,in
 	}
 }
 
-bool Correlator::AnalogCorrelation(int crateID,int moduleID,int channelID) const{
+bool Correlator::AnalogCorrelation(const int& crateID,const int& moduleID,const int& channelID) const{
 	AnalogTrigger trigtest = {.Crate = crateID, .Module = moduleID, .Channel = channelID};
 	return (this->Triggers.find(trigtest) != this->Triggers.end());
 }
@@ -97,7 +97,7 @@ void Correlator::Clear(){
 	#endif
 }
 
-bool Correlator::RollingTriggerCorrelation(double ts){
+bool Correlator::RollingTriggerCorrelation(const double& ts){
 	#ifdef CORRELATOR_DEBUG
 	this->gMinHeap.push(ts);
 	this->gMaxHeap.push(ts);
@@ -111,7 +111,7 @@ bool Correlator::RollingTriggerCorrelation(double ts){
 			return true;
 		}else{
 			#ifdef CORRELATOR_DEBUG
-				this->console->debug("Found TS: {:.15f} which is outside the correlation window of {} ns, top before clearing is {:.1f}, delta is {} ns",ts,this->Width,this->MinHeap.top(),std::abs(ts - this->MinHeap.top()));
+				this->console->debug("Found TS: {:.1f} which is outside the correlation window of {} ns, top before clearing is {:.1f}, delta is {} ns",ts,this->Width,this->MinHeap.top(),std::abs(ts - this->MinHeap.top()));
 			#endif
 			this->MinHeap.push(ts);
 			return false;
@@ -119,7 +119,7 @@ bool Correlator::RollingTriggerCorrelation(double ts){
 	}
 }
 
-bool Correlator::RollingWindowCorrelation(double ts){
+bool Correlator::RollingWindowCorrelation(const double& ts){
 	#ifdef CORRELATOR_DEBUG
 	this->gMinHeap.push(ts);
 	this->gMaxHeap.push(ts);
@@ -133,7 +133,7 @@ bool Correlator::RollingWindowCorrelation(double ts){
 			return true;
 		}else{
 			#ifdef CORRELATOR_DEBUG
-				this->console->debug("Found TS: {:.15f} which is outside the correlation window of {} ns, top before clearing is {:.1f}, delta is {} ns",ts,this->Width,this->MaxHeap.top(),std::abs(ts - this->MaxHeap.top()));
+				this->console->debug("Found TS: {:.1f} which is outside the correlation window of {} ns, top before clearing is {:.1f}, delta is {} ns",ts,this->Width,this->MaxHeap.top(),std::abs(ts - this->MaxHeap.top()));
 			#endif
 			this->MaxHeap.push(ts);
 			return false;

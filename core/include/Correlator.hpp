@@ -61,9 +61,9 @@ class Correlator{
 
 		//switch based on the type of correlation we were constructed with
 		//what's passed in is the timestamp (in ns), crate, module, channel of the last parsed event
-		bool IsWithinCorrelationWindow(double,int,int,int);
+		bool IsWithinCorrelationWindow(const double&,const int&,const int&,const int&);
 
-		void AddTriggerChannel(int,int,int);
+		void AddTriggerChannel(const int&,const int&,const int&);
 
 		void Pop();
 		void Clear();
@@ -140,17 +140,17 @@ class Correlator{
 		//just check to see if it's one of the channels we reset the correlation on
 		//False -> was a trigger channel
 		//True -> not a trigger channel
-		bool AnalogCorrelation(int,int,int) const;
+		bool AnalogCorrelation(const int&,const int&,const int&) const;
 		
 		//Compare delta time from input timestamp and the largest timestamp we currently know about
 		//True -> still trying to correlate
 		//False -> clear the Heaps and put the new timestamp into it
-		bool RollingWindowCorrelation(double);
+		bool RollingWindowCorrelation(const double&);
 		
 		//Compare delta time from input timestamp and the smallest timestamp we know about
 		//True -> still trying to correlate 
 		//False -> clear the Heaps and put the new timestamp into it
-		bool RollingTriggerCorrelation(double); 
+		bool RollingTriggerCorrelation(const double&); 
 
 		CORRELATIONWINDOWTYPE CorrelationType;
 		double Width;

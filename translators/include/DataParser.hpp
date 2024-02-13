@@ -36,7 +36,7 @@ class DataParser{
 		~DataParser() = default;
 		void SetInputFiles(std::vector<std::string>&);
 		
-		void Parse(boost::container::devector<PhysicsData>&);
+		Translator::TRANSLATORSTATE Parse(boost::container::devector<PhysicsData>&);
 
 		void SetChannelMap(const std::shared_ptr<ChannelMap>&);
 		void SetCorrelator(const std::shared_ptr<Correlator>&);

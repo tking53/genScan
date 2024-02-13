@@ -19,6 +19,7 @@
 #include "StringManipFunctions.hpp"
 
 #include "ConfigParser.hpp"
+#include "Translator.hpp"
 #include "XMLConfigParser.hpp"
 #include "YAMLConfigParser.hpp"
 #include "JSONConfigParser.hpp"
@@ -262,7 +263,15 @@ int main(int argc, char *argv[]) {
 	#endif
 
 	boost::container::devector<PhysicsData> RawEvents;
-	dataparser->Parse(RawEvents);
+	Translator::TRANSLATORSTATE CurrState = Translator::TRANSLATORSTATE::UNKNOWN;
+	try{
+		do{
+			CurrState = dataparser->Parse(RawEvents);
+			RawEvents.clear();
+		}while( CurrState == Translator::TRANSLATORSTATE::PARSING);
+	}catch(std::runtime_error const& e){
+		console->error(e.what());
+	}
 	//try{
 	// 	while(Parse(inputfile_list)){
 	// 		Correlate();

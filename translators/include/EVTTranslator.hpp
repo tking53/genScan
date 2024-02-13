@@ -17,7 +17,7 @@ class EVTTranslator : public Translator{
 		};
 		EVTTranslator(const std::string&,const std::string&,EVT_TYPE);
 		~EVTTranslator() = default;
-		void Parse(boost::container::devector<PhysicsData>&);
+		Translator::TRANSLATORSTATE Parse(boost::container::devector<PhysicsData>&);
 	private:
 		struct EVT_BUILT_INFO{
 			int rib_size;
@@ -33,9 +33,9 @@ class EVTTranslator : public Translator{
 
 		EVT_BUILT_INFO CurrEVTBuiltInfo;
 
-		void ParsePresort(boost::container::devector<PhysicsData>&);
+		Translator::TRANSLATORSTATE ParsePresort(boost::container::devector<PhysicsData>&);
 		
-		void ParseEVTBuilt(boost::container::devector<PhysicsData>&);
+		Translator::TRANSLATORSTATE ParseEVTBuilt(boost::container::devector<PhysicsData>&);
 
 		int ReadRingItemHeader();
 		int ReadRingItemBodyHeader();

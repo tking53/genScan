@@ -27,30 +27,34 @@ bool Translator::AddFile(const std::string& filename){
 	}
 }
 
-[[noreturn]] void Translator::Parse([[maybe_unused]] boost::container::devector<PhysicsData>& RawEvents){
-	console->error("Called Translator::Parse(), not the overload");
+[[noreturn]] Translator::TRANSLATORSTATE Translator::Parse([[maybe_unused]] boost::container::devector<PhysicsData>& RawEvents){
+	this->console->error("Called Translator::Parse(), not the overload");
 	throw std::runtime_error("Called Translator::Parse(), not the overload");
 }
 
 void Translator::FinalizeFiles(){
-	NumTotalFiles = InputFiles.size();
-	NumFilesRemaining = NumTotalFiles;
-	CurrentFileIndex = 0;
-	FinishedCurrentFile = true;
+	this->NumTotalFiles = this->InputFiles.size();
+	this->NumFilesRemaining = this->NumTotalFiles;
+	this->CurrentFileIndex = 0;
+	this->FinishedCurrentFile = true;
 }
 
 bool Translator::OpenNextFile(){
-	FinishedCurrentFile = false;
-	if( CurrentFileIndex == 0 ){
-		CurrentFile.open(InputFiles.at(CurrentFileIndex),std::ifstream::binary);
+	this->FinishedCurrentFile = false;
+	if( this->CurrentFileIndex == 0 ){
+		this->console->info("Opening First File : {}",this->InputFiles.at(this->CurrentFileIndex));
+		this->CurrentFile.open(this->InputFiles.at(this->CurrentFileIndex),std::ifstream::binary);
+		++(this->CurrentFileIndex);
 		return true;
-	}else if(CurrentFileIndex == NumTotalFiles){
-		CurrentFile.close();
+	}else if(this->CurrentFileIndex == this->NumTotalFiles){
+		this->console->info("Completed Final File : {}",this->InputFiles.at(this->CurrentFileIndex-1));
+		this->CurrentFile.close();
 		return false;
 	}else{
-		CurrentFile.close();
-		++CurrentFileIndex;
-		CurrentFile.open(InputFiles.at(CurrentFileIndex),std::ifstream::binary);
+		this->console->info("Swapping from File : {} to {}",this->InputFiles.at(this->CurrentFileIndex-1),this->InputFiles.at(this->CurrentFileIndex));
+		this->CurrentFile.close();
+		this->CurrentFile.open(this->InputFiles.at(this->CurrentFileIndex),std::ifstream::binary);
+		++(this->CurrentFileIndex);
 		return true;
 	}
 }

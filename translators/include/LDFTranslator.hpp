@@ -16,10 +16,10 @@ class LDFTranslator : public Translator{
 		};
 		LDFTranslator(const std::string&,const std::string&,LDF_TYPE);
 		~LDFTranslator() = default;
-		void Parse(boost::container::devector<PhysicsData>&);
+		Translator::TRANSLATORSTATE Parse(boost::container::devector<PhysicsData>&);
 	private:
 		LDF_TYPE Format;
-		void ParsePixie(boost::container::devector<PhysicsData>&);
+		Translator::TRANSLATORSTATE ParsePixie(boost::container::devector<PhysicsData>&);
 };
 
 #endif

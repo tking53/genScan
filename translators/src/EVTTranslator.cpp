@@ -2,36 +2,39 @@
 
 #include "BitDecoder.hpp"
 #include "EVTTranslator.hpp"
+#include "Translator.hpp"
 
 EVTTranslator::EVTTranslator(const std::string& log,const std::string& translatorname,EVT_TYPE formattype) : Translator(log,translatorname){
 	this->Format = formattype;
 	CurrEVTBuiltInfo = { .rib_size = 0, .ri_size = 0, .ri_type = 0};
 }	
 
-void EVTTranslator::Parse(boost::container::devector<PhysicsData>& RawEvents){
+Translator::TRANSLATORSTATE EVTTranslator::Parse(boost::container::devector<PhysicsData>& RawEvents){
 	if( this->FinishedCurrentFile ){
-		this->OpenNextFile();
+		if( !this->OpenNextFile() ){
+			return Translator::TRANSLATORSTATE::COMPLETE;
+		}
 	}
+	Translator::TRANSLATORSTATE currstate = Translator::TRANSLATORSTATE::UNKNOWN;
 	switch(this->Format){
 		case PRESORT:
-			this->ParsePresort(RawEvents);
+			currstate = this->ParsePresort(RawEvents);
 			break;
 		case EVTBUILT:
-			this->ParseEVTBuilt(RawEvents);
+			currstate = this->ParseEVTBuilt(RawEvents);
 			break;
 		default:
 			throw std::runtime_error("Unknown EVT File type, not EVTBUILT or PRESORT");
 			break;
 	}
-	if( this->CurrentFile.eof() ){
-		this->FinishedCurrentFile = true;
-	}
+	return currstate;
 }
 
-void EVTTranslator::ParsePresort(boost::container::devector<PhysicsData>& RawEvents){
+Translator::TRANSLATORSTATE EVTTranslator::ParsePresort(boost::container::devector<PhysicsData>& RawEvents){
+	return Translator::TRANSLATORSTATE::COMPLETE;
 }
 
-void EVTTranslator::ParseEVTBuilt(boost::container::devector<PhysicsData>& RawEvents){
+Translator::TRANSLATORSTATE EVTTranslator::ParseEVTBuilt(boost::container::devector<PhysicsData>& RawEvents){
 	do{
 		if( !this->Leftovers.empty() ){
 			RawEvents.push_back(this->Leftovers.back());
@@ -52,9 +55,14 @@ void EVTTranslator::ParseEVTBuilt(boost::container::devector<PhysicsData>& RawEv
 				this->correlator->Clear();
 			}
 		}
+		if( this->CurrentFile.eof() ){
+			if( !this->OpenNextFile() ){
+				return Translator::TRANSLATORSTATE::COMPLETE;
+			}
+		}
 	}while(this->LastReadEvtWithin);
 	//Clear for now
-	RawEvents.clear();
+	return Translator::TRANSLATORSTATE::PARSING;
 }
 
 int EVTTranslator::ReadFull(boost::container::devector<PhysicsData>& RawEvents){
@@ -131,6 +139,7 @@ int EVTTranslator::ReadRingItemHeader(){
 	if( !this->CurrentFile.read(reinterpret_cast<char*>(&CurrEVTBuiltInfo.ri_type),sizeof(int)) ){
 		return -1;
 	}
+	#ifndef NDEBUG
 	if( CurrEVTBuiltInfo.ri_type != 30 ){
 		switch(CurrEVTBuiltInfo.ri_type){
 			case 1:
@@ -174,6 +183,7 @@ int EVTTranslator::ReadRingItemHeader(){
 				break;
 		}
 	}		
+	#endif
 	return CurrEVTBuiltInfo.ri_type;
 }
 

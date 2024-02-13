@@ -24,10 +24,15 @@
 
 class Translator{
 	public:
+		enum TRANSLATORSTATE{
+			PARSING,
+			COMPLETE,
+			UNKNOWN
+		};
 		Translator(const std::string&,const std::string&);
 		virtual ~Translator() = default;
 		virtual bool AddFile(const std::string&);
-		[[noreturn]] virtual void Parse([[maybe_unused]] boost::container::devector<PhysicsData>&);
+		[[noreturn]] virtual TRANSLATORSTATE Parse([[maybe_unused]] boost::container::devector<PhysicsData>&);
 		virtual void FinalizeFiles();
 		virtual bool OpenNextFile();
 		virtual void SetChannelMap(const std::shared_ptr<ChannelMap>&);

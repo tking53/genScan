@@ -32,7 +32,7 @@ if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     message(STATUS "Install Prefix not specified.")
     file(MAKE_DIRECTORY install)
     get_filename_component(INSTALL_DIR ${CMAKE_BINARY_DIR}/../install REALPATH)
-    set(CMAKE_INSTALL_PREFIX ${INSTALL_DIR} CACHE PATH "Install Prefix" FORCE)
+    set(CMAKE_INSTALL_PREFIX ${INSTALL_DIR} CACHE PATH "Install Prefix")
 endif ()
 message(STATUS "Installing to ${CMAKE_INSTALL_PREFIX}")
 
@@ -40,9 +40,8 @@ option(CORRELATOR_DEBUG "Enable debugging the correlator, output will be very sl
 set_property(CACHE CORRELATOR_DEBUG PROPERTY ADVANCED OFF)
 
 #Add additional CXX flags if we use the Debug option
-set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
 if(NOT CMAKE_BUILD_TYPE)
-	set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build (Debug, Release, RelWithDebInfo, MinSizeRel)" FORCE)
+	set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build (Debug, Release, RelWithDebInfo, MinSizeRel)" FORCE)
 	message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 endif()
 
@@ -56,7 +55,7 @@ endif()
 #when setting all of the following options.
 include(CMakeDependentOption)
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE BOOL "Generates compile_commands.json, needed for some IDEs among other things" FORCE)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE BOOL "Generates compile_commands.json, needed for some IDEs among other things" )
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
@@ -120,7 +119,7 @@ endif ()
 if (${ROOT_VERSION} VERSION_LESS "6.10")
     message(FATAL_ERROR "Minimum ROOT version is 6.10.00.")
 endif (${ROOT_VERSION} VERSION_LESS "6.10")
-mark_as_advanced(FORCE GENREFLEX_EXECUTABLE ROOTCINT_EXECUTABLE ROOT_CONFIG_EXECUTABLE)
+mark_as_advanced( GENREFLEX_EXECUTABLE ROOTCINT_EXECUTABLE ROOT_CONFIG_EXECUTABLE)
 include_directories(${ROOT_INCLUDE_DIR})
 link_directories(${ROOT_LIBRARY_DIR})
 #------------------------------------------------------------------------------
