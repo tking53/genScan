@@ -248,22 +248,6 @@ int main(int argc, char *argv[]) {
 	HistogramManager->WriteInfo();
 	std::thread plotter(&PLOTS::PlotRegistry::HandleSocketHelper,HistogramManager.get());
 
-	#ifdef DEBUG_MODE
-		console->info("Beginning plotting");
-		std::thread filler(&PLOTS::PlotRegistry::RandFill,HistogramManager.get());
-		//std::this_thread::sleep_for(std::chrono::seconds(3));
-		for( int ii = 0; ii < 1000000; ++ii ) [[likely]] {
-			processorlist->PreProcess();
-			processorlist->PreAnalyze();
-	
-			processorlist->Process();
-			processorlist->Analyze();
-	
-			processorlist->PostProcess();
-			processorlist->PostAnalyze();
-		}
-	#endif
-
 	boost::container::devector<PhysicsData> RawEvents;
 	Translator::TRANSLATORSTATE CurrState = Translator::TRANSLATORSTATE::UNKNOWN;
 	try{
@@ -285,48 +269,9 @@ int main(int argc, char *argv[]) {
 	}catch(std::runtime_error const& e){
 		console->error(e.what());
 	}
-	//try{
-	// 	while(Parse(inputfile_list)){
-	// 		Correlate();
-	//
-	// 		try{
-	// 			processorlist->PreAnalyze();
-	// 			processorlist->PreProcess();
-	//
-	// 			processorlist->Analyze();
-	// 			processorlist->Process();
-	//
-	// 			processorlist->PostAnalyze();
-	// 			processorlist->PostProcess();
-	// 		}catch(std::runtime_error const& e){
-	// 			console->error(e.what());
-	// 		}
-	// 	}
-	//}catch(std::runtime_error const& e){
-	// 	console->error(e.what());
-	//}
-	//
-	//void ProcessorList::(Pre//Post)(Analyze/Process)(){
-	// 	for( auto& (a/p) : (Analyzers/Processors) )
-	// 		(a/p)->(Pre//Post)(Analyze/Process)();
-	//}
-
-	//parse portion of the data, 
-	// 	either set a limit of how much memory is being used, 
-	// 	read in certain number of entries, or 
-	// 	read until outside correlation window
-	//
-	//Correlate events
-	//
-	//Run correlated events through Analyzers
-	//Run correlated events through Processors 
-	//
+	
 	//Write correlated events to disk
 	HistogramManager->KillListen();
-	#ifdef DEBUG_MODE
-		console->info("Ending plotting");
-		filler.join();
-	#endif
 	plotter.join();
 
 	HistogramManager->WriteAllPlots();
