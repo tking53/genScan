@@ -45,7 +45,7 @@ Translator::TRANSLATORSTATE EVTTranslator::ParseEVTBuilt(boost::container::devec
 		}
 		if( this->ReadHeader(RawEvents) != -1 ){
 			this->ReadFull(RawEvents);
-			#ifndef NDEBUG
+			#ifdef TRANSLATOR_DEBUG
 			this->console->debug("{}",RawEvents.back());
 			#endif
 			if( !this->LastReadEvtWithin ){
@@ -66,7 +66,7 @@ Translator::TRANSLATORSTATE EVTTranslator::ParseEVTBuilt(boost::container::devec
 }
 
 int EVTTranslator::ReadFull(boost::container::devector<PhysicsData>& RawEvents){
-	#ifndef NDEBUG
+	#ifdef TRANSLATOR_DEBUG
 	this->console->debug("{}:{}:{}",this->CurrHeaderLength,this->CurrTraceLength,RawEvents.size());
 	this->correlator->DumpSelf();
 	#endif
@@ -116,7 +116,7 @@ int EVTTranslator::ReadHeader(boost::container::devector<PhysicsData>& RawEvents
 	uint64_t TimeStamp = static_cast<uint64_t>(TimeStampHigh);
 	TimeStamp = TimeStamp<<32;
 	TimeStamp += TimeStampLow;
-	double TimeStampInNS = TimeStamp*(this->CMap->GetModuleADCClockTicksToNS(CrateNumber,ModuleNumber));
+	double TimeStampInNS = TimeStamp*(this->CMap->GetModuleClockTicksToNS(CrateNumber,ModuleNumber));
 
 	//note that this assumes that this isn't one of the weird firmwares where this is in wordzero
 	//need to ask Toby if we actually still use those firmware versions anywhere we would want to scan this or if we should support
@@ -142,7 +142,7 @@ int EVTTranslator::ReadRingItemHeader(){
 	if( !this->CurrentFile.read(reinterpret_cast<char*>(&CurrEVTBuiltInfo.ri_type),sizeof(int)) ){
 		return -1;
 	}
-	#ifndef NDEBUG
+	#ifdef TRANSLATOR_DEBUG
 	if( CurrEVTBuiltInfo.ri_type != 30 ){
 		switch(CurrEVTBuiltInfo.ri_type){
 			case 1:
