@@ -36,8 +36,17 @@ if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 endif ()
 message(STATUS "Installing to ${CMAKE_INSTALL_PREFIX}")
 
-option(CORRELATOR_DEBUG "Enable debugging the correlator, output will be very slow" OFF)
-set_property(CACHE CORRELATOR_DEBUG PROPERTY ADVANCED OFF)
+option(GS_CORRELATOR_DEBUG "Enable debugging the correlator, output will be very slow" OFF)
+set_property(CACHE GS_CORRELATOR_DEBUG PROPERTY ADVANCED ON)
+set(GS_CORRELATOR_DEBUG OFF CACHE BOOL "Force default value" FORCE)
+
+option(GS_PROCESSOR_DEBUG "Enable debugging the ProcessorList, output will be very slow" OFF)
+set_property(CACHE GS_PROCESSOR_DEBUG PROPERTY ADVANCED ON)
+set(GS_PROCESSOR_DEBUG OFF CACHE BOOL "Force default value" FORCE)
+
+option(GS_TRANSLATOR_DEBUG "Enable debugging the Translators, output will be very slow" OFF)
+set_property(CACHE GS_TRANSLATOR_DEBUG PROPERTY ADVANCED ON)
+set(GS_TRANSLATOR_DEBUG OFF CACHE BOOL "Force default value" FORCE)
 
 #Add additional CXX flags if we use the Debug option
 if(NOT CMAKE_BUILD_TYPE)
@@ -126,6 +135,12 @@ link_directories(${ROOT_LIBRARY_DIR})
 
 include(ExternalProject)
 
+set(EXTERNAL_DEPS)
+set(EXTERNAL_CORE_DEPS)
+set(EXTERNAL_TRANSLATOR_DEPS)
+set(EXTERNAL_PROCESSOR_DEPS)
+set(EXTERNAL_LOG_DEPS)
+
 set(_LOG_OPTIONS 
 	LOG_DOWNLOAD TRUE
 	LOG_UPDATE TRUE
@@ -155,6 +170,9 @@ else()
 		)
 	include_directories(${PUGI_EXTERNAL_INSTALL_LOCATION}/include)
 	link_directories(${PUGI_EXTERNAL_INSTALL_LOCATION}/lib)
+	list(APPEND EXTERNAL_DEPS PugixmlProject)
+	list(APPEND EXTERNAL_CORE_DEPS PugixmlProject)
+	list(APPEND EXTERNAL_PROCESSOR_DEPS PugixmlProject)
 endif()
 	
 option(USE_SYSTEM_YAMLCPP "Use the system installed yaml-cpp, if not then we will download one and use that one" OFF)
@@ -174,6 +192,9 @@ else()
 		)
 	include_directories(${YAML_EXTERNAL_INSTALL_LOCATION}/include)
 	link_directories(${YAML_EXTERNAL_INSTALL_LOCATION}/lib)
+	list(APPEND EXTERNAL_DEPS PugixmlProject)
+	list(APPEND EXTERNAL_CORE_DEPS PugixmlProject)
+	list(APPEND EXTERNAL_PROCESSOR_DEPS PugixmlProject)
 endif()
 	
 option(USE_SYSTEM_JSONCPP "Use the system installed jsoncpp, if not then we will download one and use that one" OFF)
@@ -193,6 +214,9 @@ else()
 		)
 	include_directories(${JSON_EXTERNAL_INSTALL_LOCATION}/include)
 	link_directories(${JSON_EXTERNAL_INSTALL_LOCATION}/lib)
+	list(APPEND EXTERNAL_DEPS PugixmlProject)
+	list(APPEND EXTERNAL_CORE_DEPS PugixmlProject)
+	list(APPEND EXTERNAL_PROCESSOR_DEPS PugixmlProject)
 endif()
 	
 option(USE_SYSTEM_FMT "Use the system fmt library, if not then we will download and use that one" OFF)
@@ -214,6 +238,8 @@ else()
 		)
 	include_directories(${FMT_EXTERNAL_INSTALL_LOCATION}/include)
 	link_directories(${FMT_EXTERNAL_INSTALL_LOCATION}/lib)
+	list(APPEND EXTERNAL_DEPS fmtProject)
+	list(APPEND EXTERNAL_LOG_DEPS fmtProject)
 endif()
 
 option(USE_SYSTEM_SPDLOG "Use either spdlog or grab it from github" OFF)
@@ -234,6 +260,8 @@ else()
 		)
 	include_directories(${SPDLOG_EXTERNAL_INSTALL_LOCATION}/include)
 	link_directories(${SPDLOG_EXTERNAL_INSTALL_LOCATION}/lib)
+	list(APPEND EXTERNAL_DEPS spdlogProject)
+	list(APPEND EXTERNAL_LOG_DEPS spdlogProject)
 endif()
 
 option(USE_SYSTEM_BOOST "Use either system boost or grab one from github" OFF)
@@ -260,6 +288,10 @@ else()
 		)
 	include_directories(${BOOST_EXTERNAL_INSTALL_LOCATION}/include)
 	link_directories(${BOOST_EXTERNAL_INSTALL_LOCATION}/lib)
+	list(APPEND EXTERNAL_DEPS boostProject)
+	list(APPEND EXTERNAL_PROCESSOR_DEPS boostProject)
+	list(APPEND EXTERNAL_TRANSLATOR_DEPS boostProject)
+	list(APPEND EXTERNAL_CORE_DEPS boostProject)
 endif()
 
 add_subdirectory(utility)
@@ -270,6 +302,7 @@ add_subdirectory(translators)
 target_include_directories(PROCESSOR_LIB PUBLIC core/include)
 
 add_executable(GenScanor scanmain.cpp)
+add_dependencies(GenScanor ${EXTERNAL_DEPS})
 
 #include_directories(${PROJECT_SOURCE_DIR}/utility/include)
 target_link_libraries(GenScanor PRIVATE TRANSLATOR_LIB PROCESSOR_LIB CORE_LIB UTILITY_LIB )
@@ -292,6 +325,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInf
 endif()
 
 add_executable(GenConfig configmain.cpp)
+add_dependencies(GenConfig ${EXTERNAL_DEPS})
 target_link_libraries(GenConfig PRIVATE UTILITY_LIB)
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
 	target_compile_definitions(GenConfig PRIVATE DEBUG_MODE)
