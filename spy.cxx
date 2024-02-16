@@ -65,7 +65,7 @@ void Spy::DoButton()
 	if (mess->GetClass()->InheritsFrom(TH1::Class())) {
 		fHist = (TH1*) mess->ReadObject(mess->GetClass());
 		if (mess->GetClass()->InheritsFrom(TH2::Class()))
-			fHist->Draw("cont");
+			fHist->Draw("colz");
 		else
 			fHist->Draw();
 		fCanvas->GetCanvas()->Modified();
