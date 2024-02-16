@@ -112,20 +112,6 @@ namespace PLOTS{
 				KeepListen = false;
 			}
 
-			void RandFill(){
-				float px, py;
-				for (Int_t i = 0; ; i++) {
-					gRandom->Rannor(px,py);
-					Fill("Raw",px,py);
-					gRandom->Rannor(px,py);
-					Fill("Scalar",px,py);
-					gRandom->Rannor(px,py);
-					Fill("Cal",px,py);
-					if( not KeepListen )
-						break;
-				}
-			}
-
 			void HandleSocketHelper(){
 				while(KeepListen){
 					//std::this_thread::sleep_for(std::chrono::seconds(20));
