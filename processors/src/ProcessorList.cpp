@@ -167,7 +167,7 @@ void ProcessorList::ThreshAndCal(boost::container::devector<PhysicsData>& RawEve
 		auto erg = raw+this->randNum(this->randGen);
 		auto cal = cmap->GetCalibratedEnergy(evt.GetCrate(),evt.GetModule(),evt.GetChannel(),erg);
 		evt.SetEnergy(cal);
-		#ifndef NDEBUG
+		#ifdef PROCESSOR_DEBUG
 		this->console->info("raw : {}, rand : {}, cal : {}, cr : {}, mod : {} chan : {}, gchan : {}",raw,erg,cal,evt.GetCrate(),evt.GetModule(),evt.GetChannel(),evt.GetGlobalChannelID());
 		#endif
 	}
