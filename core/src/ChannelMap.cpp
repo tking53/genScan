@@ -127,7 +127,7 @@ ChannelMap::FirmwareVersion ChannelMap::CalcFirmwareEnum(const std::string& type
 	return this->ModuleFilterClockTickToNS.at(this->GetGlobalBoardID(CrateNum,ModNum));
 }
 
-[[nodiscard]] bool ChannelMap::SetParams(int crid,int bid,int cid,const std::string& t,const std::string& st,const std::string& g,const std::string& tt,const std::set<std::string>& tg,CalType c,const std::vector<double>& p,int tdelay,const std::pair<double,double>& thresh){
+[[nodiscard]] bool ChannelMap::SetParams(int crid,int bid,int cid,const std::string& xt,const std::string& t,const std::string& st,const std::string& g,const std::string& tt,const std::set<std::string>& tg,CalType c,const std::vector<double>& p,int tdelay,const std::pair<double,double>& thresh){
 	if( static_cast<int>(p.size()) > MAX_CAL_PARAMS_PER_CHANNEL ){
 		throw std::runtime_error("Trying to assign more calibration parameters than allowed");
 	}else{
@@ -149,6 +149,7 @@ ChannelMap::FirmwareVersion ChannelMap::CalcFirmwareEnum(const std::string& type
 			.CrateID = crid,
 			.GlobalChannelID = gcid,
 			.TraceDelay = tdelay, 
+			.supertype = xt,
 			.type = t,
 			.subtype = st,
 			.group = g,
@@ -285,4 +286,14 @@ void ChannelMap::FinalizeChannelMap(){
 
 XiaDecoder* ChannelMap::GetXiaDecoder(int crid,int bid) const{
 	return this->BoardConfigMap.at(this->GetGlobalBoardID(crid,bid)).xiadecoder;
+}
+
+void ChannelMap::SetChanConfigInfo(PhysicsData& evt) const{
+	auto gcid = evt.GetGlobalChannelID();
+	evt.SetSuperType(this->ChannelConfigMap.at(gcid).supertype);
+	evt.SetType(this->ChannelConfigMap.at(gcid).type);
+	evt.SetSubType(this->ChannelConfigMap.at(gcid).subtype);
+	evt.SetTags(this->ChannelConfigMap.at(gcid).tags);
+	evt.SetTagList(this->ChannelConfigMap.at(gcid).taglist);
+	evt.SetUniqueID(this->ChannelConfigMap.at(gcid).unique_id);
 }

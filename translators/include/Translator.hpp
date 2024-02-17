@@ -30,7 +30,7 @@ class Translator{
 			UNKNOWN
 		};
 		Translator(const std::string&,const std::string&);
-		virtual ~Translator() = default;
+		virtual ~Translator();
 		virtual bool AddFile(const std::string&);
 		[[noreturn]] virtual TRANSLATORSTATE Parse([[maybe_unused]] boost::container::devector<PhysicsData>&);
 		virtual void FinalizeFiles();

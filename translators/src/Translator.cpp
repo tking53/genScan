@@ -12,6 +12,12 @@ Translator::Translator(const std::string& log,const std::string& translatorname)
 	
 	this->LastReadEvtWithin = false;
 }
+
+Translator::~Translator(){
+	if( not this->CurrentFile.eof() or this->CurrentFileIndex < this->NumTotalFiles ){
+		this->console->error("Translator didn't finish reading final file");
+	}
+}
 		
 bool Translator::AddFile(const std::string& filename){
 	std::ifstream file(filename);
@@ -51,7 +57,7 @@ bool Translator::OpenNextFile(){
 		this->CurrentFile.close();
 		return false;
 	}else{
-		this->console->info("Swapping from File : {} to {}",this->InputFiles.at(this->CurrentFileIndex-1),this->InputFiles.at(this->CurrentFileIndex));
+		this->console->info("Swapping input File from : {} to : {}",this->InputFiles.at(this->CurrentFileIndex-1),this->InputFiles.at(this->CurrentFileIndex));
 		this->CurrentFile.close();
 		this->CurrentFile.open(this->InputFiles.at(this->CurrentFileIndex),std::ifstream::binary);
 		++(this->CurrentFileIndex);

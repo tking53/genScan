@@ -129,7 +129,13 @@ namespace PLOTS{
 				}
 			}
 
-			void Initialize(const int& numchannels,const int& ergsize,const int& scalarsize,const int& width_size,const int& event_size){
+			void Initialize(const int& numchannels,const int& ergsize,const int& scalarsize,const int& width_size,const int& event_size,const int& roll_size){
+				this->channel_bins = numchannels;
+				this->erg_bins = ergsize;
+				this->scalar_bins = scalarsize;
+				this->width_bins = width_size;
+				this->event_bins = event_size;
+				this->roll_bins = roll_size;
 				RegisterPlot<TH2F>("Raw","Raw Energy; Energy (channel); Channel (arb.);",ergsize,0.0,ergsize,numchannels,0,numchannels);
 				RegisterPlot<TH2F>("Scalar","Scalar Rate; Time (s); Channel (arb.);",scalarsize,0.0,scalarsize,numchannels,0,numchannels);
 				RegisterPlot<TH2F>("Cal","Cal. Energy; Energy (keV); Channel (arb.);",ergsize,0.0,ergsize,numchannels,0,numchannels);
@@ -137,6 +143,7 @@ namespace PLOTS{
 				RegisterPlot<TH1F>("Event_Size","Num Hits Event; Event Size (arb.);",event_size,0,event_size);
 				RegisterPlot<TH2F>("Event_Mult","Event Size vs Channel; Channel (arb.); Event Size (arb.);",numchannels,0,numchannels,event_size,0,event_size);
 				RegisterPlot<TH2F>("Event_Scale","Event Size vs Event Width; Time (ns); Event Size (arb.);",width_size,0,width_size,event_size,0,event_size);
+				RegisterPlot<TH2F>("Total_Rate","Total Rate of All Channels; Time(s); Rollover (arb.)",scalarsize,0,scalarsize,roll_size,0,roll_size);
 			}
 
 			template<typename T>
@@ -280,6 +287,30 @@ namespace PLOTS{
 				}
 				output.close();
 			}
+
+			int GetChannelBins() const{
+				return this->channel_bins;
+			}
+
+			int GetEnergyBins() const{
+				return this->erg_bins;
+			}
+
+			int GetScalarBins() const{
+				return this->scalar_bins;
+			}
+
+			int GetEventWidthBins() const{
+				return this->width_bins;
+			}
+
+			int GetEventSizeBins() const{
+				return this->event_bins;
+			}
+
+			int GetScalarRolloverBins() const{
+				return this->roll_bins;
+			}
 		private:
 			bool Plot1DExist(const std::string& name){
 				return this->Plots_1D.find(name) != this->Plots_1D.end();
@@ -309,6 +340,12 @@ namespace PLOTS{
 
 			bool KeepListen;
 
+			int channel_bins;
+			int erg_bins;
+			int scalar_bins;
+			int width_bins;
+			int event_bins;
+			int roll_bins;
 			//info needed for live histogramming
 			std::shared_ptr<TCanvas> fCanvas;
 			std::shared_ptr<TServerSocket> fServ;

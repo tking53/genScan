@@ -1,9 +1,11 @@
+#include <chrono>
 #include <cstdlib>
 #include <stdexcept>
 #include <string>
 #include <memory>
 #include <iostream>
 #include <thread>
+#include <csignal>
 
 #include <spdlog/common.h>
 #include <spdlog/spdlog.h>
@@ -37,7 +39,17 @@
 
 #include "PhysicsData.hpp"
 
+volatile bool ctrlCPressed = false;
+
+void signalHandler(int signum) {
+	if (signum == SIGINT) {
+		spdlog::critical("Ctrl-C pressed, Cleaning up and finalizing files");
+		ctrlCPressed = true;
+	}
+}
+
 int main(int argc, char *argv[]) {
+	std::chrono::time_point<std::chrono::high_resolution_clock> global_start_time = std::chrono::high_resolution_clock::now();
 	const std::string logname = "genscan";
 
 	std::string configfile;
@@ -215,7 +227,8 @@ int main(int argc, char *argv[]) {
 	auto sbins = PLOTS::SE;
 	auto wbins = PLOTS::SE;
 	auto zbins = PLOTS::SA;
-	HistogramManager->Initialize(MAX_CHANNELS,ebins,sbins,wbins,zbins);
+	auto rbins = PLOTS::S4;
+	HistogramManager->Initialize(MAX_CHANNELS,ebins,sbins,wbins,zbins,rbins);
 	console->info("Generated Raw, Scalar, and Cal plots for {} Channels, There are {} bins for Raw and Cal, and {} bins for Scalar",MAX_CHANNELS,ebins,sbins);
 	
 	std::shared_ptr<RootFileManager> RootManager(new RootFileManager(logname,StringManip::GetFileBaseName(outputfile)));
@@ -248,6 +261,8 @@ int main(int argc, char *argv[]) {
 	HistogramManager->WriteInfo();
 	std::thread plotter(&PLOTS::PlotRegistry::HandleSocketHelper,HistogramManager.get());
 
+	std::signal(SIGINT, signalHandler);
+
 	boost::container::devector<PhysicsData> RawEvents;
 	Translator::TRANSLATORSTATE CurrState = Translator::TRANSLATORSTATE::UNKNOWN;
 	try{
@@ -255,17 +270,17 @@ int main(int argc, char *argv[]) {
 			CurrState = dataparser->Parse(RawEvents);
 			processorlist->ThreshAndCal(RawEvents,cmap.get());
 			processorlist->ProcessRaw(RawEvents,HistogramManager.get());
-			//processorlist->PreProcess(RawEvents,HistogramManager.get());
-			//processorlist->PreAnalyze(RawEvents,HistogramManager.get());
+			processorlist->PreProcess(HistogramManager.get());
+			processorlist->PreAnalyze(HistogramManager.get());
 	
-			//processorlist->Process(RawEvents,HistogramManager.get());
-			//processorlist->Analyze(RawEvents,HistogramManager.get());
+			processorlist->Process(HistogramManager.get());
+			processorlist->Analyze(HistogramManager.get());
 	
-			//processorlist->PostProcess(RawEvents,HistogramManager.get());
-			//processorlist->PostAnalyze(RawEvents,HistogramManager.get());
+			processorlist->PostProcess(HistogramManager.get());
+			processorlist->PostAnalyze(HistogramManager.get());
 			//RootManager->Fill();
 			RawEvents.clear();
-		}while( CurrState == Translator::TRANSLATORSTATE::PARSING);
+		}while( CurrState == Translator::TRANSLATORSTATE::PARSING and not ctrlCPressed );
 	}catch(std::runtime_error const& e){
 		console->error(e.what());
 	}
@@ -276,6 +291,13 @@ int main(int argc, char *argv[]) {
 
 	HistogramManager->WriteAllPlots();
 	RootManager->FinalizeTrees();
+	std::chrono::time_point<std::chrono::high_resolution_clock> global_stop_time = std::chrono::high_resolution_clock::now();
+	auto global_run_time = global_stop_time - global_start_time;
+	const auto hrs = std::chrono::duration_cast<std::chrono::hours>(global_run_time);
+	const auto mins = std::chrono::duration_cast<std::chrono::minutes>(global_run_time - hrs);
+	const auto secs = std::chrono::duration_cast<std::chrono::seconds>(global_run_time - hrs - mins);
+	const auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(global_run_time - hrs - mins - secs);
+	console->info("Finished running in {} hours {} minutes {} seconds {} milliseconds",hrs.count(),mins.count(),secs.count(),ms.count());
 
 	return 0;
 }

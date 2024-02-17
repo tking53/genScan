@@ -174,6 +174,18 @@ const std::vector<unsigned int>& PhysicsData::GetQDCSums() const{
 	return this->QDCSums;
 }
 
+//SuperType
+void PhysicsData::SetSuperType(const std::string& value){
+	this->SuperType = value;
+}
+void PhysicsData::SetSuperType(std::string&& value){
+	this->SuperType = std::move(value);
+}
+
+std::string PhysicsData::GetSuperType() const{
+	return this->SuperType;
+}
+
 //Type
 void PhysicsData::SetType(const std::string& value){
 	this->Type = value;
@@ -220,6 +232,18 @@ void PhysicsData::SetTags(std::string&& value){
 
 std::string PhysicsData::GetTags() const{
 	return this->Tags;
+}
+
+void PhysicsData::SetUniqueID(const std::string& value){
+	this->UniqueID = value;
+}
+
+void PhysicsData::SetUniqueID(std::string&& value){
+	this->UniqueID = std::move(value);
+}
+
+std::string PhysicsData::GetUniqueID() const{
+	return this->UniqueID;
 }
 
 //Tag List

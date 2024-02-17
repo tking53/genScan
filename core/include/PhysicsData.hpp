@@ -95,6 +95,12 @@ class PhysicsData{
 
 		const std::vector<unsigned int>& GetQDCSums() const;
 
+		//SuperType
+		void SetSuperType(const std::string&);
+		void SetSuperType(std::string&&);
+
+		std::string GetSuperType() const;
+
 		//Type
 		void SetType(const std::string&);
 		void SetType(std::string&&);
@@ -118,6 +124,12 @@ class PhysicsData{
 		void SetTags(std::string&&);
 
 		std::string GetTags() const;
+
+		//UniqueID
+		void SetUniqueID(const std::string&);
+		void SetUniqueID(std::string&&);
+
+		std::string GetUniqueID() const;
 
 		//Tag List
 		void SetTagList(const std::set<std::string>&); 
@@ -173,10 +185,12 @@ class PhysicsData{
 		unsigned int ESumBaseLine;
 
 		//this is info derived from the channel map
+		std::string SuperType;
 		std::string Type;
 		std::string SubType;
 		std::string Group;
 		std::string Tags;
+		std::string UniqueID;
 		std::set<std::string> TagList;
 
 		//Trace Helper, should probably hide this from end user though

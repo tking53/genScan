@@ -259,6 +259,7 @@ void JSONConfigParser::ParseMap(ChannelMap* cmap){
 								<< bid << "\"";
 							throw std::runtime_error(ss.str());
 						}
+						std::string supertype = currchannel.get("supertype",type).asString();
 						std::string subtype = currchannel.get("subtype","").asString();
 						if( subtype.compare("") == 0 ){
 							std::stringstream ss;
@@ -421,7 +422,7 @@ void JSONConfigParser::ParseMap(ChannelMap* cmap){
 									<< cal_type << "\"";
 								throw std::runtime_error(ss.str());
 							}
-							auto duplicate = cmap->SetParams(crid,bid,cid,type,subtype,group,tags,taglist,ct,params,LocalTraceDelay,ThreshVals); 
+							auto duplicate = cmap->SetParams(crid,bid,cid,supertype,type,subtype,group,tags,taglist,ct,params,LocalTraceDelay,ThreshVals); 
 							if( duplicate ){
 								std::stringstream ss;
 								ss << "JSONConfigParser::ParseMap() : config file named \""

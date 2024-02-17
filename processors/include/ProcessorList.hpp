@@ -4,6 +4,7 @@
 #include <random>
 #include <vector>
 #include <map>
+#include <set>
 #include <string>
 #include <memory>
 
@@ -41,14 +42,14 @@ class ProcessorList{
 		void InitializeProcessors(JSONConfigParser*);
 		void InitializeAnalyzers(JSONConfigParser*);
 
-		void PreAnalyze();
-		void PreProcess();
+		void PreAnalyze(PLOTS::PlotRegistry*);
+		void PreProcess(PLOTS::PlotRegistry*);
 		
-		void Analyze();
-		void Process();
+		void Analyze(PLOTS::PlotRegistry*);
+		void Process(PLOTS::PlotRegistry*);
 
-		void PostAnalyze();
-		void PostProcess();
+		void PostAnalyze(PLOTS::PlotRegistry*);
+		void PostProcess(PLOTS::PlotRegistry*);
 
 		void RegisterOutputTrees(RootFileManager*);
 		void DeclarePlots(PLOTS::PlotRegistry*) const;
@@ -60,12 +61,13 @@ class ProcessorList{
 	private:
 		std::string LogName;
 		std::shared_ptr<spdlog::logger> console;
-		std::vector<std::shared_ptr<Processor>> processors;
-		std::vector<std::shared_ptr<Analyzer>> analyzers;
+		std::vector<std::shared_ptr<Processor>> known_processors;
+		std::vector<std::shared_ptr<Analyzer>> known_analyzers;
 
 		std::mt19937_64 randGen;
 		std::uniform_real_distribution<double> randNum;
 		double FirstTimeStamp;
+		unsigned long long EventStamp;
 };
 
 #endif

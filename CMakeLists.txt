@@ -38,15 +38,27 @@ message(STATUS "Installing to ${CMAKE_INSTALL_PREFIX}")
 
 option(GS_CORRELATOR_DEBUG "Enable debugging the correlator, output will be very slow" OFF)
 set_property(CACHE GS_CORRELATOR_DEBUG PROPERTY ADVANCED ON)
-set(GS_CORRELATOR_DEBUG OFF CACHE BOOL "Force default value" FORCE)
+if(GS_CORRELATOR_DEBUG)
+    set(GS_CORRELATOR_DEBUG ON CACHE BOOL "Enable debugging the ProcessorList, output will be very slow" FORCE)
+else()
+    set(GS_CORRELATOR_DEBUG OFF CACHE BOOL "Enable debugging the ProcessorList, output will be very slow" FORCE)
+endif()
 
 option(GS_PROCESSOR_DEBUG "Enable debugging the ProcessorList, output will be very slow" OFF)
 set_property(CACHE GS_PROCESSOR_DEBUG PROPERTY ADVANCED ON)
-set(GS_PROCESSOR_DEBUG OFF CACHE BOOL "Force default value" FORCE)
+if(GS_PROCESSOR_DEBUG)
+    set(GS_PROCESSOR_DEBUG ON CACHE BOOL "Enable debugging the ProcessorList, output will be very slow" FORCE)
+else()
+    set(GS_PROCESSOR_DEBUG OFF CACHE BOOL "Enable debugging the ProcessorList, output will be very slow" FORCE)
+endif()
 
 option(GS_TRANSLATOR_DEBUG "Enable debugging the Translators, output will be very slow" OFF)
 set_property(CACHE GS_TRANSLATOR_DEBUG PROPERTY ADVANCED ON)
-set(GS_TRANSLATOR_DEBUG OFF CACHE BOOL "Force default value" FORCE)
+if(GS_TRANSLATOR_DEBUG)
+    set(GS_TRANSLATOR_DEBUG ON CACHE BOOL "Enable debugging the ProcessorList, output will be very slow" FORCE)
+else()
+    set(GS_TRANSLATOR_DEBUG OFF CACHE BOOL "Enable debugging the ProcessorList, output will be very slow" FORCE)
+endif()
 
 #Add additional CXX flags if we use the Debug option
 if(NOT CMAKE_BUILD_TYPE)
@@ -64,7 +76,7 @@ endif()
 #when setting all of the following options.
 include(CMakeDependentOption)
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE BOOL "Generates compile_commands.json, needed for some IDEs among other things" )
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE BOOL "Generates compile_commands.json, needed for some IDEs among other things" FORCE)
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
