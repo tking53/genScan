@@ -3,6 +3,8 @@
 #include <stdexcept>
 
 #include "Processor.hpp"
+#include "EventSummary.hpp"
+#include "HistogramManager.hpp"
 
 #include <spdlog/common.h>
 #include <spdlog/spdlog.h>
@@ -54,6 +56,19 @@ std::shared_ptr<Processor> Processor::GetPtr(){
 	}
 }
 
+[[nodiscard]] bool Processor::ContainsAnyType(const std::set<std::string>& type) const{
+	if( this->Types.empty() ){
+		return false;
+	}else{
+		for( const auto& t : type ){
+			if( this->Types.find(t) != this->Types.end() ){
+				return true;
+			}
+		}
+		return false;
+	}
+}
+
 [[noreturn]] void Processor::Init([[maybe_unused]] const Json::Value& node){
 	this->console->error("Called Processor::Init(Json::Value& node), not the overload");
 	throw std::runtime_error("Called Processor::Init(Json::Value& node), not the overload");
@@ -69,25 +84,54 @@ std::shared_ptr<Processor> Processor::GetPtr(){
 	throw std::runtime_error("Called Processor::Init(pugi::xml_node& node), not the overload");
 }
 
+void Processor::AssociateType(const std::string& t){
+	if( this->Types.find(t) == this->Types.end() ){
+		this->Types.insert(t);
+		this->console->info("Type : {} has been associated with this Processor",t);
+	}else{
+		this->console->critical("Type : {} is already associated with this Processor",t);
+	}
+}
+
+[[noreturn]] void Processor::Finalize(){
+	this->console->error("Called Processor::Finalize(), not the overload");
+	throw std::runtime_error("Called Processor::Finalize(), not the overload");
+}
+
 [[maybe_unused]] bool Processor::PreProcess(){
-	this->start_time = std::chrono::high_resolution_clock::now();
-	this->currstep = STEP::PREPROCESS;
-	++(this->preprocesscalls);
+	start_time = std::chrono::high_resolution_clock::now();
+	currstep = STEP::PREPROCESS;
+	++preprocesscalls;
 	return true;
 }
 
 [[maybe_unused]] bool Processor::Process(){
-	this->start_time = std::chrono::high_resolution_clock::now();
-	this->currstep = STEP::PROCESS;
-	++(this->processcalls);
+	start_time = std::chrono::high_resolution_clock::now();
+	currstep = STEP::PROCESS;
+	++processcalls;
 	return true;
 }
 
 [[maybe_unused]] bool Processor::PostProcess(){
-	this->start_time = std::chrono::high_resolution_clock::now();
-	this->currstep = STEP::POSTPROCESS;
-	++(this->postprocesscalls);
+	start_time = std::chrono::high_resolution_clock::now();
+	currstep = STEP::POSTPROCESS;
+	++postprocesscalls;
 	return true;
+}
+
+[[noreturn]] bool Processor::PreProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager){
+	console->error("Called Processor::PreProcess(EventSummary&,PLOTS::PlotRegistry*), not the overload");
+	throw std::runtime_error("Called Processor::PreProcess(EventSummary&,PLOTS::PlotRegistry*), not the overload");
+}
+
+[[noreturn]] bool Processor::Process([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager){
+	console->error("Called Processor::Process(EventSummary&,PLOTS::PlotRegistry*), not the overload");
+	throw std::runtime_error("Called Processor::Process(EventSummary&,PLOTS::PlotRegistry*), not the overload");
+}
+
+[[noreturn]] bool Processor::PostProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager){
+	console->error("Called Processor::PostProcess(EventSummary&,PLOTS::PlotRegistry*), not the overload");
+	throw std::runtime_error("Called Processor::PostProcess(EventSummary&,PLOTS::PlotRegistry*), not the overload");
 }
 
 void Processor::EndProcess(){

@@ -191,21 +191,12 @@ const std::vector<unsigned int>& PhysicsData::GetQDCSums() const{
 	return this->QDCSums;
 }
 
-//SuperType
-void PhysicsData::SetSuperType(const std::string& value){
-	this->SuperType = value;
-}
-
-std::string_view PhysicsData::GetSuperType() const{
-	return this->SuperType;
-}
-
 //Type
 void PhysicsData::SetType(const std::string& value){
 	this->Type = value;
 }
 
-std::string_view PhysicsData::GetType() const{
+const std::string& PhysicsData::GetType() const{
 	return this->Type;
 }
 
@@ -214,7 +205,7 @@ void PhysicsData::SetSubType(const std::string& value){
 	this->SubType = value;
 }
 
-std::string_view PhysicsData::GetSubType() const{
+const std::string& PhysicsData::GetSubType() const{
 	return this->SubType;
 }
 
@@ -223,7 +214,7 @@ void PhysicsData::SetGroup(const std::string& value){
 	this->Group = value;
 }
 
-std::string_view PhysicsData::GetGroup() const{
+const std::string& PhysicsData::GetGroup() const{
 	return this->Group;
 }
 
@@ -232,15 +223,23 @@ void PhysicsData::SetTags(const std::string& value){
 	this->Tags = value;
 }
 
-std::string_view PhysicsData::GetTags() const{
+const std::string& PhysicsData::GetTags() const{
 	return this->Tags;
+}
+
+void PhysicsData::SetSummaryID(const std::string& value){
+	this->SummaryID = value; 
+}
+
+const std::string& PhysicsData::GetSummaryID() const{
+	return this->SummaryID;
 }
 
 void PhysicsData::SetUniqueID(const std::string& value){
 	this->UniqueID = value;
 }
 
-std::string_view PhysicsData::GetUniqueID() const{
+const std::string& PhysicsData::GetUniqueID() const{
 	return this->UniqueID;
 }
 

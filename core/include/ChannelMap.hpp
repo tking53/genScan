@@ -104,7 +104,6 @@ class ChannelMap{
 			int CrateID;
 			int GlobalChannelID;
 			int TraceDelay;
-			std::string supertype;
 			std::string type;
 			std::string subtype;
 			std::string group;
@@ -121,7 +120,6 @@ class ChannelMap{
 				   << " Channel: " << c.ChannelIDInBoard
 				   << " gChannel: " << c.GlobalChannelID
 				   << " TraceDelay: " << c.TraceDelay
-				   << " SuperType: " << c.supertype
 				   << " Type: " << c.type
 				   << " Subtype: " << c.subtype
 				   << " Group: " << c.group
@@ -169,7 +167,7 @@ class ChannelMap{
 
 		[[nodiscard]] double GetCalibratedEnergy(int,int,int,double);
 		
-		[[nodiscard]] bool SetParams(int,int,int,const std::string&,const std::string&,const std::string&,const std::string&,const std::string&,const std::set<std::string>&,CalType,const std::vector<double>&,int,const std::pair<double,double>&);
+		[[nodiscard]] bool SetParams(int,int,int,const std::string&,const std::string&,const std::string&,const std::string&,const std::set<std::string>&,CalType,const std::vector<double>&,int,const std::pair<double,double>&);
 
 		[[nodiscard]] CalType GetCalType(int,int,int) const;
 

@@ -6,9 +6,9 @@
 //histograms inside root
 
 #include "HistogramManager.hpp"
+#include "EventSummary.hpp"
 #include <initializer_list>
 #include <string>
-#include <vector>
 #include <memory>
 #include <chrono>
 
@@ -32,17 +32,24 @@ class Analyzer : public std::enable_shared_from_this<Analyzer>{
 		[[maybe_unused]] virtual bool PreProcess();
 		[[maybe_unused]] virtual bool Process();
 		[[maybe_unused]] virtual bool PostProcess();
-		[[maybe_unused]] virtual void EndProcess();
+		[[noreturn]] virtual bool PreProcess(EventSummary&,PLOTS::PlotRegistry*);
+		[[noreturn]] virtual bool Process(EventSummary&,PLOTS::PlotRegistry*);
+		[[noreturn]] virtual bool PostProcess(EventSummary&,PLOTS::PlotRegistry*);
+		virtual void EndProcess();
 		virtual ~Analyzer();
 
 		std::shared_ptr<Analyzer> GetPtr();
 		virtual std::string GetAnalyzerName() const;
 
-		[[nodiscard]] bool ContainsType(const std::string&) const;
+		[[nodiscard]] virtual bool ContainsType(const std::string&) const final;
+		[[nodiscard]] virtual bool ContainsAnyType(const std::set<std::string>&) const final;
 
 		[[noreturn]] virtual void Init([[maybe_unused]] const pugi::xml_node&);
 		[[noreturn]] virtual void Init([[maybe_unused]] const YAML::Node&);
 		[[noreturn]] virtual void Init([[maybe_unused]] const Json::Value&);
+
+		virtual void AssociateType(const std::string&) final;
+		[[noreturn]] virtual void Finalize();
 
 		[[noreturn]] virtual void DeclarePlots([[maybe_unused]] PLOTS::PlotRegistry*) const;
 	protected:

@@ -2,7 +2,6 @@
 #define __PHYSICS_DATA_HPP__
 
 #include <string>
-#include <string_view>
 #include <vector>
 #include <set>
 
@@ -104,35 +103,35 @@ class PhysicsData{
 		void SetRawQDCSumLength(const unsigned int);
 		void SetQDCValue(const unsigned int&,const unsigned int&);
 
-		//SuperType
-		void SetSuperType(const std::string&);
-
-		std::string_view GetSuperType() const;
-
 		//Type
 		void SetType(const std::string&);
 
-		std::string_view GetType() const;
+		const std::string& GetType() const;
 
 		//SubType
 		void SetSubType(const std::string&);
 
-		std::string_view GetSubType() const;
+		const std::string& GetSubType() const;
 
 		//Group
 		void SetGroup(const std::string&);
 
-		std::string_view GetGroup() const;
+		const std::string& GetGroup() const;
 
 		//Tags
 		void SetTags(const std::string&);
 
-		std::string_view GetTags() const;
+		const std::string& GetTags() const;
+
+		//SummaryID
+		void SetSummaryID(const std::string&);
+
+		const std::string& GetSummaryID() const;
 
 		//UniqueID
 		void SetUniqueID(const std::string&);
 
-		std::string_view GetUniqueID() const;
+		const std::string& GetUniqueID() const;
 
 		//Tag List
 		void SetTagList(const std::set<std::string>&); 
@@ -187,12 +186,12 @@ class PhysicsData{
 		unsigned int ESumBaseLine;
 
 		//this is info derived from the channel map
-		std::string_view SuperType;
-		std::string_view Type;
-		std::string_view SubType;
-		std::string_view Group;
-		std::string_view Tags;
-		std::string_view UniqueID;
+		std::string Type;
+		std::string SubType;
+		std::string Group;
+		std::string Tags;
+		std::string SummaryID;
+		std::string UniqueID;
 		std::set<std::string> TagList;
 
 		//Trace Helper, should probably hide this from end user though

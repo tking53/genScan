@@ -18,6 +18,7 @@
 
 #include "ChannelMap.hpp"
 #include "ConfigParser.hpp"
+#include "EventSummary.hpp"
 #include "HistogramManager.hpp"
 #include "PhysicsData.hpp"
 #include "RootFileManager.hpp"
@@ -42,20 +43,22 @@ class ProcessorList{
 		void InitializeProcessors(JSONConfigParser*);
 		void InitializeAnalyzers(JSONConfigParser*);
 
-		void PreAnalyze(PLOTS::PlotRegistry*);
-		void PreProcess(PLOTS::PlotRegistry*);
+		void PreAnalyze(EventSummary&,PLOTS::PlotRegistry*);
+		void PreProcess(EventSummary&,PLOTS::PlotRegistry*);
 		
-		void Analyze(PLOTS::PlotRegistry*);
-		void Process(PLOTS::PlotRegistry*);
+		void Analyze(EventSummary&,PLOTS::PlotRegistry*);
+		void Process(EventSummary&,PLOTS::PlotRegistry*);
 
-		void PostAnalyze(PLOTS::PlotRegistry*);
-		void PostProcess(PLOTS::PlotRegistry*);
+		void PostAnalyze(EventSummary&,PLOTS::PlotRegistry*);
+		void PostProcess(EventSummary&,PLOTS::PlotRegistry*);
 
 		void RegisterOutputTrees(RootFileManager*);
 		void DeclarePlots(PLOTS::PlotRegistry*) const;
 
 		void ThreshAndCal(boost::container::devector<PhysicsData>&,ChannelMap*);
 		void ProcessRaw(boost::container::devector<PhysicsData>&,PLOTS::PlotRegistry*);
+
+		void Finalize();
 
 		~ProcessorList();
 	private:

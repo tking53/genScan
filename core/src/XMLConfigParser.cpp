@@ -287,7 +287,6 @@ void XMLConfigParser::ParseMap(ChannelMap* cmap){
 								<< bid << "\"";
 							throw std::runtime_error(ss.str());
 						}
-						std::string supertype = channel.attribute("supertype").as_string(type.c_str());
 						std::string subtype = channel.attribute("subtype").as_string("");
 						if( subtype.compare("") == 0 ){
 							std::stringstream ss;
@@ -452,7 +451,7 @@ void XMLConfigParser::ParseMap(ChannelMap* cmap){
 									<< cal_type << "\"";
 								throw std::runtime_error(ss.str());
 							}
-							auto duplicate = cmap->SetParams(crid,bid,cid,supertype,type,subtype,group,tags,taglist,ct,params,LocalTraceDelay,ThreshVals); 
+							auto duplicate = cmap->SetParams(crid,bid,cid,type,subtype,group,tags,taglist,ct,params,LocalTraceDelay,ThreshVals); 
 							if( duplicate ){
 								std::stringstream ss;
 								ss << "XMLConfigParser::ParseMap() : config file named \""

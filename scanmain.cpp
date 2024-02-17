@@ -39,6 +39,8 @@
 
 #include "PhysicsData.hpp"
 
+#include "EventSummary.hpp"
+
 volatile bool ctrlCPressed = false;
 
 void signalHandler(int signum) {
@@ -252,6 +254,7 @@ int main(int argc, char *argv[]) {
 		}
 		processorlist->DeclarePlots(HistogramManager.get());
 		processorlist->RegisterOutputTrees(RootManager.get());
+		processorlist->Finalize();
 	}catch(std::runtime_error const& e){
 		console->error(e.what());
 		exit(EXIT_FAILURE);
@@ -263,23 +266,29 @@ int main(int argc, char *argv[]) {
 
 	std::signal(SIGINT, signalHandler);
 
-	boost::container::devector<PhysicsData> RawEvents;
+	EventSummary CorrelatedEvents;
 	Translator::TRANSLATORSTATE CurrState = Translator::TRANSLATORSTATE::UNKNOWN;
 	try{
 		do{
-			CurrState = dataparser->Parse(RawEvents);
-			processorlist->ThreshAndCal(RawEvents,cmap.get());
-			processorlist->ProcessRaw(RawEvents,HistogramManager.get());
-			processorlist->PreProcess(HistogramManager.get());
-			processorlist->PreAnalyze(HistogramManager.get());
+			CurrState = dataparser->Parse(CorrelatedEvents.GetRawEvents());
+
+			processorlist->ThreshAndCal(CorrelatedEvents.GetRawEvents(),cmap.get());
+			processorlist->ProcessRaw(CorrelatedEvents.GetRawEvents(),HistogramManager.get());
+
+			CorrelatedEvents.BuildDetectorSummary();
+
+			processorlist->PreProcess(CorrelatedEvents,HistogramManager.get());
+			processorlist->PreAnalyze(CorrelatedEvents,HistogramManager.get());
 	
-			processorlist->Process(HistogramManager.get());
-			processorlist->Analyze(HistogramManager.get());
+			processorlist->Process(CorrelatedEvents,HistogramManager.get());
+			processorlist->Analyze(CorrelatedEvents,HistogramManager.get());
 	
-			processorlist->PostProcess(HistogramManager.get());
-			processorlist->PostAnalyze(HistogramManager.get());
+			processorlist->PostProcess(CorrelatedEvents,HistogramManager.get());
+			processorlist->PostAnalyze(CorrelatedEvents,HistogramManager.get());
+
 			//RootManager->Fill();
-			RawEvents.clear();
+
+			CorrelatedEvents.ClearRawEvents();
 		}while( CurrState == Translator::TRANSLATORSTATE::PARSING and not ctrlCPressed );
 	}catch(std::runtime_error const& e){
 		console->error(e.what());

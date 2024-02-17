@@ -4,6 +4,7 @@
 
 #include "ProcessorList.hpp"
 
+#include "EventSummary.hpp"
 #include "Processor.hpp"
 #include "GenericProcessor.hpp"
 
@@ -22,39 +23,62 @@ ProcessorList::ProcessorList(const std::string& log){
 
 ProcessorList::~ProcessorList() = default;
 
-void ProcessorList::PreAnalyze(PLOTS::PlotRegistry* HistogramManager){
+void ProcessorList::PreAnalyze(EventSummary& Summary,PLOTS::PlotRegistry* HistogramManager){
+	auto knowntypes = Summary.GetKnownTypes();
+	#ifdef PROCESSOR_DEBUG
+	for( const auto& t : knowntypes ){
+		this->console->info("Known Type : {} for Event ID : {}",t,this->EventStamp);
+	}
+	#endif
 	for( auto& anal : this->known_analyzers ){
-		anal->PreProcess();
+		if( anal->ContainsAnyType(knowntypes) ){
+			anal->PreProcess(Summary,HistogramManager);
+		}
 	}
 }
 
-void ProcessorList::Analyze(PLOTS::PlotRegistry* HistogramManager){
+void ProcessorList::Analyze(EventSummary& Summary,PLOTS::PlotRegistry* HistogramManager){
+	auto knowntypes = Summary.GetKnownTypes();
 	for( auto& anal : this->known_analyzers ){
-		anal->Process();
+		if( anal->ContainsAnyType(knowntypes) ){
+			anal->Process(Summary,HistogramManager);
+		}
 	}
 }
 
-void ProcessorList::PostAnalyze(PLOTS::PlotRegistry* HistogramManager){
+void ProcessorList::PostAnalyze(EventSummary& Summary,PLOTS::PlotRegistry* HistogramManager){
+	auto knowntypes = Summary.GetKnownTypes();
 	for( auto& anal : this->known_analyzers ){
-		anal->PostProcess();
+		if( anal->ContainsAnyType(knowntypes) ){
+			anal->PostProcess(Summary,HistogramManager);
+		}
 	}
 }
 
-void ProcessorList::PreProcess(PLOTS::PlotRegistry* HistogramManager){
+void ProcessorList::PreProcess(EventSummary& Summary,PLOTS::PlotRegistry* HistogramManager){
+	auto knowntypes = Summary.GetKnownTypes();
 	for( auto& proc : this->known_processors ){
-		proc->PreProcess();
+		if( proc->ContainsAnyType(knowntypes) ){
+			proc->PreProcess(Summary,HistogramManager);
+		}
 	}
 }
 
-void ProcessorList::Process(PLOTS::PlotRegistry* HistogramManager){
+void ProcessorList::Process(EventSummary& Summary,PLOTS::PlotRegistry* HistogramManager){
+	auto knowntypes = Summary.GetKnownTypes();
 	for( auto& proc : this->known_processors ){
-		proc->Process();
+		if( proc->ContainsAnyType(knowntypes) ){
+			proc->Process(Summary,HistogramManager);
+		}
 	}
 }
 
-void ProcessorList::PostProcess(PLOTS::PlotRegistry* HistogramManager){
+void ProcessorList::PostProcess(EventSummary& Summary,PLOTS::PlotRegistry* HistogramManager){
+	auto knowntypes = Summary.GetKnownTypes();
 	for( auto& proc : this->known_processors ){
-		proc->PostProcess();
+		if( proc->ContainsAnyType(knowntypes) ){
+			proc->PostProcess(Summary,HistogramManager);
+		}
 	}
 	++(this->EventStamp);
 }
@@ -208,5 +232,14 @@ void ProcessorList::ProcessRaw(boost::container::devector<PhysicsData>& RawEvent
 		HistogramManager->Fill("Cal",evt.GetEnergy(),gChanID);
 		HistogramManager->Fill("Event_Mult",gChanID,evtsize);
 		HistogramManager->Fill("Total_Rate",rate_x,rate_y);
+	}
+}
+
+void ProcessorList::Finalize(){
+	for( auto& anal : this->known_analyzers ){
+		anal->Finalize();
+	}
+	for( auto& proc : this->known_processors ){
+		proc->Finalize();
 	}
 }

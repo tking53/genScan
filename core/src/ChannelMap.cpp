@@ -127,7 +127,7 @@ ChannelMap::FirmwareVersion ChannelMap::CalcFirmwareEnum(const std::string& type
 	return this->ModuleFilterClockTickToNS.at(this->GetGlobalBoardID(CrateNum,ModNum));
 }
 
-[[nodiscard]] bool ChannelMap::SetParams(int crid,int bid,int cid,const std::string& xt,const std::string& t,const std::string& st,const std::string& g,const std::string& tt,const std::set<std::string>& tg,CalType c,const std::vector<double>& p,int tdelay,const std::pair<double,double>& thresh){
+[[nodiscard]] bool ChannelMap::SetParams(int crid,int bid,int cid,const std::string& t,const std::string& st,const std::string& g,const std::string& tt,const std::set<std::string>& tg,CalType c,const std::vector<double>& p,int tdelay,const std::pair<double,double>& thresh){
 	if( static_cast<int>(p.size()) > MAX_CAL_PARAMS_PER_CHANNEL ){
 		throw std::runtime_error("Trying to assign more calibration parameters than allowed");
 	}else{
@@ -137,8 +137,7 @@ ChannelMap::FirmwareVersion ChannelMap::CalcFirmwareEnum(const std::string& type
 			std::string mess = "Invalid config file, Crate : "+std::to_string(crid)+"Board : "+std::to_string(bid)+" Channel : "+std::to_string(cid)+" Is Invalid";
 			throw std::runtime_error(mess);
 		}
-		std::string currunique_id =  "";
-		currunique_id = t + ":" + st + ":" + g;
+		std::string currunique_id = t + ":" + st + ":" + g;
 		for( auto& currtag : tg )
 			currunique_id += ":" + currtag;
 
@@ -149,7 +148,6 @@ ChannelMap::FirmwareVersion ChannelMap::CalcFirmwareEnum(const std::string& type
 			.CrateID = crid,
 			.GlobalChannelID = gcid,
 			.TraceDelay = tdelay, 
-			.supertype = xt,
 			.type = t,
 			.subtype = st,
 			.group = g,
@@ -290,7 +288,6 @@ XiaDecoder* ChannelMap::GetXiaDecoder(int crid,int bid) const{
 
 void ChannelMap::SetChanConfigInfo(PhysicsData& evt) const{
 	auto currmap = this->ChannelConfigMap.at(evt.GetGlobalChannelID());
-	evt.SetSuperType(currmap.supertype);
 	evt.SetType(currmap.type);
 	evt.SetSubType(currmap.subtype);
 	evt.SetTags(currmap.tags);

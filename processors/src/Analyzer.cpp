@@ -22,7 +22,7 @@ Analyzer::Analyzer(const std::string& log,const std::string& analyzer,const std:
 	processtime = 0.0;
 	postprocesstime = 0.0;
 	Types = types;
-	console->info("Created AnalyzerName : {}",this->AnalyzerName);
+	console->info("Created Analyzer : {}",this->AnalyzerName);
 	for( const auto& t : Types )
 		console->info("Type : {} has been associated with this Analyzer",t);
 }
@@ -41,10 +41,23 @@ std::string Analyzer::GetAnalyzerName() const{
 }
 
 [[nodiscard]] bool Analyzer::ContainsType(const std::string& type) const{
-	if( Types.empty() ){
+	if( this->Types.empty() ){
 		return false;
 	}else{
-		return Types.find(type) != Types.end();
+		return this->Types.find(type) != this->Types.end();
+	}
+}
+
+[[nodiscard]] bool Analyzer::ContainsAnyType(const std::set<std::string>& type) const{
+	if( this->Types.empty() ){
+		return false;
+	}else{
+		for( const auto& t : type ){
+			if( this->Types.find(t) != this->Types.end() ){
+				return true;
+			}
+		}
+		return false;
 	}
 }
 
@@ -63,25 +76,55 @@ std::string Analyzer::GetAnalyzerName() const{
 	throw std::runtime_error("Called Analyzer::Init(pugi::xml_node& node), not the overload");
 }
 
-bool Analyzer::PreProcess(){
+void Analyzer::AssociateType(const std::string& t){
+	if( this->Types.find(t) == this->Types.end() ){
+		this->Types.insert(t);
+		this->console->info("Type : {} has been associated with this Analyzer",t);
+	}else{
+		this->console->critical("Type : {} is already associated with this Analyzer",t);
+	}
+}
+
+[[noreturn]] void Analyzer::Finalize(){
+	this->console->error("Called Analyzer::Finalize(), not the overload");
+	throw std::runtime_error("Called Analyzer::Finalize(), not the overload");
+}
+
+
+[[maybe_unused]] bool Analyzer::PreProcess(){
 	start_time = std::chrono::high_resolution_clock::now();
 	currstep = STEP::PREPROCESS;
 	++preprocesscalls;
 	return true;
 }
 
-bool Analyzer::Process(){
+[[maybe_unused]] bool Analyzer::Process(){
 	start_time = std::chrono::high_resolution_clock::now();
 	currstep = STEP::PROCESS;
 	++processcalls;
 	return true;
 }
 
-bool Analyzer::PostProcess(){
+[[maybe_unused]] bool Analyzer::PostProcess(){
 	start_time = std::chrono::high_resolution_clock::now();
 	currstep = STEP::POSTPROCESS;
 	++postprocesscalls;
 	return true;
+}
+
+[[noreturn]] bool Analyzer::PreProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager){
+	console->error("Called Analyzer::PreProcess(EventSummary&,PLOTS::PlotRegistry*), not the overload");
+	throw std::runtime_error("Called Analyzer::PreProcess(EventSummary&,PLOTS::PlotRegistry*), not the overload");
+}
+
+[[noreturn]] bool Analyzer::Process([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager){
+	console->error("Called Analyzer::Process(EventSummary&,PLOTS::PlotRegistry*), not the overload");
+	throw std::runtime_error("Called Analyzer::Process(EventSummary&,PLOTS::PlotRegistry*), not the overload");
+}
+
+[[noreturn]] bool Analyzer::PostProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager){
+	console->error("Called Analyzer::PostProcess(EventSummary&,PLOTS::PlotRegistry*), not the overload");
+	throw std::runtime_error("Called Analyzer::PostProcess(EventSummary&,PLOTS::PlotRegistry*), not the overload");
 }
 
 void Analyzer::EndProcess(){

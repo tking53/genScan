@@ -1,22 +1,24 @@
 #include "GenericAnalyzer.hpp"
 #include "Analyzer.hpp"
+#include "EventSummary.hpp"
+#include "HistogramManager.hpp"
 
-GenericAnalyzer::GenericAnalyzer(const std::string& log) : Analyzer(log,"GenericAnalyzer",{"Generic"}){
+GenericAnalyzer::GenericAnalyzer(const std::string& log) : Analyzer(log,"GenericAnalyzer",{"generic"}){
 }
 
-bool GenericAnalyzer::PreProcess(){
+[[maybe_unused]] bool GenericAnalyzer::PreProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager){
 	Analyzer::PreProcess();
 	Analyzer::EndProcess();
 	return true;
 }
 
-bool GenericAnalyzer::Process(){
+[[maybe_unused]] bool GenericAnalyzer::Process([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager){
 	Analyzer::Process();
 	Analyzer::EndProcess();
 	return true;
 }
 
-bool GenericAnalyzer::PostProcess(){
+[[maybe_unused]] bool GenericAnalyzer::PostProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager){
 	Analyzer::PostProcess();
 	Analyzer::EndProcess();
 	return true;
@@ -33,6 +35,11 @@ void GenericAnalyzer::Init(const Json::Value&){
 void GenericAnalyzer::Init(const pugi::xml_node&){
 	console->info("Init called with pugi::xml_node");
 }
+
+void GenericAnalyzer::Finalize(){
+	this->console->info("{} has been finalized",this->AnalyzerName);
+}
+
 
 void GenericAnalyzer::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 	(void) hismanager;
