@@ -5,11 +5,10 @@
 #include "ProcessorList.hpp"
 
 #include "EventSummary.hpp"
-#include "Processor.hpp"
 #include "GenericProcessor.hpp"
 
-#include "Analyzer.hpp"
 #include "GenericAnalyzer.hpp"
+#include "RootDevProcessor.hpp"
 
 ProcessorList::ProcessorList(const std::string& log){
 	this->LogName = log;
@@ -83,18 +82,37 @@ void ProcessorList::PostProcess(EventSummary& Summary,PLOTS::PlotRegistry* Histo
 	++(this->EventStamp);
 }
 
+void ProcessorList::CreateProc(const std::string& name){
+	if( name.compare("GenericProcessor") == 0 ){
+		this->known_processors.push_back(std::make_shared<GenericProcessor>(this->LogName));
+	}else if( name.compare("RootDevProcessor") == 0 ){
+		known_processors.push_back(std::make_shared<RootDevProcessor>(this->LogName));
+	}else{
+		std::stringstream ss;
+		ss << "ProcessorList::InitializeProcessors() Unknown processor named \""
+			<< name 
+			<< "\"";
+		throw std::runtime_error(ss.str());
+	}
+
+}
+
+void ProcessorList::CreateAnal(const std::string& name){
+	if( name.compare("GenericAnalyzer") == 0 ){
+		known_analyzers.push_back(std::make_shared<GenericAnalyzer>(this->LogName));
+	}else{
+		std::stringstream ss;
+		ss << "ProcessorList::InitializeAnalyzers() Unknown analyzer named \""
+			<< name 
+			<< "\"";
+		throw std::runtime_error(ss.str());
+	}
+}
+
 void ProcessorList::InitializeProcessors(XMLConfigParser* cmap){
 	auto procnames = cmap->GetProcessorNames();
 	for( auto& name : procnames ){
-		if( name.compare("GenericProcessor") == 0 ){
-			known_processors.push_back(std::make_shared<GenericProcessor>(this->LogName));
-		}else{
-			std::stringstream ss;
-			ss << "ProcessorList::InitializeProcessors() Unknown processor named \""
-			   << name 
-			   << "\"";
-			throw std::runtime_error(ss.str());
-		}
+		this->CreateProc(name);
 		known_processors.back()->Init(cmap->GetProcessorXMLInfo(name));
 	}
 }
@@ -102,15 +120,7 @@ void ProcessorList::InitializeProcessors(XMLConfigParser* cmap){
 void ProcessorList::InitializeAnalyzers(XMLConfigParser* cmap){
 	auto analnames = cmap->GetAnalyzerNames();
 	for( auto& name : analnames ){
-		if( name.compare("GenericAnalyzer") == 0 ){
-			known_analyzers.push_back(std::make_shared<GenericAnalyzer>(this->LogName));
-		}else{
-			std::stringstream ss;
-			ss << "ProcessorList::InitializeAnalyzers() Unknown analyzer named \""
-			   << name 
-			   << "\"";
-			throw std::runtime_error(ss.str());
-		}
+		this->CreateAnal(name);
 		known_analyzers.back()->Init(cmap->GetAnalyzerXMLInfo(name));
 	}
 }
@@ -118,15 +128,7 @@ void ProcessorList::InitializeAnalyzers(XMLConfigParser* cmap){
 void ProcessorList::InitializeProcessors(YAMLConfigParser* cmap){
 	auto procnames = cmap->GetProcessorNames();
 	for( auto& name : procnames ){
-		if( name.compare("GenericProcessor") == 0 ){
-			known_processors.push_back(std::make_shared<GenericProcessor>(this->LogName));
-		}else{
-			std::stringstream ss;
-			ss << "ProcessorList::InitializeProcessors() Unknown processor named \""
-			   << name 
-			   << "\"";
-			throw std::runtime_error(ss.str());
-		}
+		this->CreateProc(name);
 		known_processors.back()->Init(cmap->GetProcessorYAMLInfo(name));
 	}
 }
@@ -134,30 +136,14 @@ void ProcessorList::InitializeProcessors(YAMLConfigParser* cmap){
 void ProcessorList::InitializeAnalyzers(YAMLConfigParser* cmap){
 	auto analnames = cmap->GetAnalyzerNames();
 	for( auto& name : analnames ){
-		if( name.compare("GenericAnalyzer") == 0 ){
-			known_analyzers.push_back(std::make_shared<GenericAnalyzer>(this->LogName));
-		}else{
-			std::stringstream ss;
-			ss << "ProcessorList::InitializeAnalyzers() Unknown analyzer named \""
-			   << name 
-			   << "\"";
-			throw std::runtime_error(ss.str());
-		}
+		this->CreateProc(name);
 		known_analyzers.back()->Init(cmap->GetAnalyzerYAMLInfo(name));
 	}
 }
 void ProcessorList::InitializeProcessors(JSONConfigParser* cmap){
 	auto procnames = cmap->GetProcessorNames();
 	for( auto& name : procnames ){
-		if( name.compare("GenericProcessor") == 0 ){
-			known_processors.push_back(std::make_shared<GenericProcessor>(this->LogName));
-		}else{
-			std::stringstream ss;
-			ss << "ProcessorList::InitializeProcessors() Unknown processor named \""
-			   << name 
-			   << "\"";
-			throw std::runtime_error(ss.str());
-		}
+		this->CreateAnal(name);
 		known_processors.back()->Init(cmap->GetProcessorJSONInfo(name));
 	}
 }
@@ -165,15 +151,7 @@ void ProcessorList::InitializeProcessors(JSONConfigParser* cmap){
 void ProcessorList::InitializeAnalyzers(JSONConfigParser* cmap){
 	auto analnames = cmap->GetAnalyzerNames();
 	for( auto& name : analnames ){
-		if( name.compare("GenericAnalyzer") == 0 ){
-			known_analyzers.push_back(std::make_shared<GenericAnalyzer>(this->LogName));
-		}else{
-			std::stringstream ss;
-			ss << "ProcessorList::InitializeAnalyzers() Unknown analyzer named \""
-			   << name 
-			   << "\"";
-			throw std::runtime_error(ss.str());
-		}
+		this->CreateAnal(name);
 		known_analyzers.back()->Init(cmap->GetAnalyzerJSONInfo(name));
 	}
 }
@@ -242,4 +220,9 @@ void ProcessorList::Finalize(){
 	for( auto& proc : this->known_processors ){
 		proc->Finalize();
 	}
+}
+
+void ProcessorList::CleanupTrees(){
+	for( auto& proc : this->known_processors )
+		proc->CleanupTree();
 }

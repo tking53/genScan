@@ -75,6 +75,8 @@ class Analyzer : public std::enable_shared_from_this<Analyzer>{
 
 		std::string AnalyzerName;
 		std::string LogName;
+
+		std::string DefaultRegex;
 		
 		std::shared_ptr<spdlog::logger> console;
 };

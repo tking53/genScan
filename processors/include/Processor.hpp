@@ -56,6 +56,8 @@ class Processor : public std::enable_shared_from_this<Processor> {
 		[[noreturn]] virtual void Finalize();
 
 		[[noreturn]] virtual void DeclarePlots([[maybe_unused]] PLOTS::PlotRegistry*) const;
+
+		virtual void CleanupTree();
 	protected:
 		enum STEP{
 			PREPROCESS,
@@ -78,6 +80,8 @@ class Processor : public std::enable_shared_from_this<Processor> {
 
 		std::string ProcessorName;
 		std::string LogName;
+
+		std::string DefaultRegex;
 
 		std::set<std::string> Types;
 

@@ -26,8 +26,16 @@ Processor::Processor(const std::string& log,const std::string& proc,const std::i
 	this->currstep = STEP::UNKNOWN;
 	this->Types = types;
 	this->console->info("Created Processor : {}",this->ProcessorName);
-	for( const auto& t : this->Types )
+	this->DefaultRegex = "(";
+	for( const auto& t : this->Types ){
+		this->DefaultRegex += t+"|";
 		this->console->info("Type : {} has been associated with this Processor",t);
+	}
+	if( this->Types.size() == 1 ){
+		this->DefaultRegex.pop_back();
+	}
+	this->DefaultRegex += ")";
+	this->console->info("Default Type Regex established to be {}",this->DefaultRegex);
 }
 
 std::string Processor::GetProcessorName() const{
@@ -86,8 +94,11 @@ std::shared_ptr<Processor> Processor::GetPtr(){
 
 void Processor::AssociateType(const std::string& t){
 	if( this->Types.find(t) == this->Types.end() ){
+		this->DefaultRegex.pop_back();
+		this->DefaultRegex += "|"+t+")";
 		this->Types.insert(t);
 		this->console->info("Type : {} has been associated with this Processor",t);
+		this->console->info("Default Type Regex updated to be {}",this->DefaultRegex);
 	}else{
 		this->console->critical("Type : {} is already associated with this Processor",t);
 	}
@@ -156,4 +167,7 @@ void Processor::EndProcess(){
 [[noreturn]] void Processor::DeclarePlots([[maybe_unused]] PLOTS::PlotRegistry* hismanager) const{
 	this->console->error("Called Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager), not the overload");
 	throw std::runtime_error("Called Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager), not the overload");
+}
+
+void Processor::CleanupTree(){
 }

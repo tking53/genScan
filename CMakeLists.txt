@@ -317,7 +317,7 @@ add_executable(GenScanor scanmain.cpp)
 add_dependencies(GenScanor ${EXTERNAL_DEPS})
 
 #include_directories(${PROJECT_SOURCE_DIR}/utility/include)
-target_link_libraries(GenScanor PRIVATE TRANSLATOR_LIB PROCESSOR_LIB CORE_LIB UTILITY_LIB )
+target_link_libraries(GenScanor PRIVATE RootDevStruct TRANSLATOR_LIB PROCESSOR_LIB CORE_LIB UTILITY_LIB ${ROOT_LIBRARIES})
 if( USE_SYSTEM_FMT )
 	target_link_libraries(GenScanor PRIVATE fmt::fmt)
 endif()

@@ -45,6 +45,14 @@ class RootFileManager{
 			}
 		}
 
+		void Fill(){
+			for( auto& tree : this->OutputTrees ){
+				if( tree.second != nullptr ){
+					tree.second->Fill();
+				}
+			}
+		}
+
 	private:
 		std::string LogName;
 		std::string outputprefix;

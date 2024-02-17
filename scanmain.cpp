@@ -286,7 +286,8 @@ int main(int argc, char *argv[]) {
 			processorlist->PostProcess(CorrelatedEvents,HistogramManager.get());
 			processorlist->PostAnalyze(CorrelatedEvents,HistogramManager.get());
 
-			//RootManager->Fill();
+			RootManager->Fill();
+			processorlist->CleanupTrees();
 
 			CorrelatedEvents.ClearRawEvents();
 		}while( CurrState == Translator::TRANSLATORSTATE::PARSING and not ctrlCPressed );

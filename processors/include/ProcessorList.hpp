@@ -3,8 +3,6 @@
 
 #include <random>
 #include <vector>
-#include <map>
-#include <set>
 #include <string>
 #include <memory>
 
@@ -17,7 +15,6 @@
 
 
 #include "ChannelMap.hpp"
-#include "ConfigParser.hpp"
 #include "EventSummary.hpp"
 #include "HistogramManager.hpp"
 #include "PhysicsData.hpp"
@@ -60,8 +57,13 @@ class ProcessorList{
 
 		void Finalize();
 
+		void CleanupTrees();
+
 		~ProcessorList();
 	private:
+		void CreateProc(const std::string&);
+		void CreateAnal(const std::string&);
+
 		std::string LogName;
 		std::shared_ptr<spdlog::logger> console;
 		std::vector<std::shared_ptr<Processor>> known_processors;
