@@ -2,6 +2,7 @@
 #define __PHYSICS_DATA_HPP__
 
 #include <string>
+#include <string_view>
 #include <vector>
 #include <set>
 
@@ -83,6 +84,10 @@ class PhysicsData{
 		void SetPhase(double);
 		double GetPhase() const;
 
+		//Raw Raw Trace
+		void SetRawTraceLength(const unsigned int);
+		std::vector<uint16_t>& GetRawTraceData();
+		
 		//Raw Trace
 		void SetRawTrace(const std::vector<uint16_t>&);
 		void SetRawTrace(std::vector<uint16_t>&&);
@@ -95,45 +100,42 @@ class PhysicsData{
 
 		const std::vector<unsigned int>& GetQDCSums() const;
 
+		//Make faster update
+		void SetRawQDCSumLength(const unsigned int);
+		void SetQDCValue(const unsigned int&,const unsigned int&);
+
 		//SuperType
 		void SetSuperType(const std::string&);
-		void SetSuperType(std::string&&);
 
-		std::string GetSuperType() const;
+		std::string_view GetSuperType() const;
 
 		//Type
 		void SetType(const std::string&);
-		void SetType(std::string&&);
 
-		std::string GetType() const;
+		std::string_view GetType() const;
 
 		//SubType
 		void SetSubType(const std::string&);
-		void SetSubType(std::string&&);
 
-		std::string GetSubType() const;
+		std::string_view GetSubType() const;
 
 		//Group
 		void SetGroup(const std::string&);
-		void SetGroup(std::string&&);
 
-		std::string GetGroup() const;
+		std::string_view GetGroup() const;
 
 		//Tags
 		void SetTags(const std::string&);
-		void SetTags(std::string&&);
 
-		std::string GetTags() const;
+		std::string_view GetTags() const;
 
 		//UniqueID
 		void SetUniqueID(const std::string&);
-		void SetUniqueID(std::string&&);
 
-		std::string GetUniqueID() const;
+		std::string_view GetUniqueID() const;
 
 		//Tag List
 		void SetTagList(const std::set<std::string>&); 
-		void SetTagList(std::set<std::string>&&);
 
 		std::set<std::string> GetTagList() const;
 
@@ -185,12 +187,12 @@ class PhysicsData{
 		unsigned int ESumBaseLine;
 
 		//this is info derived from the channel map
-		std::string SuperType;
-		std::string Type;
-		std::string SubType;
-		std::string Group;
-		std::string Tags;
-		std::string UniqueID;
+		std::string_view SuperType;
+		std::string_view Type;
+		std::string_view SubType;
+		std::string_view Group;
+		std::string_view Tags;
+		std::string_view UniqueID;
 		std::set<std::string> TagList;
 
 		//Trace Helper, should probably hide this from end user though

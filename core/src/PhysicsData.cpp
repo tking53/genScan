@@ -151,15 +151,32 @@ double PhysicsData::GetPhase() const{
 }
 
 //Raw Trace
+void PhysicsData::SetRawTraceLength(const unsigned int value){
+	this->Trace = TraceHelper<uint16_t,float>(value);
+}
+
 void PhysicsData::SetRawTrace(const std::vector<uint16_t>& value){
-	Trace = TraceHelper<uint16_t,float>(value);
+	this->Trace = TraceHelper<uint16_t,float>(value);
 }
 void PhysicsData::SetRawTrace(std::vector<uint16_t>&& value){
-	Trace = TraceHelper<uint16_t,float>(std::move(value));
+	this->Trace = TraceHelper<uint16_t,float>(std::move(value));
 }
 
 const std::vector<uint16_t>& PhysicsData::GetRawTrace() const{
-	return Trace.GetData(); 
+	return this->Trace.GetData(); 
+}
+		
+
+std::vector<uint16_t>& PhysicsData::GetRawTraceData(){
+	return this->Trace.GetRawData();
+}
+
+void PhysicsData::SetRawQDCSumLength(const unsigned int value){
+	this->QDCSums = std::vector<unsigned int>(value);
+}
+
+void PhysicsData::SetQDCValue(const unsigned int& idx,const unsigned int& value){
+	this->QDCSums[idx] = value;
 }
 
 //QDC Sums
@@ -178,11 +195,8 @@ const std::vector<unsigned int>& PhysicsData::GetQDCSums() const{
 void PhysicsData::SetSuperType(const std::string& value){
 	this->SuperType = value;
 }
-void PhysicsData::SetSuperType(std::string&& value){
-	this->SuperType = std::move(value);
-}
 
-std::string PhysicsData::GetSuperType() const{
+std::string_view PhysicsData::GetSuperType() const{
 	return this->SuperType;
 }
 
@@ -190,11 +204,8 @@ std::string PhysicsData::GetSuperType() const{
 void PhysicsData::SetType(const std::string& value){
 	this->Type = value;
 }
-void PhysicsData::SetType(std::string&& value){
-	this->Type = std::move(value);
-}
 
-std::string PhysicsData::GetType() const{
+std::string_view PhysicsData::GetType() const{
 	return this->Type;
 }
 
@@ -202,11 +213,8 @@ std::string PhysicsData::GetType() const{
 void PhysicsData::SetSubType(const std::string& value){
 	this->SubType = value;
 }
-void PhysicsData::SetSubType(std::string&& value){
-	this->SubType = std::move(value);
-}
 
-std::string PhysicsData::GetSubType() const{
+std::string_view PhysicsData::GetSubType() const{
 	return this->SubType;
 }
 
@@ -214,11 +222,8 @@ std::string PhysicsData::GetSubType() const{
 void PhysicsData::SetGroup(const std::string& value){
 	this->Group = value;
 }
-void PhysicsData::SetGroup(std::string&& value){
-	this->Group = std::move(value);
-}
 
-std::string PhysicsData::GetGroup() const{
+std::string_view PhysicsData::GetGroup() const{
 	return this->Group;
 }
 
@@ -226,11 +231,8 @@ std::string PhysicsData::GetGroup() const{
 void PhysicsData::SetTags(const std::string& value){
 	this->Tags = value;
 }
-void PhysicsData::SetTags(std::string&& value){
-	this->Tags = std::move(value);
-}
 
-std::string PhysicsData::GetTags() const{
+std::string_view PhysicsData::GetTags() const{
 	return this->Tags;
 }
 
@@ -238,11 +240,7 @@ void PhysicsData::SetUniqueID(const std::string& value){
 	this->UniqueID = value;
 }
 
-void PhysicsData::SetUniqueID(std::string&& value){
-	this->UniqueID = std::move(value);
-}
-
-std::string PhysicsData::GetUniqueID() const{
+std::string_view PhysicsData::GetUniqueID() const{
 	return this->UniqueID;
 }
 
@@ -250,9 +248,6 @@ std::string PhysicsData::GetUniqueID() const{
 void PhysicsData::SetTagList(const std::set<std::string>& value){
 	this->TagList = value;
 } 
-void PhysicsData::SetTagList(std::set<std::string>&& value){
-	this->TagList = std::move(value);
-}
 
 std::set<std::string> PhysicsData::GetTagList() const{
 	return this->TagList;

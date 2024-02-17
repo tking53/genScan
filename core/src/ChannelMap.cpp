@@ -289,11 +289,11 @@ XiaDecoder* ChannelMap::GetXiaDecoder(int crid,int bid) const{
 }
 
 void ChannelMap::SetChanConfigInfo(PhysicsData& evt) const{
-	auto gcid = evt.GetGlobalChannelID();
-	evt.SetSuperType(this->ChannelConfigMap.at(gcid).supertype);
-	evt.SetType(this->ChannelConfigMap.at(gcid).type);
-	evt.SetSubType(this->ChannelConfigMap.at(gcid).subtype);
-	evt.SetTags(this->ChannelConfigMap.at(gcid).tags);
-	evt.SetTagList(this->ChannelConfigMap.at(gcid).taglist);
-	evt.SetUniqueID(this->ChannelConfigMap.at(gcid).unique_id);
+	auto currmap = this->ChannelConfigMap.at(evt.GetGlobalChannelID());
+	evt.SetSuperType(currmap.supertype);
+	evt.SetType(currmap.type);
+	evt.SetSubType(currmap.subtype);
+	evt.SetTags(currmap.tags);
+	evt.SetTagList(currmap.taglist);
+	evt.SetUniqueID(currmap.unique_id);
 }

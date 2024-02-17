@@ -299,20 +299,18 @@ void XiaDecoder::DecodeOtherWords(const unsigned int* otherWords,PhysicsData* pd
 		pd->SetESumGap(this->DecodeESumGap(otherWords[2]));
 		pd->SetESumBaseline(this->DecodeBaseline(otherWords[3]));
 	}else if( pd->GetHeaderLength() == 12 ){
-		std::vector<unsigned int> qdcs(8,0);
-		for( int ii = 0; ii < 8; ++ii ){
-			qdcs[ii] = this->DecodeQDCSums(otherWords[ii]);
+		pd->SetRawQDCSumLength(8);
+		for( unsigned int ii = 0; ii < 8; ++ii ){
+			pd->SetQDCValue(ii,this->DecodeQDCSums(otherWords[ii]));
 		}
-		pd->SetQDCSums(qdcs);
 	}else if( pd->GetHeaderLength() == 16 ){
 		pd->SetESumTrailing(this->DecodeESumTrailing(otherWords[0]));
 		pd->SetESumLeading(this->DecodeESumLeading(otherWords[1]));
 		pd->SetESumGap(this->DecodeESumGap(otherWords[2]));
 		pd->SetESumBaseline(this->DecodeBaseline(otherWords[3]));
-		std::vector<unsigned int> qdcs(8,0);
-		for( int ii = 0; ii < 8; ++ii ){
-			qdcs[ii] = this->DecodeQDCSums(otherWords[ii+4]);
+		pd->SetRawQDCSumLength(8);
+		for( unsigned int ii = 0; ii < 8; ++ii ){
+			pd->SetQDCValue(ii,this->DecodeQDCSums(otherWords[ii+4]));
 		}
-		pd->SetQDCSums(qdcs);
 	}
 }

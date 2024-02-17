@@ -15,6 +15,9 @@ class TraceHelper final{
 		TraceHelper() : data(std::vector<T>()){
 		}
 
+		TraceHelper(const unsigned int len) : data(std::vector<T>(len)){
+		}
+
 		TraceHelper(const std::vector<T>& val) : data(val){
 		}
 
@@ -59,10 +62,14 @@ class TraceHelper final{
 			return *this;
 		}
 		
-
 		const std::vector<T>& GetData() const{
 			return data;
 		}
+
+		std::vector<T>& GetRawData(){
+			return data;
+		}
+
 
 		size_t GetSize() const{
 			return data.size();

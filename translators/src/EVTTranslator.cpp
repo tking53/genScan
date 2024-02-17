@@ -80,11 +80,15 @@ int EVTTranslator::ReadFull(boost::container::devector<PhysicsData>& RawEvents){
 
 	//We have a trace
 	if( (RawEvents.back().GetEventLength() - this->CurrHeaderLength) != 0 ){
-		std::vector<uint16_t> trace(this->CurrTraceLength);
-		if( !(this->CurrentFile.read(reinterpret_cast<char*>(&trace[0]),(this->CurrTraceLength)*2)) ){
+		RawEvents.back().SetRawTraceLength(this->CurrTraceLength);
+		if( !(this->CurrentFile.read(reinterpret_cast<char*>(&(RawEvents.back().GetRawTraceData()[0])),(this->CurrTraceLength)*2)) ){
 			return -1;
 		}
-		RawEvents.back().SetRawTrace(std::move(trace));
+		//std::vector<uint16_t> trace(this->CurrTraceLength);
+		//if( !(this->CurrentFile.read(reinterpret_cast<char*>(&trace[0]),(this->CurrTraceLength)*2)) ){
+		//	return -1;
+		//}
+		//RawEvents.back().SetRawTrace(std::move(trace));
 	}
 
 	return 0;
