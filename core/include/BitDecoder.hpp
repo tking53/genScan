@@ -61,11 +61,11 @@ class XiaDecoder{
 };
 
 namespace PIXIE{
-	const Mask ChannelNumberMask(0xF,0);
-	const Mask ModuleNumberMask(0xF0,4);
-	const Mask CrateNumberMask(0xF00,8);
-	const Mask HeaderLengthMask(0x1F000, 12);
-	const Mask FinishCodeMask(0x80000000, 31);
+	const Mask ChannelNumberMask(0x0000000F,0);
+	const Mask ModuleNumberMask(0x000000F0,4);
+	const Mask CrateNumberMask(0x00000F00,8);
+	const Mask HeaderLengthMask(0x0001F000, 12);
+	const Mask FinishCodeMask(0x8000000, 31);
 }
 
 #endif

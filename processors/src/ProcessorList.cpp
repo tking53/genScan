@@ -202,6 +202,7 @@ void ProcessorList::ProcessRaw(boost::container::devector<PhysicsData>& RawEvent
 
 	for( auto& evt : RawEvents ){
 		auto gChanID = evt.GetGlobalChannelID();
+		auto gBoardID = evt.GetGlobalBoardID();
 		auto scalartime = 1.0e-9*(evt.GetTimeStamp()-this->FirstTimeStamp);
 		int rate_y = scalartime/scalarsize;
 		int rate_x = static_cast<int>(scalartime)%scalarsize;
@@ -210,6 +211,13 @@ void ProcessorList::ProcessRaw(boost::container::devector<PhysicsData>& RawEvent
 		HistogramManager->Fill("Cal",evt.GetEnergy(),gChanID);
 		HistogramManager->Fill("Event_Mult",gChanID,evtsize);
 		HistogramManager->Fill("Total_Rate",rate_x,rate_y);
+		if( evt.GetPileup() ){
+			HistogramManager->Fill("Total_Pileup",gBoardID,evt.GetChannel());
+		}
+		if( evt.GetSaturation() ){
+			HistogramManager->Fill("Total_Saturate",gBoardID,evt.GetChannel());
+		}
+		HistogramManager->Fill("Total_Hits",gBoardID,evt.GetChannel());
 	}
 }
 

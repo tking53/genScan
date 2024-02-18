@@ -9,7 +9,7 @@
 
 class PhysicsData{
 	public:
-		PhysicsData(int,int,int,int,int,int,uint32_t,uint64_t);
+		PhysicsData(int,int,int,int,int,int,int,uint32_t,uint64_t);
 		~PhysicsData() = default;
 
 		//HeaderLength, this is mostly used for pixie data
@@ -55,6 +55,9 @@ class PhysicsData{
 
 		//GlobalChannelID 
 		int GetGlobalChannelID() const;
+
+		//GlobalBoardID 
+		int GetGlobalBoardID() const;
 
 		//Location, typically this is crateID*(maxModPerCrate*maxChanPerMod) + modID*(maxChanPerMod) + chanID
 		//but is overridable within the config file
@@ -173,6 +176,7 @@ class PhysicsData{
 		int ChanNum;
 		int Location;
 		int globalChannelID;
+		int globalBoardID;
 
 		bool Pileup;
 		bool Saturation;

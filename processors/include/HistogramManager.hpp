@@ -4,11 +4,9 @@
 #include <memory>
 #include <stdexcept>
 #include <unordered_map>
-#include <regex>
 #include <string>
 #include <fstream>
 #include <type_traits>
-#include <mutex>
 
 #include <spdlog/common.h>
 #include <spdlog/spdlog.h>
@@ -21,14 +19,12 @@
 
 #include "TH1.h"
 #include "TH2.h"
-#include "TProfile.h"
 #include "TCanvas.h"
 #include "TFrame.h"
 #include "TSocket.h"
 #include "TServerSocket.h"
 #include "TMonitor.h"
 #include "TMessage.h"
-#include "TRandom.h"
 #include "TList.h"
 #include "TError.h"
 #include "TROOT.h"
@@ -144,6 +140,9 @@ namespace PLOTS{
 				RegisterPlot<TH2F>("Event_Mult","Event Size vs Channel; Channel (arb.); Event Size (arb.);",numchannels,0,numchannels,event_size,0,event_size);
 				RegisterPlot<TH2F>("Event_Scale","Event Size vs Event Width; Time (ns); Event Size (arb.);",width_size,0,width_size,event_size,0,event_size);
 				RegisterPlot<TH2F>("Total_Rate","Total Rate of All Channels; Time(s); Rollover (arb.)",scalarsize,0,scalarsize,roll_size,0,roll_size);
+				RegisterPlot<TH2F>("Total_Pileup","Map of Channels that Underwent Pileup; Linearized Mod Num (arb.); Channel Num (arb.)",PLOTS::SA,0,PLOTS::SA,PLOTS::S6,0,PLOTS::S6);
+				RegisterPlot<TH2F>("Total_Saturate","Map of Channels that Saturated; Linearized Mod Num (arb.); Channel Num (arb.)",PLOTS::SA,0,PLOTS::SA,PLOTS::S6,0,PLOTS::S6);
+				RegisterPlot<TH2F>("Total_Hits","Map of Channels that Fired; Linearized Mod Num (arb.); Channel Num (arb.)",PLOTS::SA,0,PLOTS::SA,PLOTS::S6,0,PLOTS::S6);
 			}
 
 			template<typename T>
