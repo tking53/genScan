@@ -103,7 +103,7 @@ int EVTTranslator::ReadHeader(boost::container::devector<PhysicsData>& RawEvents
 	}
 	//decode the header
 	auto ChannelNumber = PIXIE::ChannelNumberMask(firstWords[0]);
-	auto ModuleNumber = PIXIE::ModuleNumberMask(firstWords[0])-2;
+	auto ModuleNumber = (PIXIE::ModuleNumberMask(firstWords[0]))-2;
 	auto CrateNumber = PIXIE::CrateNumberMask(firstWords[0]);
 	CurrHeaderLength = PIXIE::HeaderLengthMask(firstWords[0]);
 	auto FinishCode = (PIXIE::FinishCodeMask(firstWords[0]) != 0);
@@ -128,7 +128,8 @@ int EVTTranslator::ReadHeader(boost::container::devector<PhysicsData>& RawEvents
 
 	this->LastReadEvtWithin = this->correlator->IsWithinCorrelationWindow(TimeStampInNS,CrateNumber,ModuleNumber,ChannelNumber);
 	RawEvents.push_back(PhysicsData(CurrHeaderLength,EventLength,CrateNumber,ModuleNumber,ChannelNumber,
-				        this->CMap->GetGlobalChanID(CrateNumber,ModuleNumber,ChannelNumber),EventEnergy,TimeStamp));
+				        this->CMap->GetGlobalChanID(CrateNumber,ModuleNumber,ChannelNumber),
+					this->CMap->GetGlobalBoardID(CrateNumber,ModuleNumber),EventEnergy,TimeStamp));
 	RawEvents.back().SetPileup(FinishCode);
 	RawEvents.back().SetSaturation(OutOfRange);
 	RawEvents.back().SetTimeStamp(TimeStampInNS);
@@ -268,7 +269,7 @@ int EVTTranslator::ReadNextFragment(){
 		int rib_tmp = CurrEVTBuiltInfo.rib_size;
 		int data;
 		while(rib_tmp > 0 ){
-			//fread(&data,static_cast<size_t>(sizeof(int)),1,file);
+			this->CurrentFile.read(reinterpret_cast<char*>(&data),sizeof(int));
 			this->console->info("{}",data);
 			rib_tmp -= 4;
 		}
