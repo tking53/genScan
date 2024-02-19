@@ -15,6 +15,22 @@ RootDevProcessor::RootDevProcessor(const std::string& log) : Processor(log,"Root
 		this->CurrData.crateNum = evt->GetCrate();
 		this->CurrData.modNum = evt->GetModule();
 		this->CurrData.chanNum = evt->GetChannel();
+		this->CurrData.rawEnergy = evt->GetRawEnergy();
+		this->CurrData.energy = evt->GetEnergy();
+		this->CurrData.timeSansCfd = evt->GetRawTimeStamp();
+		this->CurrData.time = evt->GetTimeStamp();
+		this->CurrData.cfdForcedBit = evt->GetCFDForcedBit();
+		this->CurrData.cfdFraction = evt->GetCFDFraction();
+		this->CurrData.detNum = evt->GetLocation();
+		this->CurrData.type = evt->GetType();
+		this->CurrData.subtype = evt->GetSubType();
+		this->CurrData.group = evt->GetGroup();
+		this->CurrData.tag = evt->GetTags();
+		this->CurrData.pileup = evt->GetPileup();
+		this->CurrData.saturation = evt->GetSaturation();
+		this->CurrData.trace = std::vector<unsigned int>(evt->GetRawTraceData().begin(),evt->GetRawTraceData().end());
+		this->CurrData.qdcSums = evt->GetQDCSums();
+
 		this->DataVec.push_back(this->CurrData);
 	}
 	this->CurrData = ProcessorStruct::DEFAULT_RD_STRUCT;

@@ -140,6 +140,14 @@ ChannelMap::FirmwareVersion ChannelMap::CalcFirmwareEnum(const std::string& type
 		std::string currunique_id = t + ":" + st + ":" + g;
 		for( auto& currtag : tg )
 			currunique_id += ":" + currtag;
+		auto result = this->KnownUID.insert_unique(currunique_id);
+		if( not result.second ){
+			throw std::runtime_error("Channel : "+std::to_string(cid)+
+					         " Board : "+std::to_string(bid)+
+						 " Crate : "+std::to_string(crid)+
+						 " type:subtype:group:(tags) : "+currunique_id+
+						 " has duplicate type:subtype:group:(tags) as another");
+		}
 
 		ChannelInfo CurrChannelInfo = {
 			.cal = c,
@@ -280,6 +288,7 @@ void ChannelMap::FinalizeChannelMap(){
 			throw std::runtime_error("Unable to finalize the Channel Map due to duplicate board parameters found in Crate "+std::to_string(currboard.second.CrateID)+" and board "+std::to_string(currboard.second.BoardIDInCrate));
 		}
 	}
+	this->KnownUID.clear();
 }
 
 XiaDecoder* ChannelMap::GetXiaDecoder(int crid,int bid) const{

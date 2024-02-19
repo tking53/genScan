@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
 		("evtbuild,e",boost::program_options::value<bool>(&evtbuild)->default_value(false),"event build only")
 		("file,f",boost::program_options::value<std::vector<std::string>>(&FileNames),"[file1 file2 file3 ...] list of files used for input")
 		("limit,l",boost::program_options::value<int>(&limit)->default_value(100000),"limit of coincidence queue")
-		("format,x",boost::program_options::value<std::string>(&dataformat)->default_value("null"),"[file_format] format of the data file (evt,ldf,pld,caen_root,caen_bin)")
+		("format,x",boost::program_options::value<std::string>(&dataformat)->default_value("null"),"[file_format] format of the data file (evt,evt-presort,ldf,pld,caen_root,caen_bin)")
 		("port,p",boost::program_options::value<int>(&port)->default_value(9090),"[portid] port to listen/send on for the live histogramming")
 		;
 
@@ -152,7 +152,7 @@ int main(int argc, char *argv[]) {
 		}else if( dataformat.compare("caen_bin") == 0 ){
 			dataparser.reset(new DataParser(DataParser::DataFileType::CAEN_BIN,logname));
 		}else{
-			throw std::runtime_error("Unknown file format : "+dataformat+", supported types are evt,ldf,pld,caen_root,caen_bin");
+			throw std::runtime_error("Unknown file format : "+dataformat+", supported types are evt,evt-presort,ldf,pld,caen_root,caen_bin");
 		}
 	}catch(std::runtime_error const& e){
 		console->error(e.what());

@@ -3,8 +3,9 @@
 
 #include <string>
 #include <vector>
-#include <map>
 #include <memory>
+
+#include <boost/container/flat_set.hpp>
 
 #include <pugiconfig.hpp>
 #include <pugixml.hpp>
@@ -68,6 +69,10 @@ class ConfigParser{
 		std::unique_ptr<std::string> CoincidenceType;
 
 		double GlobalEventWidthInS;
+
+		boost::container::flat_set<int> KnownCrates;
+		boost::container::flat_set<int> KnownBoardsInCrate;
+		boost::container::flat_set<int> KnownChannelsInBoard;
 };
 
 #endif

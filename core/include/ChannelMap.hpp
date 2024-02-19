@@ -7,6 +7,7 @@
 #include <set>
 
 #include <boost/container/flat_map.hpp>
+#include <boost/container/flat_set.hpp>
 
 class XiaDecoder;
 
@@ -204,6 +205,8 @@ class ChannelMap{
 		int MAX_CAL_PARAMS_PER_CHANNEL;
 		int MAX_CAL_PARAMS;
 		int MAX_FID;
+		
+		boost::container::flat_set<std::string> KnownUID;
 
 		boost::container::flat_map<int,BoardInfo> BoardConfigMap;
 		boost::container::flat_map<int,ChannelInfo> ChannelConfigMap;

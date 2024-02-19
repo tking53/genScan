@@ -12,6 +12,12 @@ class PhysicsData{
 		PhysicsData(int,int,int,int,int,int,int,uint32_t,uint64_t);
 		~PhysicsData() = default;
 
+		PhysicsData(const PhysicsData&);
+		PhysicsData(PhysicsData&&) noexcept;
+
+		PhysicsData& operator=(const PhysicsData&);
+		PhysicsData& operator=(PhysicsData&&) noexcept;
+
 		//HeaderLength, this is mostly used for pixie data
 		int GetHeaderLength() const;
 
@@ -143,18 +149,24 @@ class PhysicsData{
 
 		template<typename OStream>
 		friend OStream& operator<<(OStream& os, const PhysicsData& pd) {
-			os << "PhysicsData( Crate: " << pd.CrateNum 
-			   << " Module: " << pd.ModNum
-			   << " Channel: " << pd.ChanNum
-			   << " Location: " << pd.Location
-			   << " RawEnergy: " << pd.RawEnergy
-			   << " Energy: " << pd.Energy
-			   << " RawTimeStamp: " << pd.RawTimeStamp 
-			   << " TimeStamp: " << pd.TimeStamp
-			   << " Saturation: " << pd.Saturation
-			   << " Pileup: " << pd.Pileup
-			   << " TraceLength: " << pd.Trace.GetSize() 
-			   << " )";
+			os << "PhysicsData( \nCrate: " << pd.CrateNum 
+			   << "\nModule: " << pd.ModNum
+			   << "\nChannel: " << pd.ChanNum
+			   << "\nLocation: " << pd.Location
+			   << "\ngChanID: " << pd.globalChannelID
+			   << "\ngBoardID: " << pd.globalBoardID
+			   << "\nRawEnergy: " << pd.RawEnergy
+			   << "\nEnergy: " << pd.Energy
+			   << "\nRawTimeStamp: " << pd.RawTimeStamp 
+			   << "\nTimeStamp: " << pd.TimeStamp
+			   << "\nSaturation: " << pd.Saturation
+			   << "\nPileup: " << pd.Pileup
+			   << "\nTraceLength: " << pd.Trace.GetSize() 
+			   << "\nType: " << pd.Type 
+			   << "\nSubtype: " << pd.SubType 
+			   << "\nGroup:" << pd.Group 
+			   << "\nTag: " << pd.Tags
+			   << "\n)";
 			return os;
 		}
 	private:

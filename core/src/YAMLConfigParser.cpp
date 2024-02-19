@@ -159,6 +159,10 @@ void YAMLConfigParser::ParseMap(ChannelMap* cmap){
 		}
 		for( size_t kk = 0; kk < crate.size(); ++kk ){
 			int crid = crate[kk]["number"].as<int>(std::numeric_limits<int>::max());
+			auto crid_result = this->KnownCrates.insert_unique(crid);
+			if( not crid_result.second ){
+				throw std::runtime_error("Duplicate crate number found for Crate : "+std::to_string(crid));
+			}
 			if( crid == std::numeric_limits<int>::max() ){
 				std::stringstream ss;
 				ss << "YAMLConfigParser::ParseMap() : config file named \""
@@ -177,6 +181,10 @@ void YAMLConfigParser::ParseMap(ChannelMap* cmap){
 			}
 			for( size_t ii = 0; ii < board.size(); ++ii ){
 				int bid = board[ii]["number"].as<int>(std::numeric_limits<int>::max());
+				auto board_result = this->KnownBoardsInCrate.insert_unique(bid);
+				if( not board_result.second ){
+					throw std::runtime_error("Duplicate board number : "+std::to_string(bid)+" in Crate : "+std::to_string(crid));
+				}
 				if( bid == std::numeric_limits<int>::max() ){
 					std::stringstream ss;
 					ss << "YAMLConfigParser::ParseMap() : config file named \""
@@ -244,6 +252,10 @@ void YAMLConfigParser::ParseMap(ChannelMap* cmap){
 				}
 				for(size_t jj = 0; jj < channel.size(); ++jj ){
 					int cid = channel[jj]["number"].as<int>(std::numeric_limits<int>::max());
+					auto channel_result = this->KnownChannelsInBoard.insert_unique(cid);
+					if( not channel_result.second ){
+						throw std::runtime_error("Duplicate channel : "+std::to_string(cid)+" in Board : "+std::to_string(bid)+" in Crate : "+std::to_string(crid));
+					}
 					if( cid == std::numeric_limits<int>::max() ){
 						std::stringstream ss;
 						ss << "YAMLConfigParser::ParseMap() : config file named \""
@@ -273,15 +285,6 @@ void YAMLConfigParser::ParseMap(ChannelMap* cmap){
 							throw std::runtime_error(ss.str());
 						}
 						std::string group = channel[jj]["group"].as<std::string>("");
-						if( group.compare("") == 0 ){
-							std::stringstream ss;
-							ss << "YAMLConfigParser::ParseMap() : config file named \""
-								<< *(this->ConfigName) 
-								<< "\" is most likely malformed, because no group is listed for channel with number=\""
-								<< cid << "\" in module with number=\""
-								<< bid << "\"";
-							throw std::runtime_error(ss.str());
-						}
 						std::set<std::string> taglist = {};
 						std::string tags = channel[jj]["tags"].as<std::string>("");
 						//regex to parse out tags
@@ -440,8 +443,11 @@ void YAMLConfigParser::ParseMap(ChannelMap* cmap){
 						}
 					}
 				}
+				this->KnownChannelsInBoard.clear();
 			}
+			this->KnownBoardsInCrate.clear();
 		}
+		this->KnownCrates.clear();
 		spdlog::get(this->LogName)->debug("Here is the ChannelMap Info we were able to parse");
 		auto boardconfig = cmap->GetBoardConfig();
 		for( const auto& currboard : boardconfig ){

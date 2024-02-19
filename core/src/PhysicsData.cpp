@@ -35,6 +35,151 @@ PhysicsData::PhysicsData(int headerlength,int eventlength,int cratenum,int modnu
 	this->TagList = {};
 }
 
+PhysicsData::PhysicsData(const PhysicsData& other) : 
+	HeaderLength(other.HeaderLength),
+	EventLength(other.EventLength),
+	RawEnergy(other.RawEnergy),
+	RawTimeStamp(other.RawTimeStamp),
+	Energy(other.Energy),
+	TimeStamp(other.TimeStamp),
+	CFDForcedBit(other.CFDForcedBit),
+	CFDFraction(other.CFDFraction),
+	CFDSourceBit(other.CFDSourceBit),
+	CrateNum(other.CrateNum),
+	ModNum(other.ModNum),
+	ChanNum(other.ChanNum),
+	Location(other.Location),
+	globalChannelID(other.globalChannelID),
+	globalBoardID(other.globalBoardID),
+	Pileup(other.Pileup),
+	Saturation(other.Saturation),
+	Phase(other.Phase),
+	Trace(other.Trace),  // Assuming TraceHelper has a proper copy constructor
+	QDCSums(other.QDCSums),
+	ESumTrailing(other.ESumTrailing),
+	ESumLeading(other.ESumLeading),
+	ESumGap(other.ESumGap),
+	ESumBaseLine(other.ESumBaseLine),
+	Type(other.Type),
+	SubType(other.SubType),
+	Group(other.Group),
+	Tags(other.Tags),
+	SummaryID(other.SummaryID),
+	UniqueID(other.UniqueID),
+	TagList(other.TagList)
+{
+}
+
+PhysicsData::PhysicsData(PhysicsData&& other) noexcept :
+	HeaderLength(other.HeaderLength),
+	EventLength(other.EventLength),
+	RawEnergy(other.RawEnergy),
+	RawTimeStamp(other.RawTimeStamp),
+	Energy(other.Energy),
+	TimeStamp(other.TimeStamp),
+	CFDForcedBit(other.CFDForcedBit),
+	CFDFraction(other.CFDFraction),
+	CFDSourceBit(other.CFDSourceBit),
+	CrateNum(other.CrateNum),
+	ModNum(other.ModNum),
+	ChanNum(other.ChanNum),
+	Location(other.Location),
+	globalChannelID(other.globalChannelID),
+	globalBoardID(other.globalBoardID),
+	Pileup(other.Pileup),
+	Saturation(other.Saturation),
+	Phase(other.Phase),
+	Trace(std::move(other.Trace)),  // Assuming TraceHelper has a proper move constructor
+	QDCSums(std::move(other.QDCSums)),
+	ESumTrailing(other.ESumTrailing),
+	ESumLeading(other.ESumLeading),
+	ESumGap(other.ESumGap),
+	ESumBaseLine(other.ESumBaseLine),
+	Type(std::move(other.Type)),
+	SubType(std::move(other.SubType)),
+	Group(std::move(other.Group)),
+	Tags(std::move(other.Tags)),
+	SummaryID(std::move(other.SummaryID)),
+	UniqueID(std::move(other.UniqueID)),
+	TagList(std::move(other.TagList))
+{
+}
+
+PhysicsData& PhysicsData::operator=(const PhysicsData& other){
+	if( this != &other ){
+		HeaderLength = other.HeaderLength;
+		EventLength = other.EventLength;
+		RawEnergy = other.RawEnergy;
+		RawTimeStamp = other.RawTimeStamp;
+		Energy = other.Energy;
+		TimeStamp = other.TimeStamp;
+		CFDForcedBit = other.CFDForcedBit;
+		CFDFraction = other.CFDFraction;
+		CFDSourceBit = other.CFDSourceBit;
+		CrateNum = other.CrateNum;
+		ModNum = other.ModNum;
+		ChanNum = other.ChanNum;
+		Location = other.Location;
+		globalChannelID = other.globalChannelID;
+		globalBoardID = other.globalBoardID;
+		Pileup = other.Pileup;
+		Saturation = other.Saturation;
+		Phase = other.Phase;
+		Trace = other.Trace;  // Assuming TraceHelper has a proper copy constructor
+		QDCSums = other.QDCSums;
+		ESumTrailing = other.ESumTrailing;
+		ESumLeading = other.ESumLeading;
+		ESumGap = other.ESumGap;
+		ESumBaseLine = other.ESumBaseLine;
+		Type = other.Type;
+		SubType = other.SubType;
+		Group = other.Group;
+		Tags = other.Tags;
+		SummaryID = other.SummaryID;
+		UniqueID = other.UniqueID;
+		TagList = other.TagList;
+	}
+	return *this;
+}
+
+PhysicsData& PhysicsData::operator=(PhysicsData&& other) noexcept{
+	if( this != &other ){
+		HeaderLength = other.HeaderLength;
+		EventLength = other.EventLength;
+		RawEnergy = other.RawEnergy;
+		RawTimeStamp = other.RawTimeStamp;
+		Energy = other.Energy;
+		TimeStamp = other.TimeStamp;
+		CFDForcedBit = other.CFDForcedBit;
+		CFDFraction = other.CFDFraction;
+		CFDSourceBit = other.CFDSourceBit;
+		CrateNum = other.CrateNum;
+		ModNum = other.ModNum;
+		ChanNum = other.ChanNum;
+		Location = other.Location;
+		globalChannelID = other.globalChannelID;
+		globalBoardID = other.globalBoardID;
+		Pileup = other.Pileup;
+		Saturation = other.Saturation;
+		Phase = other.Phase;
+		Trace = std::move(other.Trace);  // Assuming TraceHelper has a proper move constructor
+		QDCSums = std::move(other.QDCSums);
+		ESumTrailing = other.ESumTrailing;
+		ESumLeading = other.ESumLeading;
+		ESumGap = other.ESumGap;
+		ESumBaseLine = other.ESumBaseLine;
+		Type = std::move(other.Type);
+		SubType = std::move(other.SubType);
+		Group = std::move(other.Group);
+		Tags = std::move(other.Tags);
+		SummaryID = std::move(other.SummaryID);
+		UniqueID = std::move(other.UniqueID);
+		TagList = std::move(other.TagList);
+	}
+	return *this;
+}
+
+
 //HeaderLength, this is mostly used for pixie data
 int PhysicsData::GetHeaderLength() const{
 	return this->HeaderLength;

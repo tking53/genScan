@@ -158,6 +158,10 @@ void JSONConfigParser::ParseMap(ChannelMap* cmap){
 		}
 		for( const auto& currcrate : crate ){
 			int crid = currcrate.get("number",std::numeric_limits<int>::max()).asInt();
+			auto crid_result = this->KnownCrates.insert_unique(crid);
+			if( not crid_result.second ){
+				throw std::runtime_error("Duplicate crate number found for Crate : "+std::to_string(crid));
+			}
 			if( crid == std::numeric_limits<int>::max() ){
 				std::stringstream ss;
 				ss << "JSONConfigParser::ParseMap() : config file named \""
@@ -175,6 +179,10 @@ void JSONConfigParser::ParseMap(ChannelMap* cmap){
 			}
 			for( const auto& currboard : board ){
 				int bid = currboard.get("number",std::numeric_limits<int>::max()).asInt();
+				auto board_result = this->KnownBoardsInCrate.insert_unique(bid);
+				if( not board_result.second ){
+					throw std::runtime_error("Duplicate board number : "+std::to_string(bid)+" in Crate : "+std::to_string(crid));
+				}
 				if( bid == std::numeric_limits<int>::max() ){
 					std::stringstream ss;
 					ss << "JSONConfigParser::ParseMap() : config file named \""
@@ -241,6 +249,10 @@ void JSONConfigParser::ParseMap(ChannelMap* cmap){
 				}
 				for( const auto& currchannel : channel ){
 					int cid = currchannel.get("number",std::numeric_limits<int>::max()).asInt();
+					auto channel_result = this->KnownChannelsInBoard.insert_unique(cid);
+					if( not channel_result.second ){
+						throw std::runtime_error("Duplicate channel : "+std::to_string(cid)+" in Board : "+std::to_string(bid)+" in Crate : "+std::to_string(crid));
+					}
 					if( cid == std::numeric_limits<int>::max() ){
 						std::stringstream ss;
 						ss << "JSONConfigParser::ParseMap() : config file named \""
@@ -270,15 +282,6 @@ void JSONConfigParser::ParseMap(ChannelMap* cmap){
 							throw std::runtime_error(ss.str());
 						}
 						std::string group = currchannel.get("group","").asString();
-						if( group.compare("") == 0 ){
-							std::stringstream ss;
-							ss << "JSONConfigParser::ParseMap() : config file named \""
-								<< *(this->ConfigName) 
-								<< "\" is most likely malformed, because no group is listed for channel with number=\""
-								<< cid << "\" in module with number=\""
-								<< bid << "\"";
-							throw std::runtime_error(ss.str());
-						}
 						std::set<std::string> taglist = {};
 						std::string tags = currchannel.get("tags","").asString();
 						//regex to parse out tags
@@ -436,8 +439,11 @@ void JSONConfigParser::ParseMap(ChannelMap* cmap){
 						}
 					}
 				}
+				this->KnownChannelsInBoard.clear();
 			}
+			this->KnownBoardsInCrate.clear();
 		}
+		this->KnownCrates.clear();
 		spdlog::get(this->LogName)->debug("Here is the ChannelMap Info we were able to parse");
 		auto boardconfig = cmap->GetBoardConfig();
 		for( const auto& currboard : boardconfig ){

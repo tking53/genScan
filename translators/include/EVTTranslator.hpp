@@ -44,6 +44,8 @@ class EVTTranslator : public Translator{
 		int ReadNextFragment();
 		int ReadHeader(boost::container::devector<PhysicsData>&);
 		int ReadFull(boost::container::devector<PhysicsData>&);
+
+		int ReadPresortHelper(boost::container::devector<PhysicsData>&);
 };
 
 #endif

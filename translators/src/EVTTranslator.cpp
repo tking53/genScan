@@ -6,7 +6,7 @@
 
 EVTTranslator::EVTTranslator(const std::string& log,const std::string& translatorname,EVT_TYPE formattype) : Translator(log,translatorname){
 	this->Format = formattype;
-	CurrEVTBuiltInfo = { .rib_size = 0, .ri_size = 0, .ri_type = 0};
+	this->CurrEVTBuiltInfo = { .rib_size = 0, .ri_size = 0, .ri_type = 0};
 }	
 
 Translator::TRANSLATORSTATE EVTTranslator::Parse(boost::container::devector<PhysicsData>& RawEvents){
@@ -31,7 +31,12 @@ Translator::TRANSLATORSTATE EVTTranslator::Parse(boost::container::devector<Phys
 }
 
 Translator::TRANSLATORSTATE EVTTranslator::ParsePresort(boost::container::devector<PhysicsData>& RawEvents){
-	return Translator::TRANSLATORSTATE::COMPLETE;
+	//TODO: IMPLEMENT NORI'S PARSING OF THE PRESORT DATA
+	return Translator::TRANSLATORSTATE::PARSING;
+}
+
+int EVTTranslator::ReadPresortHelper(boost::container::devector<PhysicsData>& RawEvents){
+	return 0;
 }
 
 Translator::TRANSLATORSTATE EVTTranslator::ParseEVTBuilt(boost::container::devector<PhysicsData>& RawEvents){
@@ -75,7 +80,7 @@ int EVTTranslator::ReadFull(boost::container::devector<PhysicsData>& RawEvents){
 		if( !this->CurrentFile.read(reinterpret_cast<char*>(&otherWords),(this->CurrHeaderLength-4)*4) ){
 			return -1;
 		}
-		CurrDecoder->DecodeOtherWords(otherWords,&(RawEvents.back()));
+		this->CurrDecoder->DecodeOtherWords(otherWords,&(RawEvents.back()));
 	}
 
 	//We have a trace
@@ -95,27 +100,36 @@ int EVTTranslator::ReadFull(boost::container::devector<PhysicsData>& RawEvents){
 }
 
 int EVTTranslator::ReadHeader(boost::container::devector<PhysicsData>& RawEvents){
-	if( FindNextFragment() < 0 ){
+	if( this->FindNextFragment() < 0 ){
 		return -1;
 	}
 	if( !this->CurrentFile.read(reinterpret_cast<char*>(&firstWords),sizeof(int)*4) ){
 		return -1;
 	}
 	//decode the header
-	auto ChannelNumber = PIXIE::ChannelNumberMask(firstWords[0]);
-	auto ModuleNumber = (PIXIE::ModuleNumberMask(firstWords[0]))-2;
-	auto CrateNumber = PIXIE::CrateNumberMask(firstWords[0]);
-	CurrHeaderLength = PIXIE::HeaderLengthMask(firstWords[0]);
-	auto FinishCode = (PIXIE::FinishCodeMask(firstWords[0]) != 0);
+	uint32_t ChannelNumber = PIXIE::ChannelNumberMask(firstWords[0]);
+	uint32_t ModuleNumber = (PIXIE::ModuleNumberMask(firstWords[0]))-2;
+	uint32_t CrateNumber = PIXIE::CrateNumberMask(firstWords[0]);
+	this->CurrHeaderLength = PIXIE::HeaderLengthMask(firstWords[0]);
+	uint32_t FinishCode = (PIXIE::FinishCodeMask(firstWords[0]) != 0);
 
-	CurrDecoder = CMap->GetXiaDecoder(CrateNumber,ModuleNumber);
+	//if( ChannelNumber == 12 and ModuleNumber >=5 ){
+	//	this->console->error("Issue, decode channel 12 from invalid modules");
+	//}
+
+	try{
+		this->CurrDecoder = CMap->GetXiaDecoder(CrateNumber,ModuleNumber);
+	}catch(const boost::container::out_of_range& e){
+		this->console->error("Ill formed config file, Crate : {} Board : {} does not exist. The next message is what boost reports",CrateNumber,ModuleNumber);
+		throw std::runtime_error(e.what());
+	}
 	uint32_t TimeStampLow;
 	uint32_t TimeStampHigh;
-	unsigned int EventEnergy;
+	uint32_t EventEnergy;
 	bool OutOfRange;
-	int EventLength;
+	uint32_t EventLength;
 
-	CurrDecoder->DecodeFirstWords(firstWords,EventLength,TimeStampLow,TimeStampHigh,EventEnergy,CurrTraceLength,OutOfRange);
+	this->CurrDecoder->DecodeFirstWords(firstWords,EventLength,TimeStampLow,TimeStampHigh,EventEnergy,CurrTraceLength,OutOfRange);
 
 	uint64_t TimeStamp = static_cast<uint64_t>(TimeStampHigh);
 	TimeStamp = TimeStamp<<32;
@@ -128,14 +142,15 @@ int EVTTranslator::ReadHeader(boost::container::devector<PhysicsData>& RawEvents
 
 	this->LastReadEvtWithin = this->correlator->IsWithinCorrelationWindow(TimeStampInNS,CrateNumber,ModuleNumber,ChannelNumber);
 	RawEvents.push_back(PhysicsData(CurrHeaderLength,EventLength,CrateNumber,ModuleNumber,ChannelNumber,
+					this->CMap->GetGlobalBoardID(CrateNumber,ModuleNumber),
 				        this->CMap->GetGlobalChanID(CrateNumber,ModuleNumber,ChannelNumber),
-					this->CMap->GetGlobalBoardID(CrateNumber,ModuleNumber),EventEnergy,TimeStamp));
+					EventEnergy,TimeStamp));
 	RawEvents.back().SetPileup(FinishCode);
 	RawEvents.back().SetSaturation(OutOfRange);
 	RawEvents.back().SetTimeStamp(TimeStampInNS);
 
 	//word2 has CFD things
-	//CurrDecoder->DecodeCFDParams(firstWords,RawEvents.back());
+	//this->CurrDecoder->DecodeCFDParams(firstWords,RawEvents.back());
 
 	return 0;
 }
@@ -225,10 +240,10 @@ int EVTTranslator::ReadRingItemBody(){
 
 int EVTTranslator::FindNextFragment(){
 	if( CurrEVTBuiltInfo.rib_size > 0 ){
-		return ReadNextFragment();
+		return this->ReadNextFragment();
 	}
 	while(true){
-		int type = ReadRingItemHeader();
+		int type = this->ReadRingItemHeader();
 		if( type == -1 ){
 			return -1;
 		}
@@ -236,15 +251,15 @@ int EVTTranslator::FindNextFragment(){
 			this->CurrentFile.seekg(CurrEVTBuiltInfo.ri_size-8,std::ios::cur);
 			continue;
 		}
-		int ribh_size = ReadRingItemBodyHeader();
+		int ribh_size = this->ReadRingItemBodyHeader();
 		if( ribh_size < 0 ){
 			return ribh_size;
 		}
-		ReadRingItemBody();
+		this->ReadRingItemBody();
 		if( CurrEVTBuiltInfo.rib_size < 0 ){
 			return CurrEVTBuiltInfo.rib_size;
 		}
-		return ReadNextFragment();
+		return this->ReadNextFragment();
 	}
 }
 

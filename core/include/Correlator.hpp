@@ -29,7 +29,7 @@ class Correlator{
 			int Module;
 			int Channel;
 
-			bool operator<(const AnalogTrigger& rhs) const{
+			bool operator<(const Correlator::AnalogTrigger& rhs) const{
 				return std::tie(this->Crate,this->Module,this->Channel) < std::tie(rhs.Crate,rhs.Module,rhs.Channel);
 			}
 
@@ -37,19 +37,19 @@ class Correlator{
 				return rhs < (*this);
 			}
 
-			bool operator<=(const AnalogTrigger& rhs) const{
+			bool operator<=(const Correlator::AnalogTrigger& rhs) const{
 				return !((*this) > rhs);
 			}
 
-			bool operator>=(const AnalogTrigger& rhs) const{
+			bool operator>=(const Correlator::AnalogTrigger& rhs) const{
 				return !((*this) < rhs);
 			}
 
-			bool operator==(const AnalogTrigger& rhs) const{
+			bool operator==(const Correlator::AnalogTrigger& rhs) const{
 				return (this->Crate == rhs.Crate) and (this->Module == rhs.Module) and (this->Channel == rhs.Channel);
 			}
 
-			bool operator!=(const AnalogTrigger& rhs) const{
+			bool operator!=(const Correlator::AnalogTrigger& rhs) const{
 				return !((*this) == rhs);
 			}
 		};

@@ -8,6 +8,7 @@
 #include <spdlog/fmt/ostr.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#include <string>
 
 #include "XMLConfigParser.hpp"
 #include "ChannelMap.hpp"
@@ -182,6 +183,10 @@ void XMLConfigParser::ParseMap(ChannelMap* cmap){
 		}
 		for(; crate; crate = crate.next_sibling("Crate") ){
 			int crid = crate.attribute("number").as_ullong(std::numeric_limits<int>::max());
+			auto crid_result = this->KnownCrates.insert_unique(crid);
+			if( not crid_result.second ){
+				throw std::runtime_error("Duplicate crate number found for Crate : "+std::to_string(crid));
+			}
 			if( crid == std::numeric_limits<int>::max() ){
 				std::stringstream ss;
 				ss << "XMLConfigParser::ParseMap() : config file named \""
@@ -200,6 +205,10 @@ void XMLConfigParser::ParseMap(ChannelMap* cmap){
 			}
 			for(; board; board = board.next_sibling("Module") ){
 				int bid = board.attribute("number").as_ullong(std::numeric_limits<int>::max());
+				auto board_result = this->KnownBoardsInCrate.insert_unique(bid);
+				if( not board_result.second ){
+					throw std::runtime_error("Duplicate board number : "+std::to_string(bid)+" in Crate : "+std::to_string(crid));
+				}
 				if( bid == std::numeric_limits<int>::max() ){
 					std::stringstream ss;
 					ss << "XMLConfigParser::ParseMap() : config file named \""
@@ -269,6 +278,10 @@ void XMLConfigParser::ParseMap(ChannelMap* cmap){
 				}
 				for(; channel; channel = channel.next_sibling("Channel") ){
 					int cid = channel.attribute("number").as_ullong(std::numeric_limits<int>::max());
+					auto channel_result = this->KnownChannelsInBoard.insert_unique(cid);
+					if( not channel_result.second ){
+						throw std::runtime_error("Duplicate channel : "+std::to_string(cid)+" in Board : "+std::to_string(bid)+" in Crate : "+std::to_string(crid));
+					}
 					if( cid == std::numeric_limits<int>::max() ){
 						std::stringstream ss;
 						ss << "XMLConfigParser::ParseMap() : config file named \""
@@ -298,15 +311,6 @@ void XMLConfigParser::ParseMap(ChannelMap* cmap){
 							throw std::runtime_error(ss.str());
 						}
 						std::string group = channel.attribute("group").as_string("");
-						if( group.compare("") == 0 ){
-							std::stringstream ss;
-							ss << "XMLConfigParser::ParseMap() : config file named \""
-								<< *(this->ConfigName) 
-								<< "\" is most likely malformed, because no group is listed for channel with number=\""
-								<< cid << "\" in module with number=\""
-								<< bid << "\"";
-							throw std::runtime_error(ss.str());
-						}
 						std::set<std::string> taglist = {};
 						std::string tags = channel.attribute("tags").as_string("");
 						//regex to parse out tags
@@ -466,8 +470,11 @@ void XMLConfigParser::ParseMap(ChannelMap* cmap){
 						}
 					}
 				}
+				this->KnownChannelsInBoard.clear();
 			}
+			this->KnownBoardsInCrate.clear();
 		}
+		this->KnownCrates.clear();
 		spdlog::get(this->LogName)->debug("Here is the ChannelMap Info we were able to parse");
 		auto boardconfig = cmap->GetBoardConfig();
 		for( const auto& currboard : boardconfig ){
