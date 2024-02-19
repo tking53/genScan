@@ -1179,6 +1179,17 @@ Configuration:
                   min: 0
                   value: 0.0 1.0
               - number: 12
+                type: ignore
+                subtype: anode_l_202
+                group: 202
+                Trace:
+                  RangeLow: 5
+                  RangeHigh: 10
+                Calibration:
+                  model: linear
+                  min: 0
+                  value: 0.0 1.0
+              - number: 13
                 type: mtasimplantsipm
                 subtype: anode_h
                 group: 38
@@ -1190,7 +1201,7 @@ Configuration:
                   model: linear
                   min: 0
                   value: 0.0 1.0
-              - number: 13
+              - number: 14
                 type: mtasimplantsipm
                 subtype: anode_h
                 group: 46
@@ -1202,23 +1213,11 @@ Configuration:
                   model: linear
                   min: 0
                   value: 0.0 1.0
-              - number: 14
+              - number: 15
                 type: mtasimplantsipm
                 subtype: anode_h
                 group: 54
                 location: 53
-                Trace:
-                  RangeLow: 5
-                  RangeHigh: 10
-                Calibration:
-                  model: linear
-                  min: 0
-                  value: 0.0 1.0
-              - number: 15
-                type: mtasimplantsipm
-                subtype: anode_h
-                group: 62
-                location: 61
                 Trace:
                   RangeLow: 5
                   RangeHigh: 10
