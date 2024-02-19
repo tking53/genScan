@@ -26,6 +26,8 @@ class RootDevProcessor : public Processor{
 		virtual TTree* RegisterTree() final;
 		virtual void CleanupTree() final;
 	private:
+		void InsertAdditionalTypes(const std::string&);
+
 		std::vector<ProcessorStruct::RootDev> DataVec;
 		ProcessorStruct::RootDev CurrData;
 		std::vector<PhysicsData*> SummaryData;

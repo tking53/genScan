@@ -9,6 +9,7 @@ Configuration:
   DetectorDriver:
     Processor:
       - name: RootDevProcessor
+        included_types: mtasimplantsipm,generic,mtas,pid
   Map:
     Crate:
       - number: 0

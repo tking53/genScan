@@ -46,16 +46,36 @@ RootDevProcessor::RootDevProcessor(const std::string& log) : Processor(log,"Root
 	return true;
 }
 
-void RootDevProcessor::Init(const YAML::Node&){
+void RootDevProcessor::Init(const YAML::Node& config){
 	this->console->info("Init called with YAML::Node");
+	std::string additional_types = config["included_types"].as<std::string>("");
+	this->InsertAdditionalTypes(additional_types);
 }
 
-void RootDevProcessor::Init(const Json::Value&){
+void RootDevProcessor::Init(const Json::Value& config){
 	this->console->info("Init called with Json::Value");
+	std::string additional_types = config.get("included_types","").asString();
+	this->InsertAdditionalTypes(additional_types);
 }
 
-void RootDevProcessor::Init(const pugi::xml_node&){
+void RootDevProcessor::Init(const pugi::xml_node& config){
 	this->console->info("Init called with pugi::xml_node");
+	std::string additional_types = config.attribute("included_types").as_string(""); 
+	this->InsertAdditionalTypes(additional_types);
+}
+		
+void RootDevProcessor::InsertAdditionalTypes(const std::string& typestring){
+	std::set<std::string> typelist = {};
+	std::regex word_regex("(\\w+)");
+	auto words_begin =std::sregex_iterator(typestring.begin(),typestring.end(), word_regex);
+	auto words_end = std::sregex_iterator();
+	for (std::sregex_iterator i = words_begin; i != words_end; ++i) {
+		std::smatch match = *i;
+		typelist.insert(match.str());
+	}
+	for( const auto& t : typelist ){
+		this->AssociateType(t);
+	}
 }
 
 void RootDevProcessor::Finalize(){
