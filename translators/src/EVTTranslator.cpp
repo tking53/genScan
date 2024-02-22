@@ -4,8 +4,7 @@
 #include "EVTTranslator.hpp"
 #include "Translator.hpp"
 
-EVTTranslator::EVTTranslator(const std::string& log,const std::string& translatorname,EVT_TYPE formattype) : Translator(log,translatorname){
-	this->Format = formattype;
+EVTTranslator::EVTTranslator(const std::string& log,const std::string& translatorname) : Translator(log,translatorname){
 	this->CurrEVTBuiltInfo = { .rib_size = 0, .ri_size = 0, .ri_type = 0};
 }	
 
@@ -15,31 +14,6 @@ Translator::TRANSLATORSTATE EVTTranslator::Parse(boost::container::devector<Phys
 			return Translator::TRANSLATORSTATE::COMPLETE;
 		}
 	}
-	Translator::TRANSLATORSTATE currstate = Translator::TRANSLATORSTATE::UNKNOWN;
-	switch(this->Format){
-		case PRESORT:
-			currstate = this->ParsePresort(RawEvents);
-			break;
-		case EVTBUILT:
-			currstate = this->ParseEVTBuilt(RawEvents);
-			break;
-		default:
-			throw std::runtime_error("Unknown EVT File type, not EVTBUILT or PRESORT");
-			break;
-	}
-	return currstate;
-}
-
-Translator::TRANSLATORSTATE EVTTranslator::ParsePresort(boost::container::devector<PhysicsData>& RawEvents){
-	//TODO: IMPLEMENT NORI'S PARSING OF THE PRESORT DATA
-	return Translator::TRANSLATORSTATE::PARSING;
-}
-
-int EVTTranslator::ReadPresortHelper(boost::container::devector<PhysicsData>& RawEvents){
-	return 0;
-}
-
-Translator::TRANSLATORSTATE EVTTranslator::ParseEVTBuilt(boost::container::devector<PhysicsData>& RawEvents){
 	do{
 		if( !this->Leftovers.empty() ){
 			RawEvents.push_back(this->Leftovers.back());

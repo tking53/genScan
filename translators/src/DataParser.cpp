@@ -8,6 +8,7 @@
 #include "DataParser.hpp"
 
 #include "EVTTranslator.hpp"
+#include "EVTPresortTranslator.hpp"
 #include "LDFTranslator.hpp"
 
 DataParser::DataParser(DataParser::DataFileType dft,const std::string& log){
@@ -41,19 +42,19 @@ DataParser::DataParser(DataParser::DataFileType dft,const std::string& log){
 	switch(this->DataType){
 		case EVT_BUILT:
 			this->console = spdlog::get(this->LogName)->clone("EVT_BUILT_Parser");
-			this->DataTranslator.reset(new EVTTranslator(this->LogName,this->ParserName,EVTTranslator::EVT_TYPE::EVTBUILT));
+			this->DataTranslator.reset(new EVTTranslator(this->LogName,this->ParserName));
 			break;
-		case CAEN_ROOT:
-		case CAEN_BIN:
 		case LDF:
 			this->console = spdlog::get(this->LogName)->clone("LDF_PIXIE");
 			this->DataTranslator.reset(new LDFTranslator(this->LogName,this->ParserName,LDFTranslator::LDF_TYPE::PIXIE));
 			break;
-		case PLD:
 		case EVT_PRESORT:
 			this->console = spdlog::get(this->LogName)->clone("EVT_Presort_Parser");
-			this->DataTranslator.reset(new EVTTranslator(this->LogName,this->ParserName,EVTTranslator::EVT_TYPE::PRESORT));
+			this->DataTranslator.reset(new EVTPresortTranslator(this->LogName,this->ParserName));
 			break;
+		case CAEN_ROOT:
+		case CAEN_BIN:
+		case PLD:
 		case Unknown:
 		default:
 			throw std::runtime_error("UNKNOWN PARSER OF TYPE "+this->ParserName);

@@ -1,5 +1,5 @@
-#ifndef __EVT_TRANSLATOR_HPP__
-#define __EVT_TRANSLATOR_HPP__
+#ifndef __EVTPresort_TRANSLATOR_HPP__
+#define __EVTPresort_TRANSLATOR_HPP__
 
 #include <string>
 
@@ -9,10 +9,10 @@
 
 #include "PhysicsData.hpp"
 
-class EVTTranslator : public Translator{
+class EVTPresortTranslator : public Translator{
 	public:
-		EVTTranslator(const std::string&,const std::string&);
-		~EVTTranslator() = default;
+		EVTPresortTranslator(const std::string&,const std::string&);
+		~EVTPresortTranslator() = default;
 		Translator::TRANSLATORSTATE Parse(boost::container::devector<PhysicsData>&);
 	private:
 		struct EVT_BUILT_INFO{
@@ -25,7 +25,7 @@ class EVTTranslator : public Translator{
 		unsigned int CurrTraceLength;
 		uint32_t firstWords[4];
 		
-		EVT_BUILT_INFO CurrEVTBuiltInfo;
+		EVT_BUILT_INFO CurrEVTPresortBuiltInfo;
 
 		int ReadRingItemHeader();
 		int ReadRingItemBodyHeader();
@@ -34,6 +34,8 @@ class EVTTranslator : public Translator{
 		int ReadNextFragment();
 		int ReadHeader(boost::container::devector<PhysicsData>&);
 		int ReadFull(boost::container::devector<PhysicsData>&);
+
+		int ReadPresortHelper(boost::container::devector<PhysicsData>&);
 };
 
 #endif
