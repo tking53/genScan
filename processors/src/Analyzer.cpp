@@ -14,15 +14,15 @@
 Analyzer::Analyzer(const std::string& log,const std::string& analyzer,const std::initializer_list<std::string>& types){
 	this->AnalyzerName = analyzer;
 	this->LogName = log;
-	console = spdlog::get(this->LogName)->clone(this->AnalyzerName);
-	preprocesscalls = 0;
-	processcalls = 0;
-	postprocesscalls = 0;
-	preprocesstime = 0.0;
-	processtime = 0.0;
-	postprocesstime = 0.0;
-	Types = types;
-	console->info("Created Analyzer : {}",this->AnalyzerName);
+	this->console = spdlog::get(this->LogName)->clone(this->AnalyzerName);
+	this->preprocesscalls = 0;
+	this->processcalls = 0;
+	this->postprocesscalls = 0;
+	this->preprocesstime = 0.0;
+	this->processtime = 0.0;
+	this->postprocesstime = 0.0;
+	this->Types = types;
+	this->console->info("Created Analyzer : {}",this->AnalyzerName);
 	this->DefaultRegex = "(";
 	for( const auto& t : this->Types ){
 		this->DefaultRegex += t+"|";
@@ -36,8 +36,8 @@ Analyzer::Analyzer(const std::string& log,const std::string& analyzer,const std:
 }
 
 Analyzer::~Analyzer(){
-	console->info("PreProcessCalls : {} ProcessCalls : {} PostProcessCalls : {}",preprocesscalls,processcalls,postprocesscalls);
-	console->info("PreProcess : {:.3f}ms Process: {:.3f}ms PostProcess : {:.3f}ms",preprocesstime,processtime,postprocesstime);
+	this->console->info("PreProcessCalls : {} ProcessCalls : {} PostProcessCalls : {}",this->preprocesscalls,this->processcalls,this->postprocesscalls);
+	this->console->info("PreProcess : {:.3f}s Process: {:.3f}s PostProcess : {:.3f}s",this->preprocesstime/1000.0,this->processtime/1000.0,this->postprocesstime/1000.0);
 }
 
 std::shared_ptr<Analyzer> Analyzer::GetPtr(){
@@ -103,53 +103,53 @@ void Analyzer::AssociateType(const std::string& t){
 
 
 [[maybe_unused]] bool Analyzer::PreProcess(){
-	start_time = std::chrono::high_resolution_clock::now();
-	currstep = STEP::PREPROCESS;
-	++preprocesscalls;
+	this->start_time = std::chrono::high_resolution_clock::now();
+	this->currstep = STEP::PREPROCESS;
+	++(this->preprocesscalls);
 	return true;
 }
 
 [[maybe_unused]] bool Analyzer::Process(){
-	start_time = std::chrono::high_resolution_clock::now();
-	currstep = STEP::PROCESS;
-	++processcalls;
+	this->start_time = std::chrono::high_resolution_clock::now();
+	this->currstep = STEP::PROCESS;
+	++(this->processcalls);
 	return true;
 }
 
 [[maybe_unused]] bool Analyzer::PostProcess(){
-	start_time = std::chrono::high_resolution_clock::now();
-	currstep = STEP::POSTPROCESS;
-	++postprocesscalls;
+	this->start_time = std::chrono::high_resolution_clock::now();
+	this->currstep = STEP::POSTPROCESS;
+	++(this->postprocesscalls);
 	return true;
 }
 
 [[noreturn]] bool Analyzer::PreProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager){
-	console->error("Called Analyzer::PreProcess(EventSummary&,PLOTS::PlotRegistry*), not the overload");
+	this->console->error("Called Analyzer::PreProcess(EventSummary&,PLOTS::PlotRegistry*), not the overload");
 	throw std::runtime_error("Called Analyzer::PreProcess(EventSummary&,PLOTS::PlotRegistry*), not the overload");
 }
 
 [[noreturn]] bool Analyzer::Process([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager){
-	console->error("Called Analyzer::Process(EventSummary&,PLOTS::PlotRegistry*), not the overload");
+	this->console->error("Called Analyzer::Process(EventSummary&,PLOTS::PlotRegistry*), not the overload");
 	throw std::runtime_error("Called Analyzer::Process(EventSummary&,PLOTS::PlotRegistry*), not the overload");
 }
 
 [[noreturn]] bool Analyzer::PostProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager){
-	console->error("Called Analyzer::PostProcess(EventSummary&,PLOTS::PlotRegistry*), not the overload");
+	this->console->error("Called Analyzer::PostProcess(EventSummary&,PLOTS::PlotRegistry*), not the overload");
 	throw std::runtime_error("Called Analyzer::PostProcess(EventSummary&,PLOTS::PlotRegistry*), not the overload");
 }
 
 void Analyzer::EndProcess(){
-	stop_time = std::chrono::high_resolution_clock::now();
-	std::chrono::duration<double,std::milli> dur = stop_time - start_time;
-	switch (currstep) {
+	this->stop_time = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double,std::milli> dur = this->stop_time - this->start_time;
+	switch (this->currstep) {
 		case STEP::PREPROCESS:
-			preprocesstime += dur.count();
+			this->preprocesstime += dur.count();
 			break;
 		case STEP::PROCESS:
-			processtime += dur.count();
+			this->processtime += dur.count();
 			break;
 		case STEP::POSTPROCESS:
-			postprocesstime += dur.count();
+			this->postprocesstime += dur.count();
 			break;
 		[[unlikely]] default:
 			break;
@@ -157,6 +157,6 @@ void Analyzer::EndProcess(){
 }
 
 [[noreturn]] void Analyzer::DeclarePlots([[maybe_unused]] PLOTS::PlotRegistry* hismanager) const{
-	console->error("Called Analyzer::DeclarePlots(PLOTS::PlotRegistry* hismanager), not the overload");
+	this->console->error("Called Analyzer::DeclarePlots(PLOTS::PlotRegistry* hismanager), not the overload");
 	throw std::runtime_error("Called Analyzer::DeclarePlots(PLOTS::PlotRegistry* hismanager), not the overload");
 }

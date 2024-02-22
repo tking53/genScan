@@ -49,7 +49,7 @@ TTree* Processor::RegisterTree(){
 
 Processor::~Processor(){
 	this->console->info("PreProcessCalls : {} ProcessCalls : {} PostProcessCalls : {}",this->preprocesscalls,this->processcalls,this->postprocesscalls);
-	this->console->info("PreProcess : {:.3f}ms Process: {:.3f}ms PostProcess : {:.3f}ms",this->preprocesstime,this->processtime,this->postprocesstime);
+	this->console->info("PreProcess : {:.3f}s Process: {:.3f}s PostProcess : {:.3f}s",this->preprocesstime/1000.0,this->processtime/1000.0,this->postprocesstime/1000.0);
 }
 
 std::shared_ptr<Processor> Processor::GetPtr(){
@@ -110,44 +110,44 @@ void Processor::AssociateType(const std::string& t){
 }
 
 [[maybe_unused]] bool Processor::PreProcess(){
-	start_time = std::chrono::high_resolution_clock::now();
-	currstep = STEP::PREPROCESS;
-	++preprocesscalls;
+	this->start_time = std::chrono::high_resolution_clock::now();
+	this->currstep = STEP::PREPROCESS;
+	++(this->preprocesscalls);
 	return true;
 }
 
 [[maybe_unused]] bool Processor::Process(){
-	start_time = std::chrono::high_resolution_clock::now();
-	currstep = STEP::PROCESS;
-	++processcalls;
+	this->start_time = std::chrono::high_resolution_clock::now();
+	this->currstep = STEP::PROCESS;
+	++(this->processcalls);
 	return true;
 }
 
 [[maybe_unused]] bool Processor::PostProcess(){
-	start_time = std::chrono::high_resolution_clock::now();
-	currstep = STEP::POSTPROCESS;
-	++postprocesscalls;
+	this->start_time = std::chrono::high_resolution_clock::now();
+	this->currstep = STEP::POSTPROCESS;
+	++(this->postprocesscalls);
 	return true;
 }
 
 [[noreturn]] bool Processor::PreProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager){
-	console->error("Called Processor::PreProcess(EventSummary&,PLOTS::PlotRegistry*), not the overload");
+	this->console->error("Called Processor::PreProcess(EventSummary&,PLOTS::PlotRegistry*), not the overload");
 	throw std::runtime_error("Called Processor::PreProcess(EventSummary&,PLOTS::PlotRegistry*), not the overload");
 }
 
 [[noreturn]] bool Processor::Process([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager){
-	console->error("Called Processor::Process(EventSummary&,PLOTS::PlotRegistry*), not the overload");
+	this->console->error("Called Processor::Process(EventSummary&,PLOTS::PlotRegistry*), not the overload");
 	throw std::runtime_error("Called Processor::Process(EventSummary&,PLOTS::PlotRegistry*), not the overload");
 }
 
 [[noreturn]] bool Processor::PostProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager){
-	console->error("Called Processor::PostProcess(EventSummary&,PLOTS::PlotRegistry*), not the overload");
+	this->console->error("Called Processor::PostProcess(EventSummary&,PLOTS::PlotRegistry*), not the overload");
 	throw std::runtime_error("Called Processor::PostProcess(EventSummary&,PLOTS::PlotRegistry*), not the overload");
 }
 
 void Processor::EndProcess(){
 	this->stop_time = std::chrono::high_resolution_clock::now();
-	std::chrono::duration<double,std::milli> dur = stop_time - start_time;
+	std::chrono::duration<double,std::milli> dur = this->stop_time - this->start_time;
 	switch (this->currstep) {
 		case STEP::PREPROCESS:
 			this->preprocesstime += dur.count();
