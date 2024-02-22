@@ -12,7 +12,7 @@
 class EVTTranslator : public Translator{
 	public:
 		EVTTranslator(const std::string&,const std::string&);
-		~EVTTranslator() = default;
+		~EVTTranslator();
 		Translator::TRANSLATORSTATE Parse(boost::container::devector<PhysicsData>&);
 	private:
 		struct EVT_BUILT_INFO{

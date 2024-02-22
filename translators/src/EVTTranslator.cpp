@@ -8,14 +8,20 @@ EVTTranslator::EVTTranslator(const std::string& log,const std::string& translato
 	this->CurrEVTBuiltInfo = { .rib_size = 0, .ri_size = 0, .ri_type = 0};
 }	
 
+EVTTranslator::~EVTTranslator(){
+	if( not this->Leftovers.empty() ){
+		this->console->error("Still have data left in the queue");
+	}	
+}
+
 Translator::TRANSLATORSTATE EVTTranslator::Parse(boost::container::devector<PhysicsData>& RawEvents){
 	if( this->FinishedCurrentFile ){
-		if( !this->OpenNextFile() ){
+		if( not this->OpenNextFile() ){
 			return Translator::TRANSLATORSTATE::COMPLETE;
 		}
 	}
 	do{
-		if( !this->Leftovers.empty() ){
+		if( not this->Leftovers.empty() ){
 			RawEvents.push_back(this->Leftovers.back());
 			this->Leftovers.pop_back();
 			auto evt = RawEvents.back();
@@ -27,7 +33,7 @@ Translator::TRANSLATORSTATE EVTTranslator::Parse(boost::container::devector<Phys
 			#ifdef TRANSLATOR_DEBUG
 			this->console->debug("{}",RawEvents.back());
 			#endif
-			if( !this->LastReadEvtWithin ){
+			if( not this->LastReadEvtWithin ){
 				this->Leftovers.push_back(RawEvents.back());
 				RawEvents.pop_back();
 				this->correlator->Pop();
@@ -35,7 +41,7 @@ Translator::TRANSLATORSTATE EVTTranslator::Parse(boost::container::devector<Phys
 			}
 		}
 		if( this->CurrentFile.eof() ){
-			if( !this->OpenNextFile() ){
+			if( not this->OpenNextFile() ){
 				return Translator::TRANSLATORSTATE::COMPLETE;
 			}
 		}
@@ -57,17 +63,11 @@ int EVTTranslator::ReadFull(boost::container::devector<PhysicsData>& RawEvents){
 		this->CurrDecoder->DecodeOtherWords(otherWords,&(RawEvents.back()));
 	}
 
-	//We have a trace
 	if( (RawEvents.back().GetEventLength() - this->CurrHeaderLength) != 0 ){
 		RawEvents.back().SetRawTraceLength(this->CurrTraceLength);
 		if( !(this->CurrentFile.read(reinterpret_cast<char*>(&(RawEvents.back().GetRawTraceData()[0])),(this->CurrTraceLength)*2)) ){
 			return -1;
 		}
-		//std::vector<uint16_t> trace(this->CurrTraceLength);
-		//if( !(this->CurrentFile.read(reinterpret_cast<char*>(&trace[0]),(this->CurrTraceLength)*2)) ){
-		//	return -1;
-		//}
-		//RawEvents.back().SetRawTrace(std::move(trace));
 	}
 
 	return 0;
@@ -86,10 +86,6 @@ int EVTTranslator::ReadHeader(boost::container::devector<PhysicsData>& RawEvents
 	uint32_t CrateNumber = PIXIE::CrateNumberMask(firstWords[0]);
 	this->CurrHeaderLength = PIXIE::HeaderLengthMask(firstWords[0]);
 	uint32_t FinishCode = (PIXIE::FinishCodeMask(firstWords[0]) != 0);
-
-	//if( ChannelNumber == 12 and ModuleNumber >=5 ){
-	//	this->console->error("Issue, decode channel 12 from invalid modules");
-	//}
 
 	try{
 		this->CurrDecoder = CMap->GetXiaDecoder(CrateNumber,ModuleNumber);
