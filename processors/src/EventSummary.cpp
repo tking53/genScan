@@ -13,13 +13,17 @@ void EventSummary::BuildDetectorSummary(){
 
 void EventSummary::GetDetectorSummary(const std::regex& rkey,std::vector<PhysicsData*>& vec){
 	vec.clear();
-	std::sregex_iterator end;
+	//std::sregex_iterator end;
+	std::smatch type_match;
 	for( auto& evt : this->RawEvents ){
-		std::string unique_id(evt.GetUniqueID());
-		std::sregex_iterator keysearch(unique_id.begin(),unique_id.end(),rkey);
-		if( keysearch != end ){
+		if( std::regex_match(evt.GetUniqueID(),type_match,rkey) ){
 			vec.push_back(&evt);
 		}
+		//std::string unique_id(evt.GetUniqueID());
+		//std::sregex_iterator keysearch(unique_id.begin(),unique_id.end(),rkey);
+		//if( keysearch != end ){
+		//	vec.push_back(&evt);
+		//}
 	}
 }
 
