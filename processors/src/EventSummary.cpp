@@ -11,9 +11,8 @@ void EventSummary::BuildDetectorSummary(){
 	}
 }
 
-void EventSummary::GetDetectorSummary(const std::string& key,std::vector<PhysicsData*>& vec){
+void EventSummary::GetDetectorSummary(const std::regex& rkey,std::vector<PhysicsData*>& vec){
 	vec.clear();
-	std::regex rkey(key);
 	std::sregex_iterator end;
 	for( auto& evt : this->RawEvents ){
 		std::string unique_id(evt.GetUniqueID());
@@ -22,6 +21,11 @@ void EventSummary::GetDetectorSummary(const std::string& key,std::vector<Physics
 			vec.push_back(&evt);
 		}
 	}
+}
+
+void EventSummary::GetDetectorSummary(const std::string& key,std::vector<PhysicsData*>& vec){
+	std::regex rkey(key);
+	this->GetDetectorSummary(rkey,vec);
 }
 
 boost::container::devector<PhysicsData>& EventSummary::GetRawEvents(){

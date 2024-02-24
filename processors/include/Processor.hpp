@@ -81,7 +81,8 @@ class Processor : public std::enable_shared_from_this<Processor> {
 		std::string ProcessorName;
 		std::string LogName;
 
-		std::string DefaultRegex;
+		std::string DefaultRegexString;
+		std::regex DefaultRegex;
 
 		std::set<std::string> Types;
 

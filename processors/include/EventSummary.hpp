@@ -1,10 +1,8 @@
 #ifndef __EVENT_SUMMARY_HPP__
 #define __EVENT_SUMMARY_HPP__
 
-#include <map>
 #include <set>
 #include <string>
-#include <string_view>
 #include <regex>
 
 #include <boost/container/devector.hpp>
@@ -17,6 +15,7 @@ class EventSummary{
 		
 		void BuildDetectorSummary();
 		void GetDetectorSummary(const std::string&,std::vector<PhysicsData*>&);
+		void GetDetectorSummary(const std::regex&,std::vector<PhysicsData*>&);
 
 		boost::container::devector<PhysicsData>& GetRawEvents();
 		void ClearRawEvents();
