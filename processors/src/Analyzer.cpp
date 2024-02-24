@@ -26,7 +26,7 @@ Analyzer::Analyzer(const std::string& log,const std::string& analyzer,const std:
 	this->DefaultRegexString = "(";
 	for( const auto& t : this->Types ){
 		this->DefaultRegexString += t+"|";
-		this->console->info("Type : {} has been associated with this Analyzer",t);
+		this->console->info("Type : [{}] has been associated with this Analyzer",t);
 	}
 	if( this->Types.size() == 1 ){
 		this->DefaultRegexString.pop_back();
@@ -91,10 +91,10 @@ void Analyzer::AssociateType(const std::string& t){
 		this->DefaultRegexString += "|"+t+")";
 		this->Types.insert(t);
 		this->DefaultRegex = std::regex(this->DefaultRegexString);
-		this->console->info("Type : {} has been associated with this Analyzer",t);
+		this->console->info("Type : [{}] has been associated with this Analyzer",t);
 		this->console->info("Default Type Regex updated to be {}",this->DefaultRegexString);
 	}else{
-		this->console->critical("Type : {} is already associated with this Analyzer",t);
+		this->console->critical("Type : [{}] is already associated with this Analyzer",t);
 	}
 }
 

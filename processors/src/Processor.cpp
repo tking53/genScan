@@ -29,7 +29,7 @@ Processor::Processor(const std::string& log,const std::string& proc,const std::i
 	this->DefaultRegexString = "(";
 	for( const auto& t : this->Types ){
 		this->DefaultRegexString += t+"|";
-		this->console->info("Type : {} has been associated with this Processor",t);
+		this->console->info("Type : [{}] has been associated with this Processor",t);
 	}
 	if( this->Types.size() == 1 ){
 		this->DefaultRegexString.pop_back();
@@ -99,10 +99,10 @@ void Processor::AssociateType(const std::string& t){
 		this->DefaultRegexString += "|"+t+")";
 		this->DefaultRegex = std::regex(this->DefaultRegexString);
 		this->Types.insert(t);
-		this->console->info("Type : {} has been associated with this Processor",t);
+		this->console->info("Type : [{}] has been associated with this Processor",t);
 		this->console->info("Default Type Regex updated to be {}",this->DefaultRegexString);
 	}else{
-		this->console->critical("Type : {} is already associated with this Processor",t);
+		this->console->critical("Type : [{}] is already associated with this Processor",t);
 	}
 }
 
