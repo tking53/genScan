@@ -17,7 +17,9 @@
 #include <boost/program_options.hpp>
 #include <boost/container/devector.hpp>
 
-#include "Processor.hpp"
+#include "AnalogCorrelator.hpp"
+#include "RollingTriggerCorrelator.hpp"
+#include "RollingWindowCorrelator.hpp"
 #include "StringManipFunctions.hpp"
 
 #include "ConfigParser.hpp"
@@ -36,8 +38,6 @@
 #include "ProcessorList.hpp"
 
 #include "DataParser.hpp"
-
-#include "PhysicsData.hpp"
 
 #include "EventSummary.hpp"
 
@@ -205,14 +205,14 @@ int main(int argc, char *argv[]) {
 	}
 	dataparser->SetChannelMap(cmap);
 
-	std::shared_ptr<Correlator> correlator = std::make_shared<Correlator>(logname,cfgparser->GetGlobalEventWidthInNS());
+	std::shared_ptr<Correlator> correlator;
 	try{
 		if( cfgparser->GetCorrelationType()->compare("rolling-window") == 0 ){
-			correlator->SetCorrelationType(Correlator::CORRELATIONWINDOWTYPE::ROLLINGWIDTH);
+			correlator = std::make_shared<RollingWindowCorrelator>(logname,cfgparser->GetGlobalEventWidthInNS());
 		}else if( cfgparser->GetCorrelationType()->compare("rolling-trigger") == 0 ){
-			correlator->SetCorrelationType(Correlator::CORRELATIONWINDOWTYPE::ROLLINGTRIGGER);
+			correlator = std::make_shared<RollingTriggerCorrelator>(logname,cfgparser->GetGlobalEventWidthInNS());
 		}else if( cfgparser->GetCorrelationType()->compare("analog") == 0 ){
-			correlator->SetCorrelationType(Correlator::CORRELATIONWINDOWTYPE::ANALOG);
+			correlator = std::make_shared<AnalogCorrelator>(logname,cfgparser->GetGlobalEventWidthInNS());
 		}else{
 			throw std::runtime_error("Unknown Correlation Type : "+(*(cfgparser->GetCorrelationType()))+", supported types are rolling-window, rolling,trigger, analog");
 		}

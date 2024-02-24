@@ -1,142 +1,33 @@
 #include "Correlator.hpp"
 #include <stdexcept>
-#include <iostream>
 
-Correlator::Correlator(const std::string& log,double eventwidth){
-	this->CorrelationType = UNKNOWN;
+Correlator::Correlator(const std::string& log,const std::string& corname,double eventwidth){
 	this->Width = eventwidth;
 	this->LogName = log;
-}
-
-void Correlator::SetCorrelationType(Correlator::CORRELATIONWINDOWTYPE type){
-	if( type == Correlator::CORRELATIONWINDOWTYPE::UNKNOWN ){
-		throw std::runtime_error("UNKNOWN CORRELATIONWINDOWTYPE, KNOWN TYPES ARE ROLLINGWIDTH,ROLLINGTRIGGER,ANALOG");
-	}	
-	this->CorrelationType = type;
-	switch( this->CorrelationType ){
-		case Correlator::CORRELATIONWINDOWTYPE::ANALOG:
-			this->CorrelatorName = "Correlator_ANALOG";
-			break;
-		case Correlator::CORRELATIONWINDOWTYPE::ROLLINGTRIGGER:
-			this->CorrelatorName = "Correlator_ROLLING_TRIGGER";
-			break;
-		case Correlator::CORRELATIONWINDOWTYPE::ROLLINGWIDTH:
-			this->CorrelatorName = "Correlator_ROLLING_WINDOW";
-			break;
-		default:
-			this->CorrelatorName = "Correlator_UNKNOWN";
-			break;
-	}
-
+	this->CorrelatorName = corname;
 	this->console = spdlog::get(this->LogName)->clone(this->CorrelatorName);
-	this->console->info("Created Correlator [{}]",this->CorrelatorName);
 }
 
-void Correlator::DumpSelf() const{
-	this->console->debug("{}",*this);
+[[noreturn]] void Correlator::DumpSelf() const{
+	this->console->error("Called Correlator::DumpSelf, not the overload");
+	throw std::runtime_error("Called Correlator::DumpSelf, not the overload");
 }
 
 void Correlator::AddTriggerChannel(const int& crateID,const int& moduleID,const int& channelID){
 	this->Triggers.insert({.Crate = crateID, .Module = moduleID, .Channel = channelID});	
 }
 
-bool Correlator::IsWithinCorrelationWindow(const double& ts,const int& crateID,const int& moduleID,const int& channelID){
-	switch( this->CorrelationType ){
-		case ROLLINGWIDTH:
-			return this->RollingWindowCorrelation(ts);
-			break;
-		case ROLLINGTRIGGER:
-			return this->RollingTriggerCorrelation(ts);
-			break;
-		case ANALOG:
-			return this->AnalogCorrelation(crateID,moduleID,channelID);
-			break;
-		case UNKNOWN:
-		default:
-			throw std::runtime_error("UNHANDLED CORRELATION TYPE");
-			break;
-	}
+[[noreturn]] bool Correlator::IsWithinCorrelationWindow(const double& ts,const int& crateID,const int& moduleID,const int& channelID){
+	this->console->error("Called Correlator::IsWithinCorrelationWindow, not the overload");
+	throw std::runtime_error("Called Correlator::IsWithinCorrelationWindow, not the overload");
 }
 
-bool Correlator::AnalogCorrelation(const int& crateID,const int& moduleID,const int& channelID) const{
-	AnalogTrigger trigtest = {.Crate = crateID, .Module = moduleID, .Channel = channelID};
-	return (this->Triggers.find(trigtest) != this->Triggers.end());
+[[noreturn]] void Correlator::Pop(){
+	this->console->error("Called Correlator::Pop, not the overload");
+	throw std::runtime_error("Called Correlator::Pop, not the overload");
 }
 
-void Correlator::Pop(){
-	if( this->CorrelationType == Correlator::CORRELATIONWINDOWTYPE::ROLLINGTRIGGER ){
-		this->MinHeap.pop();
-	}
-	if( this->CorrelationType == Correlator::CORRELATIONWINDOWTYPE::ROLLINGWIDTH ){
-		this->MaxHeap.pop();
-	}
-	#ifdef CORRELATOR_DEBUG
-	if( !this->gMaxHeap.empty() ){
-		this->gMaxHeap.pop();
-	}
-	if( !this->gMinHeap.empty() ){
-		this->gMinHeap.pop();
-	}
-	#endif
-}
-
-void Correlator::Clear(){
-	if( this->CorrelationType == Correlator::CORRELATIONWINDOWTYPE::ROLLINGTRIGGER ){
-		this->MinHeap.clear();
-	}
-	if( this->CorrelationType == Correlator::CORRELATIONWINDOWTYPE::ROLLINGWIDTH ){
-		this->MaxHeap.clear();
-	}
-	#ifdef CORRELATOR_DEBUG
-	if( !this->gMinHeap.empty() ){
-		this->gMinHeap.clear();
-	}
-	if( !this->gMaxHeap.empty() ){
-		this->gMaxHeap.clear();
-	}
-	#endif
-}
-
-bool Correlator::RollingTriggerCorrelation(const double& ts){
-	#ifdef CORRELATOR_DEBUG
-	this->gMinHeap.push(ts);
-	this->gMaxHeap.push(ts);
-	#endif
-	if( this->MinHeap.empty() ){
-		this->MinHeap.push(ts);
-		return true;
-	}else{
-		if( std::abs(ts - this->MinHeap.top()) < this->Width ){
-			this->MinHeap.push(ts);
-			return true;
-		}else{
-			#ifdef CORRELATOR_DEBUG
-				this->console->debug("Found TS: {:.1f} which is outside the correlation window of {} ns, top before clearing is {:.1f}, delta is {} ns",ts,this->Width,this->MinHeap.top(),std::abs(ts - this->MinHeap.top()));
-			#endif
-			this->MinHeap.push(ts);
-			return false;
-		}
-	}
-}
-
-bool Correlator::RollingWindowCorrelation(const double& ts){
-	#ifdef CORRELATOR_DEBUG
-	this->gMinHeap.push(ts);
-	this->gMaxHeap.push(ts);
-	#endif
-	if( this->MaxHeap.empty() ){
-		this->MaxHeap.push(ts);
-		return true;
-	}else{
-		if( std::abs(ts - this->MaxHeap.top()) < this->Width ){
-			this->MaxHeap.push(ts);
-			return true;
-		}else{
-			#ifdef CORRELATOR_DEBUG
-				this->console->debug("Found TS: {:.1f} which is outside the correlation window of {} ns, top before clearing is {:.1f}, delta is {} ns",ts,this->Width,this->MaxHeap.top(),std::abs(ts - this->MaxHeap.top()));
-			#endif
-			this->MaxHeap.push(ts);
-			return false;
-		}
-	}
+[[noreturn]] void Correlator::Clear(){
+	this->console->error("Called Correlator::Clear, not the overload");
+	throw std::runtime_error("Called Correlator::Clear, not the overload");
 }

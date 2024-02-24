@@ -17,13 +17,6 @@
 
 class Correlator{
 	public:
-		enum CORRELATIONWINDOWTYPE{
-			ROLLINGWIDTH,
-			ROLLINGTRIGGER,
-			ANALOG,
-			UNKNOWN
-		};
-
 		struct AnalogTrigger{
 			int Crate;
 			int Module;
@@ -54,105 +47,25 @@ class Correlator{
 			}
 		};
 
-		Correlator(const std::string&,double);
-		~Correlator() = default;
-
-		void SetCorrelationType(CORRELATIONWINDOWTYPE);
+		Correlator(const std::string&,const std::string&,double);
+		virtual ~Correlator() = default;
 
 		//switch based on the type of correlation we were constructed with
 		//what's passed in is the timestamp (in ns), crate, module, channel of the last parsed event
-		bool IsWithinCorrelationWindow(const double&,const int&,const int&,const int&);
+		[[noreturn]] virtual bool IsWithinCorrelationWindow(const double&,const int&,const int&,const int&);
 
-		void AddTriggerChannel(const int&,const int&,const int&);
+		virtual void AddTriggerChannel(const int&,const int&,const int&) final;
 
-		void Pop();
-		void Clear();
+		[[noreturn]] virtual void Pop();
+		[[noreturn]] virtual void Clear();
 
-		void DumpSelf() const;
+		[[noreturn]] virtual void DumpSelf() const;
 
-		template<typename OStream>
-		friend OStream& operator<<(OStream& os,const Correlator& corr){
-			os << "Correlator( Window: " << corr.Width << " ns";
-			switch (corr.CorrelationType){
-				case Correlator::CORRELATIONWINDOWTYPE::ANALOG:
-					os << " Type: ANALOG )";
-					break;
-				case Correlator::CORRELATIONWINDOWTYPE::ROLLINGTRIGGER:
-					os << " Type: ROLLINGTRIGGER )";
-					break;
-				case Correlator::CORRELATIONWINDOWTYPE::ROLLINGWIDTH:
-					os << " Type: ROLLINGWIDTH )";
-					break;
-				default:
-					os << " Type: UNKNOWN )";
-					break;
-			}
-			if( corr.CorrelationType == Correlator::CORRELATIONWINDOWTYPE::ANALOG ){
-				os << "\nKnown Analog Triggers: ( Crate | Module | Channel )";
-				size_t ii = 0;
-				for( const auto& trig : corr.Triggers ){
-					os << "\nTrigger " << ii << " : ( " 
-						           << trig.Crate << " | " 
-							   << trig.Module << " | "
-							   << trig.Channel << " ) ";
-					++ii;
-				}
-				os << "\nEnd Known Analog Triggers";
-			}else{
-				#ifdef CORRELATOR_DEBUG
-				if( corr.gMaxHeap.size() > 0 and corr.gMinHeap.size() > 0 ){
-					os << "\nRange of TimeStamps: [ " << std::fixed << std::setprecision(1) << corr.gMinHeap.top() << " , " << corr.gMaxHeap.top() << " ]";
-					os << "\nglobal Min Heap TimeStamps : [ ";
-					for( const auto& ts : corr.gMinHeap ){
-						os << '\n' << std::fixed << std::setprecision(1) << ts;
-					}
-					os << "\n]";
-					os << "\nglobal Max Heap TimeStamps : [ ";
-					for( const auto& ts : corr.gMaxHeap ){
-						os << '\n' << std::fixed << std::setprecision(1) << ts;
-					}
-					os << "\n]";
-				}
-				#endif
-				if( corr.MinHeap.size() > 0 ){
-					os << "\nMin Heap TimeStamps : [ ";
-					for( const auto& ts : corr.MinHeap ){
-						os << '\n' << std::fixed << std::setprecision(1) << ts;
-					}
-					os << "\n]";
-				}
-				if( corr.MaxHeap.size() > 0 ){
-					os << "\nMax Heap TimeStamps : [ ";
-					for( const auto& ts : corr.MaxHeap ){
-						os << '\n' << std::fixed << std::setprecision(1) << ts;
-					}
-					os << "\n]";
-				}
-			}
-
-			return os;
-		}
-	private:
+	protected:
 		std::string LogName;
 		std::string CorrelatorName;
 		std::shared_ptr<spdlog::logger> console;
 
-		//just check to see if it's one of the channels we reset the correlation on
-		//False -> was a trigger channel
-		//True -> not a trigger channel
-		bool AnalogCorrelation(const int&,const int&,const int&) const;
-		
-		//Compare delta time from input timestamp and the largest timestamp we currently know about
-		//True -> still trying to correlate
-		//False -> clear the Heaps and put the new timestamp into it
-		bool RollingWindowCorrelation(const double&);
-		
-		//Compare delta time from input timestamp and the smallest timestamp we know about
-		//True -> still trying to correlate 
-		//False -> clear the Heaps and put the new timestamp into it
-		bool RollingTriggerCorrelation(const double&); 
-
-		CORRELATIONWINDOWTYPE CorrelationType;
 		double Width;
 		
 		//Used for analog triggering scheme
