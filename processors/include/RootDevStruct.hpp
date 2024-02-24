@@ -26,6 +26,6 @@ namespace ProcessorStruct{
 		std::vector<unsigned int> qdcSums = {};  //output the onboard qdc sums if present
 	};
 	static const RootDev DEFAULT_RD_STRUCT;
-};
+}
 
 #endif
