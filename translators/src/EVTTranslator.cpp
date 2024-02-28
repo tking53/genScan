@@ -110,17 +110,25 @@ int EVTTranslator::ReadHeader(boost::container::devector<PhysicsData>& RawEvents
 	//need to ask Toby if we actually still use those firmware versions anywhere we would want to scan this or if we should support
 	//them anymore
 
-	this->LastReadEvtWithin = this->correlator->IsWithinCorrelationWindow(TimeStampInNS,CrateNumber,ModuleNumber,ChannelNumber);
+	//this->LastReadEvtWithin = this->correlator->IsWithinCorrelationWindow(TimeStampInNS,CrateNumber,ModuleNumber,ChannelNumber);
 	RawEvents.push_back(PhysicsData(CurrHeaderLength,EventLength,CrateNumber,ModuleNumber,ChannelNumber,
 					this->CMap->GetGlobalBoardID(CrateNumber,ModuleNumber),
 				        this->CMap->GetGlobalChanID(CrateNumber,ModuleNumber,ChannelNumber),
 					EventEnergy,TimeStamp));
 	RawEvents.back().SetPileup(FinishCode);
 	RawEvents.back().SetSaturation(OutOfRange);
-	RawEvents.back().SetTimeStamp(TimeStampInNS);
 
 	//word2 has CFD things
-	//this->CurrDecoder->DecodeCFDParams(firstWords,RawEvents.back());
+	uint64_t CFDTimeStamp = this->CurrDecoder->DecodeCFDParams(firstWords,TimeStamp,RawEvents.back());
+	double CFDTimeStampInNS = CFDTimeStamp*(this->CMap->GetModuleADCClockTicksToNS(CrateNumber,ModuleNumber));
+
+	#ifdef TRANSLATOR_DEBUG
+	this->console->debug("TS : {}, TS(ns) : {}, CFDTS : {}, CFDTS(ns) : {}",TimeStamp,TimeStampInNS,CFDTimeStamp,CFDTimeStampInNS);
+	#endif
+	//always use the cfd based TimeStampInNS to event build, it is the same other if nothing is set
+	RawEvents.back().SetTimeStamp(CFDTimeStampInNS);
+	
+	this->LastReadEvtWithin = this->correlator->IsWithinCorrelationWindow(RawEvents.back().GetTimeStamp(),CrateNumber,ModuleNumber,ChannelNumber);
 
 	return 0;
 }

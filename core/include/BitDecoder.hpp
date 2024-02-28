@@ -33,12 +33,15 @@ class XiaDecoder{
 		unsigned int DecodeESumGap(const unsigned int &) const;
 		unsigned int DecodeBaseline(const unsigned int &) const;
 		unsigned int DecodeQDCSums(const unsigned int &) const;
-		double GetQDCSize() const;
+		double GetCFDSize() const;
 
 		void DecodeFirstWords(const unsigned int*,uint32_t&,uint32_t&,uint32_t&,unsigned int&,unsigned int&,bool&) const;
-		void DecodeCFDParams(const unsigned int*,PhysicsData&) const;
+		uint64_t DecodeCFDParams(const unsigned int*,const uint64_t&,PhysicsData&) const;
 		void DecodeOtherWords(const unsigned int*,PhysicsData*) const;
 	private:
+		ChannelMap::FirmwareVersion Ver;
+		int Freq;
+
 		Mask EventLengthMask;
 		Mask TimeLowMask;
 		Mask TimeHighMask;
@@ -57,7 +60,7 @@ class XiaDecoder{
 
 		Mask QDCSumsMask;
 
-		double QDCSize;
+		double CFDSize;
 };
 
 namespace PIXIE{

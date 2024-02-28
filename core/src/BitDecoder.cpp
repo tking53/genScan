@@ -4,6 +4,8 @@
 #include <string>
 
 XiaDecoder::XiaDecoder(ChannelMap::FirmwareVersion firmware,int Frequency) : 
+	Freq(Frequency),
+	Ver(firmware),	
 	EventLengthMask(0x7FFE0000,17),
 	TimeLowMask(0xFFFFFFFF, 0),
 	TimeHighMask(0xFFFF, 0),
@@ -21,7 +23,7 @@ XiaDecoder::XiaDecoder(ChannelMap::FirmwareVersion firmware,int Frequency) :
 	BaselineMask(0xFFFFFFFF, 0),
 
 	QDCSumsMask(0xFFFFFFFF, 0),
-	QDCSize(655536)
+	CFDSize(655536)
 {
 	if( Frequency == 100 ){
 		switch( firmware ){
@@ -181,18 +183,18 @@ XiaDecoder::XiaDecoder(ChannelMap::FirmwareVersion firmware,int Frequency) :
 	}
 
 	if( Frequency == 500){
-		this->QDCSize = 8192;
+		this->CFDSize = 8192;
 	}else if( Frequency == 100) {
 		switch( firmware ){
 			case ChannelMap::R17562:
 			case ChannelMap::R29432:
-				this->QDCSize = 65536;
+				this->CFDSize = 65536;
 				break;
 			case ChannelMap::R30474:
 			case ChannelMap::R30980:
 			case ChannelMap::R30981:
 			case ChannelMap::R34688:
-				this->QDCSize = 32768;
+				this->CFDSize = 32768;
 				break;
 			default:
 				break;
@@ -200,24 +202,22 @@ XiaDecoder::XiaDecoder(ChannelMap::FirmwareVersion firmware,int Frequency) :
 	}else if( Frequency  == 250 ){
 		switch( firmware ){
 			case ChannelMap::R20466:
-				this->QDCSize = 65536;
+				this->CFDSize = 65536;
 				break;
 			case ChannelMap::R27361:
 			case ChannelMap::R29432:
-				this->QDCSize = 32768;
+				this->CFDSize = 32768;
 				break;
 			case ChannelMap::R30980:
 			case ChannelMap::R30981:
 			case ChannelMap::R34688:
 			case ChannelMap::R30474:
-				this->QDCSize = 16384;
+				this->CFDSize = 16384;
 				break;
 			default:
 				break;
 		}
 	}
-
-
 }
 
 unsigned int XiaDecoder::DecodeEventLength(const unsigned int& val) const{
@@ -276,8 +276,8 @@ unsigned int XiaDecoder::DecodeQDCSums(const unsigned int & val) const {
 	return this->QDCSumsMask(val);
 }
 
-double XiaDecoder::GetQDCSize() const{
-	return this->QDCSize;
+double XiaDecoder::GetCFDSize() const{
+	return this->CFDSize;
 }
 
 void XiaDecoder::DecodeFirstWords(const unsigned int* firstFour,uint32_t& eventlen,uint32_t& tslow,uint32_t& tshigh,unsigned int& erg,unsigned int& tracelen,bool& tracesat) const{
@@ -289,7 +289,34 @@ void XiaDecoder::DecodeFirstWords(const unsigned int* firstFour,uint32_t& eventl
 	tracesat = static_cast<bool>(this->DecodeTraceOutRange(firstFour[3]));
 }
 
-void XiaDecoder::DecodeCFDParams(const unsigned int* firstFour,PhysicsData& pd) const{
+uint64_t XiaDecoder::DecodeCFDParams(const unsigned int* firstFour,const uint64_t& ts,PhysicsData& pd) const{
+	auto cfdfraction = this->DecodeCFDTime(firstFour[2]);
+	auto cfdforced = this->DecodeCFDForce(firstFour[2]);
+	auto cfdsource = this->DecodeCFDTrigSource(firstFour[2]);
+	pd.SetCFDForcedBit(cfdforced);
+	pd.SetCFDSourceBit(cfdsource);
+	pd.SetCFDFraction(cfdfraction);
+
+	double cfdtime = 0.0;
+	double mult = 1.0;
+	switch( this->Freq ){
+		case 100:
+			cfdtime = cfdfraction/this->CFDSize;
+			break;
+		case 250:
+			mult = 2.0;
+			cfdtime = (cfdfraction/this->CFDSize) - cfdsource;
+			break;
+		case 500:
+			mult = 10.0;
+			cfdtime = (cfdfraction/this->CFDSize) + cfdsource - 1;
+			break;
+		default:
+			throw std::runtime_error("Unknown Frequency of "+std::to_string(this->Freq)+", Known are 100, 250, 500");
+	}
+	if( cfdforced or cfdfraction == 0 )
+		return ts*mult;
+	return ts*mult + cfdtime;
 }
 
 void XiaDecoder::DecodeOtherWords(const unsigned int* otherWords,PhysicsData* pd) const{
