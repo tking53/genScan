@@ -5,21 +5,21 @@
 GenericProcessor::GenericProcessor(const std::string& log) : Processor(log,"GenericProcessor",{"generic"}){
 }
 
-[[maybe_unused]] bool GenericProcessor::PreProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager){
+[[maybe_unused]] bool GenericProcessor::PreProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	Processor::PreProcess();
 
 	Processor::EndProcess();
 	return true;
 }
 
-[[maybe_unused]] bool GenericProcessor::Process([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager){
+[[maybe_unused]] bool GenericProcessor::Process([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	Processor::Process();
 
 	Processor::EndProcess();
 	return true;
 }
 
-[[maybe_unused]] bool GenericProcessor::PostProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager){
+[[maybe_unused]] bool GenericProcessor::PostProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	Processor::PostProcess();
 
 	Processor::EndProcess();

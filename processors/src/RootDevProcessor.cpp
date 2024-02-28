@@ -1,4 +1,5 @@
 #include "RootDevProcessor.hpp"
+#include "CutManager.hpp"
 #include "EventSummary.hpp"
 #include "HistogramManager.hpp"
 #include "PhysicsData.hpp"
@@ -8,7 +9,7 @@
 RootDevProcessor::RootDevProcessor(const std::string& log) : Processor(log,"RootDevProcessor",{"RD"}){
 }
 
-[[maybe_unused]] bool RootDevProcessor::PreProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager){
+[[maybe_unused]] bool RootDevProcessor::PreProcess(EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	Processor::PreProcess();
 	summary.GetDetectorSummary(this->DefaultRegex,this->SummaryData);
 	for( const auto& evt : this->SummaryData ){
@@ -38,11 +39,11 @@ RootDevProcessor::RootDevProcessor(const std::string& log) : Processor(log,"Root
 	return true;
 }
 
-[[maybe_unused]] bool RootDevProcessor::Process([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager){
+[[maybe_unused]] bool RootDevProcessor::Process([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	return true;
 }
 
-[[maybe_unused]] bool RootDevProcessor::PostProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager){
+[[maybe_unused]] bool RootDevProcessor::PostProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	return true;
 }
 

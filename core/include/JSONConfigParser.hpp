@@ -25,6 +25,7 @@ class JSONConfigParser : public ConfigParser{
 		virtual void ParseGlobal();
 		virtual void ParseDetectorDriver();
 		virtual void ParseMap(ChannelMap*);
+		virtual void ParseCuts();
 	private:
 		std::ifstream finput;
 
@@ -35,6 +36,7 @@ class JSONConfigParser : public ConfigParser{
 		Json::Value Global;
 		Json::Value DetectorDriver;
 		Json::Value Map;
+		Json::Value Cuts;
 
 		std::map<std::string,Json::Value> ProcessorNames;
 		std::map<std::string,Json::Value> AnalyzerNames;

@@ -25,6 +25,7 @@ class XMLConfigParser : public ConfigParser{
 		virtual void ParseGlobal();
 		virtual void ParseDetectorDriver();
 		virtual void ParseMap(ChannelMap*);
+		virtual void ParseCuts();
 	private:
 		pugi::xml_document XMLDoc;
 
@@ -33,6 +34,7 @@ class XMLConfigParser : public ConfigParser{
 		pugi::xml_node Author;
 		pugi::xml_node Global;
 		pugi::xml_node DetectorDriver;
+		pugi::xml_node Cuts;
 		pugi::xml_node Map;
 
 		std::map<std::string,pugi::xml_node> ProcessorNames;

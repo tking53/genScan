@@ -24,6 +24,7 @@ class YAMLConfigParser : public ConfigParser{
 		virtual void ParseGlobal();
 		virtual void ParseDetectorDriver();
 		virtual void ParseMap(ChannelMap*);
+		virtual void ParseCuts();
 	private:
 		YAML::Node YAMLDoc;
 		YAML::Node Configuration;
@@ -32,6 +33,7 @@ class YAMLConfigParser : public ConfigParser{
 		YAML::Node Global;
 		YAML::Node DetectorDriver;
 		YAML::Node Map;
+		YAML::Node Cuts;
 
 		std::map<std::string,YAML::Node> ProcessorNames;
 		std::map<std::string,YAML::Node> AnalyzerNames;

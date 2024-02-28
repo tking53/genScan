@@ -49,6 +49,8 @@ void YAMLConfigParser::Parse(ChannelMap* cmap){
 	ParseGlobal();
 	spdlog::get(this->LogName)->info("Parsing DetectorDriver tag");
 	ParseDetectorDriver();
+	spdlog::get(this->LogName)->info("Parsing Cuts tag");
+	ParseCuts();
 	spdlog::get(this->LogName)->info("Parsing Map tag");
 	ParseMap(cmap);
 }
@@ -57,6 +59,18 @@ void YAMLConfigParser::ParseDescription(){
 	this->Description = this->Configuration["Description"];
 	if( this->Description ){
 		this->DescriptionText.reset(new std::string(this->Description.as<std::string>()));
+	}
+}
+
+void YAMLConfigParser::ParseCuts(){
+	this->Cuts = this->Configuration["Cuts"];
+	if( this->Cuts ){
+		YAML::Node cut = this->Cuts["Cut"];
+		for( size_t ii = 0; ii < cut.size(); ++ii ){
+			std::string name = cut[ii]["name"].as<std::string>();
+			std::string filename = cut[ii]["filename"].as<std::string>();
+			this->CutFiles.push_back(std::make_pair(name,filename));
+		}
 	}
 }
 

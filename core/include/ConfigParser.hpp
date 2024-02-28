@@ -46,11 +46,14 @@ class ConfigParser{
 
 		virtual std::string* GetCorrelationType() const;
 		virtual void SetCorrelationType(std::string*);
+
+		virtual std::vector<std::pair<std::string,std::string>> GetCutDetails() const final;
 	protected:
 		[[noreturn]] virtual void ParseDescription();
 		[[noreturn]] virtual void ParseAuthor();
 		[[noreturn]] virtual void ParseGlobal();
 		[[noreturn]] virtual void ParseDetectorDriver();
+		[[noreturn]] virtual void ParseCuts();
 		[[noreturn]] virtual void ParseMap([[maybe_unused]] ChannelMap*);
 
 		std::vector<std::string> ProcessorNames;
@@ -67,6 +70,8 @@ class ConfigParser{
 		std::unique_ptr<std::string> AuthorDateText;
 
 		std::unique_ptr<std::string> CoincidenceType;
+
+		std::vector<std::pair<std::string,std::string>> CutFiles;
 
 		double GlobalEventWidthInS;
 

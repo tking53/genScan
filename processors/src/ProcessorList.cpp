@@ -22,7 +22,7 @@ ProcessorList::ProcessorList(const std::string& log){
 
 ProcessorList::~ProcessorList() = default;
 
-void ProcessorList::PreAnalyze(EventSummary& Summary,PLOTS::PlotRegistry* HistogramManager){
+void ProcessorList::PreAnalyze(EventSummary& Summary,PLOTS::PlotRegistry* HistogramManager,CUTS::CutRegistry* CutManager){
 	auto knowntypes = Summary.GetKnownTypes();
 	#ifdef PROCESSOR_DEBUG
 	for( const auto& t : knowntypes ){
@@ -31,52 +31,52 @@ void ProcessorList::PreAnalyze(EventSummary& Summary,PLOTS::PlotRegistry* Histog
 	#endif
 	for( auto& anal : this->known_analyzers ){
 		if( anal->ContainsAnyType(knowntypes) ){
-			anal->PreProcess(Summary,HistogramManager);
+			anal->PreProcess(Summary,HistogramManager,CutManager);
 		}
 	}
 }
 
-void ProcessorList::Analyze(EventSummary& Summary,PLOTS::PlotRegistry* HistogramManager){
+void ProcessorList::Analyze(EventSummary& Summary,PLOTS::PlotRegistry* HistogramManager,CUTS::CutRegistry* CutManager){
 	auto knowntypes = Summary.GetKnownTypes();
 	for( auto& anal : this->known_analyzers ){
 		if( anal->ContainsAnyType(knowntypes) ){
-			anal->Process(Summary,HistogramManager);
+			anal->Process(Summary,HistogramManager,CutManager);
 		}
 	}
 }
 
-void ProcessorList::PostAnalyze(EventSummary& Summary,PLOTS::PlotRegistry* HistogramManager){
+void ProcessorList::PostAnalyze(EventSummary& Summary,PLOTS::PlotRegistry* HistogramManager,CUTS::CutRegistry* CutManager){
 	auto knowntypes = Summary.GetKnownTypes();
 	for( auto& anal : this->known_analyzers ){
 		if( anal->ContainsAnyType(knowntypes) ){
-			anal->PostProcess(Summary,HistogramManager);
+			anal->PostProcess(Summary,HistogramManager,CutManager);
 		}
 	}
 }
 
-void ProcessorList::PreProcess(EventSummary& Summary,PLOTS::PlotRegistry* HistogramManager){
+void ProcessorList::PreProcess(EventSummary& Summary,PLOTS::PlotRegistry* HistogramManager,CUTS::CutRegistry* CutManager){
 	auto knowntypes = Summary.GetKnownTypes();
 	for( auto& proc : this->known_processors ){
 		if( proc->ContainsAnyType(knowntypes) ){
-			proc->PreProcess(Summary,HistogramManager);
+			proc->PreProcess(Summary,HistogramManager,CutManager);
 		}
 	}
 }
 
-void ProcessorList::Process(EventSummary& Summary,PLOTS::PlotRegistry* HistogramManager){
+void ProcessorList::Process(EventSummary& Summary,PLOTS::PlotRegistry* HistogramManager,CUTS::CutRegistry* CutManager){
 	auto knowntypes = Summary.GetKnownTypes();
 	for( auto& proc : this->known_processors ){
 		if( proc->ContainsAnyType(knowntypes) ){
-			proc->Process(Summary,HistogramManager);
+			proc->Process(Summary,HistogramManager,CutManager);
 		}
 	}
 }
 
-void ProcessorList::PostProcess(EventSummary& Summary,PLOTS::PlotRegistry* HistogramManager){
+void ProcessorList::PostProcess(EventSummary& Summary,PLOTS::PlotRegistry* HistogramManager,CUTS::CutRegistry* CutManager){
 	auto knowntypes = Summary.GetKnownTypes();
 	for( auto& proc : this->known_processors ){
 		if( proc->ContainsAnyType(knowntypes) ){
-			proc->PostProcess(Summary,HistogramManager);
+			proc->PostProcess(Summary,HistogramManager,CutManager);
 		}
 	}
 	++(this->EventStamp);

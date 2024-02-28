@@ -9,6 +9,7 @@
 #include <spdlog/fmt/ostr.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#include <utility>
 
 #include "JSONConfigParser.hpp"
 #include "ChannelMap.hpp"
@@ -50,6 +51,8 @@ void JSONConfigParser::Parse(ChannelMap* cmap){
 	ParseGlobal();
 	spdlog::get(this->LogName)->info("Parsing DetectorDriver tag");
 	ParseDetectorDriver();
+	spdlog::get(this->LogName)->info("Parsing Cuts tag");
+	ParseCuts();
 	spdlog::get(this->LogName)->info("Parsing Map tag");
 	ParseMap(cmap);
 }
@@ -60,6 +63,19 @@ void JSONConfigParser::ParseDescription(){
 		this->DescriptionText.reset(new std::string(this->Description.asString()));
 	}
 }
+
+void JSONConfigParser::ParseCuts(){
+	this->Cuts = this->Configuration["Cuts"];
+	if( this->Cuts ){
+		Json::Value cut = this->Cuts["Cut"];
+		for(const auto& c : cut ){
+			std::string name = c["name"].asString();
+			std::string filename = c["filename"].asString();
+			this->CutFiles.push_back(std::make_pair(name,filename));
+		}
+	}
+}
+
 
 void JSONConfigParser::ParseAuthor(){
 	this->Author = this->Configuration["Author"];

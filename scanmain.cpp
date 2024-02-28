@@ -33,6 +33,8 @@
 
 #include "HistogramManager.hpp"
 
+#include "CutManager.hpp"
+
 #include "RootFileManager.hpp"
 
 #include "ProcessorList.hpp"
@@ -223,6 +225,17 @@ int main(int argc, char *argv[]) {
 	dataparser->SetCorrelator(correlator);
 	console->info("event width : {:.0f} ns Correlation type : {}",cfgparser->GetGlobalEventWidthInNS(),(*(cfgparser->GetCorrelationType())));
 
+	console->info("Generating CutRegistry if any cuts listed within the config file");
+	std::shared_ptr<CUTS::CutRegistry> CutManager(new CUTS::CutRegistry(logname));
+	try{
+		for( const auto& details : cfgparser->GetCutDetails() ){
+			CutManager->AddCut(details.first,details.second);
+		}
+	}catch(std::runtime_error const& e){
+		console->error(e.what());
+		exit(EXIT_FAILURE);
+	}
+
 	console->info("Generating Plot Registry");
 	std::shared_ptr<PLOTS::PlotRegistry> HistogramManager(new PLOTS::PlotRegistry(logname,StringManip::GetFileBaseName(outputfile),port));
 	auto ebins = PLOTS::SE;
@@ -277,14 +290,14 @@ int main(int argc, char *argv[]) {
 
 			CorrelatedEvents.BuildDetectorSummary();
 
-			processorlist->PreProcess(CorrelatedEvents,HistogramManager.get());
-			processorlist->PreAnalyze(CorrelatedEvents,HistogramManager.get());
+			processorlist->PreProcess(CorrelatedEvents,HistogramManager.get(),CutManager.get());
+			processorlist->PreAnalyze(CorrelatedEvents,HistogramManager.get(),CutManager.get());
 	
-			processorlist->Process(CorrelatedEvents,HistogramManager.get());
-			processorlist->Analyze(CorrelatedEvents,HistogramManager.get());
+			processorlist->Process(CorrelatedEvents,HistogramManager.get(),CutManager.get());
+			processorlist->Analyze(CorrelatedEvents,HistogramManager.get(),CutManager.get());
 	
-			processorlist->PostProcess(CorrelatedEvents,HistogramManager.get());
-			processorlist->PostAnalyze(CorrelatedEvents,HistogramManager.get());
+			processorlist->PostProcess(CorrelatedEvents,HistogramManager.get(),CutManager.get());
+			processorlist->PostAnalyze(CorrelatedEvents,HistogramManager.get(),CutManager.get());
 
 			RootManager->Fill();
 			processorlist->CleanupTrees();

@@ -49,6 +49,8 @@ void XMLConfigParser::Parse(ChannelMap* cmap){
 	ParseGlobal();
 	spdlog::get(this->LogName)->info("Parsing DetectorDriver tag");
 	ParseDetectorDriver();
+	spdlog::get(this->LogName)->info("Parsing Cuts tag");
+	ParseCuts();
 	spdlog::get(this->LogName)->info("Parsing Map tag");
 	ParseMap(cmap);
 }
@@ -57,6 +59,18 @@ void XMLConfigParser::ParseDescription(){
 	this->Description = this->Configuration.child("Description");
 	if( this->Description ){
 		this->DescriptionText.reset(new std::string(this->Description.text().get()));
+	}
+}
+
+void XMLConfigParser::ParseCuts(){
+	this->Cuts = this->Configuration.child("Cuts");
+	if( this->Cuts ){
+		pugi::xml_node cut = this->Cuts.child("Cut");
+		for(; cut; cut = cut.next_sibling("Cut")){
+			std::string id = cut.attribute("name").as_string("");
+			std::string file = cut.attribute("filename").as_string("");
+			this->CutFiles.push_back(std::make_pair(id,file));
+		}
 	}
 }
 

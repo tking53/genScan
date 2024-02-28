@@ -66,7 +66,11 @@ void ConfigParser::SetAuthorEmailText(std::string* txt){
 [[noreturn]] void ConfigParser::ParseMap([[maybe_unused]] ChannelMap* cmap){
 	throw std::runtime_error("ConfigParser::ParseMap() Should not be called");
 }
-		
+
+[[noreturn]] void ConfigParser::ParseCuts(){
+	throw std::runtime_error("ConfigParser::ParseCuts() Should not be called");
+}	
+
 double ConfigParser::GetGlobalEventWidth() const{
 	return this->GlobalEventWidthInS;
 }
@@ -115,4 +119,8 @@ std::string* ConfigParser::GetCorrelationType() const{
 
 void ConfigParser::SetCorrelationType(std::string* val){
 	this->CoincidenceType.reset(val);
+}
+
+std::vector<std::pair<std::string,std::string>> ConfigParser::GetCutDetails() const{
+	return this->CutFiles;
 }

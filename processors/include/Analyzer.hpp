@@ -6,6 +6,7 @@
 //histograms inside root
 
 #include "HistogramManager.hpp"
+#include "CutManager.hpp"
 #include "EventSummary.hpp"
 #include <initializer_list>
 #include <string>
@@ -32,9 +33,9 @@ class Analyzer : public std::enable_shared_from_this<Analyzer>{
 		[[maybe_unused]] virtual bool PreProcess();
 		[[maybe_unused]] virtual bool Process();
 		[[maybe_unused]] virtual bool PostProcess();
-		[[noreturn]] virtual bool PreProcess(EventSummary&,PLOTS::PlotRegistry*);
-		[[noreturn]] virtual bool Process(EventSummary&,PLOTS::PlotRegistry*);
-		[[noreturn]] virtual bool PostProcess(EventSummary&,PLOTS::PlotRegistry*);
+		[[noreturn]] virtual bool PreProcess(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
+		[[noreturn]] virtual bool Process(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
+		[[noreturn]] virtual bool PostProcess(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
 		virtual void EndProcess();
 		virtual ~Analyzer();
 

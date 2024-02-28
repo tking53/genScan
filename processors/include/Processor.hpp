@@ -24,6 +24,7 @@
 
 #include <json/json.h>
 
+#include "CutManager.hpp"
 #include "EventSummary.hpp"
 #include "TTree.h"
 
@@ -35,9 +36,9 @@ class Processor : public std::enable_shared_from_this<Processor> {
 		[[maybe_unused]] virtual bool PreProcess();
 		[[maybe_unused]] virtual bool Process();
 		[[maybe_unused]] virtual bool PostProcess();
-		[[noreturn]] virtual bool PreProcess(EventSummary&,PLOTS::PlotRegistry*);
-		[[noreturn]] virtual bool Process(EventSummary&,PLOTS::PlotRegistry*);
-		[[noreturn]] virtual bool PostProcess(EventSummary&,PLOTS::PlotRegistry*);
+		[[noreturn]] virtual bool PreProcess(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
+		[[noreturn]] virtual bool Process(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
+		[[noreturn]] virtual bool PostProcess(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
 		virtual void EndProcess();
 		virtual ~Processor();
 
