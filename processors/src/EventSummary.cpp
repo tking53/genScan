@@ -14,9 +14,9 @@ void EventSummary::BuildDetectorSummary(){
 void EventSummary::GetDetectorSummary(const boost::regex& rkey,std::vector<PhysicsData*>& vec){
 	vec.clear();
 	//std::sregex_iterator end;
-	boost::cmatch type_match;
+	boost::smatch type_match;
 	for( auto& evt : this->RawEvents ){
-		if( boost::regex_match(evt.GetUniqueID().c_str(),type_match,rkey) ){
+		if( boost::regex_match(evt.GetUniqueID(),type_match,rkey) ){
 			vec.push_back(&evt);
 		}
 		//std::string unique_id(evt.GetUniqueID());
