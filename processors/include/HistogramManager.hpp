@@ -3,7 +3,6 @@
 
 #include <memory>
 #include <stdexcept>
-#include <unordered_map>
 #include <string>
 #include <fstream>
 #include <type_traits>
@@ -16,6 +15,7 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 #include <boost/sort/spreadsort/string_sort.hpp>
+#include <boost/unordered_map.hpp>
 
 #include "TH1.h"
 #include "TH2.h"
@@ -332,8 +332,8 @@ namespace PLOTS{
 			}
 
 			std::vector<std::string> PlotIDs;
-			std::unordered_map<std::string,TH1*> Plots_1D;
-			std::unordered_map<std::string,TH2*> Plots_2D;
+			boost::unordered_map<std::string,TH1*> Plots_1D;
+			boost::unordered_map<std::string,TH2*> Plots_2D;
 			std::string LogName;
 			std::string outputprefix;
 
