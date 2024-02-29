@@ -32,7 +32,7 @@ Analyzer::Analyzer(const std::string& log,const std::string& analyzer,const std:
 		this->DefaultRegexString.pop_back();
 	}
 	this->DefaultRegexString += ")";
-	this->DefaultRegex = std::regex(this->DefaultRegexString);
+	this->DefaultRegex = boost::regex(this->DefaultRegexString);
 	this->console->info("Default Type Regex established to be {}",this->DefaultRegexString);
 }
 
@@ -90,7 +90,7 @@ void Analyzer::AssociateType(const std::string& t){
 		this->DefaultRegexString.pop_back();
 		this->DefaultRegexString += "|"+t+")";
 		this->Types.insert(t);
-		this->DefaultRegex = std::regex(this->DefaultRegexString);
+		this->DefaultRegex = boost::regex(this->DefaultRegexString);
 		this->console->info("Type : [{}] has been associated with this Analyzer",t);
 		this->console->info("Default Type Regex updated to be {}",this->DefaultRegexString);
 	}else{

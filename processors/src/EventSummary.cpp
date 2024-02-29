@@ -2,7 +2,7 @@
 #include <regex>
 
 EventSummary::EventSummary(){
-	this->ColonParse =  std::regex(":");
+	this->ColonParse =  boost::regex(":");
 }
 
 void EventSummary::BuildDetectorSummary(){
@@ -11,12 +11,12 @@ void EventSummary::BuildDetectorSummary(){
 	}
 }
 
-void EventSummary::GetDetectorSummary(const std::regex& rkey,std::vector<PhysicsData*>& vec){
+void EventSummary::GetDetectorSummary(const boost::regex& rkey,std::vector<PhysicsData*>& vec){
 	vec.clear();
 	//std::sregex_iterator end;
-	std::smatch type_match;
+	boost::cmatch type_match;
 	for( auto& evt : this->RawEvents ){
-		if( std::regex_match(evt.GetUniqueID(),type_match,rkey) ){
+		if( boost::regex_match(evt.GetUniqueID().c_str(),type_match,rkey) ){
 			vec.push_back(&evt);
 		}
 		//std::string unique_id(evt.GetUniqueID());
@@ -28,7 +28,7 @@ void EventSummary::GetDetectorSummary(const std::regex& rkey,std::vector<Physics
 }
 
 void EventSummary::GetDetectorSummary(const std::string& key,std::vector<PhysicsData*>& vec){
-	std::regex rkey(key);
+	boost::regex rkey(key);
 	this->GetDetectorSummary(rkey,vec);
 }
 

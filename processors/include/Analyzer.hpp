@@ -27,6 +27,8 @@
 
 #include <json/json.h>
 
+#include <boost/regex.hpp>
+
 class Analyzer : public std::enable_shared_from_this<Analyzer>{
 	public:
 		Analyzer(const std::string&,const std::string&,const std::initializer_list<std::string>&);
@@ -78,7 +80,7 @@ class Analyzer : public std::enable_shared_from_this<Analyzer>{
 		std::string LogName;
 
 		std::string DefaultRegexString;
-		std::regex DefaultRegex;
+		boost::regex DefaultRegex;
 		
 		std::shared_ptr<spdlog::logger> console;
 };

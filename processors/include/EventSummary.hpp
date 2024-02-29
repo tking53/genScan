@@ -6,6 +6,8 @@
 #include <regex>
 
 #include <boost/container/devector.hpp>
+#include <boost/regex.hpp>
+
 #include "PhysicsData.hpp"
 
 class EventSummary{
@@ -15,7 +17,7 @@ class EventSummary{
 		
 		void BuildDetectorSummary();
 		void GetDetectorSummary(const std::string&,std::vector<PhysicsData*>&);
-		void GetDetectorSummary(const std::regex&,std::vector<PhysicsData*>&);
+		void GetDetectorSummary(const boost::regex&,std::vector<PhysicsData*>&);
 
 		boost::container::devector<PhysicsData>& GetRawEvents();
 		void ClearRawEvents();
@@ -25,7 +27,7 @@ class EventSummary{
 	private:
 		boost::container::devector<PhysicsData> RawEvents;
 		std::set<std::string> KnownTypes;
-		std::regex ColonParse;
+		boost::regex ColonParse;
 };
 
 #endif

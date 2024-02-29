@@ -24,6 +24,8 @@
 
 #include <json/json.h>
 
+#include <boost/regex.hpp>
+
 #include "CutManager.hpp"
 #include "EventSummary.hpp"
 #include "TTree.h"
@@ -83,7 +85,7 @@ class Processor : public std::enable_shared_from_this<Processor> {
 		std::string LogName;
 
 		std::string DefaultRegexString;
-		std::regex DefaultRegex;
+		boost::regex DefaultRegex;
 
 		std::set<std::string> Types;
 
