@@ -3,7 +3,6 @@
 
 #include <memory>
 #include <string>
-#include <iostream>
 #include <fstream>
 
 #include <spdlog/common.h>

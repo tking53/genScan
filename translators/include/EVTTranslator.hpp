@@ -27,6 +27,8 @@ class EVTTranslator : public Translator{
 		
 		EVT_BUILT_INFO CurrEVTBuiltInfo;
 
+		uint64_t PrevTimeStamp;
+
 		int ReadRingItemHeader();
 		int ReadRingItemBodyHeader();
 		int ReadRingItemBody();

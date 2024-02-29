@@ -1,13 +1,14 @@
 #ifndef __CHANNEL_MAP_HPP__
 #define __CHANNEL_MAP_HPP__
 
-#include "PhysicsData.hpp"
 #include <string>
 #include <vector>
 #include <set>
 
 #include <boost/container/flat_map.hpp>
 #include <boost/container/flat_set.hpp>
+
+#include "PhysicsData.hpp"
 
 class XiaDecoder;
 

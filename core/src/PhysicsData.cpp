@@ -435,3 +435,27 @@ int PhysicsData::GetGlobalChannelID() const{
 int PhysicsData::GetGlobalBoardID() const{
 	return this->globalBoardID;
 }
+
+bool PhysicsData::operator<(const PhysicsData& rhs) const{
+	return std::tie(this->TimeStamp,this->CrateNum,this->ModNum,this->ChanNum,this->RawEnergy) < std::tie(rhs.TimeStamp,rhs.CrateNum,rhs.ModNum,rhs.ChanNum,rhs.RawEnergy);
+}
+
+bool PhysicsData::operator>(const PhysicsData& rhs) const{
+	return rhs < (*this);
+}
+
+bool PhysicsData::operator<=(const PhysicsData& rhs) const{
+	return !((*this) > rhs);
+}
+
+bool PhysicsData::operator>=(const PhysicsData& rhs) const{
+	return !((*this) < rhs);
+}
+
+bool PhysicsData::operator==(const PhysicsData& rhs) const{
+	return (this->CrateNum == rhs.CrateNum) and (this->ModNum == rhs.ModNum) and (this->ChanNum == rhs.ChanNum) and (this->RawTimeStamp == rhs.RawTimeStamp) and (this->RawEnergy == rhs.RawEnergy);
+}
+
+bool PhysicsData::operator!=(const PhysicsData& rhs) const{
+	return !((*this) == rhs);
+}

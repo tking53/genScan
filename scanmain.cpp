@@ -20,6 +20,7 @@
 #include "AnalogCorrelator.hpp"
 #include "RollingTriggerCorrelator.hpp"
 #include "RollingWindowCorrelator.hpp"
+#include "StatsTracker.hpp"
 #include "StringManipFunctions.hpp"
 
 #include "ConfigParser.hpp"
@@ -248,7 +249,7 @@ int main(int argc, char *argv[]) {
 	
 	std::shared_ptr<RootFileManager> RootManager(new RootFileManager(logname,StringManip::GetFileBaseName(outputfile)));
 	console->info("Created Root File Manager");
-
+	
 	//Init the processors/analyzers
 	std::shared_ptr<ProcessorList> processorlist = std::make_shared<ProcessorList>(logname);
 	try{
@@ -273,8 +274,14 @@ int main(int argc, char *argv[]) {
 		exit(EXIT_FAILURE);
 	}
 	
-	console->info("Generating {}.list file that contains all the declared histograms",logname);
+	console->info("Generating {}.list file that contains all the declared histograms",StringManip::GetFileBaseName(outputfile));
 	HistogramManager->WriteInfo();
+
+	console->info("Generating Statistics Manager");
+	std::shared_ptr<StatsTracker> StatsManager(new StatsTracker(logname));
+	StatsManager->Init(cmap.get());
+	console->info("Created Statistics Manager");
+
 	std::thread plotter(&PLOTS::PlotRegistry::HandleSocketHelper,HistogramManager.get());
 
 	std::signal(SIGINT, signalHandler);
@@ -287,6 +294,7 @@ int main(int argc, char *argv[]) {
 
 			processorlist->ThreshAndCal(CorrelatedEvents.GetRawEvents(),cmap.get());
 			processorlist->ProcessRaw(CorrelatedEvents.GetRawEvents(),HistogramManager.get());
+			StatsManager->IncrementStats(CorrelatedEvents.GetRawEvents());
 
 			CorrelatedEvents.BuildDetectorSummary();
 

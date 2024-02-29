@@ -169,6 +169,13 @@ class PhysicsData{
 			   << "\n)";
 			return os;
 		}
+
+		bool operator<(const PhysicsData&) const;
+		bool operator>(const PhysicsData&) const;
+		bool operator<=(const PhysicsData&) const;
+		bool operator>=(const PhysicsData&) const;
+		bool operator==(const PhysicsData&) const;
+		bool operator!=(const PhysicsData&) const;
 	private:
 		//this is info decoded from the data files
 		int HeaderLength;	

@@ -6,6 +6,7 @@
 
 EVTTranslator::EVTTranslator(const std::string& log,const std::string& translatorname) : Translator(log,translatorname){
 	this->CurrEVTBuiltInfo = { .rib_size = 0, .ri_size = 0, .ri_type = 0};
+	this->PrevTimeStamp = 0;
 }	
 
 EVTTranslator::~EVTTranslator(){
@@ -127,6 +128,11 @@ int EVTTranslator::ReadHeader(boost::container::devector<PhysicsData>& RawEvents
 	#endif
 	//always use the cfd based TimeStampInNS to event build, it is the same other if nothing is set
 	RawEvents.back().SetTimeStamp(CFDTimeStampInNS);
+
+	if( TimeStamp < this->PrevTimeStamp ){
+		this->console->critical("Timestamp out of order current : {}, previous : {}",TimeStamp,this->PrevTimeStamp);
+	}
+	this->PrevTimeStamp = TimeStamp;
 	
 	this->LastReadEvtWithin = this->correlator->IsWithinCorrelationWindow(RawEvents.back().GetTimeStamp(),CrateNumber,ModuleNumber,ChannelNumber);
 
