@@ -1,0 +1,1048 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Configuration>
+	<Global EventWidth="5.0e-7" EventWidthUnit="s" CorrelationType="rolling-window" />
+
+	<DetectorDriver SysRoot="true">
+		<Processor name="RootDevProcessor" included_types="mtasimplantsipm,generic,mtas,pid"/>
+	</DetectorDriver>
+
+	<Map>
+		<Crate number="0">
+			<Module number="0" Revision="F" Frequency="250" Firmware="R42159" TraceDelay="264" >
+				<Channel number="0" type="pspmt" subtype="dynode_high" tags="start,its,neutron_crate">
+					<Calibration model="linear">0.0 1.0</Calibration>
+					<Trace RangeLow="10" RangeHigh="40"/>
+					<Cfd f="0.45"/>
+				</Channel>
+				<Channel number="1" type="pspmt" subtype="dynode_low" tags="neutron_crate">
+					<Calibration model="linear">0.0 1.0</Calibration>
+					<Trace RangeLow="10" RangeHigh="40"/>
+					<Cfd f="0.45"/>
+				</Channel>
+				<Channel number="2" type="pid" subtype="cross_scint_b1" tags="neutron_crate">
+					<Calibration model="linear">0 0.25 </Calibration>
+					<Trace RangeLow="10" RangeHigh="40"/>
+					<Cfd f="0.45"/>
+				</Channel>
+				<Channel number="4" type="pid" subtype="cross_scint_t1" tags="neutron_crate">
+					<Calibration model="linear">0 0.25 </Calibration>
+					<Trace RangeLow="10" RangeHigh="40"/>
+					<Cfd f="0.45"/>
+				</Channel>
+				<Channel number="5" type="liquid_scint" subtype="liquid" group="bt" tags="psd"> <!-- ogs bt -->
+					<Calibration model="linear">0.0 1.0</Calibration>
+					<Trace RangeLow="10" RangeHigh="40"/>
+					<Cfd f="0.45"/>
+				</Channel>
+				<Channel number="6" type="pid" subtype="cross_pin0" group="first"> <!--msx40 -->
+					<Calibration model="linear">0 1 </Calibration>
+					<Trace RangeLow="10" RangeHigh="40"/>
+					<Cfd f="0.45"/>
+				</Channel>
+				<Channel number="7" type="pspmt" subtype="FIT" group="b1" tags="neutron_crate">
+					<Calibration model="linear">0.0 1.0</Calibration>
+					<Trace RangeLow="5" RangeHigh="20"/>
+					<Calibration model="linear">0 0.25 </Calibration>
+				</Channel>
+				<Channel number="8" type="pspmt" subtype="RIT" group="b1" tags="neutron_crate">
+					<Calibration model="linear">0.0 1.0</Calibration>
+					<Trace RangeLow="5" RangeHigh="20"/>
+					<Calibration model="linear">0 0.25 </Calibration>
+				</Channel>
+				<Channel number="9" type="liquid_scint" subtype="liquid" group="ft" tags="psd"> <!-- ogs ft -->
+					<Calibration model="linear">0.0 1.0</Calibration>
+					<Trace RangeLow="10" RangeHigh="40"/>
+					<Cfd f="0.45"/>
+				</Channel>
+				<Channel number="10" type="liquid_scint" subtype="liquid" group="fm" tags="psd"> <!-- ogs fm -->
+					<Calibration model="linear">0.0 1.0</Calibration>
+					<Trace RangeLow="10" RangeHigh="40"/>
+					<Cfd f="0.45"/>
+				</Channel>
+				<Channel number="11" type="liquid_scint" subtype="liquid" group="fb" tags="psd"> <!-- ogs fb -->
+					<Calibration model="linear">0.0 1.0</Calibration>
+					<Trace RangeLow="10" RangeHigh="40"/>
+					<Cfd f="0.45"/>
+				</Channel>
+				<Channel number="13" type="liquid_scint" subtype="liquid" group="bm" tags="psd"> <!-- ogs bm -->
+					<Calibration model="linear">0.0 1.0</Calibration>
+					<Trace RangeLow="10" RangeHigh="40"/>
+					<Cfd f="0.45"/>
+				</Channel>
+				<Channel number="14" type="liquid_scint" subtype="liquid" group="bb" tags="psd"> <!-- ogs bb -->
+					<Calibration model="linear">0.0 1.0</Calibration>
+					<Trace RangeLow="10" RangeHigh="40"/>
+					<Cfd f="0.45"/>
+				</Channel>
+				<Channel number="15" type="generic" subtype="pulser" tags="neutron_crate">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+			</Module>
+			<Module number="1" Revision="F" Frequency="250" Firmware="R42159" TraceDelay="264" >
+				<Channel number="0" type="pspmt" subtype="anode_high" group="xa" tags="neutron_crate" >
+					<Calibration model="linear">0.0 1.0</Calibration>
+					<Trace RangeLow="7" RangeHigh="40"/>
+				</Channel>
+				<Channel number="1" type="pspmt" subtype="anode_high" group="xb" tags="neutron_crate" >
+					<Calibration model="linear">0.0 1.0</Calibration>
+					<Trace RangeLow="7" RangeHigh="40"/>
+				</Channel>
+				<Channel number="2" type="pspmt" subtype="anode_high" group="ya" tags="neutron_crate" >
+					<Calibration model="linear">0.0 1.0</Calibration>
+					<Trace RangeLow="7" RangeHigh="40"/>
+				</Channel>
+				<Channel number="3" type="pspmt" subtype="anode_high" group="yb" tags="neutron_crate" >
+					<Calibration model="linear">0.0 1.0</Calibration>
+					<Trace RangeLow="7" RangeHigh="40"/>
+				</Channel>
+				<Channel number="4" type="pspmt" subtype="anode_low" group="xa" tags="neutron_crate" >
+					<Calibration model="linear">0.0 1.0</Calibration>
+					<Trace RangeLow="7" RangeHigh="40"/>
+				</Channel>
+				<Channel number="5" type="pspmt" subtype="anode_low" group="xb" tags="neutron_crate" >
+					<Calibration model="linear">0.0 1.0</Calibration>
+					<Trace RangeLow="7" RangeHigh="40"/>
+				</Channel>
+				<Channel number="6" type="pspmt" subtype="anode_low" group="ya" tags="neutron_crate" >
+					<Calibration model="linear">0.0 1.0</Calibration>
+					<Trace RangeLow="7" RangeHigh="40"/>
+				</Channel>
+				<Channel number="7" type="pspmt" subtype="anode_low" group="yb" tags="neutron_crate" >
+					<Calibration model="linear">0.0 1.0</Calibration>
+					<Trace RangeLow="7" RangeHigh="40"/>
+				</Channel>
+				<Channel number="11" type="pid" subtype="cross_pin1" group="second" tags="neutron_crate" ><!--msx100 -->
+					<Calibration model="linear">0 1 </Calibration>
+				</Channel> 
+				<Channel number="12" type="pid" subtype="db4_ppac_left" group="" tags="neutron_crate" > <!-- dispersive ppac at db4 -->
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel> 
+				<Channel number="13" type="pid" subtype="db4_ppac_right" group="" tags="neutron_crate" > <!-- dispersive ppac at db4 -->
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="14" type="pid" subtype="cross_pin0_logic" group="" tags="neutron_crate" >
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="15" type="pid" subtype="db3_scint_L_logic" group="" tags="neutron_crate" > <!-- the plastic at db3 -->
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+			</Module>
+
+			<Module number="2" Revision="F" Frequency="250" Firmware="R42159" TraceDelay="264" >
+				<Channel number="0" type="vandle" subtype="medium" group="0" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="1" type="vandle" subtype="medium" group="0" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="2" type="vandle" subtype="medium" group="1" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="3" type="vandle" subtype="medium" group="1" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="4" type="vandle" subtype="medium" group="2" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="5" type="vandle" subtype="medium" group="2" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="6" type="vandle" subtype="medium" group="3" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="7" type="vandle" subtype="medium" group="3" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="8" type="vandle" subtype="medium" group="4" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="9" type="vandle" subtype="medium" group="4" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="10" type="vandle" subtype="medium" group="5" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="11" type="vandle" subtype="medium" group="5" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="12" type="vandle" subtype="medium" group="6" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="13" type="vandle" subtype="medium" group="6" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="14" type="vandle" subtype="medium" group="7" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="15" type="vandle" subtype="medium" group="7" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+			</Module>
+			<Module number="3" Revision="F" Frequency="250" Firmware="R42159" TraceDelay="264" >
+				<Channel number="0" type="vandle" subtype="medium" group="8" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="1" type="vandle" subtype="medium" group="8" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="2" type="vandle" subtype="medium" group="9" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="3" type="vandle" subtype="medium" group="9" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="4" type="vandle" subtype="medium" group="10" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="5" type="vandle" subtype="medium" group="10" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="6" type="vandle" subtype="medium" group="11" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="7" type="vandle" subtype="medium" group="11" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="8" type="vandle" subtype="medium" group="12" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="9" type="vandle" subtype="medium" group="12" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="10" type="vandle" subtype="medium" group="13" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="11" type="vandle" subtype="medium" group="13" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="12" type="vandle" subtype="medium" group="14" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="13" type="vandle" subtype="medium" group="14" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="14" type="vandle" subtype="medium" group="15" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="15" type="vandle" subtype="medium" group="15" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+			</Module>
+			<Module number="4" Revision="F" Frequency="250" Firmware="R42159" TraceDelay="264" >
+				<Channel number="0" type="vandle" subtype="medium" group="16" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="1" type="vandle" subtype="medium" group="16" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="2" type="vandle" subtype="medium" group="17" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="3" type="vandle" subtype="medium" group="17" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="4" type="vandle" subtype="medium" group="18" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="5" type="vandle" subtype="medium" group="18" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="6" type="vandle" subtype="medium" group="19" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="7" type="vandle" subtype="medium" group="19" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="8" type="vandle" subtype="medium" group="20" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="9" type="vandle" subtype="medium" group="20" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="10" type="vandle" subtype="medium" group="21" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="11" type="vandle" subtype="medium" group="21" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="12" type="vandle" subtype="medium" group="22" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="13" type="vandle" subtype="medium" group="22" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="14" type="vandle" subtype="medium" group="23" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="15" type="vandle" subtype="medium" group="23" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+			</Module>
+			<Module number="5"  Revision="F" Frequency="250" Firmware="R42159" TraceDelay="264" >
+				<Channel number="0" type="vandle" subtype="medium" group="24" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="1" type="vandle" subtype="medium" group="24" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="2" type="vandle" subtype="medium" group="25" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="3" type="vandle" subtype="medium" group="25" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="4" type="vandle" subtype="medium" group="26" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="5" type="vandle" subtype="medium" group="26" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="6" type="vandle" subtype="medium" group="27" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="7" type="vandle" subtype="medium" group="27" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="8" type="vandle" subtype="medium" group="28" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="9" type="vandle" subtype="medium" group="28" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="10" type="vandle" subtype="medium" group="29" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="11" type="vandle" subtype="medium" group="29" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="12" type="vandle" subtype="medium" group="30" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="13" type="vandle" subtype="medium" group="30" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="14" type="vandle" subtype="medium" group="31" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="15" type="vandle" subtype="medium" group="31" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+			</Module>
+			<Module number="6"  Revision="F" Frequency="250" Firmware="R42159" TraceDelay="264" >
+				<Channel number="0" type="vandle" subtype="medium" group="32" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="1" type="vandle" subtype="medium" group="32" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="2" type="vandle" subtype="medium" group="33" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="3" type="vandle" subtype="medium" group="33" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="4" type="vandle" subtype="medium" group="34" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="5" type="vandle" subtype="medium" group="34" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="6" type="vandle" subtype="medium" group="35" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="7" type="vandle" subtype="medium" group="35" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="8" type="vandle" subtype="medium" group="36" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="9" type="vandle" subtype="medium" group="36" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="10" type="vandle" subtype="medium" group="37" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="11" type="vandle" subtype="medium" group="37" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="12" type="vandle" subtype="medium" group="38" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="13" type="vandle" subtype="medium" group="38" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="14" type="vandle" subtype="medium" group="39" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="15" type="vandle" subtype="medium" group="39" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+			</Module>
+			<Module number="7"  Revision="F" Frequency="250" Firmware="R42159" TraceDelay="264" >
+				<Channel number="0" type="vandle" subtype="medium" group="40" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="1" type="vandle" subtype="medium" group="40" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="2" type="vandle" subtype="medium" group="41" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="3" type="vandle" subtype="medium" group="41" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="4" type="vandle" subtype="medium" group="42" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="5" type="vandle" subtype="medium" group="42" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="6" type="vandle" subtype="medium" group="43" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="7" type="vandle" subtype="medium" group="43" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="8" type="vandle" subtype="medium" group="44" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="9" type="vandle" subtype="medium" group="44" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="10" type="vandle" subtype="medium" group="45" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="11" type="vandle" subtype="medium" group="45" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="12" type="vandle" subtype="medium" group="46" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="13" type="vandle" subtype="medium" group="46" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="14" type="vandle" subtype="medium" group="47" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="15" type="vandle" subtype="medium" group="47" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+			</Module>
+			<Module number="8"  Revision="F" Frequency="250" Firmware="R42159" TraceDelay="264" >
+				<Channel number="0" type="vandle" subtype="medium" group="48" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="1" type="vandle" subtype="medium" group="48" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="2" type="vandle" subtype="medium" group="49" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="3" type="vandle" subtype="medium" group="49" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="4" type="vandle" subtype="medium" group="50" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="5" type="vandle" subtype="medium" group="50" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="6" type="vandle" subtype="medium" group="51" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="7" type="vandle" subtype="medium" group="51" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="8" type="vandle" subtype="medium" group="52" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="9" type="vandle" subtype="medium" group="52" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="10" type="vandle" subtype="medium" group="53" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="11" type="vandle" subtype="medium" group="53" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="12" type="vandle" subtype="medium" group="54" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="13" type="vandle" subtype="medium" group="54" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="14" type="vandle" subtype="medium" group="55" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="15" type="vandle" subtype="medium" group="55" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+			</Module>
+			<Module number="9"  Revision="F" Frequency="250" Firmware="R42159" TraceDelay="264" >
+				<Channel number="0" type="vandle" subtype="medium" group="56" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="1" type="vandle" subtype="medium" group="56" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="2" type="vandle" subtype="medium" group="57" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="3" type="vandle" subtype="medium" group="57" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="4" type="vandle" subtype="medium" group="58" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="5" type="vandle" subtype="medium" group="58" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="6" type="vandle" subtype="medium" group="59" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="7" type="vandle" subtype="medium" group="59" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="8" type="vandle" subtype="medium" group="60" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="9" type="vandle" subtype="medium" group="60" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="10" type="vandle" subtype="medium" group="61" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="11" type="vandle" subtype="medium" group="61" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="12" type="vandle" subtype="medium" group="62" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="13" type="vandle" subtype="medium" group="62" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="14" type="vandle" subtype="medium" group="63" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="15" type="vandle" subtype="medium" group="63" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+			</Module>
+			<Module number="10"  Revision="F" Frequency="250" Firmware="R42159" TraceDelay="264" >
+				<Channel number="0" type="vandle" subtype="medium" group="64" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="1" type="vandle" subtype="medium" group="64" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="2" type="vandle" subtype="medium" group="65" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="3" type="vandle" subtype="medium" group="65" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="4" type="vandle" subtype="medium" group="66" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="5" type="vandle" subtype="medium" group="66" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="6" type="vandle" subtype="medium" group="67" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="7" type="vandle" subtype="medium" group="67" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="8" type="vandle" subtype="medium" group="68" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="9" type="vandle" subtype="medium" group="68" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="10" type="vandle" subtype="medium" group="69" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="11" type="vandle" subtype="medium" group="69" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="12" type="vandle" subtype="medium" group="70" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="13" type="vandle" subtype="medium" group="70" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="14" type="vandle" subtype="medium" group="71" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="15" type="vandle" subtype="medium" group="71" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+			</Module>
+			<Module number="11"  Revision="F" Frequency="250" Firmware="R42159" TraceDelay="264" >
+				<Channel number="0" type="vandle" subtype="medium" group="72" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="1" type="vandle" subtype="medium" group="72" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="2" type="vandle" subtype="medium" group="73" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="3" type="vandle" subtype="medium" group="73" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="4" type="vandle" subtype="medium" group="74" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="5" type="vandle" subtype="medium" group="74" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="6" type="vandle" subtype="medium" group="75" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="7" type="vandle" subtype="medium" group="75" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="8" type="vandle" subtype="medium" group="76" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="9" type="vandle" subtype="medium" group="76" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="10" type="vandle" subtype="medium" group="77" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="11" type="vandle" subtype="medium" group="77" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="12" type="vandle" subtype="medium" group="78" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="13" type="vandle" subtype="medium" group="78" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="14" type="vandle" subtype="medium" group="79" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="15" type="vandle" subtype="medium" group="79" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+			</Module>
+			<Module number="12"  Revision="F" Frequency="250" Firmware="R42159" TraceDelay="264" >
+				<Channel number="0" type="vandle" subtype="medium" group="80" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="1" type="vandle" subtype="medium" group="80" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="2" type="vandle" subtype="medium" group="81" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="3" type="vandle" subtype="medium" group="81" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="4" type="vandle" subtype="medium" group="82" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="5" type="vandle" subtype="medium" group="82" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="6" type="vandle" subtype="medium" group="83" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="7" type="vandle" subtype="medium" group="83" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="8" type="vandle" subtype="medium" group="84" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="9" type="vandle" subtype="medium" group="84" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="10" type="vandle" subtype="medium" group="85" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="11" type="vandle" subtype="medium" group="85" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="12" type="vandle" subtype="medium" group="86" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="13" type="vandle" subtype="medium" group="86" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="14" type="vandle" subtype="medium" group="87" tags="left">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="15" type="vandle" subtype="medium" group="87" tags="right">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+			</Module>
+		</Crate>
+		<Crate number="1">
+			<Module number="0" Revision="F" Frequency="250" Firmware="R42159" TraceDelay="264" >
+				<Channel number="0" type="pspmt" subtype="dynode_high" tags="">
+					<Calibration model="linear">0.0 1.0</Calibration>
+					<Trace RangeLow="10" RangeHigh="40"/>
+					<Fit beta="0.24362" gamma="0.0100"/>
+					<Cfd f="0.45"/>
+				</Channel>
+				<Channel number="1" type="pspmt" subtype="dynode_low" tags="">
+					<Calibration model="linear">0.0 1.0</Calibration>
+					<Trace RangeLow="10" RangeHigh="40"/>
+					<Fit beta="0.24362" gamma="0.0100"/>
+					<Cfd f="0.45"/>
+				</Channel>
+				<Channel number="4" type="pspmt" subtype="anode_high" group="xa">
+					<Calibration model="linear">0.0 1.0</Calibration>
+					<Trace RangeLow="7" RangeHigh="40"/>
+				</Channel>
+				<Channel number="5" type="pspmt" subtype="anode_high" group="xb">
+					<Calibration model="linear">0.0 1.0</Calibration>
+					<Trace RangeLow="7" RangeHigh="40"/>
+				</Channel>
+				<Channel number="6" type="pspmt" subtype="anode_high" group="ya">
+					<Calibration model="linear">0.0 1.0</Calibration>
+					<Trace RangeLow="7" RangeHigh="40"/>
+				</Channel>
+				<Channel number="7" type="pspmt" subtype="anode_high" group="yb">
+					<Calibration model="linear">0.0 1.0</Calibration>
+					<Trace RangeLow="7" RangeHigh="40"/>
+				</Channel>
+				<Channel number="8" type="pspmt" subtype="anode_low" group="xa">
+					<Calibration model="linear">0.0 1.0</Calibration>
+					<Trace RangeLow="7" RangeHigh="40"/>
+				</Channel>
+				<Channel number="9" type="pspmt" subtype="anode_low" group="xb">
+					<Calibration model="linear">0.0 1.0</Calibration>
+					<Trace RangeLow="7" RangeHigh="40"/>
+				</Channel>
+				<Channel number="10" type="pspmt" subtype="anode_low" group="ya">
+					<Calibration model="linear">0.0 1.0</Calibration>
+					<Trace RangeLow="7" RangeHigh="40"/>
+				</Channel>
+				<Channel number="11" type="pspmt" subtype="anode_low" group="yb">
+					<Calibration model="linear">0.0 1.0</Calibration>
+					<Trace RangeLow="7" RangeHigh="40"/>
+				</Channel>
+				<Channel number="15" type="pulser" subtype="pulser" group="">
+					<Calibration model="linear">0 0.1 </Calibration>
+				</Channel>
+			</Module>
+			<Module number="1" Revision="F" Frequency="250" Firmware="R42159" TraceDelay="264" >
+				<Channel number="5" type="pspmt" subtype="FIT" group="b1">
+					<Calibration model="linear">0 0.1 </Calibration>
+				</Channel>
+				<Channel number="6" type="pspmt" subtype="RIT" group="b1">
+					<Calibration model="linear">0 0.1 </Calibration>
+				</Channel>
+				<Channel number="7" type="pid" subtype="cross_scint_b2_logic" group="cross-scint-logic">
+					<Calibration model="linear">0 0.1 </Calibration>
+				</Channel>
+				<Channel number="8" type="pid" subtype="cross_scint_t1" group="cross_scint_t1"> <!--This is actually t2 but utkscan needs t1-->
+					<Calibration model="linear">0 0.1 </Calibration>
+					<Trace RangeLow="10" RangeHigh="40"/>
+					<Cfd f="0.45"/>
+				</Channel>
+				<Channel number="9" type="pid" subtype="cross_pin0_logic" group="msx40_logic">
+					<Calibration model="linear">0 0.1 </Calibration>
+				</Channel>
+			</Module>
+			<Module number="2" Revision="F" Frequency="250" Firmware="R42159" TraceDelay="264" >
+				<Channel number="0" type="pid" subtype="db3_scint_L_logic" group="db3_scint_L_logic">
+					<Calibration model="linear">0 0.1 </Calibration>
+				</Channel>
+				<Channel number="1" type="pid" subtype="db3_scint_R_logic" group="db3_scint_R_logic">
+					<Calibration model="linear">0 0.1 </Calibration>
+				</Channel>
+				<Channel number="2" type="pid" subtype="db3_ppac_upstream_anode" group="db3_ppac_upstream_anode">
+					<Calibration model="linear">0 0.1 </Calibration>
+				</Channel>
+				<Channel number="3" type="pid" subtype="db3_ppac_upstream_left" group="db3_ppac_upstream_left">
+					<Calibration model="linear">0 0.1 </Calibration>
+				</Channel>
+				<Channel number="4" type="pid" subtype="db3_ppac_upstream_right" group="db3_ppac_upstream_right">
+					<Calibration model="linear">0 0.1 </Calibration>
+				</Channel>
+				<Channel number="5" type="pid" subtype="db3_ppac_downstream_anode" group="db3_ppac_downstream_anode">
+					<Calibration model="linear">0 0.1 </Calibration>
+				</Channel>
+				<Channel number="6" type="pid" subtype="db3_ppac_downstream_left" group="db3_ppac_downstream_left">
+					<Calibration model="linear">0 0.1 </Calibration>
+				</Channel>
+				<Channel number="7" type="pid" subtype="db3_ppac_downstream_right" group="db3_ppac_downstream_right">
+					<Calibration model="linear">0 0.1 </Calibration>
+				</Channel>
+				<Channel number="8" type="pid" subtype="db4_ppac_up" group="db4_ppac_up">
+					<Calibration model="linear">0 0.1 </Calibration>
+				</Channel>
+				<Channel number="9" type="pid" subtype="db4_ppac_down" group="db4_ppac_down">
+					<Calibration model="linear">0 0.1 </Calibration>
+				</Channel>
+				<Channel number="10" type="pid" subtype="db4_ppac_left" group="db4_ppac_left">
+					<Calibration model="linear">0 0.1 </Calibration>
+				</Channel>
+				<Channel number="11" type="pid" subtype="db4_ppac_right" group="db4_ppac_right">
+					<Calibration model="linear">0 0.1 </Calibration>
+				</Channel>
+				<Channel number="12" type="pid" subtype="db5_ppac_upstream_right" group="db5_ppac_upstream_right">
+					<Calibration model="linear">0 0.1 </Calibration>
+				</Channel>
+				<Channel number="13" type="pid" subtype="db5_ppac_upstream_left" group="db5_ppac_upstream_left">
+					<Calibration model="linear">0 0.1 </Calibration>
+				</Channel>
+				<Channel number="14" type="pid" subtype="db5_ppac_downstream_left" group="db5_ppac_downstream_left">
+					<Calibration model="linear">0 0.1 </Calibration>
+				</Channel>
+				<Channel number="15" type="pid" subtype="db5_ppac_downstream_right" group="db5_ppac_downstream_right">
+					<Calibration model="linear">0 0.1 </Calibration>
+				</Channel>
+			</Module>
+			<Module number="3" Revision="F" Frequency="250" Firmware="R42159" TraceDelay="264" >
+				<Channel number="0" type="clover" subtype="clover_high"  location="0" tags="clover0" group="clover0A" >
+					<Calibration model="linear" min="0">   0.0133778    0.191487   </Calibration>
+					<Angular>
+						<Latch position="long"   theta="90.0" phi="88.0" radius ="1.0"/>
+						<Latch position="medium" theta="89.0" phi="89.0" radius ="1.1"/>
+						<Latch position="short"  theta="88.0" phi="90.0" radius ="1.2"/>
+					</Angular>
+				</Channel>
+				<Channel number="1" type="clover" subtype="clover_high"  location="1" tags="clover0" group="clover0B" >
+					<Calibration model="linear" min="0">   -0.0417175    0.185571   </Calibration>
+					<Angular>
+						<Latch position="long"   theta="90.0" phi="88.0" radius ="1.0"/>
+						<Latch position="medium" theta="89.0" phi="89.0" radius ="1.1"/>
+					</Angular>
+				</Channel>
+				<Channel number="2" type="clover" subtype="clover_high" location="2" tags="clover0" group="clover0C" >
+					<Calibration model="linear" min="0">   -0.0404556    0.18755   </Calibration>
+				</Channel>
+				<Channel number="3" type="clover" subtype="clover_high" location="3" tags="clover0" group="clover0D" >
+					<Calibration model="linear" min="0">   -0.538962    0.19047   </Calibration>
+				</Channel>
+				<Channel number="4" type="clover" subtype="clover_high" location="4" tags="clover1" group="clover1A" >
+					<Calibration model="linear" min="0">   -0.00523915    0.188807   </Calibration>
+				</Channel>
+				<Channel number="5" type="clover" subtype="clover_high" location="5" tags="clover1" group="clover1B" >
+					<Calibration model="linear" min="0">   -0.0160214    0.18443   </Calibration>
+				</Channel>
+				<Channel number="6" type="clover" subtype="clover_high" location="6" tags="clover1" group="clover1C" >
+					<Calibration model="linear" min="0">   -0.0798223    0.188177   </Calibration>
+				</Channel>
+				<Channel number="7" type="clover" subtype="clover_high" location="7" tags="clover1" group="clover1D" >
+					<Calibration model="linear" min="0">   -0.068461    0.186794   </Calibration>
+				</Channel>
+				<Channel number="8" type="clover" subtype="clover_high" location="8" tags="clover2" group="clover2A" >
+					<Calibration model="linear" min="0">   -0.720891    0.155378   </Calibration>
+				</Channel>
+
+				<Channel number="11" type="clover" subtype="clover_high" location="11" tags="clover2" group="clover2D" >
+					<Calibration model="linear" min="0">   -0.519519    0.187137   </Calibration>
+				</Channel>
+				<Channel number="15" type="generic" subtype="ignore" group="0" >
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+			</Module>
+			<Module number="4" Revision="F" Frequency="250" Firmware="R42159" TraceDelay="264" >
+				<Channel number="0" type="clover" subtype="clover_high" location="16" tags="clover4" group="clover4A" >
+					<Calibration model="linear" min="0">   -0.163084    0.137248   </Calibration>
+				</Channel>
+				<Channel number="1" type="clover" subtype="clover_high" location="17" tags="clover4" group="clover4B" >
+					<Calibration model="linear" min="0">   -0.162586    0.179322   </Calibration>
+				</Channel>
+				<Channel number="2" type="clover" subtype="clover_high" location="18" tags="clover4" group="clover4C" >
+					<Calibration model="linear" min="0">   0.154497    0.182474   </Calibration>
+				</Channel>
+				<Channel number="3" type="clover" subtype="clover_high" location="19" tags="clover4" group="clover4D" >
+					<Calibration model="linear" min="0">   -0.15737    0.183554   </Calibration>
+				</Channel>
+				<Channel number="4" type="clover" subtype="clover_high" location="20" tags="clover5" group="clover5A" >
+					<Calibration model="linear" min="0">   -0.141131    0.189746   </Calibration>
+				</Channel>
+				<Channel number="5" type="clover" subtype="clover_high" location="21" tags="clover5" group="clover5B" >
+					<Calibration model="linear" min="0">   -0.14335    0.188931   </Calibration>
+				</Channel>
+				<Channel number="6" type="clover" subtype="clover_high" location="22" tags="clover5" group="clover5C" >
+					<Calibration model="linear" min="0">   -0.221671    0.184795   </Calibration>
+				</Channel>
+				<Channel number="7" type="clover" subtype="clover_high" location="23" tags="clover5" group="clover5D" >
+					<Calibration model="linear" min="0">   -0.268631    0.187441   </Calibration>
+				</Channel>
+
+				<Channel number="11" type="clover" subtype="clover_high" location="27" tags="clover6" group="clover6D" >
+					<Calibration model="linear" min="0">   -0.121222    0.192572   </Calibration>
+				</Channel>
+				<Channel number="15" type="generic" subtype="ignore" group="1">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+			</Module>
+			<Module number="5" Revision="F" Frequency="250" Firmware="R42159" TraceDelay="264" >
+				<Channel number="0" type="clover" subtype="clover_high" location="32" tags="clover8" group="clover8A" >
+					<Calibration model="linear" min="0">   -0.907154    0.435207   </Calibration>
+				</Channel>
+				<Channel number="1" type="clover" subtype="clover_high" location="33" tags="clover8" group="clover8B" >
+					<Calibration model="linear" min="0">   0.530813    0.441403   </Calibration>
+				</Channel>
+				<Channel number="2" type="clover" subtype="clover_high" location="34" tags="clover8" group="clover8C" >
+					<Calibration model="linear" min="0">   -0.953722    0.431519   </Calibration>
+				</Channel>
+				<Channel number="3" type="clover" subtype="clover_high" location="35" tags="clover8" group="clover8D" >
+					<Calibration model="linear" min="0">   0.067629    0.156285   </Calibration>
+				</Channel>
+				<Channel number="4" type="clover" subtype="clover_high" location="36" tags="clover9" group="clover9A" >
+					<Calibration model="linear" min="0">   -0.613466    0.200435   </Calibration>
+				</Channel>
+				<Channel number="5" type="clover" subtype="clover_high" location="37" tags="clover9" group="clover9B" >
+					<Calibration model="linear" min="0">   0.301336    0.190495   </Calibration>
+				</Channel>
+				<Channel number="6" type="clover" subtype="clover_high" location="38" tags="clover9" group="clover9C" >
+					<Calibration model="linear" min="0">   -0.148972    0.176844   </Calibration>
+				</Channel>
+				<Channel number="7" type="clover" subtype="clover_high" location="39" tags="clover9" group="clover9D" >
+					<Calibration model="linear" min="0">   -0.244818    0.179535   </Calibration>
+				</Channel>
+				<Channel number="8" type="clover" subtype="clover_high" location="40" tags="clover10" group="clover10A" >
+					<Calibration model="linear" min="0">   -0.168236    0.184059   </Calibration>
+				</Channel>
+				<Channel number="9" type="clover" subtype="clover_high" location="41" tags="clover10" group="clover10B" >
+					<Calibration model="linear" min="0">   -0.314776    0.183405   </Calibration>
+				</Channel>
+				<Channel number="10" type="clover" subtype="clover_high" location="42" tags="clover10" group="clover10C" >
+					<Calibration model="linear" min="0">   0.218066    0.13885   </Calibration>
+				</Channel>
+				<Channel number="11" type="clover" subtype="clover_high" location="43" tags="clover10" group="clover10D" >
+					<Calibration model="linear" min="0">   -0.218456    0.138263   </Calibration>
+				</Channel>
+				<Channel number="14" type="clover" subtype="clover_high" location="46" tags="clover11" group="clover11C" >
+					<Calibration model="linear" min="0">   0.0636854    0.194472   </Calibration>
+				</Channel>
+				<Channel number="15" type="clover" subtype="clover_high" location="47" tags="clover11" group="clover11D" >
+					<Calibration model="linear" min="0">   0.218896    0.193827   </Calibration>
+				</Channel>
+			</Module>
+			<Module number="6" Revision="F" Frequency="250" Firmware="R42159" TraceDelay="264" >
+				<Channel number="0" type="clover" subtype="clover_high" location="48" tags="clover12" group="clover12A" >
+					<Calibration model="linear" min="0">   -0.568705    0.192278   </Calibration>
+				</Channel>
+				<Channel number="1" type="clover" subtype="clover_high" location="49" tags="clover12" group="clover12B" >
+					<Calibration model="linear" min="0">   0.150813    0.189506   </Calibration>
+				</Channel>
+				<Channel number="2" type="clover" subtype="clover_high" location="50" tags="clover12" group="clover12C" >
+					<Calibration model="linear" min="0">   0.0755857    0.192042   </Calibration>
+				</Channel>
+				<Channel number="3" type="clover" subtype="clover_high" location="51" tags="clover12" group="clover12D" >
+					<Calibration model="linear" min="0">   -0.182648    0.185894   </Calibration>
+				</Channel>
+				<Channel number="4" type="clover" subtype="clover_high" location="9" tags="clover2" group="clover2B" >
+					<Calibration model="linear" min="0">   -0.609673    0.1552   </Calibration>
+				</Channel>
+				<Channel number="5" type="clover" subtype="clover_high" location="10" tags="clover2" group="clover2C" >
+					<Calibration model="linear" min="0">   -0.315031    0.222468   </Calibration>
+				</Channel>
+				<Channel number="6" type="clover" subtype="clover_high" location="24" tags="clover6" group="clover6A" >
+					<Calibration model="linear" min="0">   -0.088139    0.195194   </Calibration>
+				</Channel>
+				<Channel number="7" type="clover" subtype="clover_high" location="25" tags="clover6" group="clover6B" >
+					<Calibration model="linear" min="0">   0.258254    0.196119   </Calibration>
+				</Channel>
+				<Channel number="8" type="clover" subtype="clover_high" location="26" tags="clover6" group="clover6C" >
+					<Calibration model="linear" min="0">   -0.257865    0.187313   </Calibration>
+				</Channel>
+				<Channel number="15" type="generic" subtype="ignore" group="2">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+			</Module>
+			<Module number="7" Revision="F" Frequency="250" Firmware="R42159" TraceDelay="264" >
+				<Channel number="0" type="gscint" subtype="smallhag" tags="hg0" >
+					<Calibration model="quadratic" min="0">   0    0.0838971     1.21626e-07   </Calibration>
+				</Channel>
+				<Channel number="1" type="gscint" subtype="smallhag" tags="hg1" >
+					<Calibration model="quadratic" min="0">   0    0.0924271     1.44256e-07   </Calibration>
+				</Channel>
+				<Channel number="2" type="gscint" subtype="smallhag" tags="hg2" >
+					<Calibration model="quadratic" min="0">   0    0.0909464     2.48984e-07   </Calibration>
+				</Channel>
+				<Channel number="3" type="gscint" subtype="smallhag" tags="hg3" >
+					<Calibration model="quadratic" min="0">   0    0.0942368     1.19928e-07   </Calibration>
+				</Channel>
+				<Channel number="4" type="gscint" subtype="smallhag" tags="hg4" >
+					<Calibration model="quadratic" min="0">   0    0.0822585     2.35632e-07   </Calibration>
+				</Channel>
+				<Channel number="5" type="gscint" subtype="smallhag" tags="hg5" >
+					<Calibration model="quadratic" min="0">   0    0.0832277     3.23198e-07   </Calibration>
+				</Channel>
+				<Channel number="6" type="gscint" subtype="smallhag" tags="hg6" >
+					<Calibration model="quadratic" min="0">   0    0.0840918     6.82618e-08   </Calibration>
+				</Channel>
+				<Channel number="7" type="gscint" subtype="smallhag" tags="hg7" >
+					<Calibration model="quadratic" min="0">   0    0.0852709     2.55545e-07   </Calibration>
+				</Channel>
+				<Channel number="8" type="gscint" subtype="smallhag" tags="hg8" >
+					<Calibration model="linear" min="0">   0    0.0864329   </Calibration>
+				</Channel>
+				<Channel number="9" type="gscint" subtype="smallhag" tags="hg9" >
+					<Calibration model="linear" min="0">   0    0.085709   </Calibration>
+				</Channel>
+				<Channel number="10" type="gscint" subtype="smallhag" tags="hg10" >
+					<Calibration model="quadratic" min="0">   0    0.0846741     2.2673e-07   </Calibration>
+				</Channel>
+				<Channel number="11" type="gscint" subtype="smallhag" tags="hg11" >
+					<Calibration model="quadratic" min="0">   0    0.0906469     3.283e-07   </Calibration>
+				</Channel>
+				<Channel number="12" type="gscint" subtype="smallhag" tags="hg12" >
+					<Calibration model="quadratic" min="0">   0    0.0867103     2.16194e-07   </Calibration>
+				</Channel>
+				<Channel number="14" type="gscint" subtype="smallhag" tags="hg13" >
+					<Calibration model="quadratic" min="0">   0    0.088889     3.56672e-07   </Calibration>
+				</Channel>
+				<Channel number="15" type="gscint" subtype="smallhag" tags="hg14" >
+					<Calibration model="quadratic" min="0">   0    0.0866374     2.02393e-07   </Calibration>
+				</Channel>
+
+			</Module>
+			<Module number="8" Revision="F" Frequency="250" Firmware="R42159" TraceDelay="264" >
+				<Channel number="4" type="clover" subtype="clover_high" location="44" tags="clover11" group="clover11A" >
+					<Calibration model="linear" min="0">   -0.209129    0.193338   </Calibration>
+				</Channel>
+				<Channel number="5" type="clover" subtype="clover_high" location="45" tags="clover11" group="clover11B" >
+					<Calibration model="linear" min="0">   -0.410449    0.195325   </Calibration>
+				</Channel>
+				<Channel number="15" type="generic" subtype="ignore" group="3">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+			</Module>
+			<Module number="9" Revision="F" Frequency="250" Firmware="R42159" TraceDelay="264" >
+				<Channel number="0" type="pid" subtype="cross_pin0" group="msx40">
+					<Calibration model="linear">0 0.5 </Calibration>
+					<Trace RangeLow="10" RangeHigh="40"/>
+					<Cfd f="0.45"/>
+				</Channel>
+				<Channel number="1" type="pid" subtype="cross_pin1" group="msx100">
+					<Calibration model="linear">0 0.5 </Calibration>
+					<Trace RangeLow="10" RangeHigh="40"/>
+					<Cfd f="0.45"/>
+				</Channel>
+				<Channel number="15" type="generic" subtype="ignore" group="4">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+			</Module>
+			<Module number="10" Revision="F" Frequency="250" Firmware="R42159" TraceDelay="264" >
+				<Channel number="15" type="generic" subtype="ignore" group="5">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+			</Module>
+			<Module number="11" Revision="F" Frequency="250" Firmware="R42159" TraceDelay="264" >
+				<Channel number="15" type="generic" subtype="ignore" group="6">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+			</Module>
+			<Module number="12" Revision="F" Frequency="250" Firmware="R42159" TraceDelay="264" >
+				<Channel number="15" type="generic" subtype="ignore" group="7">
+					<Calibration model="linear">0.0 1.0</Calibration>
+				</Channel>
+			</Module>
+
+		</Crate>
+	</Map>
+
+</Configuration>
