@@ -147,6 +147,8 @@ class PhysicsData{
 
 		std::set<std::string> GetTagList() const;
 
+		bool HasTag(const std::string&) const;
+
 		template<typename OStream>
 		friend OStream& operator<<(OStream& os, const PhysicsData& pd) {
 			os << "PhysicsData( \nCrate: " << pd.CrateNum 

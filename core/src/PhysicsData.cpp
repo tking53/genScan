@@ -461,3 +461,7 @@ bool PhysicsData::operator==(const PhysicsData& rhs) const{
 bool PhysicsData::operator!=(const PhysicsData& rhs) const{
 	return !((*this) == rhs);
 }
+
+bool PhysicsData::HasTag(const std::string& tagid) const{
+	return (this->TagList.find(tagid) != this->TagList.end());
+}
