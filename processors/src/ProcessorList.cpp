@@ -9,6 +9,7 @@
 
 #include "GenericAnalyzer.hpp"
 #include "RootDevProcessor.hpp"
+#include "MtasProcessor.hpp"
 
 ProcessorList::ProcessorList(const std::string& log){
 	this->LogName = log;
@@ -85,6 +86,8 @@ void ProcessorList::PostProcess(EventSummary& Summary,PLOTS::PlotRegistry* Histo
 void ProcessorList::CreateProc(const std::string& name){
 	if( name.compare("GenericProcessor") == 0 ){
 		this->known_processors.push_back(std::make_shared<GenericProcessor>(this->LogName));
+	}else if( name.compare("MtasProcessor") == 0 ){
+		known_processors.push_back(std::make_shared<MtasProcessor>(this->LogName));
 	}else if( name.compare("RootDevProcessor") == 0 ){
 		known_processors.push_back(std::make_shared<RootDevProcessor>(this->LogName));
 	}else{
