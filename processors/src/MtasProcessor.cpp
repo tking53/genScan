@@ -11,7 +11,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 
 [[maybe_unused]] bool MtasProcessor::PreProcess(EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	Processor::PreProcess();
-	summary.GetDetectorSummary(this->DefaultRegex,this->SummaryData);
+	summary.GetDetectorSummary(this->AllDefaultRegex["mtas"],this->SummaryData);
 	//this->console->info("Size of event for MTAS : {}",this->SummaryData.size());
 	//for( const auto& evt : this->SummaryData ){
 	//}

@@ -3,8 +3,16 @@
 
 #include <set>
 #include <string>
-#include <regex>
 
+#include <spdlog/common.h>
+#include <spdlog/spdlog.h>
+#include <spdlog/cfg/env.h>
+#include <spdlog/fmt/ostr.h>
+#include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+
+
+#include <boost/container/flat_map.hpp>
 #include <boost/container/devector.hpp>
 #include <boost/regex.hpp>
 
@@ -12,8 +20,8 @@
 
 class EventSummary{
 	public:
-		EventSummary();
-		~EventSummary() = default;
+		EventSummary(const std::string&);
+		~EventSummary();
 		
 		void BuildDetectorSummary();
 		void GetDetectorTypeSummary(const std::string&,std::vector<PhysicsData*>&);
@@ -26,9 +34,15 @@ class EventSummary{
 		const std::set<std::string>& GetKnownTypes() const;
 
 	private:
+		std::string LogName;
+		std::shared_ptr<spdlog::logger> console;
+
 		boost::container::devector<PhysicsData> RawEvents;
 		std::set<std::string> KnownTypes;
 		boost::regex ColonParse;
+		boost::container::flat_map<std::string,std::vector<PhysicsData*>> Cache;
+		unsigned long long CacheHits;
+		unsigned long long CacheMisses;
 };
 
 #endif

@@ -286,7 +286,7 @@ int main(int argc, char *argv[]) {
 
 	std::signal(SIGINT, signalHandler);
 
-	EventSummary CorrelatedEvents;
+	EventSummary CorrelatedEvents(logname);
 	Translator::TRANSLATORSTATE CurrState = Translator::TRANSLATORSTATE::UNKNOWN;
 	try{
 		do{
