@@ -20,7 +20,7 @@ void EventSummary::BuildDetectorSummary(){
 
 void EventSummary::GetDetectorSummary(const boost::regex& rkey,std::vector<PhysicsData*>& vec){
 	auto CacheCheck = this->Cache.find(rkey.str());
-	if( CacheCheck == this->Cache.end() ) [[likely]] {
+	if( CacheCheck == this->Cache.end() ){
 		//this->console->info("No Cached info for : {}",rkey.str());
 		++(this->CacheMisses);
 		vec.clear();
