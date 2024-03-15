@@ -27,7 +27,7 @@ void EventSummary::GetDetectorSummary(const boost::regex& rkey,std::vector<Physi
 		//std::sregex_iterator end;
 		boost::smatch type_match;
 		for( auto& evt : this->RawEvents ){
-			if( boost::regex_match(evt.GetUniqueID(),type_match,rkey) ){
+			if( boost::regex_match(evt.GetUniqueID(),type_match,rkey,boost::regex_constants::match_continuous) ){
 				vec.push_back(&evt);
 			}
 			//std::string unique_id(evt.GetUniqueID());

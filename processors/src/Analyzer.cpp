@@ -27,14 +27,14 @@ Analyzer::Analyzer(const std::string& log,const std::string& analyzer,const std:
 	for( const auto& t : this->Types ){
 		this->DefaultRegexString += t+":.*|";
 		this->console->info("Type : [{}] has been associated with this Analyzer",t);
-		this->AllDefaultRegex[t] = boost::regex(t+":.*");
+		this->AllDefaultRegex[t] = boost::regex(t+":.*",boost::regex_constants::optimize|boost::regex_constants::nosubs);
 		this->console->info("Type Regex for {}, has been generated and is available",t);
 	}
 	if( this->Types.size() == 1 ){
 		this->DefaultRegexString.pop_back();
 	}
 	this->DefaultRegexString += ")";
-	this->DefaultRegex = boost::regex(this->DefaultRegexString);
+	this->DefaultRegex = boost::regex(this->DefaultRegexString,boost::regex_constants::optimize|boost::regex_constants::nosubs);
 	this->AllDefaultRegex["ALL"] = this->DefaultRegex;
 	this->console->info("Default Type Regex established to be {}",this->DefaultRegexString);
 }
@@ -93,10 +93,10 @@ void Analyzer::AssociateType(const std::string& t){
 		this->DefaultRegexString.pop_back();
 		this->DefaultRegexString += "|"+t+":.*)";
 		this->Types.insert(t);
-		this->DefaultRegex = boost::regex(this->DefaultRegexString);
+		this->DefaultRegex = boost::regex(this->DefaultRegexString,boost::regex_constants::optimize|boost::regex_constants::nosubs);
 		this->console->info("Type : [{}] has been associated with this Analyzer",t);
 		this->console->info("Default Type Regex updated to be {}",this->DefaultRegexString);
-		this->AllDefaultRegex[t] = boost::regex(t+":.*");
+		this->AllDefaultRegex[t] = boost::regex(t+":.*",boost::regex_constants::optimize|boost::regex_constants::nosubs);
 		this->console->info("Type Regex for {}, has been generated and is available",t);
 		this->AllDefaultRegex["ALL"] = this->DefaultRegex;
 	}else{
