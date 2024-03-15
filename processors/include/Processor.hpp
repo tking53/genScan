@@ -9,6 +9,7 @@
 #include <string>
 #include <memory>
 #include <chrono>
+#include <unordered_map>
 
 #include <spdlog/common.h>
 #include <spdlog/spdlog.h>
@@ -86,6 +87,7 @@ class Processor : public std::enable_shared_from_this<Processor> {
 
 		std::string DefaultRegexString;
 		boost::regex DefaultRegex;
+		std::unordered_map<std::string,boost::regex> AllDefaultRegex;
 
 		std::set<std::string> Types;
 

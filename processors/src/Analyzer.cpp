@@ -25,14 +25,17 @@ Analyzer::Analyzer(const std::string& log,const std::string& analyzer,const std:
 	this->console->info("Created Analyzer : {}",this->AnalyzerName);
 	this->DefaultRegexString = "(";
 	for( const auto& t : this->Types ){
-		this->DefaultRegexString += t+"|";
+		this->DefaultRegexString += t+":.*|";
 		this->console->info("Type : [{}] has been associated with this Analyzer",t);
+		this->AllDefaultRegex[t] = boost::regex(t+":.*");
+		this->console->info("Type Regex for {}, has been generated and is available",t);
 	}
 	if( this->Types.size() == 1 ){
 		this->DefaultRegexString.pop_back();
 	}
 	this->DefaultRegexString += ")";
 	this->DefaultRegex = boost::regex(this->DefaultRegexString);
+	this->AllDefaultRegex["ALL"] = this->DefaultRegex;
 	this->console->info("Default Type Regex established to be {}",this->DefaultRegexString);
 }
 
@@ -88,11 +91,14 @@ std::string Analyzer::GetAnalyzerName() const{
 void Analyzer::AssociateType(const std::string& t){
 	if( this->Types.find(t) == this->Types.end() ){
 		this->DefaultRegexString.pop_back();
-		this->DefaultRegexString += "|"+t+")";
+		this->DefaultRegexString += "|"+t+":.*)";
 		this->Types.insert(t);
 		this->DefaultRegex = boost::regex(this->DefaultRegexString);
 		this->console->info("Type : [{}] has been associated with this Analyzer",t);
 		this->console->info("Default Type Regex updated to be {}",this->DefaultRegexString);
+		this->AllDefaultRegex[t] = boost::regex(t+":.*");
+		this->console->info("Type Regex for {}, has been generated and is available",t);
+		this->AllDefaultRegex["ALL"] = this->DefaultRegex;
 	}else{
 		this->console->critical("Type : [{}] is already associated with this Analyzer",t);
 	}

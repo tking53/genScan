@@ -9,6 +9,7 @@
 #include "CutManager.hpp"
 #include "EventSummary.hpp"
 #include <initializer_list>
+#include <unordered_map>
 #include <string>
 #include <memory>
 #include <chrono>
@@ -81,6 +82,7 @@ class Analyzer : public std::enable_shared_from_this<Analyzer>{
 
 		std::string DefaultRegexString;
 		boost::regex DefaultRegex;
+		std::unordered_map<std::string,boost::regex> AllDefaultRegex;
 		
 		std::shared_ptr<spdlog::logger> console;
 };

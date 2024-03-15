@@ -1,5 +1,4 @@
 #include "EventSummary.hpp"
-#include <regex>
 
 EventSummary::EventSummary(){
 	this->ColonParse =  boost::regex(":");
@@ -16,6 +15,8 @@ void EventSummary::GetDetectorSummary(const boost::regex& rkey,std::vector<Physi
 	//std::sregex_iterator end;
 	boost::smatch type_match;
 	for( auto& evt : this->RawEvents ){
+		//if( boost::regex_search(evt.GetUniqueID(),type_match,rkey) ){
+		//this was necessary if we don't add the appropriate regex, but assume the user has passed us regex correctly
 		if( boost::regex_match(evt.GetUniqueID(),type_match,rkey) ){
 			vec.push_back(&evt);
 		}
@@ -28,7 +29,14 @@ void EventSummary::GetDetectorSummary(const boost::regex& rkey,std::vector<Physi
 }
 
 void EventSummary::GetDetectorSummary(const std::string& key,std::vector<PhysicsData*>& vec){
+	//need to assume the regex is correct
 	boost::regex rkey(key);
+	this->GetDetectorSummary(rkey,vec);
+}
+
+void EventSummary::GetDetectorTypeSummary(const std::string& key,std::vector<PhysicsData*>& vec){
+	//need to assume the regex is correct
+	boost::regex rkey(key+":.*");
 	this->GetDetectorSummary(rkey,vec);
 }
 

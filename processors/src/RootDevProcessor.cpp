@@ -11,28 +11,31 @@ RootDevProcessor::RootDevProcessor(const std::string& log) : Processor(log,"Root
 
 [[maybe_unused]] bool RootDevProcessor::PreProcess(EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	Processor::PreProcess();
-	summary.GetDetectorSummary(this->DefaultRegex,this->SummaryData);
-	for( const auto& evt : this->SummaryData ){
-		this->CurrData.crateNum = evt->GetCrate();
-		this->CurrData.modNum = evt->GetModule();
-		this->CurrData.chanNum = evt->GetChannel();
-		this->CurrData.rawEnergy = evt->GetRawEnergy();
-		this->CurrData.energy = evt->GetEnergy();
-		this->CurrData.timeSansCfd = evt->GetRawTimeStamp();
-		this->CurrData.time = evt->GetTimeStamp();
-		this->CurrData.cfdForcedBit = evt->GetCFDForcedBit();
-		this->CurrData.cfdFraction = evt->GetCFDFraction();
-		this->CurrData.detNum = evt->GetLocation();
-		this->CurrData.type = evt->GetType();
-		this->CurrData.subtype = evt->GetSubType();
-		this->CurrData.group = evt->GetGroup();
-		this->CurrData.tag = evt->GetTags();
-		this->CurrData.pileup = evt->GetPileup();
-		this->CurrData.saturation = evt->GetSaturation();
-		this->CurrData.trace = std::vector<unsigned int>(evt->GetRawTraceData().begin(),evt->GetRawTraceData().end());
-		this->CurrData.qdcSums = evt->GetQDCSums();
+	for( const auto& key : this->Types ){
+		summary.GetDetectorSummary(this->AllDefaultRegex[key],this->SummaryData);
+		//this->console->info("ROOTDEV Size for type {} : {}",key,this->SummaryData.size());
+		for( const auto& evt : this->SummaryData ){
+			this->CurrData.crateNum = evt->GetCrate();
+			this->CurrData.modNum = evt->GetModule();
+			this->CurrData.chanNum = evt->GetChannel();
+			this->CurrData.rawEnergy = evt->GetRawEnergy();
+			this->CurrData.energy = evt->GetEnergy();
+			this->CurrData.timeSansCfd = evt->GetRawTimeStamp();
+			this->CurrData.time = evt->GetTimeStamp();
+			this->CurrData.cfdForcedBit = evt->GetCFDForcedBit();
+			this->CurrData.cfdFraction = evt->GetCFDFraction();
+			this->CurrData.detNum = evt->GetLocation();
+			this->CurrData.type = evt->GetType();
+			this->CurrData.subtype = evt->GetSubType();
+			this->CurrData.group = evt->GetGroup();
+			this->CurrData.tag = evt->GetTags();
+			this->CurrData.pileup = evt->GetPileup();
+			this->CurrData.saturation = evt->GetSaturation();
+			this->CurrData.trace = std::vector<unsigned int>(evt->GetRawTraceData().begin(),evt->GetRawTraceData().end());
+			this->CurrData.qdcSums = evt->GetQDCSums();
 
-		this->DataVec.push_back(this->CurrData);
+			this->DataVec.push_back(this->CurrData);
+		}
 	}
 	this->CurrData = ProcessorStruct::DEFAULT_RD_STRUCT;
 	Processor::EndProcess();

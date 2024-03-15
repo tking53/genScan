@@ -16,6 +16,7 @@ class EventSummary{
 		~EventSummary() = default;
 		
 		void BuildDetectorSummary();
+		void GetDetectorTypeSummary(const std::string&,std::vector<PhysicsData*>&);
 		void GetDetectorSummary(const std::string&,std::vector<PhysicsData*>&);
 		void GetDetectorSummary(const boost::regex&,std::vector<PhysicsData*>&);
 
