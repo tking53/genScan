@@ -172,6 +172,13 @@ void Processor::EndProcess(){
 	}
 }
 
+[[nodiscard]] const boost::regex& Processor::GetDefaultRegex() const{
+	return this->DefaultRegex;
+}
+
+[[nodiscard]] const std::unordered_map<std::string,boost::regex>& Processor::GetAllDefaultRegex() const{
+	return this->AllDefaultRegex;
+}
 		
 [[noreturn]] void Processor::DeclarePlots([[maybe_unused]] PLOTS::PlotRegistry* hismanager) const{
 	this->console->error("Called Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager), not the overload");

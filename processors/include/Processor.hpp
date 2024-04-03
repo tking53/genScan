@@ -62,6 +62,9 @@ class Processor : public std::enable_shared_from_this<Processor> {
 		[[noreturn]] virtual void DeclarePlots([[maybe_unused]] PLOTS::PlotRegistry*) const;
 
 		virtual void CleanupTree();
+
+		[[nodiscard]] virtual const boost::regex& GetDefaultRegex() const;
+		[[nodiscard]] virtual const std::unordered_map<std::string,boost::regex>& GetAllDefaultRegex() const;
 	protected:
 		enum STEP{
 			PREPROCESS,

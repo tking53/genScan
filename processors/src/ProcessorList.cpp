@@ -242,3 +242,11 @@ void ProcessorList::CleanupTrees(){
 	for( auto& proc : this->known_processors )
 		proc->CleanupTree();
 }
+
+const std::vector<std::shared_ptr<Processor>>& ProcessorList::GetProcessors() const{
+	return this->known_processors;
+}
+
+const std::vector<std::shared_ptr<Analyzer>>& ProcessorList::GetAnalyzers() const{
+	return this->known_analyzers;
+}

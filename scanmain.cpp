@@ -287,6 +287,7 @@ int main(int argc, char *argv[]) {
 	std::signal(SIGINT, signalHandler);
 
 	EventSummary CorrelatedEvents(logname);
+	CorrelatedEvents.InitMappedUIDs(cmap.get(),processorlist.get());
 	Translator::TRANSLATORSTATE CurrState = Translator::TRANSLATORSTATE::UNKNOWN;
 	try{
 		do{

@@ -288,11 +288,15 @@ void ChannelMap::FinalizeChannelMap(){
 			throw std::runtime_error("Unable to finalize the Channel Map due to duplicate board parameters found in Crate "+std::to_string(currboard.second.CrateID)+" and board "+std::to_string(currboard.second.BoardIDInCrate));
 		}
 	}
-	this->KnownUID.clear();
+	//this->KnownUID.clear();
 }
 
 XiaDecoder* ChannelMap::GetXiaDecoder(int crid,int bid) const{
 	return this->BoardConfigMap.at(this->GetGlobalBoardID(crid,bid)).xiadecoder;
+}
+		
+[[nodiscard]] int ChannelMap::GetMaxGCID() const{
+	return this->MAX_FID;
 }
 
 void ChannelMap::SetChanConfigInfo(PhysicsData& evt) const{

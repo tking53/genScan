@@ -56,6 +56,10 @@ class Analyzer : public std::enable_shared_from_this<Analyzer>{
 		[[noreturn]] virtual void Finalize();
 
 		[[noreturn]] virtual void DeclarePlots([[maybe_unused]] PLOTS::PlotRegistry*) const;
+
+	  	[[nodiscard]] virtual const boost::regex& GetDefaultRegex() const;
+		[[nodiscard]] virtual const std::unordered_map<std::string,boost::regex>& GetAllDefaultRegex() const;
+
 	protected:
 		enum STEP{
 			PREPROCESS,

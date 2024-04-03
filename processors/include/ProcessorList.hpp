@@ -61,6 +61,9 @@ class ProcessorList{
 		void CleanupTrees();
 
 		~ProcessorList();
+
+		const std::vector<std::shared_ptr<Processor>>& GetProcessors() const;
+		const std::vector<std::shared_ptr<Analyzer>>& GetAnalyzers() const;
 	private:
 		void CreateProc(const std::string&);
 		void CreateAnal(const std::string&);

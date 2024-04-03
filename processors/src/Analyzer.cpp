@@ -164,6 +164,14 @@ void Analyzer::EndProcess(){
 	}
 }
 
+[[nodiscard]] const boost::regex& Analyzer::GetDefaultRegex() const{
+	return this->DefaultRegex;
+}
+		
+[[nodiscard]] const std::unordered_map<std::string,boost::regex>& Analyzer::GetAllDefaultRegex() const{
+	return this->AllDefaultRegex;
+}
+
 [[noreturn]] void Analyzer::DeclarePlots([[maybe_unused]] PLOTS::PlotRegistry* hismanager) const{
 	this->console->error("Called Analyzer::DeclarePlots(PLOTS::PlotRegistry* hismanager), not the overload");
 	throw std::runtime_error("Called Analyzer::DeclarePlots(PLOTS::PlotRegistry* hismanager), not the overload");

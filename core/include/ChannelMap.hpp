@@ -197,6 +197,8 @@ class ChannelMap{
 
 		void FinalizeChannelMap();
 
+		[[nodiscard]] int GetMaxGCID() const;
+
 	private:
 		int MAX_CRATES;
 		int MAX_BOARDS_PER_CRATE;
