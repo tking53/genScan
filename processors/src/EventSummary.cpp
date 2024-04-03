@@ -24,35 +24,32 @@ void EventSummary::BuildDetectorSummary(){
 }
 
 void EventSummary::GetDetectorSummary(const boost::regex& rkey,std::vector<PhysicsData*>& vec){
-	auto CacheCheck = this->Cache.find(rkey.str());
-	if( CacheCheck == this->Cache.end() ){
-		++(this->CacheMisses);
-		vec.clear();
-		boost::smatch type_match;
-		//change this to a map<std::string,vector<bool>> where vector is the size of the max GCID
-		//this way we get effectively constant time lookup
-		//when we go to the loop at the end
-		auto UIDCacheCheck = this->MappedUIDs.find(rkey.str());
-		if( UIDCacheCheck == this->MappedUIDs.end() ){
+	vec.clear();
+	auto UIDCacheCheck = this->MappedUIDs.find(rkey.str());
+	if( UIDCacheCheck == this->MappedUIDs.end() ){
+		++(this->UIDCacheMisses);
+		auto CacheCheck = this->Cache.find(rkey.str());
+		if( CacheCheck == this->Cache.end() ){
+			++(this->CacheMisses);
+			boost::smatch type_match;
 			//The regex cache has been missed, i.e. it isn't a default type list
-			(++this->UIDCacheMisses);
 			for( auto& evt : this->RawEvents ){
 				if( boost::regex_match(evt.GetUniqueID(),type_match,rkey,boost::regex_constants::match_continuous) ){
 					vec.push_back(&evt);
 				}
 			}
+			this->Cache[rkey.str()] = vec;
 		}else{
-			++(this->UIDCacheHits);
-			for( auto& evt : this->RawEvents ){
-				if( UIDCacheCheck->second[evt.GetGlobalChannelID()] ){
-					vec.push_back(&evt);
-				}
+			++(this->CacheHits);
+			vec = CacheCheck->second;
+		}
+	}else{
+		++(this->UIDCacheHits);
+		for( auto& evt : this->RawEvents ){
+			if( UIDCacheCheck->second[evt.GetGlobalChannelID()] ){
+				vec.push_back(&evt);
 			}
 		}
-		this->Cache[rkey.str()] = vec;
-	}else{
-		++(this->CacheHits);
-		vec = CacheCheck->second;
 	}
 }
 
