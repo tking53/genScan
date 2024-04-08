@@ -18,16 +18,19 @@
 
 class RootFileManager{
 	public:
-		RootFileManager(const std::string& log,const std::string oup){
+		RootFileManager(const std::string& log,const std::string oup,bool disabletrees){
 			this->LogName = log;
 			this->outputprefix = oup;
 			this->outputfilename = this->outputprefix+".root";
 			this->OutputFile = new TFile(this->outputfilename.c_str(),"RECREATE");
+			this->OutputTreesToFile = !disabletrees;
 		}
 
 		void FinalizeTrees(){
-			for( auto& name : this->KnownProcNames ){
-				this->OutputTrees[name]->Write(0,2,0);
+			if( this->OutputTreesToFile ){
+				for( auto& name : this->KnownProcNames ){
+					this->OutputTrees[name]->Write(0,2,0);
+				}
 			}
 			this->OutputFile->Close();
 		}
@@ -46,9 +49,11 @@ class RootFileManager{
 		}
 
 		void Fill(){
-			for( auto& tree : this->OutputTrees ){
-				if( tree.second != nullptr ){
-					tree.second->Fill();
+			if( this->OutputTreesToFile ){
+				for( auto& tree : this->OutputTrees ){
+					if( tree.second != nullptr ){
+						tree.second->Fill();
+					}
 				}
 			}
 		}
@@ -57,6 +62,8 @@ class RootFileManager{
 		std::string LogName;
 		std::string outputprefix;
 		std::string outputfilename;
+
+		bool OutputTreesToFile;
 
 		TFile* OutputFile;
 		std::vector<std::string> KnownProcNames;
