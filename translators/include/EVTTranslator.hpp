@@ -24,6 +24,7 @@ class EVTTranslator : public Translator{
 		unsigned int CurrHeaderLength;
 		unsigned int CurrTraceLength;
 		uint32_t firstWords[4];
+		uint32_t otherWords[12];
 		
 		EVT_BUILT_INFO CurrEVTBuiltInfo;
 

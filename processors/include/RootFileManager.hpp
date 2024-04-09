@@ -18,12 +18,12 @@
 
 class RootFileManager{
 	public:
-		RootFileManager(const std::string& log,const std::string oup,bool disabletrees){
+		RootFileManager(const std::string& log,const std::string oup,bool enabletrees){
 			this->LogName = log;
 			this->outputprefix = oup;
 			this->outputfilename = this->outputprefix+".root";
 			this->OutputFile = new TFile(this->outputfilename.c_str(),"RECREATE");
-			this->OutputTreesToFile = !disabletrees;
+			this->OutputTreesToFile = enabletrees;
 		}
 
 		void FinalizeTrees(){

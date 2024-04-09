@@ -57,7 +57,6 @@ int EVTTranslator::ReadFull(boost::container::devector<PhysicsData>& RawEvents){
 	this->correlator->DumpSelf();
 	#endif
 	if( this->CurrHeaderLength > 4 ){
-		uint32_t otherWords[this->CurrHeaderLength - 4];
 		if( !this->CurrentFile.read(reinterpret_cast<char*>(&otherWords),(this->CurrHeaderLength-4)*4) ){
 			return -1;
 		}

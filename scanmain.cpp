@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
 
 	std::string configfile;
 	std::string outputfile;
-	bool disabletree;
+	bool enabletree;
 	std::vector<std::string> FileNames;
 	int port;
 	int limit;
@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
 		("help,h", "produce help message")
 		("configfile,c",boost::program_options::value<std::string>(&configfile)->default_value("config.xml"),"[filename] filename for channel map")
 		("outputfile,o",boost::program_options::value<std::string>(&outputfile)->default_value("out.txt"),"[filename] filename for output")
-		("disabletree,d",boost::program_options::value<bool>(&disabletree)->default_value(false),"disable root tree output and only generate histograms")
+		("enabletree,t",boost::program_options::value<bool>(&enabletree)->default_value(true),"enable root tree output or disable it and only generate histograms")
 		("file,f",boost::program_options::value<std::vector<std::string>>(&FileNames),"[file1 file2 file3 ...] list of files used for input")
 		("limit,l",boost::program_options::value<int>(&limit)->default_value(100000),"limit of coincidence queue")
 		("format,x",boost::program_options::value<std::string>(&dataformat)->default_value("null"),"[file_format] format of the data file (evt,evt-presort,ldf,pld,caen_root,caen_bin)")
@@ -247,7 +247,7 @@ int main(int argc, char *argv[]) {
 	HistogramManager->Initialize(MAX_CHANNELS,ebins,sbins,wbins,zbins,rbins);
 	console->info("Generated Raw, Scalar, and Cal plots for {} Channels, There are {} bins for Raw and Cal, and {} bins for Scalar",MAX_CHANNELS,ebins,sbins);
 	
-	std::shared_ptr<RootFileManager> RootManager(new RootFileManager(logname,StringManip::GetFileBaseName(outputfile),disabletree));
+	std::shared_ptr<RootFileManager> RootManager(new RootFileManager(logname,StringManip::GetFileBaseName(outputfile),enabletree));
 	console->info("Created Root File Manager");
 	
 	//Init the processors/analyzers
