@@ -53,6 +53,9 @@ namespace PLOTS{
 			PlotRegistry(const std::string& log,const std::string oup,int PORT=9090){
 				this->LogName = log;
 				this->outputprefix = oup;
+				this->console = spdlog::get(this->LogName)->clone("HistogramManager");
+				this->FillCounter1D = 0;
+				this->FillCounter2D = 0;
 				fServ = std::make_shared<TServerSocket>(PORT,true);
 				if( not fServ->IsValid() ){
 					std::string mess = "Unable to open Port : "+std::to_string(PORT)+" Bailing out";
@@ -70,6 +73,10 @@ namespace PLOTS{
 				fCanvas->GetFrame()->SetFillColor(21);
 				fCanvas->GetFrame()->SetBorderSize(6);
 				fCanvas->GetFrame()->SetBorderMode(-1);
+			}
+
+			~PlotRegistry(){
+				this->console->info("Num 1D Fills : {} | Num 2D Fills : {}",this->FillCounter1D,this->FillCounter2D);
 			}
 
 			void HandleSocket(TSocket* s){
@@ -175,6 +182,7 @@ namespace PLOTS{
 
 			void Fill(const std::string& name,double xval){
 				if( Plot1DExist(name) ){
+					++(this->FillCounter1D);
 					this->Plots_1D[name]->Fill(xval);
 				}else{
 					std::string mess = "Plot : "+name+" does not exist as a 1D plot";
@@ -184,6 +192,7 @@ namespace PLOTS{
 
 			void WeightedFill(const std::string& name,double xval,double weight){
 				if( Plot1DExist(name) ){
+					++(this->FillCounter1D);
 					this->Plots_1D[name]->Fill(xval,weight);
 				}else{
 					std::string mess = "Plot : "+name+" does not exist as a 1D plot";
@@ -193,6 +202,7 @@ namespace PLOTS{
 
 			void FillN(const std::string& name,int n,double* xval,double* weight,int stride = 1){
 				if( Plot1DExist(name) ){
+					++(this->FillCounter1D);
 					this->Plots_1D[name]->FillN(n,xval,weight,stride);
 				}else{
 					std::string mess = "Plot : "+name+" does not exist as a 1D plot";
@@ -217,6 +227,7 @@ namespace PLOTS{
 
 			void Fill(const std::string& name,double xval,double yval){
 				if( Plot2DExist(name) ){
+					++(this->FillCounter2D);
 					this->Plots_2D[name]->Fill(xval,yval);
 				}else{
 					std::string mess = "Plot : "+name+" does not exist as a 2D plot";
@@ -226,6 +237,7 @@ namespace PLOTS{
 
 			void WeightedFill(const std::string& name,double xval,double yval,double weight){
 				if( Plot2DExist(name) ){
+					++(this->FillCounter2D);
 					this->Plots_2D[name]->Fill(xval,yval,weight);
 				}else{
 					std::string mess = "Plot : "+name+" does not exist as a 2D plot";
@@ -235,6 +247,7 @@ namespace PLOTS{
 
 			void FillN(const std::string& name,int n,double* xval,double* yval,double* weight,int stride = 1){
 				if( Plot2DExist(name) ){
+					++(this->FillCounter2D);
 					this->Plots_2D[name]->FillN(n,xval,yval,weight,stride);
 				}else{
 					std::string mess = "Plot : "+name+" does not exist as a 2D plot";
@@ -345,11 +358,15 @@ namespace PLOTS{
 			int width_bins;
 			int event_bins;
 			int roll_bins;
+			unsigned long long FillCounter1D;
+			unsigned long long FillCounter2D;
 			//info needed for live histogramming
 			std::shared_ptr<TCanvas> fCanvas;
 			std::shared_ptr<TServerSocket> fServ;
 			std::shared_ptr<TMonitor> fMon;
 			std::shared_ptr<TList> fSockets;
+		
+			std::shared_ptr<spdlog::logger> console;
 	};
 
 }
