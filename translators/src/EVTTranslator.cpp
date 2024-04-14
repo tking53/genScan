@@ -231,7 +231,8 @@ int EVTTranslator::FindNextFragment(){
 			return -1;
 		}
 		if( type != 30 ){
-			this->CurrentFile.seekg(CurrEVTBuiltInfo.ri_size-8,std::ios::cur);
+			this->CurrentFile.seekg(CurrEVTBuiltInfo.ri_size-8,this->CurrentFile.cur);
+			//this->CurrentFile.seekg(CurrEVTBuiltInfo.ri_size-8,std::ios::cur);
 			continue;
 		}
 		int ribh_size = this->ReadRingItemBodyHeader();
