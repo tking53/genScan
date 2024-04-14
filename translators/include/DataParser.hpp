@@ -27,7 +27,7 @@ class DataParser{
 			Unknown,
 			CAEN_ROOT,
 			CAEN_BIN,
-			LDF,
+			LDF_PIXIE,
 			PLD,
 			EVT_PRESORT,
 			EVT_BUILT

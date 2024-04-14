@@ -9,7 +9,7 @@
 
 #include "EVTTranslator.hpp"
 #include "EVTPresortTranslator.hpp"
-#include "LDFTranslator.hpp"
+#include "LDFPixieTranslator.hpp"
 
 DataParser::DataParser(DataParser::DataFileType dft,const std::string& log){
 	this->DataType = dft;
@@ -24,8 +24,8 @@ DataParser::DataParser(DataParser::DataFileType dft,const std::string& log){
 		case CAEN_BIN:
 			this->ParserName = "CAEN_BIN";
 			break;
-		case LDF:
-			this->ParserName = "LDF";
+		case LDF_PIXIE:
+			this->ParserName = "LDF_PIXIE";
 			break;
 		case PLD:
 			this->ParserName = "PLD";
@@ -44,9 +44,9 @@ DataParser::DataParser(DataParser::DataFileType dft,const std::string& log){
 			this->console = spdlog::get(this->LogName)->clone("EVT_BUILT_Parser");
 			this->DataTranslator.reset(new EVTTranslator(this->LogName,this->ParserName));
 			break;
-		case LDF:
+		case LDF_PIXIE:
 			this->console = spdlog::get(this->LogName)->clone("LDF_PIXIE");
-			this->DataTranslator.reset(new LDFTranslator(this->LogName,this->ParserName,LDFTranslator::LDF_TYPE::PIXIE));
+			this->DataTranslator.reset(new LDFPixieTranslator(this->LogName,this->ParserName));
 			break;
 		case EVT_PRESORT:
 			this->console = spdlog::get(this->LogName)->clone("EVT_Presort_Parser");

@@ -147,7 +147,7 @@ int main(int argc, char *argv[]) {
 		}else if( dataformat.compare("evt-presort") == 0 ){
 			dataparser.reset(new DataParser(DataParser::DataFileType::EVT_PRESORT,logname));
 		}else if( dataformat.compare("ldf") == 0 ){
-			dataparser.reset(new DataParser(DataParser::DataFileType::LDF,logname));
+			dataparser.reset(new DataParser(DataParser::DataFileType::LDF_PIXIE,logname));
 		}else if( dataformat.compare("pld") == 0 ){
 			dataparser.reset(new DataParser(DataParser::DataFileType::PLD,logname));
 		}else if( dataformat.compare("caen_root") == 0 ){
