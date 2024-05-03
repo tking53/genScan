@@ -33,10 +33,42 @@ class LDFPixieTranslator : public Translator{
 			unsigned int unknown[3];
 			unsigned int run_num;
 		};
-		//struct HRIBF_HEAD_Buffer{
-		//};
-		//struct HRIBF_DATA_Buffer{
-		//};
+
+		struct HRIBF_HEAD_Buffer{
+			unsigned int bufftype;
+			unsigned int buffsize;
+			char facility[9];
+			char format[9];
+			char type[17];
+			char date[17];
+			char run_title[81];
+			unsigned int run_num;
+		};
+
+		struct HRIBF_DATA_Buffer{
+			unsigned int bufftype;
+			unsigned int buffsize;
+			unsigned int bcount;
+			unsigned int buffhead;
+			unsigned int nextbuffhead;
+			unsigned int nextbuffsize;
+			unsigned int goodchunks;
+			unsigned int missingchunks;
+			unsigned int numbytes;
+			unsigned int numchunks;
+			unsigned int currchunknum;
+			unsigned int prevchunknum;
+			unsigned int buffpos;
+			std::vector<unsigned int>* currbuffer;
+			std::vector<unsigned int>* nextbuffer;
+			std::vector<unsigned int> buffer1;
+			std::vector<unsigned int> buffer2;
+		};
+
+		struct PIXIE_MOD_Buffer{
+			unsigned int numwords;
+			unsigned int modulenum;
+		};
 
 	private:
 		unsigned int check_bufftype;
@@ -45,9 +77,15 @@ class LDFPixieTranslator : public Translator{
 		HRIBF_DIR_Buffer CurrDirBuff;
 		int ParseDirBuffer();
 
+		HRIBF_HEAD_Buffer CurrHeadBuff;
 		int ParseHeadBuffer();
 
-		int ParseDataBuffer(boost::container::devector<PhysicsData>&);
+		HRIBF_DATA_Buffer CurrDataBuff;
+		int ReadNextBuffer(bool force = false);
+		int ParseDataBuffer();
+
+		PIXIE_MOD_Buffer CurrPixieModBuff;
+		int DecodeNextModuleDump();
 
 		unsigned int CurrHeaderLength;
 		unsigned int CurrTraceLength;
@@ -56,8 +94,9 @@ class LDFPixieTranslator : public Translator{
 
 		uint64_t PrevTimeStamp;
 
-		std::vector<int> EvtSpillCounter;
-		int CurrSpillID;
+		std::vector<uint64_t> EvtSpillCounter;
+		//Increment when we find spill footer
+		uint64_t CurrSpillID;
 };
 
 #endif
