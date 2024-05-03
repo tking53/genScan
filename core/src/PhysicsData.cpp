@@ -13,6 +13,7 @@ PhysicsData::PhysicsData(int headerlength,int eventlength,int cratenum,int modnu
 	this->globalChannelID = gchan;
 	this->RawEnergy = rawerg;
 	this->RawTimeStamp = rawts;
+	this->SpillID = 0;
 
 	this->Location = -1;
 
@@ -199,6 +200,15 @@ uint32_t PhysicsData::GetRawEnergy() const{
 //RawTimeStamp
 uint64_t PhysicsData::GetRawTimeStamp() const{
 	return this->RawTimeStamp;
+}
+		
+//SpillID
+void PhysicsData::SetSpillID(uint64_t id){
+	this->SpillID = id;
+}
+
+uint64_t PhysicsData::GetSpillID() const{
+	return this->SpillID;
 }
 
 //Energy

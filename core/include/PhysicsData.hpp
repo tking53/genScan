@@ -30,6 +30,10 @@ class PhysicsData{
 		//RawTimeStamp
 		uint64_t GetRawTimeStamp() const;
 
+		//SpillID 
+		void SetSpillID(uint64_t);
+		uint64_t GetSpillID() const;
+
 		//Energy
 		void SetEnergy(double);
 		double GetEnergy() const;
@@ -184,6 +188,8 @@ class PhysicsData{
 		int EventLength;
 		uint32_t RawEnergy;
 		uint64_t RawTimeStamp;
+
+		uint64_t SpillID;
 
 		double Energy;	
 		double TimeStamp;
