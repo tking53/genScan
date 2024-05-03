@@ -293,25 +293,29 @@ int main(int argc, char *argv[]) {
 		do{
 			CurrState = dataparser->Parse(CorrelatedEvents.GetRawEvents());
 
-			processorlist->ThreshAndCal(CorrelatedEvents.GetRawEvents(),cmap.get());
-			processorlist->ProcessRaw(CorrelatedEvents.GetRawEvents(),HistogramManager.get());
-			StatsManager->IncrementStats(CorrelatedEvents.GetRawEvents());
+			if( not CorrelatedEvents.GetRawEvents().empty() ) [[likely]] {
+				processorlist->ThreshAndCal(CorrelatedEvents.GetRawEvents(),cmap.get());
+				processorlist->ProcessRaw(CorrelatedEvents.GetRawEvents(),HistogramManager.get());
+				StatsManager->IncrementStats(CorrelatedEvents.GetRawEvents());
 
-			CorrelatedEvents.BuildDetectorSummary();
+				CorrelatedEvents.BuildDetectorSummary();
 
-			processorlist->PreProcess(CorrelatedEvents,HistogramManager.get(),CutManager.get());
-			processorlist->PreAnalyze(CorrelatedEvents,HistogramManager.get(),CutManager.get());
-	
-			processorlist->Process(CorrelatedEvents,HistogramManager.get(),CutManager.get());
-			processorlist->Analyze(CorrelatedEvents,HistogramManager.get(),CutManager.get());
-	
-			processorlist->PostProcess(CorrelatedEvents,HistogramManager.get(),CutManager.get());
-			processorlist->PostAnalyze(CorrelatedEvents,HistogramManager.get(),CutManager.get());
+				processorlist->PreProcess(CorrelatedEvents,HistogramManager.get(),CutManager.get());
+				processorlist->PreAnalyze(CorrelatedEvents,HistogramManager.get(),CutManager.get());
 
-			RootManager->Fill();
-			processorlist->CleanupTrees();
+				processorlist->Process(CorrelatedEvents,HistogramManager.get(),CutManager.get());
+				processorlist->Analyze(CorrelatedEvents,HistogramManager.get(),CutManager.get());
 
-			CorrelatedEvents.ClearRawEvents();
+				processorlist->PostProcess(CorrelatedEvents,HistogramManager.get(),CutManager.get());
+				processorlist->PostAnalyze(CorrelatedEvents,HistogramManager.get(),CutManager.get());
+
+				RootManager->Fill();
+				processorlist->CleanupTrees();
+
+				CorrelatedEvents.ClearRawEvents();
+			}else [[unlikely]] {
+				throw std::runtime_error("Read data but nothing decoded to allow for correlation");
+			}
 		}while( CurrState == Translator::TRANSLATORSTATE::PARSING and not ctrlCPressed );
 	}catch(std::runtime_error const& e){
 		console->error(e.what());
