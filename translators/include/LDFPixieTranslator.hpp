@@ -82,7 +82,7 @@ class LDFPixieTranslator : public Translator{
 
 		HRIBF_DATA_Buffer CurrDataBuff;
 		int ReadNextBuffer(bool force = false);
-		int ParseDataBuffer();
+		int ParseDataBuffer(bool&);
 
 		PIXIE_MOD_Buffer CurrPixieModBuff;
 		int DecodeNextModuleDump();

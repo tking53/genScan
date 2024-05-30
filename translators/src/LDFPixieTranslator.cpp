@@ -71,7 +71,8 @@ Translator::TRANSLATORSTATE LDFPixieTranslator::Parse(boost::container::devector
 		//	(void) toss;
 		//}
 		while( this->EvtSpillCounter[0] == 0 or this->EvtSpillCounter[1] == 0 or this->EvtSpillCounter[2] == 0 ){
-			if( this->ParseDataBuffer() == -1 ){
+			bool full_spill;
+			if( this->ParseDataBuffer(full_spill) == -1 ){
 				throw std::runtime_error("Invalid Data Buffer in File : "+this->InputFiles.at(this->CurrentFileIndex));
 			}	
 
@@ -136,27 +137,84 @@ int LDFPixieTranslator::ParseHeadBuffer(){
 	return 0;
 }
 
-int LDFPixieTranslator::ParseDataBuffer(){
-	this->ReadNextBuffer(true);
-	if( this->CurrDataBuff.buffhead == HRIBF_TYPES::ENDFILE ){
-		if( this->CurrDataBuff.nextbuffhead == HRIBF_TYPES::ENDFILE ){
-			this->console->info("Read double EOF");
+int LDFPixieTranslator::ParseDataBuffer(bool& full_spill){
+	bool first_chunk = true;
+	unsigned int this_chunk_sizeB;
+	unsigned int total_num_chunks = 0;
+	unsigned int current_chunk_num = 0;
+	unsigned int prev_chunk_num;
+	unsigned int prev_num_chunks;
+
+	while( true ){
+		this->ReadNextBuffer();
+		//this->ReadNextBuffer(true);
+		if( this->CurrDataBuff.buffhead == HRIBF_TYPES::ENDFILE ){
+			if( this->CurrDataBuff.nextbuffhead == HRIBF_TYPES::ENDFILE ){
+				this->console->info("Read double EOF");
+				return 2;
+			}else{
+				this->console->info("Reached single EOF, force reading next");
+				this->ReadNextBuffer(true);
+				return 1;
+			}
+		}else if( this->CurrDataBuff.buffhead == HRIBF_TYPES::DATA ){
+			prev_chunk_num = current_chunk_num;
+			prev_num_chunks = total_num_chunks;
+			this_chunk_sizeB = this->CurrDataBuff.currbuffer->at((this->CurrDataBuff.buffpos)++);
+			total_num_chunks = this->CurrDataBuff.currbuffer->at((this->CurrDataBuff.buffpos)++);
+			current_chunk_num = this->CurrDataBuff.currbuffer->at((this->CurrDataBuff.buffpos)++);
+
+			if( first_chunk ){
+				++(this->CurrSpillID);
+				if( current_chunk_num != 0 ){
+					this->CurrDataBuff.missingchunks += current_chunk_num;
+					full_spill = false;
+				}
+				first_chunk = false;
+			}else if( total_num_chunks != prev_num_chunks ){
+				this->console->critical("Gotten out of order parsing spill {} at buffer position 0x{:x}",this->CurrSpillID,this->CurrDataBuff.buffhead);
+				this->ReadNextBuffer(true);
+				this->CurrDataBuff.missingchunks += (prev_num_chunks - 1) - prev_chunk_num;
+				return 4; 
+			}else if( current_chunk_num != prev_chunk_num+1 ){
+				full_spill = false;
+				if( current_chunk_num == prev_chunk_num+2 ){
+					this->console->critical("Missing single spill chunk {} at buffer position 0x{:x}",prev_chunk_num+1,this->CurrDataBuff.buffhead);
+				}else{
+					this->console->critical("Missing multiple spill chunks from {} to {} at buffer position 0x{:x}",prev_chunk_num+1,current_chunk_num-1,this->CurrDataBuff.buffhead);
+				}
+				this->ReadNextBuffer(true);
+				this->CurrDataBuff.missingchunks += (current_chunk_num - 1) - prev_chunk_num;
+				return 4;
+			}
+
+			if( current_chunk_num == total_num_chunks - 1) {//spill footer
+				if( this_chunk_sizeB != 20 ){
+					this->console->critical("spill footer (chunk {} of {}) has size {} != 5 at buffer position 0x{:x}",current_chunk_num,total_num_chunks,this_chunk_sizeB,this->CurrDataBuff.buffhead);
+					this->ReadNextBuffer(true);
+					return 5;
+				}
+				//memcpy(&data_[nBytes],&curr_buffer[buff_pos],8)
+				this->CurrDataBuff.numbytes += 8;
+				this->CurrDataBuff.buffpos += 2;
+				return 0;
+			}else{
+				unsigned int copied_bytes = 0;
+				if( this_chunk_sizeB <= 12 ){
+					this->console->critical("invalid number of bytes in chunk {} of {}, {} bytes at buffer position 0x{:x}",current_chunk_num+1,total_num_chunks,this_chunk_sizeB,this->CurrDataBuff.buffhead);
+					++this->CurrDataBuff.missingchunks;
+					return 4;
+				}
+				++this->CurrDataBuff.goodchunks;
+				copied_bytes = this_chunk_sizeB - 12;
+				//memcpy(&data_[nBytes],&curr_buffer[buff_pos],copied_bytes);
+				this->CurrDataBuff.numbytes += copied_bytes;
+				this->CurrDataBuff.buffpos += copied_bytes/4;
+			}
 		}else{
-			this->console->info("Reached single EOF, force reading next");
+			this->console->critical("found non data/non eof buffer 0x{:x}",this->CurrDataBuff.buffhead);
 			this->ReadNextBuffer(true);
 		}
-	}else if( this->CurrDataBuff.buffhead == HRIBF_TYPES::DATA ){
-		//decode the spill
-		//need to advance the buffpos identifier when we move things around
-		//this misses the edge case of a spill fitting within an 8194
-		if( this->CurrDataBuff.currchunknum <= this->CurrDataBuff.prevchunknum ){
-			++this->CurrSpillID;
-		}
-		//this will not output any chunk numbers for 8194 buffers that have multiple chunks
-		this->console->info("spill : {} chunk: {}/{}",this->CurrSpillID,this->CurrDataBuff.currchunknum,this->CurrDataBuff.numchunks);
-	}else{
-		this->console->warn("found non data/non eof buffer 0x{:x}",this->CurrDataBuff.buffhead);
-		this->ReadNextBuffer(true);
 	}
 	return 0;
 }
@@ -188,7 +246,7 @@ int LDFPixieTranslator::ReadNextBuffer(bool force){
 	this->CurrDataBuff.numchunks = this->CurrDataBuff.currbuffer->at(3);
 	this->CurrDataBuff.prevchunknum = this->CurrDataBuff.currchunknum;
 	this->CurrDataBuff.currchunknum = this->CurrDataBuff.currbuffer->at(4);
-	this->CurrDataBuff.buffpos = 5;
+	this->CurrDataBuff.buffpos = 2;
 	//for( size_t ii = 0; ii < 8194; ++ii ){
 	//	this->console->info("{} {:x}",ii,this->CurrDataBuff.currbuffer->at(ii));
 	//}
