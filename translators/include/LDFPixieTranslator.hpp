@@ -63,11 +63,10 @@ class LDFPixieTranslator : public Translator{
 			std::vector<unsigned int>* nextbuffer;
 			std::vector<unsigned int> buffer1;
 			std::vector<unsigned int> buffer2;
-		};
 
-		struct PIXIE_MOD_Buffer{
-			unsigned int numwords;
-			unsigned int modulenum;
+			unsigned int operator[](unsigned int pos){
+				return this->currbuffer->at(pos);
+			}
 		};
 
 	private:
@@ -82,10 +81,11 @@ class LDFPixieTranslator : public Translator{
 
 		HRIBF_DATA_Buffer CurrDataBuff;
 		int ReadNextBuffer(bool force = false);
-		int ParseDataBuffer(bool&);
+		int ParseDataBuffer(unsigned int&,bool&,bool&);
 
-		PIXIE_MOD_Buffer CurrPixieModBuff;
-		int DecodeNextModuleDump();
+		int UnpackData(unsigned int&,bool&,bool&);
+
+		std::vector<unsigned int> databuffer;
 
 		unsigned int CurrHeaderLength;
 		unsigned int CurrTraceLength;

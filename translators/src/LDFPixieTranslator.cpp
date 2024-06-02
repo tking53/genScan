@@ -42,10 +42,6 @@ LDFPixieTranslator::LDFPixieTranslator(const std::string& log,const std::string&
 		.buffer1 = std::vector<unsigned int>(8194,0xFFFFFFFF),
 		.buffer2 = std::vector<unsigned int>(8194,0xFFFFFFFF)
 	};
-	this->CurrPixieModBuff = {
-		.numwords = 0,
-		.modulenum = 9999
-	};
 }	
 
 Translator::TRANSLATORSTATE LDFPixieTranslator::Parse(boost::container::devector<PhysicsData>& RawEvents){
@@ -70,11 +66,16 @@ Translator::TRANSLATORSTATE LDFPixieTranslator::Parse(boost::container::devector
 		//	auto toss = this->correlator->IsWithinCorrelationWindow(evt.GetTimeStamp(),evt.GetCrate(),evt.GetModule(),evt.GetChannel());
 		//	(void) toss;
 		//}
+		this->databuffer.clear();
 		while( this->EvtSpillCounter[0] == 0 or this->EvtSpillCounter[1] == 0 or this->EvtSpillCounter[2] == 0 ){
 			bool full_spill;
-			if( this->ParseDataBuffer(full_spill) == -1 ){
+			bool bad_spill;
+			unsigned int nBytes = 0;
+			int retval = this->ParseDataBuffer(nBytes,full_spill,bad_spill);
+			if( retval == -1 ){
 				throw std::runtime_error("Invalid Data Buffer in File : "+this->InputFiles.at(this->CurrentFileIndex));
-			}	
+			}
+			this->UnpackData(nBytes,full_spill,bad_spill);
 
 			if( this->CurrentFile.eof() ){
 				if( not this->OpenNextFile() ){
@@ -137,7 +138,7 @@ int LDFPixieTranslator::ParseHeadBuffer(){
 	return 0;
 }
 
-int LDFPixieTranslator::ParseDataBuffer(bool& full_spill){
+int LDFPixieTranslator::ParseDataBuffer(unsigned int& nBytes,bool& full_spill,bool& bad_spill){
 	bool first_chunk = true;
 	unsigned int this_chunk_sizeB;
 	unsigned int total_num_chunks = 0;
@@ -195,7 +196,11 @@ int LDFPixieTranslator::ParseDataBuffer(bool& full_spill){
 					return 5;
 				}
 				//memcpy(&data_[nBytes],&curr_buffer[buff_pos],8)
-				this->CurrDataBuff.numbytes += 8;
+				unsigned int nWords = 2;
+				for( int ii = 0; ii < nWords; ++ii ){
+					this->databuffer.push_back(this->CurrDataBuff[this->CurrDataBuff.buffpos+ii]);
+				}
+				nBytes += 8;
 				this->CurrDataBuff.buffpos += 2;
 				return 0;
 			}else{
@@ -208,7 +213,11 @@ int LDFPixieTranslator::ParseDataBuffer(bool& full_spill){
 				++this->CurrDataBuff.goodchunks;
 				copied_bytes = this_chunk_sizeB - 12;
 				//memcpy(&data_[nBytes],&curr_buffer[buff_pos],copied_bytes);
-				this->CurrDataBuff.numbytes += copied_bytes;
+				unsigned int nWords = copied_bytes/4;
+				for( int ii = 0; ii < nWords; ++ii ){
+					this->databuffer.push_back(this->CurrDataBuff[this->CurrDataBuff.buffpos+ii]);
+				}
+				nBytes += copied_bytes;
 				this->CurrDataBuff.buffpos += copied_bytes/4;
 			}
 		}else{
@@ -257,16 +266,33 @@ int LDFPixieTranslator::ReadNextBuffer(bool force){
 	return 0;
 }
 
-int LDFPixieTranslator::DecodeNextModuleDump(){
-	this->CurrPixieModBuff.numwords = this->CurrDataBuff.currbuffer->at(this->CurrDataBuff.buffpos);
-	++this->CurrDataBuff.buffpos;
-	this->CurrPixieModBuff.modulenum = this->CurrDataBuff.currbuffer->at(this->CurrDataBuff.buffpos);
-	++this->CurrDataBuff.buffpos;
-	if( this->CurrPixieModBuff.numwords == 2 ){
-		return -1;
-	}else{
-		//read through the module data
-		//it has numwords-2 items to read
+int LDFPixieTranslator::UnpackData(unsigned int& nBytes,bool& full_spill,bool& bad_spill){
+	unsigned int nWords = nBytes/4;
+	unsigned int nWords_read = 0;
+	unsigned int lenrec = 0xFFFFFFFF;
+	unsigned int vsn = 0xFFFFFFFF;
+	while( nWords_read <= nWords ){
+		while( this->databuffer[nWords_read] == 0xFFFFFFFF ){
+			++nWords_read;
+		}
+		lenrec = this->databuffer[nWords_read];
+		vsn = this->databuffer[nWords_read + 1];
+		this->console->info("lenrec : {} vsn : {}",lenrec,vsn);
+
+		if( lenrec == 6 ){
+			nWords_read += lenrec;
+		}
+
+		if( vsn < 14 ){
+			nWords_read += lenrec;
+		}else if( vsn == 1000 ){
+			nWords_read += lenrec;
+		}else if( vsn == 9999 ){
+			break;
+		}else{
+			this->console->critical("UNEXPECTED VSN : {}",vsn);
+			break;
+		}
 	}
 	return 0;
 }
