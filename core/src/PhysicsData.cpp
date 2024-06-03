@@ -43,6 +43,7 @@ PhysicsData::PhysicsData(const PhysicsData& other) :
 	EventLength(other.EventLength),
 	RawEnergy(other.RawEnergy),
 	RawTimeStamp(other.RawTimeStamp),
+	SpillID(other.SpillID),
 	Energy(other.Energy),
 	TimeStamp(other.TimeStamp),
 	CFDForcedBit(other.CFDForcedBit),
@@ -78,6 +79,7 @@ PhysicsData::PhysicsData(PhysicsData&& other) noexcept :
 	EventLength(other.EventLength),
 	RawEnergy(other.RawEnergy),
 	RawTimeStamp(other.RawTimeStamp),
+	SpillID(other.SpillID),
 	Energy(other.Energy),
 	TimeStamp(other.TimeStamp),
 	CFDForcedBit(other.CFDForcedBit),
@@ -114,6 +116,7 @@ PhysicsData& PhysicsData::operator=(const PhysicsData& other){
 		EventLength = other.EventLength;
 		RawEnergy = other.RawEnergy;
 		RawTimeStamp = other.RawTimeStamp;
+		SpillID = other.SpillID;
 		Energy = other.Energy;
 		TimeStamp = other.TimeStamp;
 		CFDForcedBit = other.CFDForcedBit;
@@ -151,6 +154,7 @@ PhysicsData& PhysicsData::operator=(PhysicsData&& other) noexcept{
 		EventLength = other.EventLength;
 		RawEnergy = other.RawEnergy;
 		RawTimeStamp = other.RawTimeStamp;
+		SpillID = other.SpillID;
 		Energy = other.Energy;
 		TimeStamp = other.TimeStamp;
 		CFDForcedBit = other.CFDForcedBit;

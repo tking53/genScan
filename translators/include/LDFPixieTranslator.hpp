@@ -2,6 +2,7 @@
 #define __LDF_PIXIE_TRANSLATOR_HPP__
 
 #include <string>
+#include <map>
 
 #include <boost/container/devector.hpp>
 
@@ -84,17 +85,20 @@ class LDFPixieTranslator : public Translator{
 		int ParseDataBuffer(unsigned int&,bool&,bool&);
 
 		int UnpackData(unsigned int&,bool&,bool&);
+		int CountBuffersWithData() const;
 
 		std::vector<unsigned int> databuffer;
 
 		unsigned int CurrHeaderLength;
 		unsigned int CurrTraceLength;
-		uint32_t firstWords[4];
-		uint32_t otherWords[12];
+		uint32_t* firstWords;
+		uint32_t* otherWords;
 
 		uint64_t PrevTimeStamp;
 
-		std::vector<uint64_t> EvtSpillCounter;
+		const int NUMCONCURRENTSPILLS = 3;
+
+		std::map<uint64_t,int> EvtSpillCounter;
 		//Increment when we find spill footer
 		uint64_t CurrSpillID;
 };
