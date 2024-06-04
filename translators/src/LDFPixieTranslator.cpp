@@ -117,27 +117,8 @@ Translator::TRANSLATORSTATE LDFPixieTranslator::Parse(boost::container::devector
 				++stopidx;
 			}
 		}
-		//RawEvents = boost::container::devector<PhysicsData>(this->Leftovers.begin(),this->Leftovers.begin()+stopidx);
 		RawEvents.insert(RawEvents.end(),boost::make_move_iterator(this->Leftovers.begin()),boost::make_move_iterator(this->Leftovers.begin()+stopidx));
 		this->Leftovers.erase(this->Leftovers.begin(),this->Leftovers.begin()+stopidx);
-		//RawEvents.push_back(this->Leftovers.at(0));
-		//this->Leftovers.pop_front();
-		//this->EvtSpillCounter[RawEvents.back().GetSpillID()] -= 1;
-		//auto toss = this->correlator->IsWithinCorrelationWindow(RawEvents.back().GetTimeStamp(),RawEvents.back().GetCrate(),RawEvents.back().GetModule(),RawEvents.back().GetChannel());
-		//(void) toss;
-
-		//for( int ii = 1; ii < this->Leftovers.size(); ++ii ){
-		//	this->LastReadEvtWithin = this->correlator->IsWithinCorrelationWindow(this->Leftovers.at(ii).GetTimeStamp(),this->Leftovers.at(ii).GetCrate(),this->Leftovers.at(ii).GetModule(),this->Leftovers.at(ii).GetChannel());
-		//	if( not this->LastReadEvtWithin ){
-		//		this->correlator->Pop();
-		//		this->correlator->Clear();
-		//		break;
-		//	}else{
-		//		RawEvents.push_back(this->Leftovers.at(ii));
-		//		this->Leftovers.pop_front();
-		//		this->EvtSpillCounter[RawEvents.back().GetSpillID()] -= 1;
-		//	}
-		//}
 	}else{
 		return Translator::TRANSLATORSTATE::COMPLETE;
 	}
