@@ -36,6 +36,8 @@ LDFPixieTranslator::LDFPixieTranslator(const std::string& log,const std::string&
 		.buffsize = 8192,
 		.bcount = 0,
 		.buffhead = 0,
+		.nextbuffhead = 0,
+		.nextbuffsize = 0,
 		.goodchunks = 0,
 		.missingchunks = 0,
 		.numbytes = 0,

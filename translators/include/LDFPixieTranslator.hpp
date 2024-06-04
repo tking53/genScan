@@ -64,10 +64,6 @@ class LDFPixieTranslator : public Translator{
 			std::vector<unsigned int>* nextbuffer;
 			std::vector<unsigned int> buffer1;
 			std::vector<unsigned int> buffer2;
-
-			unsigned int operator[](unsigned int pos){
-				return this->currbuffer->at(pos);
-			}
 		};
 
 	private:
