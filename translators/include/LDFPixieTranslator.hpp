@@ -95,6 +95,7 @@ class LDFPixieTranslator : public Translator{
 		uint32_t* otherWords;
 
 		uint64_t PrevTimeStamp;
+		bool FinishedReadingFiles;
 
 		const int NUMCONCURRENTSPILLS = 3;
 		std::vector<int> EvtSpillCounter;

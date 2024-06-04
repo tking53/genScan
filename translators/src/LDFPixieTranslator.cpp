@@ -15,6 +15,7 @@ LDFPixieTranslator::LDFPixieTranslator(const std::string& log,const std::string&
 	this->PrevTimeStamp = 0;
 	this->CurrSpillID = 0;
 	this->EvtSpillCounter = std::vector<int>(this->NUMCONCURRENTSPILLS,0);
+	this->FinishedReadingFiles = false;
 	this->CurrDirBuff = { 
 		.bufftype = HRIBF_TYPES::DIR, 
 		.buffsize = 8192, 
@@ -70,10 +71,12 @@ Translator::TRANSLATORSTATE LDFPixieTranslator::Parse(boost::container::devector
 				throw std::runtime_error("Invalid Head Buffer when opening file : "+this->InputFiles.at(this->CurrentFileIndex));
 			}
 			this->CurrDataBuff.bcount = 0;
+		}else{
+			this->FinishedReadingFiles = true;
 		}
 	}
 	bool entriesread = false;
-	while( this->CountBuffersWithData() < this->NUMCONCURRENTSPILLS ){
+	while( not this->FinishedReadingFiles and (this->CountBuffersWithData() < this->NUMCONCURRENTSPILLS) ){
 		if( this->CurrentFile.eof() ){
 			if( this->OpenNextFile() ){
 				if( this->ParseDirBuffer() == -1 ){
@@ -83,6 +86,8 @@ Translator::TRANSLATORSTATE LDFPixieTranslator::Parse(boost::container::devector
 					throw std::runtime_error("Invalid Head Buffer when opening file : "+this->InputFiles.at(this->CurrentFileIndex));
 				}
 				this->CurrDataBuff.bcount = 0;
+			}else{
+				this->FinishedReadingFiles = true;
 			}
 		}
 
