@@ -34,6 +34,7 @@ class TraceHelper final{
 
 		TraceHelper& operator=(const TraceHelper& other){
 			if( this != &other ){
+				data.clear();
 				data = other.data;
 				TQDCSums = other.TQDCSums;
 				PreTriggerBaselineInfo = other.PreTriggerBaselineInfo;
@@ -53,6 +54,7 @@ class TraceHelper final{
 
 		TraceHelper& operator=(TraceHelper&& other) noexcept{
 			if( this != &other ){
+				data.clear();
 				data = std::move(other.data);
 				TQDCSums = std::move(other.TQDCSums);
 				PreTriggerBaselineInfo = std::move(other.PreTriggerBaselineInfo);
