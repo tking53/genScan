@@ -90,6 +90,9 @@ Translator::TRANSLATORSTATE LDFPixieTranslator::Parse(boost::container::devector
 				this->FinishedReadingFiles = true;
 			}
 		}
+		if( this->FinishedReadingFiles ){
+			break;
+		}
 
 		entriesread = true;
 		bool full_spill;
@@ -124,11 +127,14 @@ Translator::TRANSLATORSTATE LDFPixieTranslator::Parse(boost::container::devector
 		}
 		RawEvents.insert(RawEvents.end(),boost::make_move_iterator(this->Leftovers.begin()),boost::make_move_iterator(this->Leftovers.begin()+stopidx));
 		this->Leftovers.erase(this->Leftovers.begin(),this->Leftovers.begin()+stopidx);
+		if( not this->Leftovers.empty() ){
+			return Translator::TRANSLATORSTATE::PARSING;
+		}else{
+			return Translator::TRANSLATORSTATE::COMPLETE;
+		}
 	}else{
 		return Translator::TRANSLATORSTATE::COMPLETE;
 	}
-	//Clear for now
-	return Translator::TRANSLATORSTATE::PARSING;
 }
 
 int LDFPixieTranslator::ParseDirBuffer(){
@@ -144,7 +150,10 @@ int LDFPixieTranslator::ParseDirBuffer(){
 	this->CurrentFile.read(reinterpret_cast<char*>(&(this->CurrDirBuff.unknown)),2*(sizeof(unsigned int)));
 	this->CurrentFile.read(reinterpret_cast<char*>(&(this->CurrDirBuff.run_num)),sizeof(unsigned int));
 	this->CurrentFile.seekg(this->CurrDirBuff.buffsize*4 - 20,this->CurrentFile.cur);
-	this->console->info("Parsed Dir Buffer : found total buff size : {}, unknown [0-2] : {} {} {}, runnum : {}",this->CurrDirBuff.totalbuffsize,this->CurrDirBuff.unknown[0],this->CurrDirBuff.unknown[1],this->CurrDirBuff.unknown[2],this->CurrDirBuff.run_num);
+	this->console->info("Parsed Dir Buffer");
+	this->console->info("found total buff size : {}",this->CurrDirBuff.totalbuffsize);
+	this->console->info("unknown [0-2] : {} {} {}",this->CurrDirBuff.unknown[0],this->CurrDirBuff.unknown[1],this->CurrDirBuff.unknown[2]);
+	this->console->info("runnum : {}",this->CurrDirBuff.run_num);
 	return 0;
 }
 
@@ -168,7 +177,13 @@ int LDFPixieTranslator::ParseHeadBuffer(){
 	this->CurrHeadBuff.run_title[80] = '\0';
 	this->CurrentFile.read(reinterpret_cast<char*>(&(this->CurrHeadBuff.run_num)),sizeof(unsigned int));
 	this->CurrentFile.seekg(8194*4 - 140,this->CurrentFile.cur);
-	this->console->info("Found Head Buffer : facility : {}, format : {}, type : {}, date : {}, title : {}, run : {}",this->CurrHeadBuff.facility,this->CurrHeadBuff.format,this->CurrHeadBuff.type,this->CurrHeadBuff.date,this->CurrHeadBuff.run_title,this->CurrHeadBuff.run_num);
+	this->console->info("Found Head Buffer");
+	this->console->info("facility : {}",this->CurrHeadBuff.facility);
+	this->console->info("format : {}",this->CurrHeadBuff.format);
+	this->console->info("type : {}",this->CurrHeadBuff.type);
+	this->console->info("date : {}",this->CurrHeadBuff.date);
+	this->console->info("title : {}",this->CurrHeadBuff.run_title);
+	this->console->info("run : {}",this->CurrHeadBuff.run_num);
 
 	return 0;
 }

@@ -293,7 +293,7 @@ int main(int argc, char *argv[]) {
 		do{
 			CurrState = dataparser->Parse(CorrelatedEvents.GetRawEvents());
 
-			if( not CorrelatedEvents.GetRawEvents().empty() and (CurrState != Translator::TRANSLATORSTATE::COMPLETE) ) [[likely]] {
+			if( not CorrelatedEvents.GetRawEvents().empty() ) [[likely]] {
 				processorlist->ThreshAndCal(CorrelatedEvents.GetRawEvents(),cmap.get());
 				processorlist->ProcessRaw(CorrelatedEvents.GetRawEvents(),HistogramManager.get());
 				StatsManager->IncrementStats(CorrelatedEvents.GetRawEvents());
@@ -314,7 +314,10 @@ int main(int argc, char *argv[]) {
 
 				CorrelatedEvents.ClearRawEvents();
 			}else [[unlikely]] {
-				throw std::runtime_error("Read data but nothing decoded to allow for correlation");
+				if( CurrState != Translator::TRANSLATORSTATE::COMPLETE ){
+					console->critical("CurrState : {} RawEvents : {}",CurrState,CorrelatedEvents.GetRawEvents().size());
+					throw std::runtime_error("Read data but nothing decoded to allow for correlation");
+				}
 			}
 		}while( CurrState == Translator::TRANSLATORSTATE::PARSING and not ctrlCPressed );
 	}catch(std::runtime_error const& e){
