@@ -203,7 +203,7 @@ int LDFPixieTranslator::ParseDataBuffer(unsigned int& nBytes,bool& full_spill,bo
 
 			if( first_chunk ){
 				if( current_chunk_num != 0 ){
-					this->console->critical("first chunk isn't chunk 0 at spill {}",this->CurrSpillID);
+					this->console->critical("first chunk {} isn't chunk 0 at spill {}",current_chunk_num,this->CurrSpillID);
 					this->CurrDataBuff.missingchunks += current_chunk_num;
 					full_spill = false;
 				}
