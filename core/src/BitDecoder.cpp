@@ -4,8 +4,8 @@
 #include <string>
 
 XiaDecoder::XiaDecoder(ChannelMap::FirmwareVersion firmware,int Frequency) : 
-	Freq(Frequency),
 	Ver(firmware),	
+	Freq(Frequency),
 	EventLengthMask(0x7FFE0000,17),
 	TimeLowMask(0xFFFFFFFF, 0),
 	TimeHighMask(0xFFFF, 0),

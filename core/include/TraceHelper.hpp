@@ -24,16 +24,16 @@ class TraceHelper final{
 		TraceHelper(std::initializer_list<T> val) : data(val){
 		}
 
-		TraceHelper(const TraceHelper& other) : data(other.data){
-			TQDCSums = other.TQDCSums;
-			PreTriggerBaselineInfo = other.PreTriggerBaselineInfo;
-			PostTriggerBaselineInfo = other.PostTriggerBaselineInfo;
-			MaxInfo = other.MaxInfo;
+		TraceHelper(const TraceHelper& other) : data(other.data), 
+							TQDCSums(other.TQDCSums), 
+							PreTriggerBaselineInfo(other.PreTriggerBaselineInfo),
+							PostTriggerBaselineInfo(other.PostTriggerBaselineInfo),
+							MaxInfo(other.MaxInfo)
+	        {
 		}
 
 		TraceHelper& operator=(const TraceHelper& other){
 			if( this != &other ){
-				data.clear();
 				data = other.data;
 				TQDCSums = other.TQDCSums;
 				PreTriggerBaselineInfo = other.PreTriggerBaselineInfo;
@@ -43,21 +43,21 @@ class TraceHelper final{
 			return *this;
 		}
 
-		TraceHelper(TraceHelper&& other) noexcept : data(std::move(other.data)){
-			TQDCSums = other.TQDCSums;
-			PreTriggerBaselineInfo = other.PreTriggerBaselineInfo;
-			PostTriggerBaselineInfo = other.PostTriggerBaselineInfo;
-			MaxInfo = other.MaxInfo;
+		TraceHelper(TraceHelper&& other) noexcept : data(std::move(other.data)),
+							    TQDCSums(std::move(other.TQDCSums)),
+							    PreTriggerBaselineInfo(std::move(other.PreTriggerBaselineInfo)),
+							    PostTriggerBaselineInfo(std::move(other.PostTriggerBaselineInfo)),
+							    MaxInfo(std::move(other.MaxInfo))
+		{
 		}
 
-		TraceHelper& operator=(TraceHelper&& other){
+		TraceHelper& operator=(TraceHelper&& other) noexcept{
 			if( this != &other ){
-				data.clear();
 				data = std::move(other.data);
-				TQDCSums = other.TQDCSums;
-				PreTriggerBaselineInfo = other.PreTriggerBaselineInfo;
-				PostTriggerBaselineInfo = other.PostTriggerBaselineInfo;
-				MaxInfo = other.MaxInfo;
+				TQDCSums = std::move(other.TQDCSums);
+				PreTriggerBaselineInfo = std::move(other.PreTriggerBaselineInfo);
+				PostTriggerBaselineInfo = std::move(other.PostTriggerBaselineInfo);
+				MaxInfo = std::move(other.MaxInfo);
 			}
 			return *this;
 		}
