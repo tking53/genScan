@@ -62,9 +62,7 @@ LDFPixieTranslator::~LDFPixieTranslator(){
 
 Translator::TRANSLATORSTATE LDFPixieTranslator::Parse(boost::container::devector<PhysicsData>& RawEvents){
 	if( this->FinishedCurrentFile ){
-		if( not this->OpenNextFile() ){
-			return Translator::TRANSLATORSTATE::COMPLETE;
-		}else{
+		if( this->OpenNextFile() ){
 			if( this->ParseDirBuffer() == -1 ){
 				throw std::runtime_error("Invalid Dir Buffer when opening file : "+this->InputFiles.at(this->CurrentFileIndex));
 			}
