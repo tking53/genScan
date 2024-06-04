@@ -14,6 +14,7 @@
 LDFPixieTranslator::LDFPixieTranslator(const std::string& log,const std::string& translatorname) : Translator(log,translatorname){
 	this->PrevTimeStamp = 0;
 	this->CurrSpillID = 0;
+	this->EvtSpillCounter = std::vector<int>(this->NUMCONCURRENTSPILLS,0);
 	this->CurrDirBuff = { 
 		.bufftype = HRIBF_TYPES::DIR, 
 		.buffsize = 8192, 
@@ -54,6 +55,9 @@ LDFPixieTranslator::LDFPixieTranslator(const std::string& log,const std::string&
 
 LDFPixieTranslator::~LDFPixieTranslator(){
 	this->console->info("good chunks : {}, bad chunks : {}",this->CurrDataBuff.goodchunks,this->CurrDataBuff.missingchunks);
+	if( not this->Leftovers.empty() ){
+		this->console->critical("Leftover Events");
+	}
 }
 
 Translator::TRANSLATORSTATE LDFPixieTranslator::Parse(boost::container::devector<PhysicsData>& RawEvents){
@@ -113,7 +117,7 @@ Translator::TRANSLATORSTATE LDFPixieTranslator::Parse(boost::container::devector
 				this->correlator->Clear();
 				break;
 			}else{
-				this->EvtSpillCounter[evt.GetSpillID()] -= 1;
+				this->EvtSpillCounter[evt.GetSpillID()%this->NUMCONCURRENTSPILLS] -= 1;
 				++stopidx;
 			}
 		}
@@ -413,14 +417,14 @@ int LDFPixieTranslator::UnpackData(unsigned int& nBytes,bool& full_spill,bool& b
 		}else if( vsn == 9999 ){
 			//end of readout
 			auto finalsize = this->Leftovers.size();
-			this->EvtSpillCounter[this->CurrSpillID] = (finalsize - currsize);
+			this->EvtSpillCounter[this->CurrSpillID%this->NUMCONCURRENTSPILLS] = (finalsize - currsize);
 			//this->console->info("evts added {}",(finalsize-currsize));
 			++(this->CurrSpillID);
 			this->databuffer.clear();
 			break;
 		}else{
 			auto finalsize = this->Leftovers.size();
-			this->EvtSpillCounter[this->CurrSpillID] = (finalsize - currsize);
+			this->EvtSpillCounter[this->CurrSpillID%this->NUMCONCURRENTSPILLS] = (finalsize - currsize);
 			++(this->CurrSpillID);
 			this->databuffer.clear();
 			this->console->critical("UNEXPECTED VSN : {}",vsn);
@@ -431,17 +435,24 @@ int LDFPixieTranslator::UnpackData(unsigned int& nBytes,bool& full_spill,bool& b
 }
 
 int LDFPixieTranslator::CountBuffersWithData() const{
-	if( this->EvtSpillCounter.size() == 0 ){
-		return 0;
-	}else{
-		int numspill = 0;
-		for( const auto& kv : this->EvtSpillCounter ){
-			if( kv.second > 0 ){
-				++numspill;
-				//this->console->info("spill {} : entries {}",kv.first,kv.second);
-			}
+	int numspill = 0;
+	for( const auto& itr : this->EvtSpillCounter ){
+		if( itr > 0 ){
+			++numspill;
 		}
-		//this->console->info("done");
-		return numspill;
 	}
+	return numspill;
+	//if( this->EvtSpillCounter.size() == 0 ){
+	//	return 0;
+	//}else{
+	//	int numspill = 0;
+	//	for( const auto& kv : this->EvtSpillCounter ){
+	//		if( kv.second > 0 ){
+	//			++numspill;
+	//			//this->console->info("spill {} : entries {}",kv.first,kv.second);
+	//		}
+	//	}
+	//	//this->console->info("done");
+	//	return numspill;
+	//}
 }

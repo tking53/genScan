@@ -97,8 +97,9 @@ class LDFPixieTranslator : public Translator{
 		uint64_t PrevTimeStamp;
 
 		const int NUMCONCURRENTSPILLS = 3;
+		std::vector<int> EvtSpillCounter;
 
-		std::map<uint64_t,int> EvtSpillCounter;
+		//std::map<uint64_t,int> EvtSpillCounter;
 		//Increment when we find spill footer
 		uint64_t CurrSpillID;
 };
