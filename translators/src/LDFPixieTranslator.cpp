@@ -319,6 +319,7 @@ int LDFPixieTranslator::UnpackData(unsigned int& nBytes,bool& full_spill,bool& b
 	unsigned int lenrec = 0xFFFFFFFF;
 	unsigned int vsn = 0xFFFFFFFF;
 	auto currsize = this->Leftovers.size();
+	time_t theTime = 0;
 	while( nWords_read <= nWords ){
 		while( this->databuffer[nWords_read] == 0xFFFFFFFF ){
 			++nWords_read;
@@ -410,6 +411,8 @@ int LDFPixieTranslator::UnpackData(unsigned int& nBytes,bool& full_spill,bool& b
 			}
 		}else if( vsn == 1000 ){
 			//this is for superheavy
+			memcpy(&theTime,&(this->databuffer[nWords_read + 2]),sizeof(time_t));
+			this->console->info("ctime : {}",ctime(&theTime));
 			nWords_read += lenrec;
 			continue;
 		}else if( vsn == 9999 ){
