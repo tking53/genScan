@@ -52,10 +52,11 @@ LDFPixieTranslator::LDFPixieTranslator(const std::string& log,const std::string&
 		.buffer1 = std::vector<unsigned int>(8194,0xFFFFFFFF),
 		.buffer2 = std::vector<unsigned int>(8194,0xFFFFFFFF)
 	};
+	this->NTotalWords = 0;
 }	
 
 LDFPixieTranslator::~LDFPixieTranslator(){
-	this->console->info("good chunks : {}, bad chunks : {}",this->CurrDataBuff.goodchunks,this->CurrDataBuff.missingchunks);
+	this->console->info("good chunks : {}, bad chunks : {}, spills : {}",this->CurrDataBuff.goodchunks,this->CurrDataBuff.missingchunks,this->CurrSpillID);
 	if( not this->Leftovers.empty() ){
 		this->console->critical("Leftover Events : {}",this->Leftovers.size());
 	}
@@ -102,10 +103,8 @@ Translator::TRANSLATORSTATE LDFPixieTranslator::Parse(boost::container::devector
 		if( retval == -1 ){
 			throw std::runtime_error("Invalid Data Buffer in File : "+this->InputFiles.at(this->CurrentFileIndex));
 		}
-		if( retval == 0 ){
+		if( full_spill ){
 			this->UnpackData(nBytes,full_spill,bad_spill);
-		}else{
-			this->databuffer.clear();
 		}
 	}
 	if( entriesread ){
@@ -196,9 +195,13 @@ int LDFPixieTranslator::ParseDataBuffer(unsigned int& nBytes,bool& full_spill,bo
 	unsigned int current_chunk_num = 0;
 	unsigned int prev_chunk_num;
 	unsigned int prev_num_chunks;
+	nBytes = 0;
 
 	while( true ){
-		this->ReadNextBuffer();
+		if( this->ReadNextBuffer() == -1 ){
+			this->console->critical("Failed to read from input data file");
+			return 6;
+		}
 		//this->ReadNextBuffer(true);
 		if( this->CurrDataBuff.buffhead == HRIBF_TYPES::ENDFILE ){
 			if( this->CurrDataBuff.nextbuffhead == HRIBF_TYPES::ENDFILE ){
@@ -212,19 +215,21 @@ int LDFPixieTranslator::ParseDataBuffer(unsigned int& nBytes,bool& full_spill,bo
 		}else if( this->CurrDataBuff.buffhead == HRIBF_TYPES::DATA ){
 			prev_chunk_num = current_chunk_num;
 			prev_num_chunks = total_num_chunks;
-			this_chunk_sizeB = this->CurrDataBuff.currbuffer->at((this->CurrDataBuff.buffpos)++);
-			total_num_chunks = this->CurrDataBuff.currbuffer->at((this->CurrDataBuff.buffpos)++);
-			current_chunk_num = this->CurrDataBuff.currbuffer->at((this->CurrDataBuff.buffpos)++);
+			this_chunk_sizeB = this->CurrDataBuff.currbuffer->at(this->CurrDataBuff.buffpos++);
+			total_num_chunks = this->CurrDataBuff.currbuffer->at(this->CurrDataBuff.buffpos++);
+			current_chunk_num = this->CurrDataBuff.currbuffer->at(this->CurrDataBuff.buffpos++);
 
 			if( first_chunk ){
 				if( current_chunk_num != 0 ){
 					this->console->critical("first chunk {} isn't chunk 0 at spill {}",current_chunk_num,this->CurrSpillID);
 					this->CurrDataBuff.missingchunks += current_chunk_num;
 					full_spill = false;
+				}else{
+					full_spill = true;
 				}
 				first_chunk = false;
 			}else if( total_num_chunks != prev_num_chunks ){
-				this->console->critical("Gotten out of order parsing spill {} at spill {}",this->CurrSpillID,this->CurrSpillID);
+				this->console->critical("Gotten out of order parsing spill {}",this->CurrSpillID);
 				this->ReadNextBuffer(true);
 				this->CurrDataBuff.missingchunks += (prev_num_chunks - 1) - prev_chunk_num;
 				return 4; 
@@ -236,7 +241,7 @@ int LDFPixieTranslator::ParseDataBuffer(unsigned int& nBytes,bool& full_spill,bo
 					this->console->critical("Missing multiple spill chunks from {} to {} at spill {}",prev_chunk_num+1,current_chunk_num-1,this->CurrSpillID);
 				}
 				this->ReadNextBuffer(true);
-				this->CurrDataBuff.missingchunks += (current_chunk_num - 1) - prev_chunk_num;
+				this->CurrDataBuff.missingchunks += std::abs(static_cast<double>(static_cast<double>(current_chunk_num - 1) - prev_chunk_num));
 				return 4;
 			}
 
@@ -281,7 +286,7 @@ int LDFPixieTranslator::ParseDataBuffer(unsigned int& nBytes,bool& full_spill,bo
 
 int LDFPixieTranslator::ReadNextBuffer(bool force){
 	if( this->CurrDataBuff.bcount == 0 ){
-		this->CurrentFile.read(reinterpret_cast<char*>(&(this->CurrDataBuff.buffer1[0])),8194*sizeof(unsigned int));
+		this->CurrentFile.read(reinterpret_cast<char*>(&(this->CurrDataBuff.buffer1[0])),8194*4);
 	}else if( this->CurrDataBuff.buffpos + 3 <= 8193 and not force ){
 		while( this->CurrDataBuff.currbuffer->at(this->CurrDataBuff.buffpos) == HRIBF_TYPES::ENDBUFF and  this->CurrDataBuff.buffpos < 8193 ){
 			++(this->CurrDataBuff.buffpos);
@@ -291,11 +296,11 @@ int LDFPixieTranslator::ReadNextBuffer(bool force){
 		}
 	}
 	if( this->CurrDataBuff.bcount % 2 == 0 ){
-		this->CurrentFile.read(reinterpret_cast<char*>(&(this->CurrDataBuff.buffer2[0])),8194*sizeof(unsigned int));
+		this->CurrentFile.read(reinterpret_cast<char*>(&(this->CurrDataBuff.buffer2[0])),8194*4);
 		this->CurrDataBuff.currbuffer = &(this->CurrDataBuff.buffer1);
 		this->CurrDataBuff.nextbuffer = &(this->CurrDataBuff.buffer2);
 	}else{
-		this->CurrentFile.read(reinterpret_cast<char*>(&(this->CurrDataBuff.buffer1[0])),8194*sizeof(unsigned int));
+		this->CurrentFile.read(reinterpret_cast<char*>(&(this->CurrDataBuff.buffer1[0])),8194*4);
 		this->CurrDataBuff.currbuffer = &(this->CurrDataBuff.buffer2);
 		this->CurrDataBuff.nextbuffer = &(this->CurrDataBuff.buffer1);
 	}
@@ -309,6 +314,11 @@ int LDFPixieTranslator::ReadNextBuffer(bool force){
 	
 	this->CurrDataBuff.nextbuffhead = this->CurrDataBuff.nextbuffer->at(0);
 	this->CurrDataBuff.nextbuffsize = this->CurrDataBuff.nextbuffer->at(1);
+	if( not this->CurrentFile.good() ){
+		return -1;
+	}else if( this->CurrentFile.eof() ){
+		return 2;
+	}
 
 	return 0;
 }
@@ -320,6 +330,7 @@ int LDFPixieTranslator::UnpackData(unsigned int& nBytes,bool& full_spill,bool& b
 	unsigned int vsn = 0xFFFFFFFF;
 	auto currsize = this->Leftovers.size();
 	time_t theTime = 0;
+	this->NTotalWords += nWords;
 	while( nWords_read <= nWords ){
 		while( this->databuffer[nWords_read] == 0xFFFFFFFF ){
 			++nWords_read;
@@ -420,6 +431,7 @@ int LDFPixieTranslator::UnpackData(unsigned int& nBytes,bool& full_spill,bool& b
 			auto finalsize = this->Leftovers.size();
 			this->EvtSpillCounter[this->CurrSpillID%this->NUMCONCURRENTSPILLS] = (finalsize - currsize);
 			//this->console->info("evts added {}",(finalsize-currsize));
+			this->console->info("spill : {} words : {} Total words : {}",this->CurrSpillID,nWords,this->NTotalWords);
 			++(this->CurrSpillID);
 			this->databuffer.clear();
 			break;

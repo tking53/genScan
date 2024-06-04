@@ -100,6 +100,8 @@ class LDFPixieTranslator : public Translator{
 		const int NUMCONCURRENTSPILLS = 3;
 		std::vector<int> EvtSpillCounter;
 
+		unsigned int NTotalWords;
+
 		//std::map<uint64_t,int> EvtSpillCounter;
 		//Increment when we find spill footer
 		uint64_t CurrSpillID;
