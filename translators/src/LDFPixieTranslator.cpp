@@ -56,7 +56,7 @@ LDFPixieTranslator::LDFPixieTranslator(const std::string& log,const std::string&
 LDFPixieTranslator::~LDFPixieTranslator(){
 	this->console->info("good chunks : {}, bad chunks : {}",this->CurrDataBuff.goodchunks,this->CurrDataBuff.missingchunks);
 	if( not this->Leftovers.empty() ){
-		this->console->critical("Leftover Events");
+		this->console->critical("Leftover Events : {}",this->Leftovers.size());
 	}
 }
 
@@ -191,6 +191,7 @@ int LDFPixieTranslator::ParseHeadBuffer(){
 
 int LDFPixieTranslator::ParseDataBuffer(unsigned int& nBytes,bool& full_spill,bool& bad_spill){
 	bool first_chunk = true;
+	bad_spill = false;
 	unsigned int this_chunk_sizeB;
 	unsigned int total_num_chunks = 0;
 	unsigned int current_chunk_num = 0;
@@ -248,7 +249,7 @@ int LDFPixieTranslator::ParseDataBuffer(unsigned int& nBytes,bool& full_spill,bo
 				}
 				//memcpy(&data_[nBytes],&curr_buffer[buff_pos],8)
 				unsigned int nWords = 2;
-				for( int ii = 0; ii < nWords; ++ii ){
+				for( unsigned int ii = 0; ii < nWords; ++ii ){
 					this->databuffer.push_back(this->CurrDataBuff[this->CurrDataBuff.buffpos+ii]);
 				}
 				nBytes += 8;
@@ -265,7 +266,7 @@ int LDFPixieTranslator::ParseDataBuffer(unsigned int& nBytes,bool& full_spill,bo
 				copied_bytes = this_chunk_sizeB - 12;
 				//memcpy(&data_[nBytes],&curr_buffer[buff_pos],copied_bytes);
 				unsigned int nWords = copied_bytes/4;
-				for( int ii = 0; ii < nWords; ++ii ){
+				for( unsigned int ii = 0; ii < nWords; ++ii ){
 					this->databuffer.push_back(this->CurrDataBuff[this->CurrDataBuff.buffpos+ii]);
 				}
 				nBytes += copied_bytes;
