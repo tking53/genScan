@@ -293,7 +293,7 @@ int main(int argc, char *argv[]) {
 		do{
 			CurrState = dataparser->Parse(CorrelatedEvents.GetRawEvents());
 
-			if( not CorrelatedEvents.GetRawEvents().empty() ) [[likely]] {
+			if( not CorrelatedEvents.GetRawEvents().empty() and (CurrState != Translator::TRANSLATORSTATE::COMPLETE) ) [[likely]] {
 				processorlist->ThreshAndCal(CorrelatedEvents.GetRawEvents(),cmap.get());
 				processorlist->ProcessRaw(CorrelatedEvents.GetRawEvents(),HistogramManager.get());
 				StatsManager->IncrementStats(CorrelatedEvents.GetRawEvents());

@@ -13,7 +13,7 @@
 class LDFPixieTranslator : public Translator{
 	public:
 		LDFPixieTranslator(const std::string&,const std::string&);
-		~LDFPixieTranslator() = default;
+		~LDFPixieTranslator();
 		Translator::TRANSLATORSTATE Parse(boost::container::devector<PhysicsData>&);
 
 		enum HRIBF_TYPES{

@@ -52,6 +52,10 @@ LDFPixieTranslator::LDFPixieTranslator(const std::string& log,const std::string&
 	};
 }	
 
+LDFPixieTranslator::~LDFPixieTranslator(){
+	this->console->info("good chunks : {}, bad chunks : {}",this->CurrDataBuff.goodchunks,this->CurrDataBuff.missingchunks);
+}
+
 Translator::TRANSLATORSTATE LDFPixieTranslator::Parse(boost::container::devector<PhysicsData>& RawEvents){
 	if( this->FinishedCurrentFile ){
 		if( not this->OpenNextFile() ){
@@ -212,21 +216,22 @@ int LDFPixieTranslator::ParseDataBuffer(unsigned int& nBytes,bool& full_spill,bo
 
 			if( first_chunk ){
 				if( current_chunk_num != 0 ){
+					this->console->critical("first chunk isn't chunk 0 at spill {}",this->CurrSpillID);
 					this->CurrDataBuff.missingchunks += current_chunk_num;
 					full_spill = false;
 				}
 				first_chunk = false;
 			}else if( total_num_chunks != prev_num_chunks ){
-				this->console->critical("Gotten out of order parsing spill {} at buffer position 0x{:x}",this->CurrSpillID,this->CurrDataBuff.buffhead);
+				this->console->critical("Gotten out of order parsing spill {} at spill {}",this->CurrSpillID,this->CurrSpillID);
 				this->ReadNextBuffer(true);
 				this->CurrDataBuff.missingchunks += (prev_num_chunks - 1) - prev_chunk_num;
 				return 4; 
 			}else if( current_chunk_num != prev_chunk_num+1 ){
 				full_spill = false;
 				if( current_chunk_num == prev_chunk_num+2 ){
-					this->console->critical("Missing single spill chunk {} at buffer position 0x{:x}",prev_chunk_num+1,this->CurrDataBuff.buffhead);
+					this->console->critical("Missing single spill chunk {} at spill {}",prev_chunk_num+1,this->CurrSpillID);
 				}else{
-					this->console->critical("Missing multiple spill chunks from {} to {} at buffer position 0x{:x}",prev_chunk_num+1,current_chunk_num-1,this->CurrDataBuff.buffhead);
+					this->console->critical("Missing multiple spill chunks from {} to {} at spill {}",prev_chunk_num+1,current_chunk_num-1,this->CurrSpillID);
 				}
 				this->ReadNextBuffer(true);
 				this->CurrDataBuff.missingchunks += (current_chunk_num - 1) - prev_chunk_num;
@@ -235,7 +240,7 @@ int LDFPixieTranslator::ParseDataBuffer(unsigned int& nBytes,bool& full_spill,bo
 
 			if( current_chunk_num == total_num_chunks - 1) {//spill footer
 				if( this_chunk_sizeB != 20 ){
-					this->console->critical("spill footer (chunk {} of {}) has size {} != 5 at buffer position 0x{:x}",current_chunk_num,total_num_chunks,this_chunk_sizeB,this->CurrDataBuff.buffhead);
+					this->console->critical("spill footer (chunk {} of {}) has size {} != 5 at spill {}",current_chunk_num,total_num_chunks,this_chunk_sizeB,this->CurrSpillID);
 					this->ReadNextBuffer(true);
 					return 5;
 				}
@@ -250,7 +255,7 @@ int LDFPixieTranslator::ParseDataBuffer(unsigned int& nBytes,bool& full_spill,bo
 			}else{
 				unsigned int copied_bytes = 0;
 				if( this_chunk_sizeB <= 12 ){
-					this->console->critical("invalid number of bytes in chunk {} of {}, {} bytes at buffer position 0x{:x}",current_chunk_num+1,total_num_chunks,this_chunk_sizeB,this->CurrDataBuff.buffhead);
+					this->console->critical("invalid number of bytes in chunk {} of {}, {} bytes at spill {}",current_chunk_num+1,total_num_chunks,this_chunk_sizeB,this->CurrSpillID);
 					++this->CurrDataBuff.missingchunks;
 					return 4;
 				}
@@ -293,13 +298,9 @@ int LDFPixieTranslator::ReadNextBuffer(bool force){
 		this->CurrDataBuff.nextbuffer = &(this->CurrDataBuff.buffer1);
 	}
 	++(this->CurrDataBuff.bcount);
-	this->CurrDataBuff.buffhead = this->CurrDataBuff.currbuffer->at(0);
-	this->CurrDataBuff.buffsize = this->CurrDataBuff.currbuffer->at(1);
-	this->CurrDataBuff.numbytes = this->CurrDataBuff.currbuffer->at(2);
-	this->CurrDataBuff.numchunks = this->CurrDataBuff.currbuffer->at(3);
-	this->CurrDataBuff.prevchunknum = this->CurrDataBuff.currchunknum;
-	this->CurrDataBuff.currchunknum = this->CurrDataBuff.currbuffer->at(4);
-	this->CurrDataBuff.buffpos = 2;
+	this->CurrDataBuff.buffpos = 0;
+	this->CurrDataBuff.buffhead = this->CurrDataBuff.currbuffer->at((this->CurrDataBuff.buffpos)++);
+	this->CurrDataBuff.buffsize = this->CurrDataBuff.currbuffer->at((this->CurrDataBuff.buffpos)++);
 	//for( size_t ii = 0; ii < 8194; ++ii ){
 	//	this->console->info("{} {:x}",ii,this->CurrDataBuff.currbuffer->at(ii));
 	//}
