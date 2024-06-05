@@ -1,16 +1,19 @@
-#ifndef __MTAS_PROCESSOR_HPP__
-#define __MTAS_PROCESSOR_HPP__
+#ifndef __E21069B_PROCESSOR_HPP__
+#define __E21069B_PROCESSOR_HPP__
 
+#include <memory>
 #include <string>
 
-#include "MtasStruct.hpp"
 #include "EventSummary.hpp"
 #include "HistogramManager.hpp"
+#include "MtasImplantProcessor.hpp"
+#include "MtasProcessor.hpp"
+#include "PidProcessor.hpp"
 #include "Processor.hpp"
 
-class MtasProcessor : public Processor{
+class e21069bProcessor : public Processor{
 	public:
-		MtasProcessor(const std::string&);
+		e21069bProcessor(const std::string&);
 		[[maybe_unused]] bool PreProcess([[maybe_unused]] EventSummary&,[[maybe_unused]] PLOTS::PlotRegistry*,[[maybe_unused]] CUTS::CutRegistry*) final;
 		[[maybe_unused]] bool Process(EventSummary&,[[maybe_unused]] PLOTS::PlotRegistry*,[[maybe_unused]] CUTS::CutRegistry*) final;
 		[[maybe_unused]] bool PostProcess([[maybe_unused]] EventSummary&,[[maybe_unused]] PLOTS::PlotRegistry*,[[maybe_unused]] CUTS::CutRegistry*) final;
@@ -25,11 +28,11 @@ class MtasProcessor : public Processor{
 		virtual TTree* RegisterTree() final;
 		virtual void CleanupTree() final;
 	private:
+
+		std::unique_ptr<MtasProcessor> MtasProc;
+		std::unique_ptr<PidProcessor> PidProc;
+		std::unique_ptr<MtasImplantProcessor> MtasImplantProc;
 		
-		std::vector<ProcessorStruct::MtasSegment> SegmentDataVec;
-		ProcessorStruct::MtasSegment CurrSegmentData;
-		std::vector<ProcessorStruct::MtasTotal> TotalDataVec;
-		ProcessorStruct::MtasTotal CurrTotalData;
 };
 
 #endif

@@ -10,25 +10,6 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 [[maybe_unused]] bool MtasProcessor::PreProcess(EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	Processor::PreProcess();
 	summary.GetDetectorSummary(this->AllDefaultRegex["mtas"],this->SummaryData);
-	//this->console->info("Size of event for MTAS : {}",this->SummaryData.size());
-	//for( const auto& evt : this->SummaryData ){
-	//}
-	
-//	summary.GetDetectorSummary("mtas:center.*",this->SummaryData);
-//	if( this->SummaryData.size() > 0 )
-//		this->console->info("Num Center : {}",this->SummaryData.size());
-//
-//	summary.GetDetectorSummary("mtas:inner.*",this->SummaryData);
-//	if( this->SummaryData.size() > 0 )
-//		this->console->info("Num Inner : {}",this->SummaryData.size());
-//
-//	summary.GetDetectorSummary("mtas:middle.*",this->SummaryData);
-//	if( this->SummaryData.size() > 0 )
-//		this->console->info("Num Middle : {}",this->SummaryData.size());
-//
-//	summary.GetDetectorSummary("mtas:outer.*",this->SummaryData);
-//	if( this->SummaryData.size() > 0 )
-//		this->console->info("Num Outer : {}",this->SummaryData.size());
 
 	Processor::EndProcess();
 	return true;
