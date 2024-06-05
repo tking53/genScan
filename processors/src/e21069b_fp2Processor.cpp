@@ -4,7 +4,7 @@
 #include "HistogramManager.hpp"
 #include <TTree.h>
 
-e21069b_fp2Processor::e21069b_fp2Processor(const std::string& log) : Processor(log,"e21069b_fp2Processor",{}){
+e21069b_fp2Processor::e21069b_fp2Processor(const std::string& log) : Processor(log,"e21069b_fp2Processor",{"mtas","mtasimplant","pid"}){
 	this->MtasProc = std::make_unique<MtasProcessor>(log);
 	this->MtasImplantProc = std::make_unique<MtasImplantProcessor>(log);
 	this->PidProc = std::make_unique<PidProcessor>(log);
