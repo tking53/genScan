@@ -5,8 +5,11 @@
 	</Description>
 	<Global EventWidth="5.0e-7" EventWidthUnit="s" CorrelationType="rolling-window" />
 	<DetectorDriver>
-		<Processor name="RootDevProcessor" included_types="mtasimplantsipm,generic,mtas,pid"/>
-		<Processor name="MtasProcessor"/>
+		<Processor name="e21069b_fp2Processor">
+			<Processor name="MtasProcessor"/>
+			<Processor name="MtasImpantProcessor"/>
+			<Processor name="PidProcessor"/>
+		</Processor>
 	</DetectorDriver>
 	<Map>
 		<Crate number="0">

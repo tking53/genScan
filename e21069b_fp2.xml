@@ -5,15 +5,15 @@
 	</Description>
 	<Global EventWidth="5.0e-7" EventWidthUnit="s" CorrelationType="rolling-window" />
 	<DetectorDriver>
-		<Processor name="RootDevProcessor" included_types="mtasimplantsipm,generic,mtas,pid"/>
+		<Processor name="RootDevProcessor" included_types="mtasimplant,generic,mtas,pid"/>
 	</DetectorDriver>
 	<Map>
 		<Crate number="0">
 			<Module number="0" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="264">
-				<Channel number="0" type="mtasimplantsipm" subtype="dyn_h">
+				<Channel number="0" type="mtasimplant" subtype="dyn_h">
 					<Calibration model="linear">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="1" type="mtasimplantsipm" subtype="dyn_l">
+				<Channel number="1" type="mtasimplant" subtype="dyn_l">
 					<Calibration model="linear">0.0 1.0</Calibration>
 				</Channel>
 				<Channel number="4" type="generic" subtype="ogs" group="mtas_veto">
@@ -333,51 +333,51 @@
 				</Channel>
 			</Module>
 			<Module number="5" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="264">
-				<Channel number="0" type="mtasimplantsipm" subtype="anode_h" group="9" location="8" >
+				<Channel number="0" type="mtasimplant" subtype="anode_h" group="9" location="8" >
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="1" type="mtasimplantsipm" subtype="anode_h" group="17" location="16" >
+				<Channel number="1" type="mtasimplant" subtype="anode_h" group="17" location="16" >
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="2" type="mtasimplantsipm" subtype="anode_h" group="25" location="24">
+				<Channel number="2" type="mtasimplant" subtype="anode_h" group="25" location="24">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="3" type="mtasimplantsipm" subtype="anode_h" group="33" location="32">
+				<Channel number="3" type="mtasimplant" subtype="anode_h" group="33" location="32">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="4" type="mtasimplantsipm" subtype="anode_h" group="41" location="40">
+				<Channel number="4" type="mtasimplant" subtype="anode_h" group="41" location="40">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="5" type="mtasimplantsipm" subtype="anode_h" group="49" location="48">
+				<Channel number="5" type="mtasimplant" subtype="anode_h" group="49" location="48">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="6" type="mtasimplantsipm" subtype="anode_h" group="2" location="1">
+				<Channel number="6" type="mtasimplant" subtype="anode_h" group="2" location="1">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="7" type="mtasimplantsipm" subtype="anode_h" group="10" location="9">
+				<Channel number="7" type="mtasimplant" subtype="anode_h" group="10" location="9">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="8" type="mtasimplantsipm" subtype="anode_h" group="18" location="17">
+				<Channel number="8" type="mtasimplant" subtype="anode_h" group="18" location="17">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="9" type="mtasimplantsipm" subtype="anode_h" group="26" location="25">
+				<Channel number="9" type="mtasimplant" subtype="anode_h" group="26" location="25">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="10" type="mtasimplantsipm" subtype="anode_h" group="34" location="33">
+				<Channel number="10" type="mtasimplant" subtype="anode_h" group="34" location="33">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="11" type="mtasimplantsipm" subtype="anode_h" group="42" location="41">
+				<Channel number="11" type="mtasimplant" subtype="anode_h" group="42" location="41">
 					<Trace RangeLow="6" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
@@ -385,66 +385,66 @@
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="13" type="mtasimplantsipm" subtype="anode_h" group="50" location="49">
+				<Channel number="13" type="mtasimplant" subtype="anode_h" group="50" location="49">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="14" type="mtasimplantsipm" subtype="anode_h" group="58" location="57">
+				<Channel number="14" type="mtasimplant" subtype="anode_h" group="58" location="57">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="15" type="mtasimplantsipm" subtype="anode_h" group="3" location="2">
+				<Channel number="15" type="mtasimplant" subtype="anode_h" group="3" location="2">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
 			</Module>
 
 			<Module number="6" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="264">
-				<Channel number="0" type="mtasimplantsipm" subtype="anode_h" group="11" location="10">
+				<Channel number="0" type="mtasimplant" subtype="anode_h" group="11" location="10">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="1" type="mtasimplantsipm" subtype="anode_h" group="19" location="18">
+				<Channel number="1" type="mtasimplant" subtype="anode_h" group="19" location="18">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="2" type="mtasimplantsipm" subtype="anode_h" group="27" location="26">
+				<Channel number="2" type="mtasimplant" subtype="anode_h" group="27" location="26">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="3" type="mtasimplantsipm" subtype="anode_h" group="35" location="34">
+				<Channel number="3" type="mtasimplant" subtype="anode_h" group="35" location="34">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="4" type="mtasimplantsipm" subtype="anode_h" group="43" location="42">
+				<Channel number="4" type="mtasimplant" subtype="anode_h" group="43" location="42">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="5" type="mtasimplantsipm" subtype="anode_h" group="51" location="50">
+				<Channel number="5" type="mtasimplant" subtype="anode_h" group="51" location="50">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="6" type="mtasimplantsipm" subtype="anode_h" group="59" location="58">
+				<Channel number="6" type="mtasimplant" subtype="anode_h" group="59" location="58">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="7" type="mtasimplantsipm" subtype="anode_h" group="4" location="3">
+				<Channel number="7" type="mtasimplant" subtype="anode_h" group="4" location="3">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="8" type="mtasimplantsipm" subtype="anode_h" group="12" location="11">
+				<Channel number="8" type="mtasimplant" subtype="anode_h" group="12" location="11">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="9" type="mtasimplantsipm" subtype="anode_h" group="20" location="19">
+				<Channel number="9" type="mtasimplant" subtype="anode_h" group="20" location="19">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="10" type="mtasimplantsipm" subtype="anode_h" group="28" location="27">
+				<Channel number="10" type="mtasimplant" subtype="anode_h" group="28" location="27">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="11" type="mtasimplantsipm" subtype="anode_h" group="36" location="35">
+				<Channel number="11" type="mtasimplant" subtype="anode_h" group="36" location="35">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
@@ -452,66 +452,66 @@
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="13" type="mtasimplantsipm" subtype="anode_h" group="44" location="43">
+				<Channel number="13" type="mtasimplant" subtype="anode_h" group="44" location="43">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="14" type="mtasimplantsipm" subtype="anode_h" group="52" location="51">
+				<Channel number="14" type="mtasimplant" subtype="anode_h" group="52" location="51">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="15" type="mtasimplantsipm" subtype="anode_h" group="60" location="59">
+				<Channel number="15" type="mtasimplant" subtype="anode_h" group="60" location="59">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
 			</Module>
 
 			<Module number="7" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="264">
-				<Channel number="0" type="mtasimplantsipm" subtype="anode_h" group="5" location="4">
+				<Channel number="0" type="mtasimplant" subtype="anode_h" group="5" location="4">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="1" type="mtasimplantsipm" subtype="anode_h" group="13" location="12">
+				<Channel number="1" type="mtasimplant" subtype="anode_h" group="13" location="12">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="2" type="mtasimplantsipm" subtype="anode_h" group="21" location="20">
+				<Channel number="2" type="mtasimplant" subtype="anode_h" group="21" location="20">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="3" type="mtasimplantsipm" subtype="anode_h" group="29" location="28">
+				<Channel number="3" type="mtasimplant" subtype="anode_h" group="29" location="28">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="4" type="mtasimplantsipm" subtype="anode_h" group="37" location="36">
+				<Channel number="4" type="mtasimplant" subtype="anode_h" group="37" location="36">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="5" type="mtasimplantsipm" subtype="anode_h" group="45" location="44">
+				<Channel number="5" type="mtasimplant" subtype="anode_h" group="45" location="44">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="6" type="mtasimplantsipm" subtype="anode_h" group="53" location="52">
+				<Channel number="6" type="mtasimplant" subtype="anode_h" group="53" location="52">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="7" type="mtasimplantsipm" subtype="anode_h" group="61" location="60">
+				<Channel number="7" type="mtasimplant" subtype="anode_h" group="61" location="60">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="8" type="mtasimplantsipm" subtype="anode_h" group="6" location="5">
+				<Channel number="8" type="mtasimplant" subtype="anode_h" group="6" location="5">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="9" type="mtasimplantsipm" subtype="anode_h" group="14" location="13">
+				<Channel number="9" type="mtasimplant" subtype="anode_h" group="14" location="13">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="10" type="mtasimplantsipm" subtype="anode_h" group="22" location="21">
+				<Channel number="10" type="mtasimplant" subtype="anode_h" group="22" location="21">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="11" type="mtasimplantsipm" subtype="anode_h" group="30" location="29">
+				<Channel number="11" type="mtasimplant" subtype="anode_h" group="30" location="29">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
@@ -519,65 +519,65 @@
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="13" type="mtasimplantsipm" subtype="anode_h" group="38" location="37">
+				<Channel number="13" type="mtasimplant" subtype="anode_h" group="38" location="37">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="14" type="mtasimplantsipm" subtype="anode_h" group="46" location="45">
+				<Channel number="14" type="mtasimplant" subtype="anode_h" group="46" location="45">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="15" type="mtasimplantsipm" subtype="anode_h" group="54" location="53">
+				<Channel number="15" type="mtasimplant" subtype="anode_h" group="54" location="53">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
 			</Module>
 			<Module number="8" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="264">
-				<Channel number="0" type="mtasimplantsipm" subtype="anode_h" group="62" location="61">
+				<Channel number="0" type="mtasimplant" subtype="anode_h" group="62" location="61">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="1" type="mtasimplantsipm" subtype="anode_h" group="7" location="6">
+				<Channel number="1" type="mtasimplant" subtype="anode_h" group="7" location="6">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="2" type="mtasimplantsipm" subtype="anode_h" group="15" location="14">
+				<Channel number="2" type="mtasimplant" subtype="anode_h" group="15" location="14">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="3" type="mtasimplantsipm" subtype="anode_h" group="23" location="22">
+				<Channel number="3" type="mtasimplant" subtype="anode_h" group="23" location="22">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="4" type="mtasimplantsipm" subtype="anode_h" group="31" location="30">
+				<Channel number="4" type="mtasimplant" subtype="anode_h" group="31" location="30">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="5" type="mtasimplantsipm" subtype="anode_h" group="39" location="38">
+				<Channel number="5" type="mtasimplant" subtype="anode_h" group="39" location="38">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="6" type="mtasimplantsipm" subtype="anode_h" group="47" location="46">
+				<Channel number="6" type="mtasimplant" subtype="anode_h" group="47" location="46">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="7" type="mtasimplantsipm" subtype="anode_h" group="55" location="54">
+				<Channel number="7" type="mtasimplant" subtype="anode_h" group="55" location="54">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="8" type="mtasimplantsipm" subtype="anode_h" group="63" location="62">
+				<Channel number="8" type="mtasimplant" subtype="anode_h" group="63" location="62">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="9" type="mtasimplantsipm" subtype="anode_h" group="16" location="15">
+				<Channel number="9" type="mtasimplant" subtype="anode_h" group="16" location="15">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="10" type="mtasimplantsipm" subtype="anode_h" group="24" location="23">
+				<Channel number="10" type="mtasimplant" subtype="anode_h" group="24" location="23">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="11" type="mtasimplantsipm" subtype="anode_h" group="32" location="31">
+				<Channel number="11" type="mtasimplant" subtype="anode_h" group="32" location="31">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
@@ -585,65 +585,65 @@
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="13" type="mtasimplantsipm" subtype="anode_h" group="40" location="39">
+				<Channel number="13" type="mtasimplant" subtype="anode_h" group="40" location="39">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="14" type="mtasimplantsipm" subtype="anode_h" group="48" location="47">
+				<Channel number="14" type="mtasimplant" subtype="anode_h" group="48" location="47">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="15" type="mtasimplantsipm" subtype="anode_h" group="56" location="55">
+				<Channel number="15" type="mtasimplant" subtype="anode_h" group="56" location="55">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
 			</Module>
 			<Module number="9" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="264">
-				<Channel number="0" type="mtasimplantsipm" subtype="anode_l" group="9" location="8">
+				<Channel number="0" type="mtasimplant" subtype="anode_l" group="9" location="8">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="1" type="mtasimplantsipm" subtype="anode_l" group="17" location="16">
+				<Channel number="1" type="mtasimplant" subtype="anode_l" group="17" location="16">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="2" type="mtasimplantsipm" subtype="anode_l" group="25" location="24">
+				<Channel number="2" type="mtasimplant" subtype="anode_l" group="25" location="24">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="3" type="mtasimplantsipm" subtype="anode_l" group="33" location="32">
+				<Channel number="3" type="mtasimplant" subtype="anode_l" group="33" location="32">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="4" type="mtasimplantsipm" subtype="anode_l" group="41" location="40">
+				<Channel number="4" type="mtasimplant" subtype="anode_l" group="41" location="40">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="5" type="mtasimplantsipm" subtype="anode_l" group="49" location="48">
+				<Channel number="5" type="mtasimplant" subtype="anode_l" group="49" location="48">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="6" type="mtasimplantsipm" subtype="anode_l" group="2" location="1">
+				<Channel number="6" type="mtasimplant" subtype="anode_l" group="2" location="1">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="7" type="mtasimplantsipm" subtype="anode_l" group="10" location="9">
+				<Channel number="7" type="mtasimplant" subtype="anode_l" group="10" location="9">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="8" type="mtasimplantsipm" subtype="anode_l" group="18" location="17">
+				<Channel number="8" type="mtasimplant" subtype="anode_l" group="18" location="17">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="9" type="mtasimplantsipm" subtype="anode_l" group="26" location="25">
+				<Channel number="9" type="mtasimplant" subtype="anode_l" group="26" location="25">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="10" type="mtasimplantsipm" subtype="anode_l" group="34" location="33">
+				<Channel number="10" type="mtasimplant" subtype="anode_l" group="34" location="33">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="11" type="mtasimplantsipm" subtype="anode_l" group="42" location="41">
+				<Channel number="11" type="mtasimplant" subtype="anode_l" group="42" location="41">
 					<Trace RangeLow="6" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
@@ -651,65 +651,65 @@
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="13" type="mtasimplantsipm" subtype="anode_l" group="50" location="49">
+				<Channel number="13" type="mtasimplant" subtype="anode_l" group="50" location="49">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="14" type="mtasimplantsipm" subtype="anode_l" group="58" location="57">
+				<Channel number="14" type="mtasimplant" subtype="anode_l" group="58" location="57">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="15" type="mtasimplantsipm" subtype="anode_l" group="3" location="2">
+				<Channel number="15" type="mtasimplant" subtype="anode_l" group="3" location="2">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
 			</Module>
 			<Module number="10" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="264">
-				<Channel number="0" type="mtasimplantsipm" subtype="anode_l" group="11" location="10">
+				<Channel number="0" type="mtasimplant" subtype="anode_l" group="11" location="10">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="1" type="mtasimplantsipm" subtype="anode_l" group="19" location="18">
+				<Channel number="1" type="mtasimplant" subtype="anode_l" group="19" location="18">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="2" type="mtasimplantsipm" subtype="anode_l" group="27" location="26">
+				<Channel number="2" type="mtasimplant" subtype="anode_l" group="27" location="26">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="3" type="mtasimplantsipm" subtype="anode_l" group="35" location="34">
+				<Channel number="3" type="mtasimplant" subtype="anode_l" group="35" location="34">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="4" type="mtasimplantsipm" subtype="anode_l" group="43" location="42">
+				<Channel number="4" type="mtasimplant" subtype="anode_l" group="43" location="42">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="5" type="mtasimplantsipm" subtype="anode_l" group="51" location="50">
+				<Channel number="5" type="mtasimplant" subtype="anode_l" group="51" location="50">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="6" type="mtasimplantsipm" subtype="anode_l" group="59" location="58">
+				<Channel number="6" type="mtasimplant" subtype="anode_l" group="59" location="58">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="7" type="mtasimplantsipm" subtype="anode_l" group="4" location="3">
+				<Channel number="7" type="mtasimplant" subtype="anode_l" group="4" location="3">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="8" type="mtasimplantsipm" subtype="anode_l" group="12" location="11">
+				<Channel number="8" type="mtasimplant" subtype="anode_l" group="12" location="11">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="9" type="mtasimplantsipm" subtype="anode_l" group="20" location="19">
+				<Channel number="9" type="mtasimplant" subtype="anode_l" group="20" location="19">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="10" type="mtasimplantsipm" subtype="anode_l" group="28" location="27">
+				<Channel number="10" type="mtasimplant" subtype="anode_l" group="28" location="27">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="11" type="mtasimplantsipm" subtype="anode_l" group="36" location="35">
+				<Channel number="11" type="mtasimplant" subtype="anode_l" group="36" location="35">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
@@ -717,65 +717,65 @@
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="13" type="mtasimplantsipm" subtype="anode_l" group="44" location="43">
+				<Channel number="13" type="mtasimplant" subtype="anode_l" group="44" location="43">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="14" type="mtasimplantsipm" subtype="anode_l" group="52" location="51">
+				<Channel number="14" type="mtasimplant" subtype="anode_l" group="52" location="51">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="15" type="mtasimplantsipm" subtype="anode_l" group="60" location="59">
+				<Channel number="15" type="mtasimplant" subtype="anode_l" group="60" location="59">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
 			</Module>
 			<Module number="11" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="264">
-				<Channel number="0" type="mtasimplantsipm" subtype="anode_l" group="5" location="4">
+				<Channel number="0" type="mtasimplant" subtype="anode_l" group="5" location="4">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="1" type="mtasimplantsipm" subtype="anode_l" group="13" location="12">
+				<Channel number="1" type="mtasimplant" subtype="anode_l" group="13" location="12">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="2" type="mtasimplantsipm" subtype="anode_l" group="21" location="20">
+				<Channel number="2" type="mtasimplant" subtype="anode_l" group="21" location="20">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="3" type="mtasimplantsipm" subtype="anode_l" group="29" location="28">
+				<Channel number="3" type="mtasimplant" subtype="anode_l" group="29" location="28">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="4" type="mtasimplantsipm" subtype="anode_l" group="37" location="36">
+				<Channel number="4" type="mtasimplant" subtype="anode_l" group="37" location="36">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="5" type="mtasimplantsipm" subtype="anode_l" group="45" location="44">
+				<Channel number="5" type="mtasimplant" subtype="anode_l" group="45" location="44">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="6" type="mtasimplantsipm" subtype="anode_l" group="53" location="52">
+				<Channel number="6" type="mtasimplant" subtype="anode_l" group="53" location="52">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="7" type="mtasimplantsipm" subtype="anode_l" group="61" location="60">
+				<Channel number="7" type="mtasimplant" subtype="anode_l" group="61" location="60">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="8" type="mtasimplantsipm" subtype="anode_l" group="6" location="5">
+				<Channel number="8" type="mtasimplant" subtype="anode_l" group="6" location="5">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="9" type="mtasimplantsipm" subtype="anode_l" group="14" location="13">
+				<Channel number="9" type="mtasimplant" subtype="anode_l" group="14" location="13">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="10" type="mtasimplantsipm" subtype="anode_l" group="22" location="21">
+				<Channel number="10" type="mtasimplant" subtype="anode_l" group="22" location="21">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="11" type="mtasimplantsipm" subtype="anode_l" group="30" location="29">
+				<Channel number="11" type="mtasimplant" subtype="anode_l" group="30" location="29">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
@@ -783,65 +783,65 @@
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="13" type="mtasimplantsipm" subtype="anode_l" group="38" location="37">
+				<Channel number="13" type="mtasimplant" subtype="anode_l" group="38" location="37">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="14" type="mtasimplantsipm" subtype="anode_l" group="46" location="45">
+				<Channel number="14" type="mtasimplant" subtype="anode_l" group="46" location="45">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="15" type="mtasimplantsipm" subtype="anode_l" group="54" location="53">
+				<Channel number="15" type="mtasimplant" subtype="anode_l" group="54" location="53">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
 			</Module>
 			<Module number="12" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="264">
-				<Channel number="0" type="mtasimplantsipm" subtype="anode_l" group="62" location="61">
+				<Channel number="0" type="mtasimplant" subtype="anode_l" group="62" location="61">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="1" type="mtasimplantsipm" subtype="anode_l" group="7" location="6">
+				<Channel number="1" type="mtasimplant" subtype="anode_l" group="7" location="6">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="2" type="mtasimplantsipm" subtype="anode_l" group="15" location="14">
+				<Channel number="2" type="mtasimplant" subtype="anode_l" group="15" location="14">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="3" type="mtasimplantsipm" subtype="anode_l" group="23" location="22">
+				<Channel number="3" type="mtasimplant" subtype="anode_l" group="23" location="22">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="4" type="mtasimplantsipm" subtype="anode_l" group="31" location="30">
+				<Channel number="4" type="mtasimplant" subtype="anode_l" group="31" location="30">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="5" type="mtasimplantsipm" subtype="anode_l" group="39" location="38">
+				<Channel number="5" type="mtasimplant" subtype="anode_l" group="39" location="38">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="6" type="mtasimplantsipm" subtype="anode_l" group="47" location="46">
+				<Channel number="6" type="mtasimplant" subtype="anode_l" group="47" location="46">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="7" type="mtasimplantsipm" subtype="anode_l" group="55" location="54">
+				<Channel number="7" type="mtasimplant" subtype="anode_l" group="55" location="54">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="8" type="mtasimplantsipm" subtype="anode_l" group="63" location="62">
+				<Channel number="8" type="mtasimplant" subtype="anode_l" group="63" location="62">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="9" type="mtasimplantsipm" subtype="anode_l" group="16" location="15">
+				<Channel number="9" type="mtasimplant" subtype="anode_l" group="16" location="15">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="10" type="mtasimplantsipm" subtype="anode_l" group="24" location="23">
+				<Channel number="10" type="mtasimplant" subtype="anode_l" group="24" location="23">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="11" type="mtasimplantsipm" subtype="anode_l" group="32" location="31">
+				<Channel number="11" type="mtasimplant" subtype="anode_l" group="32" location="31">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
@@ -849,15 +849,15 @@
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="13" type="mtasimplantsipm" subtype="anode_l" group="40" location="39">
+				<Channel number="13" type="mtasimplant" subtype="anode_l" group="40" location="39">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="14" type="mtasimplantsipm" subtype="anode_l" group="48" location="47">
+				<Channel number="14" type="mtasimplant" subtype="anode_l" group="48" location="47">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="15" type="mtasimplantsipm" subtype="anode_l" group="56" location="55">
+				<Channel number="15" type="mtasimplant" subtype="anode_l" group="56" location="55">
 					<Trace RangeLow="5" RangeHigh="10" />
 					<Calibration model="linear" min="0"> 0.0 1.0 </Calibration>
 				</Channel>
