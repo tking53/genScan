@@ -431,7 +431,7 @@ int LDFPixieTranslator::UnpackData(unsigned int& nBytes,bool& full_spill,bool& b
 			auto finalsize = this->Leftovers.size();
 			this->EvtSpillCounter[this->CurrSpillID%this->NUMCONCURRENTSPILLS] = (finalsize - currsize);
 			//this->console->info("evts added {}",(finalsize-currsize));
-			this->console->info("spill : {} words : {} Total words : {}",this->CurrSpillID,nWords,this->NTotalWords);
+			//this->console->info("spill : {} words : {} Total words : {}",this->CurrSpillID,nWords,this->NTotalWords);
 			++(this->CurrSpillID);
 			this->databuffer.clear();
 			break;
