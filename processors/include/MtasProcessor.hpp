@@ -31,7 +31,6 @@ class MtasProcessor : public Processor{
 		ProcessorStruct::MtasSegment CurrSegmentData;
 		std::vector<ProcessorStruct::MtasTotal> TotalDataVec;
 		ProcessorStruct::MtasTotal CurrTotalData;
-		std::vector<PhysicsData*> SummaryData;
 };
 
 #endif

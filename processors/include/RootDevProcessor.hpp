@@ -3,7 +3,6 @@
 
 #include <string>
 
-#include "PhysicsData.hpp"
 #include "RootDevStruct.hpp"
 #include "EventSummary.hpp"
 #include "HistogramManager.hpp"
@@ -30,7 +29,6 @@ class RootDevProcessor : public Processor{
 
 		std::vector<ProcessorStruct::RootDev> DataVec;
 		ProcessorStruct::RootDev CurrData;
-		std::vector<PhysicsData*> SummaryData;
 };
 
 #endif

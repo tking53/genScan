@@ -2,8 +2,6 @@
 #include "CutManager.hpp"
 #include "EventSummary.hpp"
 #include "HistogramManager.hpp"
-#include "PhysicsData.hpp"
-#include "MtasStruct.hpp"
 #include <TTree.h>
 
 MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProcessor",{"mtas"}){

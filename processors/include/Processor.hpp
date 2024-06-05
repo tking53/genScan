@@ -10,6 +10,7 @@
 #include <memory>
 #include <chrono>
 #include <unordered_map>
+#include <vector>
 
 #include <spdlog/common.h>
 #include <spdlog/spdlog.h>
@@ -27,10 +28,11 @@
 
 #include <boost/regex.hpp>
 
-#include "CutManager.hpp"
-#include "EventSummary.hpp"
 #include "TTree.h"
 
+#include "CutManager.hpp"
+#include "EventSummary.hpp"
+#include "PhysicsData.hpp"
 #include "HistogramManager.hpp"
 
 class Processor : public std::enable_shared_from_this<Processor> {
@@ -95,6 +97,8 @@ class Processor : public std::enable_shared_from_this<Processor> {
 		std::set<std::string> Types;
 
 		std::shared_ptr<spdlog::logger> console;
+		
+		std::vector<PhysicsData*> SummaryData;
 
 		TTree* OutputTree;
 };
