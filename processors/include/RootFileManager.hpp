@@ -37,14 +37,35 @@ class RootFileManager{
 
 		void RegisterProcessor(Processor* proc){
 			auto procname = proc->GetProcessorName();
-			auto proctree = proc->RegisterTree();
-			if( proctree != nullptr ){
-				this->KnownProcNames.push_back(procname);
-				this->OutputTrees[this->KnownProcNames.back()] = proctree;
-				spdlog::get(this->LogName)->info("Registering Processor [{}] to the root file [{}]",this->KnownProcNames.back(),this->outputfilename);
+
+			auto beforesize = this->OutputTrees.size();
+			std::set<std::string> beforenames;
+			for( const auto& kv : this->OutputTrees ){
+				beforenames.insert(kv.first);
+			}
+			proc->RegisterTree(this->OutputTrees);
+			std::set<std::string> newnames;
+			for( const auto& kv : this->OutputTrees ){
+				if( beforenames.find(kv.first) == beforenames.end() ){
+					newnames.insert(kv.first);
+				}
+			}
+			auto aftersize = this->OutputTrees.size();
+
+			if( beforesize != aftersize ){
+				for( const auto& name : newnames ){
+					this->KnownProcNames.push_back(name);
+				}
+				if( newnames.size() == 1 ){
+					spdlog::get(this->LogName)->info("Registering Processor [{}] to the root file [{}]",this->KnownProcNames.back(),this->outputfilename);
+				}else{
+					for( const auto& name : newnames ){
+						spdlog::get(this->LogName)->info("Registering Processor's [{}] Tree to the root file [{}] from [{}]",name,this->outputfilename,procname);
+					}
+				}
 			}else{
 				this->NullProcNames.push_back(procname);
-				spdlog::get(this->LogName)->critical("Processor [{}] has null OutputTree",this->NullProcNames.back());
+				spdlog::get(this->LogName)->critical("Processor [{}] has no OutputTree(s)",this->NullProcNames.back());
 			}
 		}
 

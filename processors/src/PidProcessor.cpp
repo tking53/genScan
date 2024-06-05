@@ -44,9 +44,7 @@ void PidProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 	this->console->info("Finished Declaring Plots");
 }
 
-TTree* PidProcessor::RegisterTree(){
-	this->OutputTree = new TTree("Pid","Pid Processor output");
-	return this->OutputTree;
+void PidProcessor::RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>& outputtrees){
 }
 
 void PidProcessor::CleanupTree(){

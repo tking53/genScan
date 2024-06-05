@@ -44,9 +44,7 @@ void MtasImplantProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 	this->console->info("Finished Declaring Plots");
 }
 
-TTree* MtasImplantProcessor::RegisterTree(){
-	this->OutputTree = new TTree("MtasImplant","MtasImplant Processor output");
-	return this->OutputTree;
+void MtasImplantProcessor::RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>& outputtrees){
 }
 
 void MtasImplantProcessor::CleanupTree(){

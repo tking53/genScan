@@ -49,7 +49,7 @@ class Processor : public std::enable_shared_from_this<Processor> {
 
 		std::shared_ptr<Processor> GetPtr();
 		virtual std::string GetProcessorName() const;
-		virtual TTree* RegisterTree();
+		virtual void RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>&);
 
 		[[nodiscard]] virtual bool ContainsType(const std::string&) const final;
 		[[nodiscard]] virtual bool ContainsAnyType(const std::set<std::string>&) const final;
@@ -67,6 +67,8 @@ class Processor : public std::enable_shared_from_this<Processor> {
 
 		[[nodiscard]] virtual const boost::regex& GetDefaultRegex() const;
 		[[nodiscard]] virtual const std::unordered_map<std::string,boost::regex>& GetAllDefaultRegex() const;
+		
+		[[nodiscard]] virtual std::set<std::string> GetKnownTypes() const;
 	protected:
 		enum STEP{
 			PREPROCESS,

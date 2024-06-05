@@ -2,6 +2,7 @@
 #define __ROOTDEV_PROCESSOR_HPP__
 
 #include <string>
+#include <unordered_map>
 
 #include "RootDevStruct.hpp"
 #include "EventSummary.hpp"
@@ -22,7 +23,7 @@ class RootDevProcessor : public Processor{
 		void Init(const pugi::xml_node&);
 
 		void DeclarePlots(PLOTS::PlotRegistry*) const;
-		virtual TTree* RegisterTree() final;
+		virtual void RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>&) final;
 		virtual void CleanupTree() final;
 	private:
 		void InsertAdditionalTypes(const std::string&);

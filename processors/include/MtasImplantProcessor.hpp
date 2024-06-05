@@ -21,7 +21,7 @@ class MtasImplantProcessor : public Processor{
 		void Init(const pugi::xml_node&);
 
 		void DeclarePlots(PLOTS::PlotRegistry*) const;
-		virtual TTree* RegisterTree() final;
+		virtual void RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>&) final;
 		virtual void CleanupTree() final;
 	private:
 		

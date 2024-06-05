@@ -44,11 +44,12 @@ void MtasProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 	this->console->info("Finished Declaring Plots");
 }
 
-TTree* MtasProcessor::RegisterTree(){
+void MtasProcessor::RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>& outputtrees){
 	this->OutputTree = new TTree("Mtas","Mtas Processor output");
 	this->OutputTree->Branch("segment_vec",&(this->SegmentDataVec));
 	this->OutputTree->Branch("total_vec",&(this->TotalDataVec));
-	return this->OutputTree;
+
+	outputtrees[this->ProcessorName] = this->OutputTree;
 }
 
 void MtasProcessor::CleanupTree(){

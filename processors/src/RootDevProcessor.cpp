@@ -91,10 +91,10 @@ void RootDevProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 	this->console->info("Finished Declaring Plots");
 }
 
-TTree* RootDevProcessor::RegisterTree(){
+void RootDevProcessor::RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>& outputtrees){
 	this->OutputTree = new TTree("RootDev","RootDev Processor output");
 	this->OutputTree->Branch("data_vec",&(this->DataVec));
-	return this->OutputTree;
+	outputtrees[this->ProcessorName] = this->OutputTree;
 }
 
 void RootDevProcessor::CleanupTree(){

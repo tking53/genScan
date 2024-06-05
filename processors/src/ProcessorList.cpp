@@ -8,8 +8,13 @@
 #include "GenericProcessor.hpp"
 
 #include "GenericAnalyzer.hpp"
-#include "RootDevProcessor.hpp"
+
+#include "e21069b_fp2Processor.hpp"
+
 #include "MtasProcessor.hpp"
+#include "MtasImplantProcessor.hpp"
+#include "PidProcessor.hpp"
+#include "RootDevProcessor.hpp"
 
 ProcessorList::ProcessorList(const std::string& log){
 	this->LogName = log;
@@ -86,8 +91,14 @@ void ProcessorList::PostProcess(EventSummary& Summary,PLOTS::PlotRegistry* Histo
 void ProcessorList::CreateProc(const std::string& name){
 	if( name.compare("GenericProcessor") == 0 ){
 		this->known_processors.push_back(std::make_shared<GenericProcessor>(this->LogName));
+	}else if( name.compare("e21069b_fp2Processor") == 0 ){
+		known_processors.push_back(std::make_shared<e21069b_fp2Processor>(this->LogName));
 	}else if( name.compare("MtasProcessor") == 0 ){
 		known_processors.push_back(std::make_shared<MtasProcessor>(this->LogName));
+	}else if( name.compare("MtasImplantProcessor") == 0 ){
+		known_processors.push_back(std::make_shared<MtasImplantProcessor>(this->LogName));
+	}else if( name.compare("PidProcessor") == 0 ){
+		known_processors.push_back(std::make_shared<PidProcessor>(this->LogName));
 	}else if( name.compare("RootDevProcessor") == 0 ){
 		known_processors.push_back(std::make_shared<RootDevProcessor>(this->LogName));
 	}else{

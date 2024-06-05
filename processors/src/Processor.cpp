@@ -47,9 +47,7 @@ std::string Processor::GetProcessorName() const{
 	return this->ProcessorName;
 }
 
-TTree* Processor::RegisterTree(){
-	this->OutputTree = nullptr;
-	return this->OutputTree;
+void Processor::RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>& outputtrees){
 }
 
 Processor::~Processor(){
@@ -183,6 +181,10 @@ void Processor::EndProcess(){
 [[noreturn]] void Processor::DeclarePlots([[maybe_unused]] PLOTS::PlotRegistry* hismanager) const{
 	this->console->error("Called Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager), not the overload");
 	throw std::runtime_error("Called Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager), not the overload");
+}
+
+[[nodiscard]] std::set<std::string> Processor::GetKnownTypes() const{
+	return this->Types;
 }
 
 void Processor::CleanupTree(){
