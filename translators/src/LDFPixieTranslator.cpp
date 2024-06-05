@@ -198,7 +198,7 @@ int LDFPixieTranslator::ParseDataBuffer(unsigned int& nBytes,bool& full_spill,bo
 	nBytes = 0;
 
 	while( true ){
-		if( this->ReadNextBuffer() == -1 ){
+		if( this->ReadNextBuffer() == -1 and (this->CurrDataBuff.buffhead != HRIBF_TYPES::ENDFILE) ){
 			this->console->critical("Failed to read from input data file");
 			return 6;
 		}
