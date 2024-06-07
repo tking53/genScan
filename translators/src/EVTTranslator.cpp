@@ -7,6 +7,7 @@
 EVTTranslator::EVTTranslator(const std::string& log,const std::string& translatorname) : Translator(log,translatorname){
 	this->CurrEVTBuiltInfo = { .rib_size = 0, .ri_size = 0, .ri_type = 0};
 	this->PrevTimeStamp = 0;
+	this->LastReadEvtWithin = true;
 }	
 
 EVTTranslator::~EVTTranslator(){
@@ -23,21 +24,24 @@ Translator::TRANSLATORSTATE EVTTranslator::Parse(boost::container::devector<Phys
 	}
 	do{
 		if( not this->Leftovers.empty() ){
+			//this->console->info("leftovers push size of rawevts {}, leftovers {}",RawEvents.size(),this->Leftovers.size());
 			RawEvents.push_back(this->Leftovers.back());
 			this->Leftovers.pop_back();
 			auto evt = RawEvents.back();
-			auto toss = this->correlator->IsWithinCorrelationWindow(evt.GetTimeStamp(),evt.GetCrate(),evt.GetModule(),evt.GetChannel());
-			(void) toss;
+			//make sure correlator is clear
+			this->correlator->Clear();
+			this->LastReadEvtWithin = this->correlator->IsWithinCorrelationWindow(evt.GetTimeStamp(),evt.GetCrate(),evt.GetModule(),evt.GetChannel());
 		}
 		if( this->ReadHeader(RawEvents) != -1 ){
 			this->ReadFull(RawEvents);
-			#ifdef TRANSLATOR_DEBUG
+#ifdef TRANSLATOR_DEBUG
 			this->console->debug("{}",RawEvents.back());
-			#endif
+#endif
 			if( not this->LastReadEvtWithin ){
+				//this->console->info("raw push size of rawevts {}, leftovers {}",RawEvents.size(),this->Leftovers.size());
 				this->Leftovers.push_back(RawEvents.back());
 				RawEvents.pop_back();
-				this->correlator->Pop();
+				//this->correlator->Pop();
 				this->correlator->Clear();
 			}
 		}
@@ -48,6 +52,7 @@ Translator::TRANSLATORSTATE EVTTranslator::Parse(boost::container::devector<Phys
 		}
 	}while(this->LastReadEvtWithin);
 	//Clear for now
+	this->LastReadEvtWithin = true;
 	return Translator::TRANSLATORSTATE::PARSING;
 }
 
