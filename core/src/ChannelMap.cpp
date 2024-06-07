@@ -303,6 +303,7 @@ void ChannelMap::SetChanConfigInfo(PhysicsData& evt) const{
 	auto currmap = this->ChannelConfigMap.at(evt.GetGlobalChannelID());
 	evt.SetType(currmap.type);
 	evt.SetSubType(currmap.subtype);
+	evt.SetGroup(currmap.group);
 	evt.SetTags(currmap.tags);
 	evt.SetTagList(currmap.taglist);
 	evt.SetUniqueID(currmap.unique_id);
