@@ -23,9 +23,23 @@ e21069b_fp2Processor::e21069b_fp2Processor(const std::string& log) : Processor(l
 [[maybe_unused]] bool e21069b_fp2Processor::PreProcess(EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	Processor::PreProcess();
 
-	this->MtasProc->PreProcess(summary,hismanager,cutmanager);
-	this->MtasImplantProc->PreProcess(summary,hismanager,cutmanager);
-	this->PidProc->PreProcess(summary,hismanager,cutmanager);
+	auto types = summary.GetKnownTypes();
+
+	this->HasMtas = (types.find("mtas") != types.end());
+	this->HasPid = (types.find("pid") != types.end());
+	this->HasImplant = (types.find("mtasimplant") != types.end());
+
+	if( this->HasMtas ){
+		this->MtasProc->PreProcess(summary,hismanager,cutmanager);
+	}
+
+	if( this->HasImplant ){
+		this->MtasImplantProc->PreProcess(summary,hismanager,cutmanager);
+	}
+
+	if( this->HasPid ){
+		this->PidProc->PreProcess(summary,hismanager,cutmanager);
+	}
 
 	Processor::EndProcess();
 	return true;
@@ -33,18 +47,34 @@ e21069b_fp2Processor::e21069b_fp2Processor(const std::string& log) : Processor(l
 
 [[maybe_unused]] bool e21069b_fp2Processor::Process([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 
-	this->MtasProc->Process(summary,hismanager,cutmanager);
-	this->MtasImplantProc->Process(summary,hismanager,cutmanager);
-	this->PidProc->Process(summary,hismanager,cutmanager);
+	if( this->HasMtas ){
+		this->MtasProc->Process(summary,hismanager,cutmanager);
+	}
+
+	if( this->HasImplant ){
+		this->MtasImplantProc->Process(summary,hismanager,cutmanager);
+	}
+
+	if( this->HasPid ){
+		this->PidProc->Process(summary,hismanager,cutmanager);
+	}
 
 	return true;
 }
 
 [[maybe_unused]] bool e21069b_fp2Processor::PostProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 
-	this->MtasProc->PostProcess(summary,hismanager,cutmanager);
-	this->MtasImplantProc->PostProcess(summary,hismanager,cutmanager);
-	this->PidProc->PostProcess(summary,hismanager,cutmanager);
+	if( this->HasMtas ){
+		this->MtasProc->PostProcess(summary,hismanager,cutmanager);
+	}
+
+	if( this->HasImplant ){
+		this->MtasImplantProc->PostProcess(summary,hismanager,cutmanager);
+	}
+
+	if( this->HasPid ){
+		this->PidProc->PostProcess(summary,hismanager,cutmanager);
+	}
 
 	return true;
 }

@@ -9,8 +9,10 @@
 
 #include "GenericAnalyzer.hpp"
 
+#include "BSMExpProcessor.hpp"
 #include "e21069b_fp2Processor.hpp"
 
+#include "BSMProcessor.hpp"
 #include "MtasProcessor.hpp"
 #include "MtasImplantProcessor.hpp"
 #include "PidProcessor.hpp"
@@ -91,8 +93,12 @@ void ProcessorList::PostProcess(EventSummary& Summary,PLOTS::PlotRegistry* Histo
 void ProcessorList::CreateProc(const std::string& name){
 	if( name.compare("GenericProcessor") == 0 ){
 		this->known_processors.push_back(std::make_shared<GenericProcessor>(this->LogName));
+	}else if( name.compare("BSMExpProcessor") == 0 ){
+		known_processors.push_back(std::make_shared<BSMExpProcessor>(this->LogName));
 	}else if( name.compare("e21069b_fp2Processor") == 0 ){
 		known_processors.push_back(std::make_shared<e21069b_fp2Processor>(this->LogName));
+	}else if( name.compare("BSMProcessor") == 0 ){
+		known_processors.push_back(std::make_shared<BSMProcessor>(this->LogName));
 	}else if( name.compare("MtasProcessor") == 0 ){
 		known_processors.push_back(std::make_shared<MtasProcessor>(this->LogName));
 	}else if( name.compare("MtasImplantProcessor") == 0 ){

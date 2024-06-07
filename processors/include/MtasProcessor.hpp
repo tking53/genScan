@@ -25,12 +25,54 @@ class MtasProcessor : public Processor{
 		void DeclarePlots(PLOTS::PlotRegistry*) const;
 		virtual void RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>&) final;
 		virtual void CleanupTree() final;
+
+		struct EventInfo{
+			std::vector<double> TotalEnergy;
+			std::vector<double> SumFrontBackEnergy;
+			double FirstTime;
+			double LastTime;
+			bool Saturate;
+			bool Pileup;
+			bool BetaTriggered;
+			bool RealEvt;
+		};
+
 	private:
+		void Reset();
+
+		EventInfo CurrEvt;
+		EventInfo PrevEvt;
+		EventInfo NewEvt;
+
+		std::vector<double> Center;
+		std::vector<double> Inner;
+		std::vector<double> Middle;
+		std::vector<double> Outer;
+		std::vector<int> CenterHits;
+		std::vector<int> InnerHits;
+		std::vector<int> MiddleHits;
+		std::vector<int> OuterHits;
 		
 		std::vector<ProcessorStruct::MtasSegment> SegmentDataVec;
 		ProcessorStruct::MtasSegment CurrSegmentData;
 		std::vector<ProcessorStruct::MtasTotal> TotalDataVec;
 		ProcessorStruct::MtasTotal CurrTotalData;
+
+		enum SUBTYPE{
+			CENTER,
+			INNER,
+			MIDDLE,
+			OUTER,
+			UNKNOWN
+		};
+
+		std::string fronttag;
+		std::string backtag;
+
+		SUBTYPE currsubtype;
+
+		bool foundfirstevt;
+		double globalfirsttime;
 };
 
 #endif
