@@ -37,6 +37,10 @@ class MtasProcessor : public Processor{
 			bool RealEvt;
 		};
 
+		void SetIsBeta();
+		EventInfo& GetCurrEvt();
+		EventInfo& GetPrevEvt();
+
 	private:
 		void Reset();
 

@@ -152,7 +152,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		this->CurrEvt.TotalEnergy[4] += this->CurrEvt.SumFrontBackEnergy[ii+18];
 	}
 
-	if( not this->CurrEvt.Saturate or this->CurrEvt.Pileup ){
+	if( (not this->CurrEvt.Saturate) or (not this->CurrEvt.Pileup) ){
 		hismanager->Fill("MTAS_3200",this->CurrEvt.TotalEnergy[0]);
 		
 		hismanager->Fill("MTAS_3210",this->CurrEvt.TotalEnergy[1]);
@@ -193,7 +193,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 
 [[maybe_unused]] bool MtasProcessor::Process([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	Processor::Process();
-	if( not this->CurrEvt.Saturate or not this->CurrEvt.Pileup ){
+	if( (not this->CurrEvt.Saturate) or (not this->CurrEvt.Pileup) ){
 		if( this->CurrEvt.BetaTriggered ){
 
 			hismanager->Fill("MTAS_3300",this->CurrEvt.TotalEnergy[0]);
@@ -290,7 +290,7 @@ void MtasProcessor::Finalize(){
 }
 
 void MtasProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
-	//MTAS diagnostic plots, always want these not matter what
+	//MTAS diagnostic plots, always want these no matter what
 	hismanager->RegisterPlot<TH1F>("MTAS_3200","Mtas Total; Energy (keV)",16384,0,16384);
 	hismanager->RegisterPlot<TH2F>("MTAS_3201","Sum F+B; Energy (keV); F+B Pair (arb.)",16384,0,16384,24,0,24);
 
@@ -391,4 +391,16 @@ void MtasProcessor::Reset(){
 	this->InnerHits = std::vector<int>(12,0);
 	this->MiddleHits = std::vector<int>(12,0);
 	this->OuterHits = std::vector<int>(12,0);
+}
+
+void MtasProcessor::SetIsBeta(){
+	this->CurrEvt.BetaTriggered = true;
+}
+
+MtasProcessor::EventInfo& MtasProcessor::GetCurrEvt(){
+	return this->CurrEvt;
+}
+
+MtasProcessor::EventInfo& MtasProcessor::GetPrevEvt(){
+	return this->PrevEvt;
 }

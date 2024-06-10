@@ -24,7 +24,55 @@ class BSMProcessor : public Processor{
 		void DeclarePlots(PLOTS::PlotRegistry*) const;
 		virtual void RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>&) final;
 		virtual void CleanupTree() final;
+
+		struct EventInfo{
+			double TotalEnergy;
+			std::vector<double> SumFrontBackEnergy;
+			std::vector<double> Position;
+			double UnCorrectedTotalEnergy;
+			std::vector<double> UnCorrectedSumFrontBackEnergy;
+			double FirstTime;
+			double LastTime;
+			bool Saturate;
+			bool Pileup;
+			bool RealEvt;
+		};
+
+		EventInfo& GetCurrEvt();
+		EventInfo& GetPrevEvt();
+
+		struct PosCorrection{
+			double constant;
+			double slope;
+			double mean;
+
+			double Correct(double erg,double pos){
+				double val = mean/std::exp(constant + slope*pos);
+				return val;
+			}
+		};
+
+
 	private:
+
+		double CalcPosition(double,double);
+
+		void Reset();
+
+		EventInfo CurrEvt;
+		EventInfo PrevEvt;
+		EventInfo NewEvt;
+
+		std::vector<double> UnCorrectedBSM;
+		std::vector<int> BSMHits;
+
+		std::map<int,PosCorrection> PosCorrectionMap;
+
+		std::string fronttag;
+		std::string backtag;
+
+		bool foundfirstevt;
+		double globalfirsttime;
 };
 
 #endif
