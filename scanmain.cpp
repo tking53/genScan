@@ -239,7 +239,7 @@ int main(int argc, char *argv[]) {
 
 	console->info("Generating Plot Registry");
 	std::shared_ptr<PLOTS::PlotRegistry> HistogramManager(new PLOTS::PlotRegistry(logname,StringManip::GetFileBaseName(outputfile),port));
-	auto ebins = PLOTS::SE;
+	auto ebins = PLOTS::SG;
 	auto sbins = PLOTS::SE;
 	auto wbins = PLOTS::SE;
 	auto zbins = PLOTS::SA;
