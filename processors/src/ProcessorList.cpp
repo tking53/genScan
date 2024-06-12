@@ -16,6 +16,7 @@
 #include "MtasProcessor.hpp"
 #include "MtasImplantProcessor.hpp"
 #include "PidProcessor.hpp"
+#include "PSPMTProcessor.hpp"
 #include "RootDevProcessor.hpp"
 
 ProcessorList::ProcessorList(const std::string& log){
@@ -105,6 +106,8 @@ void ProcessorList::CreateProc(const std::string& name){
 		known_processors.push_back(std::make_shared<MtasImplantProcessor>(this->LogName));
 	}else if( name.compare("PidProcessor") == 0 ){
 		known_processors.push_back(std::make_shared<PidProcessor>(this->LogName));
+	}else if( name.compare("PSPMTProcessor") == 0 ){
+		known_processors.push_back(std::make_shared<PSPMTProcessor>(this->LogName));
 	}else if( name.compare("RootDevProcessor") == 0 ){
 		known_processors.push_back(std::make_shared<RootDevProcessor>(this->LogName));
 	}else{
@@ -197,7 +200,7 @@ void ProcessorList::ThreshAndCal(boost::container::devector<PhysicsData>& RawEve
 		auto raw = evt.GetRawEnergy();
 		auto erg = raw+this->randNum(this->randGen);
 		auto cal = cmap->GetCalibratedEnergy(evt.GetCrate(),evt.GetModule(),evt.GetChannel(),erg);
-		evt.SetEnergy(cal);
+		evt.SetEnergy(erg,cal);
 		try{
 			cmap->SetChanConfigInfo(evt);
 		}catch(const boost::container::out_of_range& e){
@@ -231,7 +234,7 @@ void ProcessorList::ProcessRaw(boost::container::devector<PhysicsData>& RawEvent
 		auto scalartime = 1.0e-9*(evt.GetTimeStamp()-this->FirstTimeStamp);
 		int rate_y = scalartime/scalarsize;
 		int rate_x = static_cast<int>(scalartime)%scalarsize;
-		HistogramManager->Fill("Raw",evt.GetRawEnergy(),gChanID);
+		HistogramManager->Fill("Raw",evt.GetRawEnergyWRandom(),gChanID);
 		HistogramManager->Fill("Scalar",scalartime,gChanID);
 		HistogramManager->Fill("Cal",evt.GetEnergy(),gChanID);
 		HistogramManager->Fill("Event_Mult",gChanID,evtsize);
