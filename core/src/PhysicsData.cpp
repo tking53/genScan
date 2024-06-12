@@ -42,6 +42,7 @@ PhysicsData::PhysicsData(const PhysicsData& other) :
 	HeaderLength(other.HeaderLength),
 	EventLength(other.EventLength),
 	RawEnergy(other.RawEnergy),
+	RawEnergyWRandom(other.RawEnergyWRandom),
 	RawTimeStamp(other.RawTimeStamp),
 	SpillID(other.SpillID),
 	Energy(other.Energy),
@@ -78,6 +79,7 @@ PhysicsData::PhysicsData(PhysicsData&& other) noexcept :
 	HeaderLength(other.HeaderLength),
 	EventLength(other.EventLength),
 	RawEnergy(other.RawEnergy),
+	RawEnergyWRandom(other.RawEnergyWRandom),
 	RawTimeStamp(other.RawTimeStamp),
 	SpillID(other.SpillID),
 	Energy(other.Energy),
@@ -115,6 +117,7 @@ PhysicsData& PhysicsData::operator=(const PhysicsData& other){
 		HeaderLength = other.HeaderLength;
 		EventLength = other.EventLength;
 		RawEnergy = other.RawEnergy;
+		RawEnergyWRandom = other.RawEnergyWRandom;
 		RawTimeStamp = other.RawTimeStamp;
 		SpillID = other.SpillID;
 		Energy = other.Energy;
@@ -153,6 +156,7 @@ PhysicsData& PhysicsData::operator=(PhysicsData&& other) noexcept{
 		HeaderLength = other.HeaderLength;
 		EventLength = other.EventLength;
 		RawEnergy = other.RawEnergy;
+		RawEnergyWRandom = other.RawEnergyWRandom;
 		RawTimeStamp = other.RawTimeStamp;
 		SpillID = other.SpillID;
 		Energy = other.Energy;
@@ -201,6 +205,11 @@ uint32_t PhysicsData::GetRawEnergy() const{
 	return this->RawEnergy;
 }
 
+//RawEnergyWRandom
+double PhysicsData::GetRawEnergyWRandom() const{
+	return this->RawEnergyWRandom;
+}
+
 //RawTimeStamp
 uint64_t PhysicsData::GetRawTimeStamp() const{
 	return this->RawTimeStamp;
@@ -216,8 +225,9 @@ uint64_t PhysicsData::GetSpillID() const{
 }
 
 //Energy
-void PhysicsData::SetEnergy(double value){
-	this->Energy = value;
+void PhysicsData::SetEnergy(double value1,double value2){
+	this->RawEnergyWRandom = value1;
+	this->Energy = value2;
 }
 
 double PhysicsData::GetEnergy() const{
