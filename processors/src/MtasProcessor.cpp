@@ -37,6 +37,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 	double firsttime = 0.0;
 	double lasttime = 0.0;
 	for( const auto& evt : this->SummaryData ){
+		this->CurrEvt.RealEvt = true;
 		auto subtype = evt->GetSubType();
 		auto group = evt->GetGroup();
 
