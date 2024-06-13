@@ -13,6 +13,7 @@
 #include "e21069b_fp2Processor.hpp"
 
 #include "BSMProcessor.hpp"
+#include "HagridProcessor.hpp"
 #include "MtasProcessor.hpp"
 #include "MtasImplantProcessor.hpp"
 #include "PidProcessor.hpp"
@@ -100,6 +101,8 @@ void ProcessorList::CreateProc(const std::string& name){
 		known_processors.push_back(std::make_shared<e21069b_fp2Processor>(this->LogName));
 	}else if( name.compare("BSMProcessor") == 0 ){
 		known_processors.push_back(std::make_shared<BSMProcessor>(this->LogName));
+	}else if( name.compare("HagridProcessor") == 0 ){
+		known_processors.push_back(std::make_shared<HagridProcessor>(this->LogName));
 	}else if( name.compare("MtasProcessor") == 0 ){
 		known_processors.push_back(std::make_shared<MtasProcessor>(this->LogName));
 	}else if( name.compare("MtasImplantProcessor") == 0 ){
