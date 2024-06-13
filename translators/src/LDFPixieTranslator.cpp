@@ -1,5 +1,6 @@
 #include <cstdint>
 #include <cstdlib>
+#include <limits>
 #include <stdexcept>
 
 #include <boost/sort/pdqsort/pdqsort.hpp>
@@ -403,6 +404,14 @@ int LDFPixieTranslator::UnpackData(unsigned int& nBytes,bool& full_spill,bool& b
 						otherWords = &(this->databuffer[buffpos+4]);
 						this->CurrDecoder->DecodeOtherWords(otherWords,&(this->Leftovers.back()));
 					}
+
+					if( this->Leftovers.back().GetExternalTimeStamp() != std::numeric_limits<uint64_t>::max() ){
+						this->CurrExtTS = this->Leftovers.back().GetExternalTimeStamp();
+					}else{
+						this->Leftovers.back().SetExternalTimeStamp(this->CurrExtTS);
+					}
+					this->console->info("{}",this->Leftovers.back().GetExternalTimeStamp());
+
 					buffpos += this->CurrHeaderLength;
 
 					if( this->CurrTraceLength > 0 ){

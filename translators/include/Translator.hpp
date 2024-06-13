@@ -56,6 +56,8 @@ class Translator{
 		std::shared_ptr<Correlator> correlator;
 
 		XiaDecoder* CurrDecoder;
+
+		uint64_t CurrExtTS;
 };
 
 #endif

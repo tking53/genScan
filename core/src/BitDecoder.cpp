@@ -23,6 +23,8 @@ XiaDecoder::XiaDecoder(ChannelMap::FirmwareVersion firmware,int Frequency) :
 	BaselineMask(0xFFFFFFFF, 0),
 
 	QDCSumsMask(0xFFFFFFFF, 0),
+	ExtTSLowMask(0xFFFFFFFF,0),
+	ExtTSHighMask(0x0000FFFF,0),
 	CFDSize(655536)
 {
 	if( Frequency == 100 ){
@@ -276,6 +278,14 @@ unsigned int XiaDecoder::DecodeQDCSums(const unsigned int & val) const {
 	return this->QDCSumsMask(val);
 }
 
+unsigned int XiaDecoder::DecodeExternalTSLow(const unsigned int & val) const{
+	return this->ExtTSLowMask(val);
+}
+
+unsigned int XiaDecoder::DecodeExternalTSHigh(const unsigned int & val) const{
+	return this->ExtTSHighMask(val);
+}
+
 double XiaDecoder::GetCFDSize() const{
 	return this->CFDSize;
 }
@@ -320,16 +330,45 @@ uint64_t XiaDecoder::DecodeCFDParams(const unsigned int* firstFour,const uint64_
 }
 
 void XiaDecoder::DecodeOtherWords(const unsigned int* otherWords,PhysicsData* pd) const{
-	if( pd->GetHeaderLength() == 8 ){
+	if( pd->GetHeaderLength() == 6 ){
+		auto extlow = this->DecodeExternalTSLow(otherWords[0]);
+		auto exthigh = this->DecodeExternalTSHigh(otherWords[1]);
+		uint64_t extts = static_cast<uint64_t>(exthigh);
+		extts = extts << 32;
+		extts += extlow;
+		pd->SetExternalTimeStamp(extts);
+	}else if( pd->GetHeaderLength() == 8 ){
 		pd->SetESumTrailing(this->DecodeESumTrailing(otherWords[0]));
 		pd->SetESumLeading(this->DecodeESumLeading(otherWords[1]));
 		pd->SetESumGap(this->DecodeESumGap(otherWords[2]));
 		pd->SetESumBaseline(this->DecodeBaseline(otherWords[3]));
+	}else if( pd->GetHeaderLength() == 10 ){
+		pd->SetESumTrailing(this->DecodeESumTrailing(otherWords[0]));
+		pd->SetESumLeading(this->DecodeESumLeading(otherWords[1]));
+		pd->SetESumGap(this->DecodeESumGap(otherWords[2]));
+		pd->SetESumBaseline(this->DecodeBaseline(otherWords[3]));
+		auto extlow = this->DecodeExternalTSLow(otherWords[4]);
+		auto exthigh = this->DecodeExternalTSHigh(otherWords[5]);
+		uint64_t extts = static_cast<uint64_t>(exthigh);
+		extts = extts << 32;
+		extts += extlow;
+		pd->SetExternalTimeStamp(extts);
 	}else if( pd->GetHeaderLength() == 12 ){
 		pd->SetRawQDCSumLength(8);
 		for( unsigned int ii = 0; ii < 8; ++ii ){
 			pd->SetQDCValue(ii,this->DecodeQDCSums(otherWords[ii]));
 		}
+	}else if( pd->GetHeaderLength() == 14 ){
+		pd->SetRawQDCSumLength(8);
+		for( unsigned int ii = 0; ii < 8; ++ii ){
+			pd->SetQDCValue(ii,this->DecodeQDCSums(otherWords[ii]));
+		}
+		auto extlow = this->DecodeExternalTSLow(otherWords[8]);
+		auto exthigh = this->DecodeExternalTSHigh(otherWords[9]);
+		uint64_t extts = static_cast<uint64_t>(exthigh);
+		extts = extts << 32;
+		extts += extlow;
+		pd->SetExternalTimeStamp(extts);
 	}else if( pd->GetHeaderLength() == 16 ){
 		pd->SetESumTrailing(this->DecodeESumTrailing(otherWords[0]));
 		pd->SetESumLeading(this->DecodeESumLeading(otherWords[1]));
@@ -339,5 +378,20 @@ void XiaDecoder::DecodeOtherWords(const unsigned int* otherWords,PhysicsData* pd
 		for( unsigned int ii = 0; ii < 8; ++ii ){
 			pd->SetQDCValue(ii,this->DecodeQDCSums(otherWords[ii+4]));
 		}
+	}else if( pd->GetHeaderLength() == 18 ){
+		pd->SetESumTrailing(this->DecodeESumTrailing(otherWords[0]));
+		pd->SetESumLeading(this->DecodeESumLeading(otherWords[1]));
+		pd->SetESumGap(this->DecodeESumGap(otherWords[2]));
+		pd->SetESumBaseline(this->DecodeBaseline(otherWords[3]));
+		pd->SetRawQDCSumLength(8);
+		for( unsigned int ii = 0; ii < 8; ++ii ){
+			pd->SetQDCValue(ii,this->DecodeQDCSums(otherWords[ii+4]));
+		}
+		auto extlow = this->DecodeExternalTSLow(otherWords[12]);
+		auto exthigh = this->DecodeExternalTSHigh(otherWords[13]);
+		uint64_t extts = static_cast<uint64_t>(exthigh);
+		extts = extts << 32;
+		extts += extlow;
+		pd->SetExternalTimeStamp(extts);
 	}
 }

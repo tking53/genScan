@@ -33,6 +33,8 @@ class XiaDecoder{
 		unsigned int DecodeESumGap(const unsigned int &) const;
 		unsigned int DecodeBaseline(const unsigned int &) const;
 		unsigned int DecodeQDCSums(const unsigned int &) const;
+		unsigned int DecodeExternalTSLow(const unsigned int &) const;
+		unsigned int DecodeExternalTSHigh(const unsigned int &) const;
 		double GetCFDSize() const;
 
 		void DecodeFirstWords(const unsigned int*,uint32_t&,uint32_t&,uint32_t&,unsigned int&,unsigned int&,bool&) const;
@@ -59,6 +61,9 @@ class XiaDecoder{
 		Mask BaselineMask;
 
 		Mask QDCSumsMask;
+
+		Mask ExtTSLowMask;
+		Mask ExtTSHighMask;
 
 		double CFDSize;
 };

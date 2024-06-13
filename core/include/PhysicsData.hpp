@@ -83,6 +83,9 @@ class PhysicsData{
 		void SetSaturation(bool);
 		bool GetSaturation() const;
 
+		void SetExternalTimeStamp(uint64_t);
+		uint64_t GetExternalTimeStamp() const;
+
 		//ESums
 		void SetESumLeading(unsigned int);
 		unsigned int GetESumLeading() const;
@@ -190,6 +193,8 @@ class PhysicsData{
 		uint32_t RawEnergy;
 		double RawEnergyWRandom;
 		uint64_t RawTimeStamp;
+
+		uint64_t ExternalTimestamp;
 
 		uint64_t SpillID;
 

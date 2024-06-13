@@ -1,4 +1,5 @@
 #include <fstream>
+#include <limits>
 #include <stdexcept>
 
 #include "Translator.hpp"
@@ -11,6 +12,7 @@ Translator::Translator(const std::string& log,const std::string& translatorname)
 	this->console->info("Created Translator [{}]",this->TranslatorName);
 	
 	this->LastReadEvtWithin = false;
+	this->CurrExtTS = std::numeric_limits<uint64_t>::max();
 }
 
 Translator::~Translator(){

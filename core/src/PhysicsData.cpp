@@ -1,3 +1,4 @@
+#include <limits>
 #include <tuple>
 
 #include "PhysicsData.hpp"
@@ -28,6 +29,8 @@ PhysicsData::PhysicsData(int headerlength,int eventlength,int cratenum,int modnu
 
 	this->Phase = -1.0;
 
+	this->ExternalTimestamp = std::numeric_limits<uint64_t>::max();
+
 	this->Trace = TraceHelper<uint16_t,float>();
 	this->QDCSums = {};
 
@@ -44,6 +47,7 @@ PhysicsData::PhysicsData(const PhysicsData& other) :
 	RawEnergy(other.RawEnergy),
 	RawEnergyWRandom(other.RawEnergyWRandom),
 	RawTimeStamp(other.RawTimeStamp),
+	ExternalTimestamp(other.ExternalTimestamp),
 	SpillID(other.SpillID),
 	Energy(other.Energy),
 	TimeStamp(other.TimeStamp),
@@ -81,6 +85,7 @@ PhysicsData::PhysicsData(PhysicsData&& other) noexcept :
 	RawEnergy(other.RawEnergy),
 	RawEnergyWRandom(other.RawEnergyWRandom),
 	RawTimeStamp(other.RawTimeStamp),
+	ExternalTimestamp(other.ExternalTimestamp),
 	SpillID(other.SpillID),
 	Energy(other.Energy),
 	TimeStamp(other.TimeStamp),
@@ -119,6 +124,7 @@ PhysicsData& PhysicsData::operator=(const PhysicsData& other){
 		RawEnergy = other.RawEnergy;
 		RawEnergyWRandom = other.RawEnergyWRandom;
 		RawTimeStamp = other.RawTimeStamp;
+		ExternalTimestamp = other.ExternalTimestamp;
 		SpillID = other.SpillID;
 		Energy = other.Energy;
 		TimeStamp = other.TimeStamp;
@@ -158,6 +164,7 @@ PhysicsData& PhysicsData::operator=(PhysicsData&& other) noexcept{
 		RawEnergy = other.RawEnergy;
 		RawEnergyWRandom = other.RawEnergyWRandom;
 		RawTimeStamp = other.RawTimeStamp;
+		ExternalTimestamp = other.ExternalTimestamp;
 		SpillID = other.SpillID;
 		Energy = other.Energy;
 		TimeStamp = other.TimeStamp;
@@ -488,4 +495,12 @@ bool PhysicsData::operator!=(const PhysicsData& rhs) const{
 
 bool PhysicsData::HasTag(const std::string& tagid) const{
 	return (this->TagList.find(tagid) != this->TagList.end());
+}
+
+void PhysicsData::SetExternalTimeStamp(uint64_t val){
+	this->ExternalTimestamp = val;
+}
+
+uint64_t PhysicsData::GetExternalTimeStamp() const{
+	return this->ExternalTimestamp;
 }
