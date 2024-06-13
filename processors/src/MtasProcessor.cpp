@@ -153,7 +153,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		this->CurrEvt.TotalEnergy[4] += this->CurrEvt.SumFrontBackEnergy[ii+18];
 	}
 
-	if( (not this->CurrEvt.Saturate) or (not this->CurrEvt.Pileup) ){
+	if( (not this->CurrEvt.Saturate) and (not this->CurrEvt.Pileup) ){
 		hismanager->Fill("MTAS_3200",this->CurrEvt.TotalEnergy[0]);
 		
 		hismanager->Fill("MTAS_3210",this->CurrEvt.TotalEnergy[1]);
