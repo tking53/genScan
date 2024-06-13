@@ -410,7 +410,6 @@ int LDFPixieTranslator::UnpackData(unsigned int& nBytes,bool& full_spill,bool& b
 					}else{
 						this->Leftovers.back().SetExternalTimeStamp(this->CurrExtTS);
 					}
-					this->console->info("{}",this->Leftovers.back().GetExternalTimeStamp());
 
 					buffpos += this->CurrHeaderLength;
 
