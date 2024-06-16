@@ -83,24 +83,39 @@ IonizationChamberProcessor::IonizationChamberProcessor(const std::string& log) :
 		double sum = 0.0;
 		for( const auto& e : this->CurrEvt.AnodeEnergy ){
 			sum += e;
+			if( e > this->CurrEvt.MaxAnodeEnergy ){
+				this->CurrEvt.MaxAnodeEnergy = e;
+			}
 		}
 		this->CurrEvt.TotalAnodeEnergy = sum;
 
 		sum = 0.0;
 		for( const auto& e : this->CurrEvt.CathodeEnergy ){
 			sum += e;
+			if( e > this->CurrEvt.MaxCathodeEnergy ){
+				this->CurrEvt.MaxCathodeEnergy = e;
+			}
 		}
 		this->CurrEvt.TotalCathodeEnergy = sum;
 
 		this->CurrEvt.FirstPSD = this->CurrEvt.AnodeEnergy[0]/this->CurrEvt.CathodeEnergy[0];
 		this->CurrEvt.TotalPSD = this->CurrEvt.TotalAnodeEnergy/this->CurrEvt.TotalCathodeEnergy;
+		this->CurrEvt.MaxPSD = this->CurrEvt.MaxAnodeEnergy/this->CurrEvt.MaxCathodeEnergy;
 
 		hismanager->Fill("IONCHAMBER_7000",this->CurrEvt.CathodeEnergy[0],this->CurrEvt.AnodeEnergy[0]);
 		hismanager->Fill("IONCHAMBER_7010",this->CurrEvt.CathodeEnergy[0],this->CurrEvt.FirstPSD);
 		hismanager->Fill("IONCHAMBER_7020",this->CurrEvt.CathodeEnergy[0],this->CurrEvt.TotalPSD);
+		hismanager->Fill("IONCHAMBER_7030",this->CurrEvt.CathodeEnergy[0],this->CurrEvt.MaxPSD);
+
 		hismanager->Fill("IONCHAMBER_8000",this->CurrEvt.TotalCathodeEnergy,this->CurrEvt.TotalAnodeEnergy);
 		hismanager->Fill("IONCHAMBER_8010",this->CurrEvt.TotalCathodeEnergy,this->CurrEvt.TotalPSD);
 		hismanager->Fill("IONCHAMBER_8020",this->CurrEvt.TotalCathodeEnergy,this->CurrEvt.FirstPSD);
+		hismanager->Fill("IONCHAMBER_8030",this->CurrEvt.TotalCathodeEnergy,this->CurrEvt.MaxPSD);
+
+		hismanager->Fill("IONCHAMBER_9000",this->CurrEvt.MaxCathodeEnergy,this->CurrEvt.MaxAnodeEnergy);
+		hismanager->Fill("IONCHAMBER_9010",this->CurrEvt.MaxCathodeEnergy,this->CurrEvt.TotalPSD);
+		hismanager->Fill("IONCHAMBER_9020",this->CurrEvt.MaxCathodeEnergy,this->CurrEvt.FirstPSD);
+		hismanager->Fill("IONCHAMBER_9030",this->CurrEvt.MaxCathodeEnergy,this->CurrEvt.MaxPSD);
 	}
 
 	Processor::EndProcess();
@@ -143,11 +158,19 @@ void IonizationChamberProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) c
 	hismanager->RegisterPlot<TH2F>("IONCHAMBER_7000","First Anode vs First Cathode",16384,0,16384,16384,0,16384);
 	hismanager->RegisterPlot<TH2F>("IONCHAMBER_7010","First PSD (A/C) vs First Cathode",16384,0,16384,1024,0,1.0);
 	hismanager->RegisterPlot<TH2F>("IONCHAMBER_7020","Total PSD (A/C) vs First Cathode",16384,0,16384,1024,0,1.0);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_7030","Max PSD (A/C) vs First Cathode",16384,0,16384,1024,0,1.0);
 
 	//Total Cathode
 	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8000","Anode Sum vs Cathode Sum",16384,0,16384,16384,0,16384);
 	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8010","Total PSD (A/C) vs Cathode Sum",16384,0,16384,1024,0,1.0);
 	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8020","First PSD (A/C) vs Cathode Sum",16384,0,16384,1024,0,1.0);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8030","Max PSD (A/C) vs Cathode Sum",16384,0,16384,1024,0,1.0);
+
+	//Max Cathode
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_9000","Max Anode vs Max Cathode",16384,0,16384,16384,0,16384);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_9010","Total PSD (A/C) vs Max Cathode",16384,0,16384,1024,0,1.0);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_9020","First PSD (A/C) vs Max Cathode",16384,0,16384,1024,0,1.0);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_9030","Max PSD (A/C) vs Max Cathode",16384,0,16384,1024,0,1.0);
 
 	this->console->info("Finished Declaring Plots");
 }
@@ -171,11 +194,14 @@ void IonizationChamberProcessor::InitHelpers(){
 		.AnodeEnergy = std::vector<double>(this->NumAnode,0.0),
 		.AnodeTimeStamp = std::vector<double>(this->NumAnode,0.0),
 		.TotalAnodeEnergy = 0.0,
+		.MaxAnodeEnergy = 0.0,
 		.CathodeEnergy = std::vector<double>(this->NumCathode,0.0),
 		.CathodeTimeStamp = std::vector<double>(this->NumCathode,0.0),
 		.TotalCathodeEnergy = 0.0,
+		.MaxCathodeEnergy = 0.0,
 		.FirstPSD = 0.0,
 		.TotalPSD = 0.0,
+		.MaxPSD = 0.0,
 		.FirstTimeStamp = 0.0,
 		.FinalTimeStamp = 0.0,
 		.Saturate = false,

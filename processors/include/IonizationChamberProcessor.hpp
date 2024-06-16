@@ -28,11 +28,14 @@ class IonizationChamberProcessor : public Processor{
 			std::vector<double> AnodeEnergy;
 			std::vector<double> AnodeTimeStamp;
 			double TotalAnodeEnergy;
+			double MaxAnodeEnergy;
 			std::vector<double> CathodeEnergy;
 			std::vector<double> CathodeTimeStamp;
 			double TotalCathodeEnergy;
+			double MaxCathodeEnergy;
 			double FirstPSD;
 			double TotalPSD;
+			double MaxPSD;
 			double FirstTimeStamp;
 			double FinalTimeStamp;
 			bool Saturate;
