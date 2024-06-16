@@ -178,6 +178,9 @@ double ChannelMap::GetCalibratedEnergy(int crid,int bid,int cid,double erg){
 		throw std::runtime_error(mess);
 	}
 	auto c = ChannelConfigMap.at(gcid);
+	//if( erg < c.Thresh.first or erg > c.Thresh.second ){
+	//	return 0.0;
+	//}
 	switch(c.cal){
 		case Linear:
 			return c.Params.at(0) + c.Params.at(1)*erg; 
