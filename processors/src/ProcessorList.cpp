@@ -11,6 +11,7 @@
 
 #include "BSMExpProcessor.hpp"
 #include "e21069b_fp2Processor.hpp"
+#include "ribf168Processor.hpp"
 
 #include "BSMProcessor.hpp"
 #include "HagridProcessor.hpp"
@@ -100,6 +101,8 @@ void ProcessorList::CreateProc(const std::string& name){
 		known_processors.push_back(std::make_shared<BSMExpProcessor>(this->LogName));
 	}else if( name.compare("e21069b_fp2Processor") == 0 ){
 		known_processors.push_back(std::make_shared<e21069b_fp2Processor>(this->LogName));
+	}else if( name.compare("ribf168Processor") == 0 ){
+		known_processors.push_back(std::make_shared<ribf168Processor>(this->LogName));
 	}else if( name.compare("BSMProcessor") == 0 ){
 		known_processors.push_back(std::make_shared<BSMProcessor>(this->LogName));
 	}else if( name.compare("HagridProcessor") == 0 ){

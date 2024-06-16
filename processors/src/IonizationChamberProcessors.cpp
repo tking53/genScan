@@ -155,22 +155,22 @@ void IonizationChamberProcessor::Finalize(){
 
 void IonizationChamberProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 	//First Cathode
-	hismanager->RegisterPlot<TH2F>("IONCHAMBER_7000","First Anode vs First Cathode",16384,0,16384,16384,0,16384);
-	hismanager->RegisterPlot<TH2F>("IONCHAMBER_7010","First PSD (A/C) vs First Cathode",16384,0,16384,1024,0,1.0);
-	hismanager->RegisterPlot<TH2F>("IONCHAMBER_7020","Total PSD (A/C) vs First Cathode",16384,0,16384,1024,0,1.0);
-	hismanager->RegisterPlot<TH2F>("IONCHAMBER_7030","Max PSD (A/C) vs First Cathode",16384,0,16384,1024,0,1.0);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_7000","First Anode vs First Cathode",8192,0,8192,8192,0,8192);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_7010","First PSD (A/C) vs First Cathode",8192,0,8192,1024,0,1.0);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_7020","Total PSD (A/C) vs First Cathode",8192,0,8192,1024,0,1.0);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_7030","Max PSD (A/C) vs First Cathode",8192,0,8192,1024,0,1.0);
 
 	//Total Cathode
-	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8000","Anode Sum vs Cathode Sum",16384,0,16384,16384,0,16384);
-	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8010","Total PSD (A/C) vs Cathode Sum",16384,0,16384,1024,0,1.0);
-	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8020","First PSD (A/C) vs Cathode Sum",16384,0,16384,1024,0,1.0);
-	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8030","Max PSD (A/C) vs Cathode Sum",16384,0,16384,1024,0,1.0);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8000","Anode Sum vs Cathode Sum",8192,0,8192,8192,0,8192);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8010","Total PSD (A/C) vs Cathode Sum",8192,0,8192,1024,0,1.0);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8020","First PSD (A/C) vs Cathode Sum",8192,0,8192,1024,0,1.0);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8030","Max PSD (A/C) vs Cathode Sum",8192,0,8192,1024,0,1.0);
 
 	//Max Cathode
-	hismanager->RegisterPlot<TH2F>("IONCHAMBER_9000","Max Anode vs Max Cathode",16384,0,16384,16384,0,16384);
-	hismanager->RegisterPlot<TH2F>("IONCHAMBER_9010","Total PSD (A/C) vs Max Cathode",16384,0,16384,1024,0,1.0);
-	hismanager->RegisterPlot<TH2F>("IONCHAMBER_9020","First PSD (A/C) vs Max Cathode",16384,0,16384,1024,0,1.0);
-	hismanager->RegisterPlot<TH2F>("IONCHAMBER_9030","Max PSD (A/C) vs Max Cathode",16384,0,16384,1024,0,1.0);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_9000","Max Anode vs Max Cathode",8192,0,8192,8192,0,8192);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_9010","Total PSD (A/C) vs Max Cathode",8192,0,8192,1024,0,1.0);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_9020","First PSD (A/C) vs Max Cathode",8192,0,8192,1024,0,1.0);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_9030","Max PSD (A/C) vs Max Cathode",8192,0,8192,1024,0,1.0);
 
 	this->console->info("Finished Declaring Plots");
 }
