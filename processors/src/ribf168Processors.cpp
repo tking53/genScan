@@ -60,11 +60,11 @@ ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf
 [[maybe_unused]] bool ribf168Processor::Process([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	
 	if( this->HasHagrid ){
-		this->HagridProc->PreProcess(summary,hismanager,cutmanager);
+		this->HagridProc->Process(summary,hismanager,cutmanager);
 	}
 
 	if( this->HasIonChamber ){
-		this->IonizationChamberProc->PreProcess(summary,hismanager,cutmanager);
+		this->IonizationChamberProc->Process(summary,hismanager,cutmanager);
 	}
 
 	if( this->HasPid ){
@@ -72,7 +72,7 @@ ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf
 	}
 
 	if( this->HasPSPMT ){
-		this->PSPMTProc->PreProcess(summary,hismanager,cutmanager);
+		this->PSPMTProc->Process(summary,hismanager,cutmanager);
 	}
 
 	return true;
@@ -81,11 +81,11 @@ ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf
 [[maybe_unused]] bool ribf168Processor::PostProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	
 	if( this->HasHagrid ){
-		this->HagridProc->PreProcess(summary,hismanager,cutmanager);
+		this->HagridProc->PostProcess(summary,hismanager,cutmanager);
 	}
 
 	if( this->HasIonChamber ){
-		this->IonizationChamberProc->PreProcess(summary,hismanager,cutmanager);
+		this->IonizationChamberProc->PostProcess(summary,hismanager,cutmanager);
 	}
 
 	if( this->HasPid ){
@@ -93,7 +93,7 @@ ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf
 	}
 
 	if( this->HasPSPMT ){
-		this->PSPMTProc->PreProcess(summary,hismanager,cutmanager);
+		this->PSPMTProc->PostProcess(summary,hismanager,cutmanager);
 	}
 
 	return true;
