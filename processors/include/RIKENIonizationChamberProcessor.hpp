@@ -1,20 +1,15 @@
-#ifndef __RIBF168_PROCESSOR_HPP__
-#define __RIBF168_PROCESSOR_HPP__
+#ifndef __RIKEN_IONIZATION_CHAMBER_PROCESSOR_HPP__
+#define __RIKEN_IONIZATION_CHAMBER_PROCESSOR_HPP__
 
-#include <memory>
 #include <string>
 
 #include "EventSummary.hpp"
 #include "HistogramManager.hpp"
-#include "HagridProcessor.hpp"
-#include "RIKENIonizationChamberProcessor.hpp"
-#include "PidProcessor.hpp"
-#include "PSPMTProcessor.hpp"
 #include "Processor.hpp"
 
-class ribf168Processor : public Processor{
+class RIKENIonizationChamberProcessor : public Processor{
 	public:
-		ribf168Processor(const std::string&);
+		RIKENIonizationChamberProcessor(const std::string&);
 		[[maybe_unused]] bool PreProcess([[maybe_unused]] EventSummary&,[[maybe_unused]] PLOTS::PlotRegistry*,[[maybe_unused]] CUTS::CutRegistry*) final;
 		[[maybe_unused]] bool Process(EventSummary&,[[maybe_unused]] PLOTS::PlotRegistry*,[[maybe_unused]] CUTS::CutRegistry*) final;
 		[[maybe_unused]] bool PostProcess([[maybe_unused]] EventSummary&,[[maybe_unused]] PLOTS::PlotRegistry*,[[maybe_unused]] CUTS::CutRegistry*) final;
@@ -28,18 +23,37 @@ class ribf168Processor : public Processor{
 		void DeclarePlots(PLOTS::PlotRegistry*) const;
 		virtual void RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>&) final;
 		virtual void CleanupTree() final;
+
+		struct EventInfo{
+			std::vector<double> AnodeEnergy;
+			std::vector<double> AnodeTimeStamp;
+			double TotalAnodeEnergy;
+			double MaxAnodeEnergy;
+			double FirstPSD;
+			double MaxPSD;
+			double FirstTimeStamp;
+			double FinalTimeStamp;
+			bool Saturate;
+			bool Pileup;
+			bool RealEvent;
+		};
+
+		EventInfo& GetCurrEvt();
+		EventInfo& GetPrevEvt();
+
 	private:
-		bool HasHagrid;
-		bool HasRIKENIonChamber;
-		bool HasPid;
-		bool HasPSPMT;
+		void Reset();
+		void InitHelpers();
 
+		EventInfo NewEvt;
+		EventInfo CurrEvt;
+		EventInfo PrevEvt;
 
-		std::unique_ptr<HagridProcessor> HagridProc;
-		std::unique_ptr<RIKENIonizationChamberProcessor> RIKENIonizationChamberProc;
-		std::unique_ptr<PidProcessor> PidProc;
-		std::unique_ptr<PSPMTProcessor> PSPMTProc;
-		
+		std::vector<int> AnodeHits;
+
+		bool firstevt;
+
+		int NumAnode;
 };
 
 #endif

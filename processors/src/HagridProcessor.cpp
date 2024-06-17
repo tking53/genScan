@@ -15,8 +15,6 @@ HagridProcessor::HagridProcessor(const std::string& log) : Processor(log,"Hagrid
 [[maybe_unused]] bool HagridProcessor::PreProcess(EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	Processor::PreProcess();
 
-	this->Reset();
-
 	summary.GetDetectorSummary(this->AllDefaultRegex["hagrid"],this->SummaryData);
 	for( const auto& evt : this->SummaryData ){
 		auto currgroup = evt->GetGroup();
@@ -87,6 +85,8 @@ HagridProcessor::HagridProcessor(const std::string& log) : Processor(log,"Hagrid
 }
 
 [[maybe_unused]] bool HagridProcessor::PostProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+	this->Reset();
+
 	return true;
 }
 

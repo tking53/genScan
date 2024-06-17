@@ -23,8 +23,6 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log) : Processor(log,"PSPMTPro
 [[maybe_unused]] bool PSPMTProcessor::PreProcess(EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	Processor::PreProcess();
 
-	this->Reset();
-
 	summary.GetDetectorSummary(this->AllDefaultRegex["pspmt"],this->SummaryData);
 	for( const auto& evt : this->SummaryData ){
 		auto subtype = evt->GetSubType();
@@ -168,6 +166,7 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log) : Processor(log,"PSPMTPro
 }
 
 [[maybe_unused]] bool PSPMTProcessor::PostProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+	this->Reset();
 	return true;
 }
 

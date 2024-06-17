@@ -20,6 +20,7 @@
 #include "MtasImplantProcessor.hpp"
 #include "PidProcessor.hpp"
 #include "PSPMTProcessor.hpp"
+#include "RIKENIonizationChamberProcessor.hpp"
 #include "RootDevProcessor.hpp"
 
 ProcessorList::ProcessorList(const std::string& log){
@@ -117,6 +118,8 @@ void ProcessorList::CreateProc(const std::string& name){
 		known_processors.push_back(std::make_shared<PidProcessor>(this->LogName));
 	}else if( name.compare("PSPMTProcessor") == 0 ){
 		known_processors.push_back(std::make_shared<PSPMTProcessor>(this->LogName));
+	}else if( name.compare("RIKENIonizationChamberProcessor") == 0 ){
+		known_processors.push_back(std::make_shared<RIKENIonizationChamberProcessor>(this->LogName));
 	}else if( name.compare("RootDevProcessor") == 0 ){
 		known_processors.push_back(std::make_shared<RootDevProcessor>(this->LogName));
 	}else{
