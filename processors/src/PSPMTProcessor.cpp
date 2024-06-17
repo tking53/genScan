@@ -18,6 +18,7 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log) : Processor(log,"PSPMTPro
 	this->PrevEvt = this->CurrEvt;
 	this->highgaintag = "highgain";
 	this->lowgaintag = "lowgain";
+	this->Reset();
 }
 
 [[maybe_unused]] bool PSPMTProcessor::PreProcess(EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){

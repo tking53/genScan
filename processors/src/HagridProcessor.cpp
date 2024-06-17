@@ -146,9 +146,7 @@ void HagridProcessor::InitHelpers(){
 		.Pileup = false,
 		.RealEvent = false
 	};
-	this->CurrEvt = this->NewEvt;
-	this->PrevEvt = this->CurrEvt;
-
+	this->Reset();
 }
 
 void HagridProcessor::SetIsBeta(){

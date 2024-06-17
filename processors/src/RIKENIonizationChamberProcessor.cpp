@@ -157,9 +157,7 @@ void RIKENIonizationChamberProcessor::InitHelpers(){
 		.Pileup = false,
 		.RealEvent = false
 	};
-	this->CurrEvt = this->NewEvt;
-	this->PrevEvt = this->CurrEvt;
-
+	this->Reset();
 }
 
 RIKENIonizationChamberProcessor::EventInfo& RIKENIonizationChamberProcessor::GetCurrEvt(){
