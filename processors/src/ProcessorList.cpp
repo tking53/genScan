@@ -21,6 +21,7 @@
 #include "PidProcessor.hpp"
 #include "PSPMTProcessor.hpp"
 #include "RIKENIonizationChamberProcessor.hpp"
+#include "RIKENPidProcessor.hpp"
 #include "RootDevProcessor.hpp"
 #include "VetoProcessor.hpp"
 
@@ -121,6 +122,8 @@ void ProcessorList::CreateProc(const std::string& name){
 		known_processors.push_back(std::make_shared<PSPMTProcessor>(this->LogName));
 	}else if( name.compare("RIKENIonizationChamberProcessor") == 0 ){
 		known_processors.push_back(std::make_shared<RIKENIonizationChamberProcessor>(this->LogName));
+	}else if( name.compare("RIKENPidProcessor") == 0 ){
+		known_processors.push_back(std::make_shared<RIKENPidProcessor>(this->LogName));
 	}else if( name.compare("RootDevProcessor") == 0 ){
 		known_processors.push_back(std::make_shared<RootDevProcessor>(this->LogName));
 	}else if( name.compare("VetoProcessor") == 0 ){

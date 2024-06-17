@@ -7,7 +7,7 @@
 ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf168Processor",{"hagrid","ionchamber","pspmt","pid"}){
 	this->HagridProc = std::make_unique<HagridProcessor>(log);
 	this->RIKENIonizationChamberProc = std::make_unique<RIKENIonizationChamberProcessor>(log);
-	this->PidProc = std::make_unique<PidProcessor>(log);
+	this->RIKENPidProc = std::make_unique<RIKENPidProcessor>(log);
 	this->PSPMTProc = std::make_unique<PSPMTProcessor>(log);
 	this->VetoProc = std::make_unique<VetoProcessor>(log);
 
@@ -19,7 +19,7 @@ ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf
 		this->AssociateType(type);
 	}
 
-	for( const auto& type : this->PidProc->GetKnownTypes() ){
+	for( const auto& type : this->RIKENPidProc->GetKnownTypes() ){
 		this->AssociateType(type);
 	}
 	
@@ -39,7 +39,7 @@ ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf
 
 	this->HasHagrid = (types.find("hagrid") != types.end());
 	this->HasRIKENIonChamber = (types.find("ionchamber") != types.end());
-	this->HasPid = (types.find("pid") != types.end());
+	this->HasRIKENPid = (types.find("pid") != types.end());
 	this->HasPSPMT = (types.find("pspmt") != types.end());
 	this->HasVeto = (types.find("veto") != types.end());
 
@@ -51,8 +51,8 @@ ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf
 		this->RIKENIonizationChamberProc->PreProcess(summary,hismanager,cutmanager);
 	}
 
-	if( this->HasPid ){
-		this->PidProc->PreProcess(summary,hismanager,cutmanager);
+	if( this->HasRIKENPid ){
+		this->RIKENPidProc->PreProcess(summary,hismanager,cutmanager);
 	}
 
 	if( this->HasPSPMT ){
@@ -77,8 +77,8 @@ ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf
 		this->RIKENIonizationChamberProc->Process(summary,hismanager,cutmanager);
 	}
 
-	if( this->HasPid ){
-		this->PidProc->Process(summary,hismanager,cutmanager);
+	if( this->HasRIKENPid ){
+		this->RIKENPidProc->Process(summary,hismanager,cutmanager);
 	}
 
 	if( this->HasPSPMT ){
@@ -102,8 +102,8 @@ ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf
 		this->RIKENIonizationChamberProc->PostProcess(summary,hismanager,cutmanager);
 	}
 
-	if( this->HasPid ){
-		this->PidProc->PostProcess(summary,hismanager,cutmanager);
+	if( this->HasRIKENPid ){
+		this->RIKENPidProc->PostProcess(summary,hismanager,cutmanager);
 	}
 
 	if( this->HasPSPMT ){
@@ -120,7 +120,7 @@ ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf
 void ribf168Processor::Init(const YAML::Node& config){
 	this->HagridProc->Init(config);
 	this->RIKENIonizationChamberProc->Init(config);
-	this->PidProc->Init(config);
+	this->RIKENPidProc->Init(config);
 	this->PSPMTProc->Init(config);
 	this->VetoProc->Init(config);
 }
@@ -128,7 +128,7 @@ void ribf168Processor::Init(const YAML::Node& config){
 void ribf168Processor::Init(const Json::Value& config){
 	this->HagridProc->Init(config);
 	this->RIKENIonizationChamberProc->Init(config);
-	this->PidProc->Init(config);
+	this->RIKENPidProc->Init(config);
 	this->PSPMTProc->Init(config);
 	this->VetoProc->Init(config);
 }
@@ -136,7 +136,7 @@ void ribf168Processor::Init(const Json::Value& config){
 void ribf168Processor::Init(const pugi::xml_node& config){
 	this->HagridProc->Init(config);
 	this->RIKENIonizationChamberProc->Init(config);
-	this->PidProc->Init(config);
+	this->RIKENPidProc->Init(config);
 	this->PSPMTProc->Init(config);
 	this->VetoProc->Init(config);
 }
@@ -144,7 +144,7 @@ void ribf168Processor::Init(const pugi::xml_node& config){
 void ribf168Processor::Finalize(){
 	this->HagridProc->Finalize();
 	this->RIKENIonizationChamberProc->Finalize();
-	this->PidProc->Finalize();
+	this->RIKENPidProc->Finalize();
 	this->PSPMTProc->Finalize();
 	this->VetoProc->Finalize();
 	this->console->info("{} has been finalized",this->ProcessorName);
@@ -153,7 +153,7 @@ void ribf168Processor::Finalize(){
 void ribf168Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 	this->HagridProc->DeclarePlots(hismanager);
 	this->RIKENIonizationChamberProc->DeclarePlots(hismanager);
-	this->PidProc->DeclarePlots(hismanager);
+	this->RIKENPidProc->DeclarePlots(hismanager);
 	this->PSPMTProc->DeclarePlots(hismanager);
 	this->VetoProc->DeclarePlots(hismanager);
 	this->console->info("Finished Declaring Plots");
@@ -162,7 +162,7 @@ void ribf168Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 void ribf168Processor::RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>& outputtrees){
 	this->HagridProc->RegisterTree(outputtrees);
 	this->RIKENIonizationChamberProc->RegisterTree(outputtrees);
-	this->PidProc->RegisterTree(outputtrees);
+	this->RIKENPidProc->RegisterTree(outputtrees);
 	this->PSPMTProc->RegisterTree(outputtrees);
 	this->VetoProc->RegisterTree(outputtrees);
 }
@@ -170,7 +170,7 @@ void ribf168Processor::RegisterTree([[maybe_unused]] std::unordered_map<std::str
 void ribf168Processor::CleanupTree(){
 	this->HagridProc->CleanupTree();
 	this->RIKENIonizationChamberProc->CleanupTree();
-	this->PidProc->CleanupTree();
+	this->RIKENPidProc->CleanupTree();
 	this->PSPMTProc->CleanupTree();
 	this->VetoProc->CleanupTree();
 }
