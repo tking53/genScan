@@ -211,8 +211,14 @@ void ProcessorList::ThreshAndCal(boost::container::devector<PhysicsData>& RawEve
 	for( auto& evt : RawEvents ){
 		auto raw = evt.GetRawEnergy();
 		auto erg = raw+this->randNum(this->randGen);
-		auto cal = cmap->GetCalibratedEnergy(evt.GetCrate(),evt.GetModule(),evt.GetChannel(),erg);
-		evt.SetEnergy(erg,cal);
+		try{
+			auto cal = cmap->GetCalibratedEnergy(evt.GetCrate(),evt.GetModule(),evt.GetChannel(),erg);
+			evt.SetEnergy(erg,cal);
+		}catch(const boost::container::out_of_range& e){
+			this->console->error("Invalid channel map for event {}. Next message is description from boost",evt);
+			throw std::runtime_error(e.what());
+		}
+
 		try{
 			cmap->SetChanConfigInfo(evt);
 		}catch(const boost::container::out_of_range& e){
