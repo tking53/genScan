@@ -337,6 +337,7 @@ int main(int argc, char *argv[]) {
 	const auto secs = std::chrono::duration_cast<std::chrono::seconds>(global_run_time - hrs - mins);
 	const auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(global_run_time - hrs - mins - secs);
 	console->info("Finished running in {} hours {} minutes {} seconds {} milliseconds",hrs.count(),mins.count(),secs.count(),ms.count());
+	console->critical("All data has been written to {}",outputfile);
 
 	return 0;
 }
