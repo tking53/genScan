@@ -22,6 +22,7 @@
 #include "PSPMTProcessor.hpp"
 #include "RIKENIonizationChamberProcessor.hpp"
 #include "RootDevProcessor.hpp"
+#include "VetoProcessor.hpp"
 
 ProcessorList::ProcessorList(const std::string& log){
 	this->LogName = log;
@@ -122,6 +123,8 @@ void ProcessorList::CreateProc(const std::string& name){
 		known_processors.push_back(std::make_shared<RIKENIonizationChamberProcessor>(this->LogName));
 	}else if( name.compare("RootDevProcessor") == 0 ){
 		known_processors.push_back(std::make_shared<RootDevProcessor>(this->LogName));
+	}else if( name.compare("VetoProcessor") == 0 ){
+		known_processors.push_back(std::make_shared<VetoProcessor>(this->LogName));
 	}else{
 		std::stringstream ss;
 		ss << "ProcessorList::InitializeProcessors() Unknown processor named \""

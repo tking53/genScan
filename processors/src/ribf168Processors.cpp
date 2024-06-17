@@ -9,6 +9,7 @@ ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf
 	this->RIKENIonizationChamberProc = std::make_unique<RIKENIonizationChamberProcessor>(log);
 	this->PidProc = std::make_unique<PidProcessor>(log);
 	this->PSPMTProc = std::make_unique<PSPMTProcessor>(log);
+	this->VetoProc = std::make_unique<VetoProcessor>(log);
 
 	for( const auto& type : this->HagridProc->GetKnownTypes() ){
 		this->AssociateType(type);
@@ -25,6 +26,10 @@ ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf
 	for( const auto& type : this->PSPMTProc->GetKnownTypes() ){
 		this->AssociateType(type);
 	}
+	
+	for( const auto& type : this->VetoProc->GetKnownTypes() ){
+		this->AssociateType(type);
+	}
 }
 
 [[maybe_unused]] bool ribf168Processor::PreProcess(EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
@@ -36,6 +41,7 @@ ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf
 	this->HasRIKENIonChamber = (types.find("ionchamber") != types.end());
 	this->HasPid = (types.find("pid") != types.end());
 	this->HasPSPMT = (types.find("pspmt") != types.end());
+	this->HasVeto = (types.find("veto") != types.end());
 
 	if( this->HasHagrid ){
 		this->HagridProc->PreProcess(summary,hismanager,cutmanager);
@@ -51,6 +57,10 @@ ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf
 
 	if( this->HasPSPMT ){
 		this->PSPMTProc->PreProcess(summary,hismanager,cutmanager);
+	}
+
+	if( this->HasVeto ){
+		this->VetoProc->PreProcess(summary,hismanager,cutmanager);
 	}
 
 	Processor::EndProcess();
@@ -75,6 +85,10 @@ ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf
 		this->PSPMTProc->Process(summary,hismanager,cutmanager);
 	}
 
+	if( this->HasVeto ){
+		this->VetoProc->Process(summary,hismanager,cutmanager);
+	}
+
 	return true;
 }
 
@@ -96,6 +110,10 @@ ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf
 		this->PSPMTProc->PostProcess(summary,hismanager,cutmanager);
 	}
 
+	if( this->HasVeto ){
+		this->VetoProc->PostProcess(summary,hismanager,cutmanager);
+	}
+
 	return true;
 }
 
@@ -104,6 +122,7 @@ void ribf168Processor::Init(const YAML::Node& config){
 	this->RIKENIonizationChamberProc->Init(config);
 	this->PidProc->Init(config);
 	this->PSPMTProc->Init(config);
+	this->VetoProc->Init(config);
 }
 
 void ribf168Processor::Init(const Json::Value& config){
@@ -111,6 +130,7 @@ void ribf168Processor::Init(const Json::Value& config){
 	this->RIKENIonizationChamberProc->Init(config);
 	this->PidProc->Init(config);
 	this->PSPMTProc->Init(config);
+	this->VetoProc->Init(config);
 }
 
 void ribf168Processor::Init(const pugi::xml_node& config){
@@ -118,6 +138,7 @@ void ribf168Processor::Init(const pugi::xml_node& config){
 	this->RIKENIonizationChamberProc->Init(config);
 	this->PidProc->Init(config);
 	this->PSPMTProc->Init(config);
+	this->VetoProc->Init(config);
 }
 		
 void ribf168Processor::Finalize(){
@@ -125,6 +146,7 @@ void ribf168Processor::Finalize(){
 	this->RIKENIonizationChamberProc->Finalize();
 	this->PidProc->Finalize();
 	this->PSPMTProc->Finalize();
+	this->VetoProc->Finalize();
 	this->console->info("{} has been finalized",this->ProcessorName);
 }
 
@@ -133,6 +155,7 @@ void ribf168Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 	this->RIKENIonizationChamberProc->DeclarePlots(hismanager);
 	this->PidProc->DeclarePlots(hismanager);
 	this->PSPMTProc->DeclarePlots(hismanager);
+	this->VetoProc->DeclarePlots(hismanager);
 	this->console->info("Finished Declaring Plots");
 }
 
@@ -141,6 +164,7 @@ void ribf168Processor::RegisterTree([[maybe_unused]] std::unordered_map<std::str
 	this->RIKENIonizationChamberProc->RegisterTree(outputtrees);
 	this->PidProc->RegisterTree(outputtrees);
 	this->PSPMTProc->RegisterTree(outputtrees);
+	this->VetoProc->RegisterTree(outputtrees);
 }
 
 void ribf168Processor::CleanupTree(){
@@ -148,4 +172,5 @@ void ribf168Processor::CleanupTree(){
 	this->RIKENIonizationChamberProc->CleanupTree();
 	this->PidProc->CleanupTree();
 	this->PSPMTProc->CleanupTree();
+	this->VetoProc->CleanupTree();
 }
