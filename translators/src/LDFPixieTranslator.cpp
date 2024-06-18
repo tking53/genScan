@@ -391,11 +391,10 @@ int LDFPixieTranslator::UnpackData(unsigned int& nBytes,bool& full_spill,bool& b
 					this->Leftovers.back().SetSaturation(OutOfRange);
 
 					//word2 has CFD things
-					uint64_t CFDTimeStamp = this->CurrDecoder->DecodeCFDParams(firstWords,TimeStamp,this->Leftovers.back());
-					double CFDTimeStampInNS = CFDTimeStamp*(this->CMap->GetModuleClockTicksToNS(CrateNumber,ModuleNumber));
+					double CFDTimeStampInNS = this->CurrDecoder->DecodeCFDParams(firstWords,TimeStamp,this->Leftovers.back());
 
 #ifdef TRANSLATOR_DEBUG
-					this->console->debug("convert: {},TS : {}, TS(ns) : {}, CFDTS : {}, CFDTS(ns) : {}",this->CMap->GetModuleClockTicksToNS(CrateNumber,ModuleNumber),TimeStamp,TimeStampInNS,CFDTimeStamp,CFDTimeStampInNS);
+					this->console->debug("convert: {},TS : {}, TS(ns) : {}, CFDTS(ns) : {}",this->CMap->GetModuleClockTicksToNS(CrateNumber,ModuleNumber),TimeStamp,TimeStampInNS,CFDTimeStampInNS);
 					this->console->debug("convert: {},cfdfraction: {},cfdforced: {},cfdsource: {}",this->CMap->GetModuleClockTicksToNS(CrateNumber,ModuleNumber),this->Leftovers.back().GetCFDFraction(),this->Leftovers.back().GetCFDForcedBit(),this->Leftovers.back().GetCFDSourceBit());
 #endif
 					//always use the cfd based TimeStampInNS to event build, it is the same other if nothing is set

@@ -124,11 +124,10 @@ int EVTTranslator::ReadHeader(boost::container::devector<PhysicsData>& RawEvents
 	RawEvents.back().SetSaturation(OutOfRange);
 
 	//word2 has CFD things
-	uint64_t CFDTimeStamp = this->CurrDecoder->DecodeCFDParams(firstWords,TimeStamp,RawEvents.back());
-	double CFDTimeStampInNS = CFDTimeStamp*(this->CMap->GetModuleADCClockTicksToNS(CrateNumber,ModuleNumber));
+	double CFDTimeStampInNS = this->CurrDecoder->DecodeCFDParams(firstWords,TimeStamp,RawEvents.back());
 
 	#ifdef TRANSLATOR_DEBUG
-	this->console->debug("TS : {}, TS(ns) : {}, CFDTS : {}, CFDTS(ns) : {}",TimeStamp,TimeStampInNS,CFDTimeStamp,CFDTimeStampInNS);
+	this->console->debug("TS : {}, TS(ns) : {}, CFDTS(ns) : {}",TimeStamp,TimeStampInNS,CFDTimeStampInNS);
 	#endif
 	//always use the cfd based TimeStampInNS to event build, it is the same other if nothing is set
 	RawEvents.back().SetTimeStamp(CFDTimeStampInNS);

@@ -38,7 +38,7 @@ class XiaDecoder{
 		double GetCFDSize() const;
 
 		void DecodeFirstWords(const unsigned int*,uint32_t&,uint32_t&,uint32_t&,unsigned int&,unsigned int&,bool&) const;
-		uint64_t DecodeCFDParams(const unsigned int*,const uint64_t&,PhysicsData&) const;
+		double DecodeCFDParams(const unsigned int*,const uint64_t&,PhysicsData&) const;
 		void DecodeOtherWords(const unsigned int*,PhysicsData*) const;
 	private:
 		ChannelMap::FirmwareVersion Ver;

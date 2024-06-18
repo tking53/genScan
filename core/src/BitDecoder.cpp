@@ -299,7 +299,7 @@ void XiaDecoder::DecodeFirstWords(const unsigned int* firstFour,uint32_t& eventl
 	tracesat = static_cast<bool>(this->DecodeTraceOutRange(firstFour[3]));
 }
 
-uint64_t XiaDecoder::DecodeCFDParams(const unsigned int* firstFour,const uint64_t& ts,PhysicsData& pd) const{
+double XiaDecoder::DecodeCFDParams(const unsigned int* firstFour,const uint64_t& ts,PhysicsData& pd) const{
 	auto cfdfraction = this->DecodeCFDTime(firstFour[2]);
 	auto cfdforced = this->DecodeCFDForce(firstFour[2]);
 	auto cfdsource = this->DecodeCFDTrigSource(firstFour[2]);
@@ -347,8 +347,8 @@ uint64_t XiaDecoder::DecodeCFDParams(const unsigned int* firstFour,const uint64_
 			throw std::runtime_error("Unknown Frequency of "+std::to_string(this->Freq)+", Known are 100, 250, 500");
 	}
 	if( cfdforced or cfdfraction == 0 )
-		return ts;
-	return ts + cfdtime;
+		return ts*mult;
+	return ts*mult + cfdtime;
 }
 
 void XiaDecoder::DecodeOtherWords(const unsigned int* otherWords,PhysicsData* pd) const{
