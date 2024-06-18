@@ -84,6 +84,9 @@ HagridProcessor::HagridProcessor(const std::string& log) : Processor(log,"Hagrid
 
 			++idx;
 		}
+
+		hismanager->Fill("HAGRID_6000",(this->CurrEvt.FirstTimeStamp-this->FirstEvtTime)*1.0e-9);
+
 		hismanager->Fill("HAGRID_5010",upstreamsum);
 		hismanager->Fill("HAGRID_5010_TIME",upstreamsum,(this->CurrEvt.FirstTimeStamp-this->FirstEvtTime)*1.0e-9);
 		hismanager->Fill("HAGRID_5020",downstreamsum);
@@ -135,12 +138,15 @@ void HagridProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 	hismanager->RegisterPlot<TH1F>("HAGRID_5020","Downstream Hagrid sum; Energy (keV)",16384,0,16384);
 	hismanager->RegisterPlot<TH1F>("HAGRID_5025","Downstream Hagrid stack; Energy (keV)",16384,0,16384);
 	
-	hismanager->RegisterPlot<TH2F>("HAGRID_5000_TIME","Hagrid sum; Energy (keV)",16384,0,16384,1024,0,1024);
-	hismanager->RegisterPlot<TH2F>("HAGRID_5005_TIME","Hagrid stack; Energy (keV)",16384,0,16384,1024,0,1024);
-	hismanager->RegisterPlot<TH2F>("HAGRID_5010_TIME","Upstream Hagrid sum; Energy (keV)",16384,0,16384,1024,0,1024);
-	hismanager->RegisterPlot<TH2F>("HAGRID_5015_TIME","Upstream Hagrid stack; Energy (keV)",16384,0,16384,1024,0,1024);
-	hismanager->RegisterPlot<TH2F>("HAGRID_5020_TIME","Downstream Hagrid sum; Energy (keV)",16384,0,16384,1024,0,1024);
-	hismanager->RegisterPlot<TH2F>("HAGRID_5025_TIME","Downstream Hagrid stack; Energy (keV)",16384,0,16384,1024,0,1024);
+	hismanager->RegisterPlot<TH2F>("HAGRID_5000_TIME","Hagrid sum decay; Energy (keV)",16384,0,16384,1024,0,1024);
+	hismanager->RegisterPlot<TH2F>("HAGRID_5005_TIME","Hagrid stack decay; Energy (keV)",16384,0,16384,1024,0,1024);
+	hismanager->RegisterPlot<TH2F>("HAGRID_5010_TIME","Upstream Hagrid sum decay; Energy (keV)",16384,0,16384,1024,0,1024);
+	hismanager->RegisterPlot<TH2F>("HAGRID_5015_TIME","Upstream Hagrid stack decay; Energy (keV)",16384,0,16384,1024,0,1024);
+	hismanager->RegisterPlot<TH2F>("HAGRID_5020_TIME","Downstream Hagrid sum decay; Energy (keV)",16384,0,16384,1024,0,1024);
+	hismanager->RegisterPlot<TH2F>("HAGRID_5025_TIME","Downstream Hagrid stack decay; Energy (keV)",16384,0,16384,1024,0,1024);
+	
+	hismanager->RegisterPlot<TH1F>("HAGRID_6000","Hagrid decay; Energy (keV)",65536,0,65536);
+
 	this->console->info("Finished Declaring Plots");
 }
 
