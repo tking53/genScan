@@ -143,10 +143,10 @@ void RIKENPidProcessor::Finalize(){
 }
 
 void RIKENPidProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
-	hismanager->RegisterPlot<TH1F>("PID_4000","TDiff F11_Left - F7_Analog; tdiff (ns)",1000,-1000,1000);
-	hismanager->RegisterPlot<TH1F>("PID_4001","TDiff F11_Right - F7_Analog; tdiff (ns)",1000,-1000,1000);
-	hismanager->RegisterPlot<TH1F>("PID_4010","TDiff F11_Left - F7_Logic; tdiff (ns)",1000,-1000,1000);
-	hismanager->RegisterPlot<TH1F>("PID_4011","TDiff F11_Right - F7_Logic; tdiff (ns)",1000,-1000,1000);
+	hismanager->RegisterPlot<TH1F>("PID_4000","TDiff F11_Left - F7_Analog; tdiff (ns)",1000,-20,20);
+	hismanager->RegisterPlot<TH1F>("PID_4001","TDiff F11_Right - F7_Analog; tdiff (ns)",1000,-20,20);
+	hismanager->RegisterPlot<TH1F>("PID_4010","TDiff F11_Left - F7_Logic; tdiff (ns)",1000,-20,20);
+	hismanager->RegisterPlot<TH1F>("PID_4011","TDiff F11_Right - F7_Logic; tdiff (ns)",1000,-20,20);
 	this->console->info("Finished Declaring Plots");
 }
 
