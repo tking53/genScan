@@ -137,7 +137,7 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log) : Processor(log,"PSPMTPro
 				}else{
 					if( not this->DynodeHighHits ){
 						++this->DynodeHighHits;
-						this->CurrEvt.lg.dynode += evt->GetEnergy();
+						this->CurrEvt.hg.dynode += evt->GetEnergy();
 					}else{
 						++this->DynodeHighHits;
 					}
