@@ -395,7 +395,7 @@ int LDFPixieTranslator::UnpackData(unsigned int& nBytes,bool& full_spill,bool& b
 					double CFDTimeStampInNS = CFDTimeStamp*(this->CMap->GetModuleADCClockTicksToNS(CrateNumber,ModuleNumber));
 
 #ifdef TRANSLATOR_DEBUG
-					this->console->debug("TS : {}, TS(ns) : {}, CFDTS : {}, CFDTS(ns) : {}",TimeStamp,TimeStampInNS,CFDTimeStamp,CFDTimeStampInNS);
+					this->console->debug("convert: {},TS : {}, TS(ns) : {}, CFDTS : {}, CFDTS(ns) : {}",this->CMap->GetModuleClockTicksToNS(CrateNumber,ModuleNumber),TimeStamp,TimeStampInNS,CFDTimeStamp,CFDTimeStampInNS);
 #endif
 					//always use the cfd based TimeStampInNS to event build, it is the same other if nothing is set
 					this->Leftovers.back().SetTimeStamp(TimeStampInNS);
