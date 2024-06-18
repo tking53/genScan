@@ -392,7 +392,7 @@ int LDFPixieTranslator::UnpackData(unsigned int& nBytes,bool& full_spill,bool& b
 
 					//word2 has CFD things
 					uint64_t CFDTimeStamp = this->CurrDecoder->DecodeCFDParams(firstWords,TimeStamp,this->Leftovers.back());
-					double CFDTimeStampInNS = CFDTimeStamp*(this->CMap->GetModuleADCClockTicksToNS(CrateNumber,ModuleNumber));
+					double CFDTimeStampInNS = CFDTimeStamp*(this->CMap->GetModuleClockTicksToNS(CrateNumber,ModuleNumber));
 
 #ifdef TRANSLATOR_DEBUG
 					this->console->debug("convert: {},TS : {}, TS(ns) : {}, CFDTS : {}, CFDTS(ns) : {}",this->CMap->GetModuleClockTicksToNS(CrateNumber,ModuleNumber),TimeStamp,TimeStampInNS,CFDTimeStamp,CFDTimeStampInNS);
