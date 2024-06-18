@@ -52,10 +52,14 @@ class HagridProcessor : public Processor{
 		EventInfo PrevEvt;
 
 		std::vector<int> Hits;
+		std::vector<double> TimeStamps;
 		unsigned int NumHagrid;
 
 		std::string upstreamtag;
 		std::string downstreamtag;
+
+		double FirstEvtTime;
+		bool FoundFirstEvt;
 };
 
 #endif
