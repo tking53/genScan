@@ -180,13 +180,6 @@ void HagridProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 	hismanager->RegisterPlot<TH2F>("HAGRID_5020_TIME_H","Downstream Hagrid sum decay; Energy (keV); Time Since First Evt (hr)",16384,0,16384,1024,0,1024);
 	hismanager->RegisterPlot<TH2F>("HAGRID_5025_TIME_H","Downstream Hagrid stack decay; Energy (keV); Time Since First Evt (hr)",16384,0,16384,1024,0,1024);
 	
-	hismanager->RegisterPlot<TH2F>("HAGRID_5000_TIME_S","Hagrid sum decay; Energy (keV); Time Since First Evt (s)",16384,0,16384,1024,0,1024);
-	hismanager->RegisterPlot<TH2F>("HAGRID_5005_TIME_S","Hagrid stack decay; Energy (keV); Time Since First Evt (s)",16384,0,16384,1024,0,1024);
-	hismanager->RegisterPlot<TH2F>("HAGRID_5010_TIME_S","Upstream Hagrid sum decay; Energy (keV); Time Since First Evt (s)",16384,0,16384,1024,0,1024);
-	hismanager->RegisterPlot<TH2F>("HAGRID_5015_TIME_S","Upstream Hagrid stack decay; Energy (keV); Time Since First Evt (s)",16384,0,16384,1024,0,1024);
-	hismanager->RegisterPlot<TH2F>("HAGRID_5020_TIME_S","Downstream Hagrid sum decay; Energy (keV); Time Since First Evt (s)",16384,0,16384,1024,0,1024);
-	hismanager->RegisterPlot<TH2F>("HAGRID_5025_TIME_S","Downstream Hagrid stack decay; Energy (keV); Time Since First Evt (s)",16384,0,16384,1024,0,1024);
-	
 	hismanager->RegisterPlot<TH1F>("HAGRID_6000","Hagrid decay; Time Since First Evt (s)",65536,0,65536);
 	hismanager->RegisterPlot<TH1F>("HAGRID_6001","Hagrid decay; Time Since First Evt (min)",65536,0,65536);
 	hismanager->RegisterPlot<TH1F>("HAGRID_6002","Hagrid decay; Time Since First Evt (hr)",65536,0,65536);
