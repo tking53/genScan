@@ -35,6 +35,7 @@ class PSPMTProcessor : public Processor{
 			double anodesum;
 			int numanodes;
 			std::pair<double,double> position;
+			double DynodeTimeStamp;
 		};
 
 		struct EventInfo{

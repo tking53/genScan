@@ -7,8 +7,8 @@
 
 PSPMTProcessor::PSPMTProcessor(const std::string& log) : Processor(log,"PSPMTProcessor",{"pspmt"}){
 	this->NewEvt = {
-		.hg = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, { -10.0, -10.0 }},
-		.lg = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, { -10.0, -10.0 }},
+		.hg = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, { -10.0, -10.0 }, 0.0},
+		.lg = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, { -10.0, -10.0 }, 0.0},
 		.ampdynode = 0.0,
 		.Pileup = false,
 		.Saturate = false,
@@ -131,6 +131,7 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log) : Processor(log,"PSPMTPro
 					if( not this->DynodeLowHits ){
 						++this->DynodeLowHits;
 						this->CurrEvt.lg.dynode += evt->GetEnergy();
+						this->CurrEvt.lg.DynodeTimeStamp = evt->GetTimeStamp();
 					}else{
 						++this->DynodeLowHits;
 					}
@@ -138,6 +139,7 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log) : Processor(log,"PSPMTPro
 					if( not this->DynodeHighHits ){
 						++this->DynodeHighHits;
 						this->CurrEvt.hg.dynode += evt->GetEnergy();
+						this->CurrEvt.hg.DynodeTimeStamp = evt->GetTimeStamp();
 					}else{
 						++this->DynodeHighHits;
 					}

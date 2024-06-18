@@ -65,6 +65,11 @@ ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf
 		this->VetoProc->PreProcess(summary,hismanager,cutmanager);
 	}
 
+	if( this->HasPSPMT or this->HasRIKENIonChamber ){
+		hismanager->Fill("RIBF168_1001",(this->CurrPSPMT.lg.DynodeTimeStamp - this->CurrIonChamber.FirstTimeStamp)*1.0e-9);
+		hismanager->Fill("RIBF168_1002",(this->CurrPSPMT.hg.DynodeTimeStamp - this->CurrIonChamber.FirstTimeStamp)*1.0e-9);
+	}
+
 	if( this->HasPSPMT and this->HasRIKENIonChamber ){
 		if( this->CurrIonChamber.MaxAnodeEnergy >= 6400 ){
 			if( this->CurrPSPMT.lg.numanodes == 4 ){
@@ -167,6 +172,10 @@ void ribf168Processor::Finalize(){
 	this->RIKENPidProc->Finalize();
 	this->PSPMTProc->Finalize();
 	this->VetoProc->Finalize();
+
+	this->CurrPSPMT = this->PSPMTProc->GetCurrEvt();
+	this->CurrIonChamber = this->RIKENIonizationChamberProc->GetCurrEvt();
+
 	this->console->info("{} has been finalized",this->ProcessorName);
 }
 
@@ -181,6 +190,8 @@ void ribf168Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 	hismanager->RegisterPlot<TH2F>("RIBF168_1902_ABOVE","High Gain Image Max IonChamber Gated; Position (arb.); Position (arb.)",1024,-1.0,1.0,1024,-1.0,1.0);
 	hismanager->RegisterPlot<TH2F>("RIBF168_1901_BELOW","Low Gain Image Max IonChamber Gated; Position (arb.); Position (arb.)",1024,-1.0,1.0,1024,-1.0,1.0);
 	hismanager->RegisterPlot<TH2F>("RIBF168_1902_BELOW","High Gain Image Max IonChamber Gated; Position (arb.); Position (arb.)",1024,-1.0,1.0,1024,-1.0,1.0);
+
+	hismanager->RegisterPlot<TH1F>("RIBF168_1000","TDiff",65536,-65536,65535);
 
 	this->console->info("Finished Declaring Plots");
 }
