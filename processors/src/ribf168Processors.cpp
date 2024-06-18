@@ -49,6 +49,7 @@ ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf
 
 	if( this->HasRIKENIonChamber ){
 		this->RIKENIonizationChamberProc->PreProcess(summary,hismanager,cutmanager);
+		this->CurrIonChamber = this->RIKENIonizationChamberProc->GetCurrEvt();
 	}
 
 	if( this->HasRIKENPid ){
@@ -57,10 +58,29 @@ ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf
 
 	if( this->HasPSPMT ){
 		this->PSPMTProc->PreProcess(summary,hismanager,cutmanager);
+		this->CurrPSPMT = this->PSPMTProc->GetCurrEvt();
 	}
 
 	if( this->HasVeto ){
 		this->VetoProc->PreProcess(summary,hismanager,cutmanager);
+	}
+
+	if( this->HasPSPMT and this->HasRIKENIonChamber ){
+		if( this->CurrIonChamber.MaxAnodeEnergy >= 6400 ){
+			if( this->CurrPSPMT.lg.numanodes == 4 ){
+				hismanager->Fill("RIBF168_1901_ABOVE",this->CurrPSPMT.lg.position.first,this->CurrPSPMT.lg.position.second);
+			}
+			if( this->CurrPSPMT.hg.numanodes == 4 ){
+				hismanager->Fill("RIBF168_1902_ABOVE",this->CurrPSPMT.hg.position.first,this->CurrPSPMT.hg.position.second);
+			}
+		}else{
+			if( this->CurrPSPMT.lg.numanodes == 4 ){
+				hismanager->Fill("RIBF168_1901_BELOW",this->CurrPSPMT.lg.position.first,this->CurrPSPMT.lg.position.second);
+			}
+			if( this->CurrPSPMT.hg.numanodes == 4 ){
+				hismanager->Fill("RIBF168_1902_BELOW",this->CurrPSPMT.hg.position.first,this->CurrPSPMT.hg.position.second);
+			}
+		}
 	}
 
 	Processor::EndProcess();
@@ -156,6 +176,12 @@ void ribf168Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 	this->RIKENPidProc->DeclarePlots(hismanager);
 	this->PSPMTProc->DeclarePlots(hismanager);
 	this->VetoProc->DeclarePlots(hismanager);
+
+	hismanager->RegisterPlot<TH2F>("RIBF168_1901_ABOVE","Low Gain Image Max IonChamber Gated; Position (arb.); Position (arb.)",1024,-1.0,1.0,1024,-1.0,1.0);
+	hismanager->RegisterPlot<TH2F>("RIBF168_1902_ABOVE","High Gain Image Max IonChamber Gated; Position (arb.); Position (arb.)",1024,-1.0,1.0,1024,-1.0,1.0);
+	hismanager->RegisterPlot<TH2F>("RIBF168_1901_BELOW","Low Gain Image Max IonChamber Gated; Position (arb.); Position (arb.)",1024,-1.0,1.0,1024,-1.0,1.0);
+	hismanager->RegisterPlot<TH2F>("RIBF168_1902_BELOW","High Gain Image Max IonChamber Gated; Position (arb.); Position (arb.)",1024,-1.0,1.0,1024,-1.0,1.0);
+
 	this->console->info("Finished Declaring Plots");
 }
 

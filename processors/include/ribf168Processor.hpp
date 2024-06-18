@@ -36,6 +36,9 @@ class ribf168Processor : public Processor{
 		bool HasPSPMT;
 		bool HasVeto;
 
+		RIKENIonizationChamberProcessor::EventInfo CurrIonChamber;
+		PSPMTProcessor::EventInfo CurrPSPMT;
+
 		std::unique_ptr<HagridProcessor> HagridProc;
 		std::unique_ptr<RIKENIonizationChamberProcessor> RIKENIonizationChamberProc;
 		std::unique_ptr<RIKENPidProcessor> RIKENPidProc;
