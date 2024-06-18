@@ -102,10 +102,10 @@ RIKENPidProcessor::RIKENPidProcessor(const std::string& log) : Processor(log,"RI
 	}
 	
 	if( (not this->CurrEvt.Saturate) and (not this->CurrEvt.Pileup) ){
-		this->CurrEvt.tdiff[0] = std::abs(this->CurrEvt.F11LeftRightTimeStamp[0] - this->CurrEvt.F7AnalogTimeStamp);
-		this->CurrEvt.tdiff[1] = std::abs(this->CurrEvt.F11LeftRightTimeStamp[1] - this->CurrEvt.F7AnalogTimeStamp);
-		this->CurrEvt.tdiff[2] = std::abs(this->CurrEvt.F11LeftRightTimeStamp[0] - this->CurrEvt.F7LogicTimeStamp);
-		this->CurrEvt.tdiff[3] = std::abs(this->CurrEvt.F11LeftRightTimeStamp[1] - this->CurrEvt.F7LogicTimeStamp);
+		this->CurrEvt.tdiff[0] = this->CurrEvt.F11LeftRightTimeStamp[0] - this->CurrEvt.F7AnalogTimeStamp;
+		this->CurrEvt.tdiff[1] = this->CurrEvt.F11LeftRightTimeStamp[1] - this->CurrEvt.F7AnalogTimeStamp;
+		this->CurrEvt.tdiff[2] = this->CurrEvt.F11LeftRightTimeStamp[0] - this->CurrEvt.F7LogicTimeStamp;
+		this->CurrEvt.tdiff[3] = this->CurrEvt.F11LeftRightTimeStamp[1] - this->CurrEvt.F7LogicTimeStamp;
 
 		hismanager->Fill("PID_4000",this->CurrEvt.tdiff[0]);
 		hismanager->Fill("PID_4001",this->CurrEvt.tdiff[1]);
@@ -143,10 +143,10 @@ void RIKENPidProcessor::Finalize(){
 }
 
 void RIKENPidProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
-	hismanager->RegisterPlot<TH1F>("PID_4000","TDiff F11_Left - F7_Analog; tdiff (ns)",8192,-4096.0,4095.0);
-	hismanager->RegisterPlot<TH1F>("PID_4001","TDiff F11_Right - F7_Analog; tdiff (ns)",8192,-4096.0,4095.0);
-	hismanager->RegisterPlot<TH1F>("PID_4010","TDiff F11_Left - F7_Logic; tdiff (ns)",8192,-4096.0,4095.0);
-	hismanager->RegisterPlot<TH1F>("PID_4011","TDiff F11_Right - F7_Logic; tdiff (ns)",8192,-4096.0,4095.0);
+	hismanager->RegisterPlot<TH1F>("PID_4000","TDiff F11_Left - F7_Analog; tdiff (ns)",8192,-16384,16383);
+	hismanager->RegisterPlot<TH1F>("PID_4001","TDiff F11_Right - F7_Analog; tdiff (ns)",8192,-16384,16383);
+	hismanager->RegisterPlot<TH1F>("PID_4010","TDiff F11_Left - F7_Logic; tdiff (ns)",8192,-16384,16383);
+	hismanager->RegisterPlot<TH1F>("PID_4011","TDiff F11_Right - F7_Logic; tdiff (ns)",8192,-16384,16383);
 	this->console->info("Finished Declaring Plots");
 }
 
