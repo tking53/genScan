@@ -3,6 +3,7 @@
 #include "EventSummary.hpp"
 #include "HistogramManager.hpp"
 #include <TTree.h>
+#include <algorithm>
 
 ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf168Processor",{"hagrid","ionchamber","pspmt","pid","veto"}){
 	this->HagridProc = std::make_unique<HagridProcessor>(log);
@@ -92,8 +93,15 @@ ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf
 	}
 
 	if( this->HasRIKENIonChamber and this->HasRIKENPid ){
-		hismanager->Fill("RIBF168_1003",this->CurrPid.F7LogicTimeStamp - this->CurrIonChamber.FirstTimeStamp);
-		hismanager->Fill("RIBF168_2000",this->CurrPid.F7LogicTimeStamp - this->CurrIonChamber.FirstTimeStamp,this->CurrIonChamber.MaxAnodeEnergy);
+		double tof = this->CurrPid.F7LogicTimeStamp - this->CurrIonChamber.FirstTimeStamp;
+		hismanager->Fill("RIBF168_1003",tof);
+		hismanager->Fill("RIBF168_2003",tof,this->CurrIonChamber.MaxAnodeEnergy);
+	}
+
+	if( this->HasRIKENIonChamber and this->HasVeto and this->HasRIKENPid ){
+		double tof = this->CurrPid.F7LogicTimeStamp - this->CurrVeto.MaxFrontTimeStamp;
+		hismanager->Fill("RIBF168_1004",tof);
+		hismanager->Fill("RIBF168_2004",tof,this->CurrIonChamber.MaxAnodeEnergy);
 	}
 
 	Processor::EndProcess();
@@ -205,8 +213,10 @@ void ribf168Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 	hismanager->RegisterPlot<TH1F>("RIBF168_1001","TDiff",8192,-1024,1023);
 	hismanager->RegisterPlot<TH1F>("RIBF168_1002","TDiff",8192,-1024,1023);
 	hismanager->RegisterPlot<TH1F>("RIBF168_1003","TDiff",8192,-1024,1023);
+	hismanager->RegisterPlot<TH1F>("RIBF168_1004","TDiff",8192,-1024,1023);
 
-	hismanager->RegisterPlot<TH2F>("RIBF168_2000","Pid",8192,-1024,1023,8192,0,8192);
+	hismanager->RegisterPlot<TH2F>("RIBF168_2003","Pid",8192,-1024,1023,8192,0,8192);
+	hismanager->RegisterPlot<TH2F>("RIBF168_2004","Pid",8192,-1024,1023,8192,0,8192);
 
 	this->console->info("Finished Declaring Plots");
 }
