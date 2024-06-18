@@ -336,7 +336,7 @@ double XiaDecoder::DecodeCFDParams(const unsigned int* firstFour,const uint64_t&
 			cfdtime = cfdfraction/this->CFDSize;
 			break;
 		case 250:
-			mult = 4.0;
+			mult = 8.0;
 			cfdtime = (cfdfraction/this->CFDSize) - cfdsource;
 			break;
 		case 500:
