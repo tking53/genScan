@@ -46,6 +46,9 @@ class PSPMTProcessor : public Processor{
 			bool RealEvt;
 		};
 
+		EventInfo& GetCurrEvt();
+		EventInfo& GetPrevEvt();
+
 	private:
 		void Reset();
 		void CalculatePosition(Image&,double,double,double,bool);

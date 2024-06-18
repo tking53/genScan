@@ -266,3 +266,11 @@ void PSPMTProcessor::CalculatePosition(PSPMTProcessor::Image& img,double rotatio
 
 	img.position = { x*std::cos(rotation) + xcenter -y*std::sin(rotation) + ycenter, x*std::sin(rotation) + xcenter + y*std::cos(rotation) + ycenter};
 }
+
+PSPMTProcessor::EventInfo& PSPMTProcessor::GetCurrEvt(){
+	return this->CurrEvt;
+}
+
+PSPMTProcessor::EventInfo& PSPMTProcessor::GetPrevEvt(){
+	return this->PrevEvt;
+}
