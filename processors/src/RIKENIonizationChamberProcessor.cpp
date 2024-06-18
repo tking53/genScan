@@ -4,6 +4,7 @@
 #include "HistogramManager.hpp"
 #include <TTree.h>
 #include <algorithm>
+#include <cmath>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -73,13 +74,21 @@ RIKENIonizationChamberProcessor::RIKENIonizationChamberProcessor(const std::stri
 		this->CurrEvt.FirstPSD = this->CurrEvt.AnodeEnergy[0]/this->CurrEvt.TotalAnodeEnergy;
 		this->CurrEvt.MaxPSD = this->CurrEvt.MaxAnodeEnergy/this->CurrEvt.TotalAnodeEnergy;
 
+		double curranodenum = 0.0;
 		for( int ii = 0; ii < this->NumAnode; ++ii ){
+			if( this->CurrEvt.AnodeEnergy[ii] > 0.0 ){
+				this->CurrEvt.AverageEnergy += this->CurrEvt.AnodeEnergy[ii];
+				curranodenum += 1.0;
+			}
 			hismanager->Fill("IONCHAMBER_7000",this->CurrEvt.AnodeEnergy[ii],ii);
 			for( int jj = 0; jj < this->NumAnode; ++jj ){
 				if( ii != jj ){
 					hismanager->Fill("IONCHAMBER_7050",this->CurrEvt.AnodeEnergy[ii],this->CurrEvt.AnodeEnergy[jj]);
 				}
 			}
+		}
+		if( curranodenum > 0.0 ){
+			this->CurrEvt.AverageEnergy/=curranodenum;
 		}
 
 		hismanager->Fill("IONCHAMBER_7010",this->CurrEvt.TotalAnodeEnergy,this->CurrEvt.FirstPSD);
@@ -89,6 +98,7 @@ RIKENIonizationChamberProcessor::RIKENIonizationChamberProcessor(const std::stri
 
 		hismanager->Fill("IONCHAMBER_8000",this->CurrEvt.MaxAnodeEnergy);
 		hismanager->Fill("IONCHAMBER_8010",this->CurrEvt.TotalAnodeEnergy);
+		hismanager->Fill("IONCHAMBER_8020",this->CurrEvt.AverageEnergy);
 
 		double time_s = (this->CurrEvt.FirstTimeStamp - this->FirstEvtTime)*1.0e-9;
 		double time_m = time_s/60.0;
@@ -96,12 +106,15 @@ RIKENIonizationChamberProcessor::RIKENIonizationChamberProcessor(const std::stri
 		
 		hismanager->Fill("IONCHAMBER_8000_TIME_S",this->CurrEvt.MaxAnodeEnergy,time_s);
 		hismanager->Fill("IONCHAMBER_8010_TIME_S",this->CurrEvt.TotalAnodeEnergy,time_s);
+		hismanager->Fill("IONCHAMBER_8020_TIME_S",this->CurrEvt.AverageEnergy,time_s);
 		
 		hismanager->Fill("IONCHAMBER_8000_TIME_M",this->CurrEvt.MaxAnodeEnergy,time_m);
 		hismanager->Fill("IONCHAMBER_8010_TIME_M",this->CurrEvt.TotalAnodeEnergy,time_m);
+		hismanager->Fill("IONCHAMBER_8020_TIME_M",this->CurrEvt.AverageEnergy,time_m);
 
 		hismanager->Fill("IONCHAMBER_8000_TIME_H",this->CurrEvt.MaxAnodeEnergy,time_h);
 		hismanager->Fill("IONCHAMBER_8010_TIME_H",this->CurrEvt.TotalAnodeEnergy,time_h);
+		hismanager->Fill("IONCHAMBER_8020_TIME_H",this->CurrEvt.AverageEnergy,time_h);
 	}
 
 	Processor::EndProcess();
@@ -149,15 +162,19 @@ void RIKENIonizationChamberProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanag
 
 	hismanager->RegisterPlot<TH1F>("IONCHAMBER_8000","Max Anode Energy; Energy (arb.)",65536,0,65536);
 	hismanager->RegisterPlot<TH1F>("IONCHAMBER_8010","Total Anode Energy; Energy (arb.)",65536,0,65536);
+	hismanager->RegisterPlot<TH1F>("IONCHAMBER_8020","Average Anode Energy; Energy (arb.)",65536,0,65536);
 
 	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8000_TIME_S","Max Anode Energy; Energy (arb.); Time since first evt (s)",16384,0,65536,1024,0,1024);
 	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8010_TIME_S","Total Anode Energy; Energy (arb.); Time since first evt (s)",16384,0,65536,1024,0,1024);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8020_TIME_S","Average Anode Energy; Energy (arb.); Time since first evt (s)",16384,0,65536,1024,0,1024);
 
 	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8000_TIME_M","Max Anode Energy; Energy (arb.); Time since first evt (min)",16384,0,65536,1024,0,1024);
 	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8010_TIME_M","Total Anode Energy; Energy (arb.); Time since first evt (min)",16384,0,65536,1024,0,1024);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8020_TIME_M","Average Anode Energy; Energy (arb.); Time since first evt (min)",16384,0,65536,1024,0,1024);
 
 	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8000_TIME_H","Max Anode Energy; Energy (arb.); Time since first evt (hr)",16384,0,65536,1024,0,1024);
 	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8010_TIME_H","Total Anode Energy; Energy (arb.); Time since first evt (hr)",16384,0,65536,1024,0,1024);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8020_TIME_H","Average Anode Energy; Energy (arb.); Time since first evt (hr)",16384,0,65536,1024,0,1024);
 
 	this->console->info("Finished Declaring Plots");
 }
@@ -181,6 +198,7 @@ void RIKENIonizationChamberProcessor::InitHelpers(){
 		.AnodeTimeStamp = std::vector<double>(this->NumAnode,0.0),
 		.TotalAnodeEnergy = 0.0,
 		.MaxAnodeEnergy = 0.0,
+		.AverageEnergy = 0.0,
 		.FirstPSD = 0.0,
 		.MaxPSD = 0.0,
 		.FirstTimeStamp = 0.0,

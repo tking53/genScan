@@ -29,6 +29,7 @@ class RIKENIonizationChamberProcessor : public Processor{
 			std::vector<double> AnodeTimeStamp;
 			double TotalAnodeEnergy;
 			double MaxAnodeEnergy;
+			double AverageEnergy;
 			double FirstPSD;
 			double MaxPSD;
 			double FirstTimeStamp;
