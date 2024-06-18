@@ -48,7 +48,7 @@ HagridProcessor::HagridProcessor(const std::string& log) : Processor(log,"Hagrid
 		}
 		if( not this->FoundFirstEvt ){
 			this->FoundFirstEvt = true;
-			this->FirstEvtTime = this->CurrEvt.FirstTimeStamp;
+			this->FirstEvtTime = evt->GetTimeStamp();
 		}
 
 		if( not this->Hits[detloc] ){
