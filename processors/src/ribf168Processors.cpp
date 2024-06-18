@@ -92,7 +92,8 @@ ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf
 	}
 
 	if( this->HasRIKENIonChamber and this->HasRIKENPid ){
-		hismanager->Fill("RIBF168_2000",(this->CurrPid.F7LogicTimeStamp - this->CurrIonChamber.FirstTimeStamp)*1.0e-9,this->CurrIonChamber.MaxAnodeEnergy);
+		hismanager->Fill("RIBF168_1003",this->CurrPid.F7LogicTimeStamp - this->CurrIonChamber.FirstTimeStamp);
+		hismanager->Fill("RIBF168_2000",this->CurrPid.F7LogicTimeStamp - this->CurrIonChamber.FirstTimeStamp,this->CurrIonChamber.MaxAnodeEnergy);
 	}
 
 	Processor::EndProcess();
@@ -203,8 +204,9 @@ void ribf168Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 
 	hismanager->RegisterPlot<TH1F>("RIBF168_1001","TDiff",65536,-65536,65535);
 	hismanager->RegisterPlot<TH1F>("RIBF168_1002","TDiff",65536,-65536,65535);
+	hismanager->RegisterPlot<TH1F>("RIBF168_1003","TDiff",65536,-65536,65535);
 
-	hismanager->RegisterPlot<TH2F>("RIBF168_2000","Pid",8192,-4096,4095,8192,0,8192);
+	hismanager->RegisterPlot<TH2F>("RIBF168_2000","Pid",8192,-100,100,8192,0,8192);
 
 	this->console->info("Finished Declaring Plots");
 }
