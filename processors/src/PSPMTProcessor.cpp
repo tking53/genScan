@@ -151,11 +151,39 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log) : Processor(log,"PSPMTPro
 	if( this->CurrEvt.lg.numanodes == 4 ){
 		this->CalculatePosition(this->CurrEvt.lg,0.0,0.0,0.0,false);
 		hismanager->Fill("PSPMT_1901",this->CurrEvt.lg.position.first,this->CurrEvt.lg.position.second);
+
+		hismanager->Fill("PSPMT_2001",this->CurrEvt.lg.dynode);
+
+		hismanager->Fill("PSPMT_2101",this->CurrEvt.lg.dynode,this->CurrEvt.lg.xa);
+		hismanager->Fill("PSPMT_2101",this->CurrEvt.lg.dynode,this->CurrEvt.lg.xb);
+		hismanager->Fill("PSPMT_2101",this->CurrEvt.lg.dynode,this->CurrEvt.lg.ya);
+		hismanager->Fill("PSPMT_2101",this->CurrEvt.lg.dynode,this->CurrEvt.lg.yb);
+		
+		hismanager->Fill("PSPMT_2201",this->CurrEvt.lg.xa,0);
+		hismanager->Fill("PSPMT_2201",this->CurrEvt.lg.xb,1);
+		hismanager->Fill("PSPMT_2201",this->CurrEvt.lg.ya,2);
+		hismanager->Fill("PSPMT_2201",this->CurrEvt.lg.yb,3);
+
+		hismanager->Fill("PSPMT_2301",this->CurrEvt.lg.dynode,this->CurrEvt.lg.anodesum);
 	}
 		
 	if( this->CurrEvt.hg.numanodes == 4 ){
 		this->CalculatePosition(this->CurrEvt.hg,0.0,0.0,0.0,false);
 		hismanager->Fill("PSPMT_1902",this->CurrEvt.hg.position.first,this->CurrEvt.hg.position.second);
+
+		hismanager->Fill("PSPMT_2002",this->CurrEvt.hg.dynode);
+
+		hismanager->Fill("PSPMT_2102",this->CurrEvt.hg.dynode,this->CurrEvt.hg.xa);
+		hismanager->Fill("PSPMT_2102",this->CurrEvt.hg.dynode,this->CurrEvt.hg.xb);
+		hismanager->Fill("PSPMT_2102",this->CurrEvt.hg.dynode,this->CurrEvt.hg.ya);
+		hismanager->Fill("PSPMT_2102",this->CurrEvt.hg.dynode,this->CurrEvt.hg.yb);
+		
+		hismanager->Fill("PSPMT_2202",this->CurrEvt.hg.xa,0);
+		hismanager->Fill("PSPMT_2202",this->CurrEvt.hg.xb,1);
+		hismanager->Fill("PSPMT_2202",this->CurrEvt.hg.ya,2);
+		hismanager->Fill("PSPMT_2202",this->CurrEvt.hg.yb,3);
+
+		hismanager->Fill("PSPMT_2302",this->CurrEvt.hg.dynode,this->CurrEvt.hg.anodesum);
 	}
 
 	Processor::EndProcess();
@@ -190,6 +218,18 @@ void PSPMTProcessor::Finalize(){
 void PSPMTProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 	hismanager->RegisterPlot<TH2F>("PSPMT_1901","Low Gain Image; Position (arb.); Position (arb.)",1024,0,1,1024,0,1);
 	hismanager->RegisterPlot<TH2F>("PSPMT_1902","High Gain Image; Position (arb.); Position (arb.)",1024,0,1,1024,0,1);
+
+	hismanager->RegisterPlot<TH1F>("PSPMT_2001","Low Gain Dynode; Energy (arb.)",65536,0,65536);
+	hismanager->RegisterPlot<TH1F>("PSPMT_2002","High Gain Dynode; Energy (arb.)",65536,0,65536);
+	
+	hismanager->RegisterPlot<TH2F>("PSPMT_2101","Low Gain Anodes vs Low Gain Dynode; Energy (arb.)",8192,0,65536,8192,0,65536);
+	hismanager->RegisterPlot<TH2F>("PSPMT_2102","High Gain Anodes vs High Gain Dynode; Energy (arb.)",8192,0,65536,8192,0,65536);
+
+	hismanager->RegisterPlot<TH2F>("PSPMT_2201","Inividual Low Gain Anode; Energy (arb.); Position (arb.)",16384,0,65536,4,0,4);
+	hismanager->RegisterPlot<TH2F>("PSPMT_2202","Inividual High Gain Anode; Energy (arb.); Position (arb.)",16384,0,65536,4,0,4);
+	
+	hismanager->RegisterPlot<TH2F>("PSPMT_2301","Low Gain Anodes vs Low Gain Dynode; Energy (arb.)",8192,0,65536,8192,0,65536);
+	hismanager->RegisterPlot<TH2F>("PSPMT_2302","High Gain Anodes vs High Gain Dynode; Energy (arb.)",8192,0,65536,8192,0,65536);
 	this->console->info("Finished Declaring Plots");
 }
 
