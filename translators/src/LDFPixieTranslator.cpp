@@ -398,7 +398,7 @@ int LDFPixieTranslator::UnpackData(unsigned int& nBytes,bool& full_spill,bool& b
 					this->console->debug("TS : {}, TS(ns) : {}, CFDTS : {}, CFDTS(ns) : {}",TimeStamp,TimeStampInNS,CFDTimeStamp,CFDTimeStampInNS);
 #endif
 					//always use the cfd based TimeStampInNS to event build, it is the same other if nothing is set
-					this->Leftovers.back().SetTimeStamp(CFDTimeStampInNS);
+					//this->Leftovers.back().SetTimeStamp(CFDTimeStampInNS);
 
 					if( this->CurrHeaderLength > 4 ){
 						otherWords = &(this->databuffer[buffpos+4]);
