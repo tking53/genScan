@@ -93,18 +93,26 @@ RIKENPidProcessor::RIKENPidProcessor(const std::string& log) : Processor(log,"RI
 		if( this->CurrEvt.F11LeftRight[0] > 0.0 and this->CurrEvt.F7Analog > 0.0 ){
 			this->CurrEvt.tdiff[0] = this->CurrEvt.F11LeftRightTimeStamp[0] - this->CurrEvt.F7AnalogTimeStamp;
 			hismanager->Fill("PID_4000",this->CurrEvt.tdiff[0]);
+		}else{
+			this->CurrEvt.tdiff[0] = std::numeric_limits<double>::max();
 		}
 		if( this->CurrEvt.F11LeftRight[1] > 0.0 and this->CurrEvt.F7Analog > 0.0 ){
 			this->CurrEvt.tdiff[1] = this->CurrEvt.F11LeftRightTimeStamp[1] - this->CurrEvt.F7AnalogTimeStamp;
 			hismanager->Fill("PID_4001",this->CurrEvt.tdiff[1]);
+		}else{
+			this->CurrEvt.tdiff[1] = std::numeric_limits<double>::max();
 		}
 		if( this->CurrEvt.F11LeftRight[0] > 0.0 and this->CurrEvt.F7Logic > 0.0 ){
 			this->CurrEvt.tdiff[2] = this->CurrEvt.F11LeftRightTimeStamp[0] - this->CurrEvt.F7LogicTimeStamp;
 			hismanager->Fill("PID_4010",this->CurrEvt.tdiff[2]);
+		}else{
+			this->CurrEvt.tdiff[2] = std::numeric_limits<double>::max();
 		}
 		if( this->CurrEvt.F11LeftRight[1] > 0.0 and this->CurrEvt.F7Logic > 0.0 ){
 			this->CurrEvt.tdiff[3] = this->CurrEvt.F11LeftRightTimeStamp[1] - this->CurrEvt.F7LogicTimeStamp;
 			hismanager->Fill("PID_4011",this->CurrEvt.tdiff[3]);
+		}else{
+			this->CurrEvt.tdiff[3] = std::numeric_limits<double>::max();
 		}
 	}
 	
