@@ -399,7 +399,8 @@ int LDFPixieTranslator::UnpackData(unsigned int& nBytes,bool& full_spill,bool& b
 					this->console->debug("convert: {},cfdfraction: {},cfdforced: {},cfdsource: {}",this->CMap->GetModuleClockTicksToNS(CrateNumber,ModuleNumber),this->Leftovers.back().GetCFDFraction(),this->Leftovers.back().GetCFDForcedBit(),this->Leftovers.back().GetCFDSourceBit());
 #endif
 					//always use the cfd based TimeStampInNS to event build, it is the same other if nothing is set
-					this->Leftovers.back().SetTimeStamp(TimeStampInNS);
+					this->Leftovers.back().SetTimeStamp(CFDTimeStampInNS);
+					//this->Leftovers.back().SetTimeStamp(TimeStampInNS);
 
 					if( this->CurrHeaderLength > 4 ){
 						otherWords = &(this->databuffer[buffpos+4]);
