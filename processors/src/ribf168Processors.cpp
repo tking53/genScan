@@ -202,11 +202,11 @@ void ribf168Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 	hismanager->RegisterPlot<TH2F>("RIBF168_1901_BELOW","Low Gain Image Max IonChamber Gated; Position (arb.); Position (arb.)",1024,0.0,1.0,1024,0.0,1.0);
 	hismanager->RegisterPlot<TH2F>("RIBF168_1902_BELOW","High Gain Image Max IonChamber Gated; Position (arb.); Position (arb.)",1024,0.0,1.0,1024,0.0,1.0);
 
-	hismanager->RegisterPlot<TH1F>("RIBF168_1001","TDiff",8192,-4096,4095);
-	hismanager->RegisterPlot<TH1F>("RIBF168_1002","TDiff",8192,-4096,4095);
-	hismanager->RegisterPlot<TH1F>("RIBF168_1003","TDiff",8192,-4096,4095);
+	hismanager->RegisterPlot<TH1F>("RIBF168_1001","TDiff",8192,-1024,1023);
+	hismanager->RegisterPlot<TH1F>("RIBF168_1002","TDiff",8192,-1024,1023);
+	hismanager->RegisterPlot<TH1F>("RIBF168_1003","TDiff",8192,-1024,1023);
 
-	hismanager->RegisterPlot<TH2F>("RIBF168_2000","Pid",8192,-4069,4095,8192,0,8192);
+	hismanager->RegisterPlot<TH2F>("RIBF168_2000","Pid",8192,-1024,1023,8192,0,8192);
 
 	this->console->info("Finished Declaring Plots");
 }
