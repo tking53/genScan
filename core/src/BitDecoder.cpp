@@ -307,26 +307,48 @@ uint64_t XiaDecoder::DecodeCFDParams(const unsigned int* firstFour,const uint64_
 	pd.SetCFDSourceBit(cfdsource);
 	pd.SetCFDFraction(cfdfraction);
 
-	double cfdtime = 0.0;
-	double mult = 1.0;
-	switch( this->Freq ){
-		case 100:
-			cfdtime = cfdfraction/this->CFDSize;
-			break;
-		case 250:
-			mult = 2.0;
-			cfdtime = (cfdfraction/this->CFDSize) - cfdsource;
-			break;
-		case 500:
-			mult = 10.0;
-			cfdtime = (cfdfraction/this->CFDSize) + cfdsource - 1;
-			break;
-		default:
-			throw std::runtime_error("Unknown Frequency of "+std::to_string(this->Freq)+", Known are 100, 250, 500");
+	//going to tim's method
+	unsigned long long time = ts << 15;
+
+	if( this->Freq == 250 ){
+		if( cfdforced == 0 ){
+			cfdfraction = cfdfraction - 16384*static_cast<int>(cfdsource);
+		}else{
+			cfdfraction = 16384;
+		}
+		time += cfdfraction;
+		time = time*8/10;
+	}else if( this->Freq == 500 ){
+		if( cfdsource == 7 ){
+			cfdfraction = 40960*4/5;
+		}else{
+			cfdfraction = (cfdfraction + 8192*(static_cast<int>(cfdsource)-1))*4/5;
+		}
+		time += cfdfraction;
+	}else{
 	}
-	if( cfdforced or cfdfraction == 0 )
-		return ts*mult;
-	return ts*mult + cfdtime;
+	return time;
+
+	//double cfdtime = 0.0;
+	//double mult = 1.0;
+	//switch( this->Freq ){
+	//	case 100:
+	//		cfdtime = cfdfraction/this->CFDSize;
+	//		break;
+	//	case 250:
+	//		mult = 2.0;
+	//		cfdtime = (cfdfraction/this->CFDSize) - cfdsource;
+	//		break;
+	//	case 500:
+	//		mult = 10.0;
+	//		cfdtime = (cfdfraction/this->CFDSize) + cfdsource - 1;
+	//		break;
+	//	default:
+	//		throw std::runtime_error("Unknown Frequency of "+std::to_string(this->Freq)+", Known are 100, 250, 500");
+	//}
+	//if( cfdforced or cfdfraction == 0 )
+	//	return ts*mult;
+	//return ts*mult + cfdtime;
 }
 
 void XiaDecoder::DecodeOtherWords(const unsigned int* otherWords,PhysicsData* pd) const{
