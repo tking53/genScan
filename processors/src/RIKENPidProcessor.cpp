@@ -57,40 +57,28 @@ RIKENPidProcessor::RIKENPidProcessor(const std::string& log) : Processor(log,"RI
 
 		if( this->currsubtype == SUBTYPE::F7 ){
 			if( evt->HasTag(this->analogtag) ){
-				if( not this->F7AnalogHits ){
-					++this->F7AnalogHits;
-					this->CurrEvt.F7Analog += evt->GetEnergy();
+				if( evt->GetEnergy() > this->CurrEvt.F7Analog ){
+					this->CurrEvt.F7Analog = evt->GetEnergy();
 					this->CurrEvt.F7AnalogTimeStamp = evt->GetTimeStamp();
-				}else{
-					++this->F7AnalogHits;
 				}
 			}else if( evt->HasTag(this->logictag) ){
-				if( not this->F7LogicHits ){
-					++this->F7LogicHits;
-					this->CurrEvt.F7Logic += evt->GetEnergy();
+				if( evt->GetEnergy() > this->CurrEvt.F7Logic ){
+					this->CurrEvt.F7Logic = evt->GetEnergy();
 					this->CurrEvt.F7LogicTimeStamp = evt->GetTimeStamp();
-				}else{
-					++this->F7LogicHits;
 				}
 			}else{
 				throw std::runtime_error("malformed xml tag for pid:f7 requires either analog or logic tag");
 			}
 		}else if( this->currsubtype == SUBTYPE::F11 ){
 			if( evt->HasTag(lefttag) ){
-				if( not this->F11Hits[0] ){
-					++this->F11Hits[0];
-					this->CurrEvt.F11LeftRight[0] += evt->GetEnergy();
+				if( evt->GetEnergy() > this->CurrEvt.F11LeftRight[0] ){
+					this->CurrEvt.F11LeftRight[0] = evt->GetEnergy();
 					this->CurrEvt.F11LeftRightTimeStamp[0] = evt->GetTimeStamp();
-				}else{
-					++this->F11Hits[0];
 				}
 			}else if( evt->HasTag(righttag) ){
-				if( not this->F11Hits[1] ){
-					++this->F11Hits[1];
-					this->CurrEvt.F11LeftRight[1] += evt->GetEnergy();
+				if( evt->GetEnergy() > this->CurrEvt.F11LeftRight[1] ){
+					this->CurrEvt.F11LeftRight[1] = evt->GetEnergy();
 					this->CurrEvt.F11LeftRightTimeStamp[1] = evt->GetTimeStamp();
-				}else{
-					++this->F11Hits[1];
 				}
 			}else{
 				throw std::runtime_error("malformed xml tag for pid:f11 requires either left or right tag");
@@ -102,15 +90,22 @@ RIKENPidProcessor::RIKENPidProcessor(const std::string& log) : Processor(log,"RI
 	}
 	
 	if( (not this->CurrEvt.Saturate) and (not this->CurrEvt.Pileup) ){
-		this->CurrEvt.tdiff[0] = this->CurrEvt.F11LeftRightTimeStamp[0] - this->CurrEvt.F7AnalogTimeStamp;
-		this->CurrEvt.tdiff[1] = this->CurrEvt.F11LeftRightTimeStamp[1] - this->CurrEvt.F7AnalogTimeStamp;
-		this->CurrEvt.tdiff[2] = this->CurrEvt.F11LeftRightTimeStamp[0] - this->CurrEvt.F7LogicTimeStamp;
-		this->CurrEvt.tdiff[3] = this->CurrEvt.F11LeftRightTimeStamp[1] - this->CurrEvt.F7LogicTimeStamp;
-
-		hismanager->Fill("PID_4000",this->CurrEvt.tdiff[0]);
-		hismanager->Fill("PID_4001",this->CurrEvt.tdiff[1]);
-		hismanager->Fill("PID_4010",this->CurrEvt.tdiff[2]);
-		hismanager->Fill("PID_4011",this->CurrEvt.tdiff[3]);
+		if( this->CurrEvt.F11LeftRight[0] > 0.0 and this->CurrEvt.F7Analog > 0.0 ){
+			this->CurrEvt.tdiff[0] = this->CurrEvt.F11LeftRightTimeStamp[0] - this->CurrEvt.F7AnalogTimeStamp;
+			hismanager->Fill("PID_4000",this->CurrEvt.tdiff[0]);
+		}
+		if( this->CurrEvt.F11LeftRight[1] > 0.0 and this->CurrEvt.F7Analog > 0.0 ){
+			this->CurrEvt.tdiff[1] = this->CurrEvt.F11LeftRightTimeStamp[1] - this->CurrEvt.F7AnalogTimeStamp;
+			hismanager->Fill("PID_4001",this->CurrEvt.tdiff[1]);
+		}
+		if( this->CurrEvt.F11LeftRight[0] > 0.0 and this->CurrEvt.F7Logic > 0.0 ){
+			this->CurrEvt.tdiff[2] = this->CurrEvt.F11LeftRightTimeStamp[0] - this->CurrEvt.F7LogicTimeStamp;
+			hismanager->Fill("PID_4010",this->CurrEvt.tdiff[2]);
+		}
+		if( this->CurrEvt.F11LeftRight[1] > 0.0 and this->CurrEvt.F7Logic > 0.0 ){
+			this->CurrEvt.tdiff[3] = this->CurrEvt.F11LeftRightTimeStamp[1] - this->CurrEvt.F7LogicTimeStamp;
+			hismanager->Fill("PID_4011",this->CurrEvt.tdiff[3]);
+		}
 	}
 	
 	Processor::EndProcess();
@@ -167,7 +162,4 @@ RIKENPidProcessor::EventInfo& RIKENPidProcessor::GetPrevEvt(){
 void RIKENPidProcessor::Reset(){
 	this->PrevEvt = this->CurrEvt;
 	this->CurrEvt = this->NewEvt;
-	this->F7AnalogHits = 0;
-	this->F7LogicHits = 0;
-	this->F11Hits = std::vector<int>(2,0);
 }

@@ -56,10 +56,6 @@ class RIKENPidProcessor : public Processor{
 
 		SUBTYPE currsubtype;
 
-		int F7AnalogHits;
-		int F7LogicHits;
-		std::vector<int> F11Hits;
-
 		std::string analogtag;
 		std::string logictag;
 		std::string lefttag;
