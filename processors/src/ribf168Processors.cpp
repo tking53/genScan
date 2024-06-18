@@ -45,6 +45,7 @@ ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf
 
 	if( this->HasHagrid ){
 		this->HagridProc->PreProcess(summary,hismanager,cutmanager);
+		this->CurrHagrid = this->HagridProc->GetCurrEvt();
 	}
 
 	if( this->HasRIKENIonChamber ){
@@ -54,6 +55,7 @@ ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf
 
 	if( this->HasRIKENPid ){
 		this->RIKENPidProc->PreProcess(summary,hismanager,cutmanager);
+		this->CurrPid = this->RIKENPidProc->GetCurrEvt();
 	}
 
 	if( this->HasPSPMT ){
@@ -63,6 +65,7 @@ ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf
 
 	if( this->HasVeto ){
 		this->VetoProc->PreProcess(summary,hismanager,cutmanager);
+		this->CurrVeto = this->VetoProc->GetCurrEvt();
 	}
 
 	if( this->HasPSPMT or this->HasRIKENIonChamber ){
@@ -86,6 +89,10 @@ ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf
 				hismanager->Fill("RIBF168_1902_BELOW",this->CurrPSPMT.hg.position.first,this->CurrPSPMT.hg.position.second);
 			}
 		}
+	}
+
+	if( this->HasRIKENIonChamber and this->HasRIKENPid ){
+		hismanager->Fill("RIBF168_2000",(this->CurrPid.tdiff[0])*1.0e-9,this->CurrIonChamber.MaxAnodeEnergy);
 	}
 
 	Processor::EndProcess();
@@ -175,6 +182,9 @@ void ribf168Processor::Finalize(){
 
 	this->CurrPSPMT = this->PSPMTProc->GetCurrEvt();
 	this->CurrIonChamber = this->RIKENIonizationChamberProc->GetCurrEvt();
+	this->CurrHagrid = this->HagridProc->GetCurrEvt();
+	this->CurrPid = this->RIKENPidProc->GetCurrEvt();
+	this->CurrVeto = this->VetoProc->GetCurrEvt();
 
 	this->console->info("{} has been finalized",this->ProcessorName);
 }
@@ -193,6 +203,8 @@ void ribf168Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 
 	hismanager->RegisterPlot<TH1F>("RIBF168_1001","TDiff",65536,-65536,65535);
 	hismanager->RegisterPlot<TH1F>("RIBF168_1002","TDiff",65536,-65536,65535);
+
+	hismanager->RegisterPlot<TH2>("RIBF168_2000","Pid",8192,-65536,65535,8192,0,65536);
 
 	this->console->info("Finished Declaring Plots");
 }

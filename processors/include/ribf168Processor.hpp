@@ -38,6 +38,9 @@ class ribf168Processor : public Processor{
 
 		RIKENIonizationChamberProcessor::EventInfo CurrIonChamber;
 		PSPMTProcessor::EventInfo CurrPSPMT;
+		HagridProcessor::EventInfo CurrHagrid;
+		RIKENPidProcessor::EventInfo CurrPid;
+		VetoProcessor::EventInfo CurrVeto;
 
 		std::unique_ptr<HagridProcessor> HagridProc;
 		std::unique_ptr<RIKENIonizationChamberProcessor> RIKENIonizationChamberProc;
