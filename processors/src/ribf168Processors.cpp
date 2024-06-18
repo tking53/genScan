@@ -4,7 +4,7 @@
 #include "HistogramManager.hpp"
 #include <TTree.h>
 
-ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf168Processor",{"hagrid","ionchamber","pspmt","pid"}){
+ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf168Processor",{"hagrid","ionchamber","pspmt","pid","veto"}){
 	this->HagridProc = std::make_unique<HagridProcessor>(log);
 	this->RIKENIonizationChamberProc = std::make_unique<RIKENIonizationChamberProcessor>(log);
 	this->RIKENPidProc = std::make_unique<RIKENPidProcessor>(log);
