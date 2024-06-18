@@ -160,6 +160,7 @@ namespace PLOTS{
 					this->PlotIDs.push_back(name);
 				}else{
 					std::string mess = "Unable to register plot "+name+" as it already exists";
+					this->console->error("{}",mess);
 					throw mess;
 				}
 			}
@@ -172,6 +173,7 @@ namespace PLOTS{
 					this->PlotIDs.push_back(name);
 				}else{
 					std::string mess = "Unable to register plot "+name+" as it already exists";
+					this->console->error("{}",mess);
 					throw mess;
 				}
 			}
@@ -186,6 +188,7 @@ namespace PLOTS{
 					this->Plots_1D[name]->Fill(xval);
 				}else{
 					std::string mess = "Plot : "+name+" does not exist as a 1D plot";
+					this->console->error("{}",mess);
 					throw mess;
 				}
 			}
@@ -196,6 +199,7 @@ namespace PLOTS{
 					this->Plots_1D[name]->Fill(xval,weight);
 				}else{
 					std::string mess = "Plot : "+name+" does not exist as a 1D plot";
+					this->console->error("{}",mess);
 					throw mess;
 				}
 			}
@@ -206,6 +210,7 @@ namespace PLOTS{
 					this->Plots_1D[name]->FillN(n,xval,weight,stride);
 				}else{
 					std::string mess = "Plot : "+name+" does not exist as a 1D plot";
+					this->console->error("{}",mess);
 					throw mess;
 				}
 			}
@@ -221,6 +226,7 @@ namespace PLOTS{
 					}
 				}else{
 					std::string mess = "Plot : "+name+" does not exist as a 1D plot";
+					this->console->error("{}",mess);
 					throw mess;
 				}
 			}
@@ -231,6 +237,7 @@ namespace PLOTS{
 					this->Plots_2D[name]->Fill(xval,yval);
 				}else{
 					std::string mess = "Plot : "+name+" does not exist as a 2D plot";
+					this->console->error("{}",mess);
 					throw mess;
 				}
 			}
@@ -241,6 +248,7 @@ namespace PLOTS{
 					this->Plots_2D[name]->Fill(xval,yval,weight);
 				}else{
 					std::string mess = "Plot : "+name+" does not exist as a 2D plot";
+					this->console->error("{}",mess);
 					throw mess;
 				}
 			}
@@ -251,6 +259,7 @@ namespace PLOTS{
 					this->Plots_2D[name]->FillN(n,xval,yval,weight,stride);
 				}else{
 					std::string mess = "Plot : "+name+" does not exist as a 2D plot";
+					this->console->error("{}",mess);
 					throw mess;
 				}
 			}
@@ -266,6 +275,7 @@ namespace PLOTS{
 					}
 				}else{
 					std::string mess = "Plot : "+name+" does not exist as a 2D plot";
+					this->console->error("{}",mess);
 					throw mess;
 				}
 			}
@@ -340,6 +350,7 @@ namespace PLOTS{
 					this->Plots_2D[name]->Write(0,2,0);
 				}else{
 					std::string mess = "Unable to write plot "+name+" as it doesn't exist";
+					this->console->error("{}",mess);
 					throw mess;
 				}
 			}
