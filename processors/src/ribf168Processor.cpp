@@ -95,13 +95,13 @@ ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf
 	if( this->HasRIKENIonChamber and this->HasRIKENPid ){
 		double tof = this->CurrPid.F7LogicTimeStamp - this->CurrIonChamber.FirstTimeStamp;
 		hismanager->Fill("RIBF168_1003",tof);
-		hismanager->Fill("RIBF168_2003",tof,this->CurrIonChamber.MaxAnodeEnergy);
+		hismanager->Fill("RIBF168_2003",tof,this->CurrIonChamber.AverageEnergy);
 	}
 
 	if( this->HasRIKENIonChamber and this->HasVeto and this->HasRIKENPid ){
 		double tof = this->CurrPid.F7LogicTimeStamp - this->CurrVeto.MaxFrontTimeStamp;
 		hismanager->Fill("RIBF168_1004",tof);
-		hismanager->Fill("RIBF168_2004",tof,this->CurrIonChamber.MaxAnodeEnergy);
+		hismanager->Fill("RIBF168_2004",tof,this->CurrIonChamber.AverageEnergy);
 	}
 
 	Processor::EndProcess();
