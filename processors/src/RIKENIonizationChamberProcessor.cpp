@@ -3,11 +3,14 @@
 #include "EventSummary.hpp"
 #include "HistogramManager.hpp"
 #include <TTree.h>
+#include <algorithm>
 #include <stdexcept>
 #include <string>
 #include <vector>
 
 RIKENIonizationChamberProcessor::RIKENIonizationChamberProcessor(const std::string& log) : Processor(log,"RIKENIonizationChamberProcessor",{"ionchamber"}){
+	this->FoundFirstEvt = false;
+	this->FirstEvtTime = 0.0;
 }
 
 [[maybe_unused]] bool RIKENIonizationChamberProcessor::PreProcess(EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
@@ -35,11 +38,9 @@ RIKENIonizationChamberProcessor::RIKENIonizationChamberProcessor(const std::stri
 		}
 		this->CurrEvt.RealEvent = true;
 
-		if( not this->firstevt ){
-			this->firstevt = true;
-			this->CurrEvt.FirstTimeStamp = evt->GetTimeStamp();
-		}else{
-			this->CurrEvt.FinalTimeStamp = evt->GetTimeStamp();
+		if( not this->FoundFirstEvt ){
+			this->FoundFirstEvt = true;
+			this->FirstEvtTime = evt->GetTimeStamp();
 		}
 
 		if( detloc > this->NumAnode ){
@@ -49,6 +50,7 @@ RIKENIonizationChamberProcessor::RIKENIonizationChamberProcessor(const std::stri
 				++this->AnodeHits[detloc];
 				this->CurrEvt.AnodeEnergy[detloc] += evt->GetEnergy();
 				this->CurrEvt.AnodeTimeStamp[detloc] = evt->GetTimeStamp();
+				this->TimeStamps.push_back(evt->GetTimeStamp());
 			}else{
 				++this->AnodeHits[detloc];
 			}
@@ -57,6 +59,8 @@ RIKENIonizationChamberProcessor::RIKENIonizationChamberProcessor(const std::stri
 	}
 
 	if( (not this->CurrEvt.Saturate) and (not this->CurrEvt.Pileup) ){
+		this->CurrEvt.FirstTimeStamp = *(std::min_element(this->TimeStamps.begin(),this->TimeStamps.end()));
+		this->CurrEvt.FinalTimeStamp = *(std::max_element(this->TimeStamps.begin(),this->TimeStamps.end()));
 		double sum = 0.0;
 		for( const auto& e : this->CurrEvt.AnodeEnergy ){
 			sum += e;
@@ -82,6 +86,22 @@ RIKENIonizationChamberProcessor::RIKENIonizationChamberProcessor(const std::stri
 		hismanager->Fill("IONCHAMBER_7020",this->CurrEvt.TotalAnodeEnergy,this->CurrEvt.MaxPSD);
 		hismanager->Fill("IONCHAMBER_7030",this->CurrEvt.MaxAnodeEnergy,this->CurrEvt.FirstPSD);
 		hismanager->Fill("IONCHAMBER_7040",this->CurrEvt.MaxAnodeEnergy,this->CurrEvt.MaxPSD);
+
+		hismanager->Fill("IONCHAMBER_8000",this->CurrEvt.MaxAnodeEnergy);
+		hismanager->Fill("IONCHAMBER_8010",this->CurrEvt.TotalAnodeEnergy);
+
+		double time_s = (this->CurrEvt.FirstTimeStamp - this->FirstEvtTime)*1.0e-9;
+		double time_m = time_s/60.0;
+		double time_h = time_m/60.0;
+		
+		hismanager->Fill("IONCHAMBER_8000_TIME_S",this->CurrEvt.MaxAnodeEnergy,time_s);
+		hismanager->Fill("IONCHAMBER_8010_TIME_S",this->CurrEvt.TotalAnodeEnergy,time_s);
+		
+		hismanager->Fill("IONCHAMBER_8000_TIME_M",this->CurrEvt.MaxAnodeEnergy,time_m);
+		hismanager->Fill("IONCHAMBER_8010_TIME_M",this->CurrEvt.TotalAnodeEnergy,time_m);
+
+		hismanager->Fill("IONCHAMBER_8000_TIME_H",this->CurrEvt.MaxAnodeEnergy,time_h);
+		hismanager->Fill("IONCHAMBER_8010_TIME_H",this->CurrEvt.TotalAnodeEnergy,time_h);
 	}
 
 	Processor::EndProcess();
@@ -127,6 +147,18 @@ void RIKENIonizationChamberProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanag
 	hismanager->RegisterPlot<TH2F>("IONCHAMBER_7040","Max PSD (A/C) vs Max Anode",8192,0,8192,1024,0,1.0);
 	hismanager->RegisterPlot<TH2F>("IONCHAMBER_7050","Anode vs Anode; Energy (arb.); Energy (arb.)",8192,0,8192,8192,0,8192);
 
+	hismanager->RegisterPlot<TH1F>("IONCHAMBER_8000","Max Anode Energy; Energy (arb.)",65536,0,65536);
+	hismanager->RegisterPlot<TH1F>("IONCHAMBER_8010","Total Anode Energy; Energy (arb.)",65536,0,65536);
+
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8000_TIME_S","Max Anode Energy; Energy (arb.); Time since first evt (s)",16384,0,65536,1024,0,1024);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8010_TIME_S","Total Anode Energy; Energy (arb.); Time since first evt (s)",16384,0,65536,1024,0,1024);
+
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8000_TIME_M","Max Anode Energy; Energy (arb.); Time since first evt (min)",16384,0,65536,1024,0,1024);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8010_TIME_M","Total Anode Energy; Energy (arb.); Time since first evt (min)",16384,0,65536,1024,0,1024);
+
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8000_TIME_H","Max Anode Energy; Energy (arb.); Time since first evt (hr)",16384,0,65536,1024,0,1024);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8010_TIME_H","Total Anode Energy; Energy (arb.); Time since first evt (hr)",16384,0,65536,1024,0,1024);
+
 	this->console->info("Finished Declaring Plots");
 }
 
@@ -140,7 +172,7 @@ void RIKENIonizationChamberProcessor::Reset(){
 	this->PrevEvt = this->CurrEvt;
 	this->CurrEvt = this->NewEvt;
 	this->AnodeHits = std::vector<int>(this->NumAnode,0);
-	this->firstevt = false;
+	this->TimeStamps = std::vector<double>();
 }
 
 void RIKENIonizationChamberProcessor::InitHelpers(){
