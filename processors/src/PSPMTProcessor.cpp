@@ -230,8 +230,8 @@ void PSPMTProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 	hismanager->RegisterPlot<TH2F>("PSPMT_2201","Inividual Low Gain Anode; Energy (arb.); Position (arb.)",16384,0,65536,4,0,4);
 	hismanager->RegisterPlot<TH2F>("PSPMT_2202","Inividual High Gain Anode; Energy (arb.); Position (arb.)",16384,0,65536,4,0,4);
 	
-	hismanager->RegisterPlot<TH2F>("PSPMT_2301","Low Gain Anodesum vs Low Gain Dynode; Energy (arb.)",8192,0,4*65536,8192,0,65536);
-	hismanager->RegisterPlot<TH2F>("PSPMT_2302","High Gain Anodesum vs High Gain Dynode; Energy (arb.)",8192,0,4*65536,8192,0,65536);
+	hismanager->RegisterPlot<TH2F>("PSPMT_2301","Low Gain Anodesum vs Low Gain Dynode; Energy (arb.)",8192,0,65536,8192,0,4*65536);
+	hismanager->RegisterPlot<TH2F>("PSPMT_2302","High Gain Anodesum vs High Gain Dynode; Energy (arb.)",8192,0,65536,8192,0,4*65536);
 	this->console->info("Finished Declaring Plots");
 }
 
