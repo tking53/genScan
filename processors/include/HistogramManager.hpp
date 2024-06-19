@@ -174,7 +174,7 @@ namespace PLOTS{
 			
 			template<typename T>
 			void RegisterPlot(std::string name,std::string title,const HisHelper2D& h){
-					this->RegisterPlot<T>(name,title,h.nbinsx,h.xlow,h.xhigh,h.nbinsy,h.ylow,h.yhigh);
+				this->RegisterPlot<T>(name,title,h.nbinsx,h.xlow,h.xhigh,h.nbinsy,h.ylow,h.yhigh);
 			}
 
 			template<typename T>
