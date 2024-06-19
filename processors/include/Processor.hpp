@@ -107,8 +107,8 @@ class Processor : public std::enable_shared_from_this<Processor> {
 
 		TTree* OutputTree;
 
-		std::map<int,PLOTS::HisHelper1D> h1dsettings;;
-		std::map<int,PLOTS::HisHelper2D> h2dsettings;;
+		std::map<int,PLOTS::HisHelper1D> h1dsettings;
+		std::map<int,PLOTS::HisHelper2D> h2dsettings;
 };
 
 #endif
