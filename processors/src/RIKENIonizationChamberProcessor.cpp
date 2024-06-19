@@ -47,48 +47,48 @@ RIKENIonizationChamberProcessor::RIKENIonizationChamberProcessor(const std::stri
 		if( detloc > this->NumAnode ){
 			throw std::runtime_error("found anode group larger than known number of anodes");
 		}else{
-			if( not this->AnodeHits[detloc] ){
-				++this->AnodeHits[detloc];
-				this->CurrEvt.AnodeEnergy[detloc] += evt->GetEnergy();
-				this->CurrEvt.AnodeTimeStamp[detloc] = evt->GetTimeStamp();
-				this->TimeStamps.push_back(evt->GetTimeStamp());
-			}else{
-				++this->AnodeHits[detloc];
+			if( evt->GetEnergy() > this->IC[detloc].first ){
+				this->IC[detloc].first = evt->GetEnergy();
+				this->IC[detloc].second = evt->GetTimeStamp();
 			}
 		}
 
 	}
 
 	if( (not this->CurrEvt.Saturate) and (not this->CurrEvt.Pileup) ){
+		int idx = 0;
+		double sum = 0.0;
+		double curranodenum = 0.0;
+		for( const auto& ic : this->IC ){
+			if( ic.first > 0.0 ){
+				this->TimeStamps.push_back(ic.second);
+				this->CurrEvt.AnodeEnergy[idx] = std::log10(ic.first);
+				this->CurrEvt.AverageEnergy += this->CurrEvt.AnodeEnergy[idx];
+				curranodenum += 1.0;
+			}
+			if( ic.first > this->CurrEvt.MaxAnodeEnergy ){
+				this->CurrEvt.MaxAnodeEnergy = std::log10(ic.first);
+			}
+			hismanager->Fill("IONCHAMBER_7000",this->CurrEvt.AnodeEnergy[idx],idx);
+			sum += this->CurrEvt.AnodeEnergy[idx];
+			++idx;
+		}
+		this->CurrEvt.AverageEnergy/=curranodenum;
+		this->CurrEvt.AverageEnergy = std::pow(10,this->CurrEvt.AverageEnergy);
+		this->CurrEvt.TotalAnodeEnergy = std::pow(10,sum);
+
 		this->CurrEvt.FirstTimeStamp = *(std::min_element(this->TimeStamps.begin(),this->TimeStamps.end()));
 		this->CurrEvt.FinalTimeStamp = *(std::max_element(this->TimeStamps.begin(),this->TimeStamps.end()));
-		double sum = 0.0;
-		for( const auto& e : this->CurrEvt.AnodeEnergy ){
-			sum += e;
-			if( e > this->CurrEvt.MaxAnodeEnergy ){
-				this->CurrEvt.MaxAnodeEnergy = e;
-			}
-		}
-		this->CurrEvt.TotalAnodeEnergy = sum;
 
 		this->CurrEvt.FirstPSD = this->CurrEvt.AnodeEnergy[0]/this->CurrEvt.TotalAnodeEnergy;
 		this->CurrEvt.MaxPSD = this->CurrEvt.MaxAnodeEnergy/this->CurrEvt.TotalAnodeEnergy;
 
-		double curranodenum = 0.0;
 		for( int ii = 0; ii < this->NumAnode; ++ii ){
-			if( this->CurrEvt.AnodeEnergy[ii] > 0.0 ){
-				this->CurrEvt.AverageEnergy += this->CurrEvt.AnodeEnergy[ii];
-				curranodenum += 1.0;
-			}
-			hismanager->Fill("IONCHAMBER_7000",this->CurrEvt.AnodeEnergy[ii],ii);
 			for( int jj = 0; jj < this->NumAnode; ++jj ){
 				if( ii != jj ){
 					hismanager->Fill("IONCHAMBER_7050",this->CurrEvt.AnodeEnergy[ii],this->CurrEvt.AnodeEnergy[jj]);
 				}
 			}
-		}
-		if( curranodenum > 0.0 ){
-			this->CurrEvt.AverageEnergy/=curranodenum;
 		}
 
 		hismanager->Fill("IONCHAMBER_7010",this->CurrEvt.TotalAnodeEnergy,this->CurrEvt.FirstPSD);
@@ -188,7 +188,13 @@ void RIKENIonizationChamberProcessor::CleanupTree(){
 void RIKENIonizationChamberProcessor::Reset(){
 	this->PrevEvt = this->CurrEvt;
 	this->CurrEvt = this->NewEvt;
-	this->AnodeHits = std::vector<int>(this->NumAnode,0);
+	this->IC = { {0.0,0.0}
+		    ,{0.0,0.0}
+		    ,{0.0,0.0}
+		    ,{0.0,0.0}
+		    ,{0.0,0.0}
+		    ,{0.0,0.0}
+	};
 	this->TimeStamps = std::vector<double>();
 }
 

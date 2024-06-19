@@ -50,12 +50,12 @@ class RIKENIonizationChamberProcessor : public Processor{
 		EventInfo CurrEvt;
 		EventInfo PrevEvt;
 
-		std::vector<int> AnodeHits;
-		std::vector<double> TimeStamps;
-
 		bool FoundFirstEvt;
 		double FirstEvtTime;
 
+		std::vector<std::pair<double,double>> IC;
+		std::vector<double> TimeStamps;
+		
 		int NumAnode;
 };
 
