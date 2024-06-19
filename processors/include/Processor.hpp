@@ -69,7 +69,10 @@ class Processor : public std::enable_shared_from_this<Processor> {
 		[[nodiscard]] virtual const std::unordered_map<std::string,boost::regex>& GetAllDefaultRegex() const;
 		
 		[[nodiscard]] virtual std::set<std::string> GetKnownTypes() const;
+
 	protected:
+		virtual void LoadHistogramSettings(const pugi::xml_node&) final;
+
 		enum STEP{
 			PREPROCESS,
 			PROCESS,
@@ -103,6 +106,9 @@ class Processor : public std::enable_shared_from_this<Processor> {
 		std::vector<PhysicsData*> SummaryData;
 
 		TTree* OutputTree;
+
+		std::map<int,PLOTS::HisHelper1D> h1dsettings;;
+		std::map<int,PLOTS::HisHelper2D> h2dsettings;;
 };
 
 #endif

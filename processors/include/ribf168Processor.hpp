@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <string>
+#include <map>
 
 #include "EventSummary.hpp"
 #include "HistogramManager.hpp"
@@ -47,7 +48,6 @@ class ribf168Processor : public Processor{
 		std::unique_ptr<RIKENPidProcessor> RIKENPidProc;
 		std::unique_ptr<PSPMTProcessor> PSPMTProc;
 		std::unique_ptr<VetoProcessor> VetoProc;
-		
 };
 
 #endif

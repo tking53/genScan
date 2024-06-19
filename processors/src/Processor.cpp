@@ -13,6 +13,7 @@
 #include <spdlog/fmt/ostr.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#include <string>
 
 Processor::Processor(const std::string& log,const std::string& proc,const std::initializer_list<std::string>& types){
 	this->LogName = log;
@@ -188,4 +189,27 @@ void Processor::EndProcess(){
 }
 
 void Processor::CleanupTree(){
+}
+
+void Processor::LoadHistogramSettings(const pugi::xml_node& config){
+	for( pugi::xml_node histogram = config.child("Histogram"); histogram; histogram = histogram.next_sibling("Histogram") ){
+		int id = histogram.attribute("id").as_int(0);
+		auto currh1d = this->h1dsettings.find(id);
+		auto currh2d = this->h2dsettings.find(id);
+		if( currh1d != this->h1dsettings.end()){
+			this->h1dsettings[id].nbinsx = histogram.attribute("nbinsx").as_int(currh1d->second.nbinsx);
+			this->h1dsettings[id].xlow = histogram.attribute("xlow").as_double(currh1d->second.xlow);
+			this->h1dsettings[id].xhigh = histogram.attribute("xhigh").as_double(currh1d->second.xhigh);
+		}else if( currh2d != this->h2dsettings.end() ){
+			this->h2dsettings[id].nbinsx = histogram.attribute("nbinsx").as_int(currh2d->second.nbinsx);
+			this->h2dsettings[id].xlow = histogram.attribute("xlow").as_double(currh2d->second.xlow);
+			this->h2dsettings[id].xhigh = histogram.attribute("xhigh").as_double(currh2d->second.xhigh);
+			this->h2dsettings[id].nbinsy = histogram.attribute("nbinsy").as_int(currh2d->second.nbinsy);
+			this->h2dsettings[id].ylow = histogram.attribute("ylow").as_double(currh2d->second.ylow);
+			this->h2dsettings[id].yhigh = histogram.attribute("yhigh").as_double(currh2d->second.yhigh);
+		}else{
+			std::string mess = "Unknown histogram id: "+std::to_string(id)+" for "+this->ProcessorName;
+			throw std::runtime_error(mess);
+		}
+	}
 }

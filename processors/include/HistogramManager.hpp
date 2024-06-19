@@ -47,6 +47,21 @@ namespace PLOTS{
 	const int SE = 16384;
 	const int SF = 32768;
 	const int SG = 65536;
+
+	struct HisHelper1D{
+		int nbinsx;
+		double xlow;
+		double xhigh;
+	};
+
+	struct HisHelper2D{
+		int nbinsx;
+		double xlow;
+		double xhigh;
+		int nbinsy;
+		double ylow;
+		double yhigh;
+	};
 	
 	class PlotRegistry{
 		public:
@@ -150,6 +165,16 @@ namespace PLOTS{
 				RegisterPlot<TH2F>("Total_Pileup","Map of Channels that Underwent Pileup; Linearized Mod Num (arb.); Channel Num (arb.)",PLOTS::SA,0,PLOTS::SA,PLOTS::S6,0,PLOTS::S6);
 				RegisterPlot<TH2F>("Total_Saturate","Map of Channels that Saturated; Linearized Mod Num (arb.); Channel Num (arb.)",PLOTS::SA,0,PLOTS::SA,PLOTS::S6,0,PLOTS::S6);
 				RegisterPlot<TH2F>("Total_Hits","Map of Channels that Fired; Linearized Mod Num (arb.); Channel Num (arb.)",PLOTS::SA,0,PLOTS::SA,PLOTS::S6,0,PLOTS::S6);
+			}
+
+			template<typename T>
+			void RegisterPlot(std::string name,std::string title,const HisHelper1D& h){
+				this->RegisterPlot<T>(name,title,h.nbinsx,h.xlow,h.xhigh);
+			}
+			
+			template<typename T>
+			void RegisterPlot(std::string name,std::string title,const HisHelper2D& h){
+					this->RegisterPlot<T>(name,title,h.nbinsx,h.xlow,h.xhigh,h.nbinsy,h.ylow,h.yhigh);
 			}
 
 			template<typename T>
