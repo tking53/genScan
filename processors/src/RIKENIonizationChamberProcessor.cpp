@@ -161,7 +161,7 @@ void RIKENIonizationChamberProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanag
 	hismanager->RegisterPlot<TH2F>("IONCHAMBER_7050","Anode vs Anode; Energy (arb.); Energy (arb.)",8192,0,4,8192,0,4);
 
 	hismanager->RegisterPlot<TH1F>("IONCHAMBER_8000","Max Anode Energy; Energy (arb.)",8192,0,4);
-	hismanager->RegisterPlot<TH1F>("IONCHAMBER_8010","Total Anode Energy; Energy (arb.)",8192,0,4);
+	hismanager->RegisterPlot<TH1F>("IONCHAMBER_8010","Total Anode Energy; Energy (arb.)",8192,0,32);
 	hismanager->RegisterPlot<TH1F>("IONCHAMBER_8020","Average Anode Energy; Energy (arb.)",8192,0,4);
 
 	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8000_TIME_S","Max Anode Energy; Energy (arb.); Time since first evt (s)",8192,0,4,1024,0,1024);
