@@ -154,8 +154,8 @@ void RIKENIonizationChamberProcessor::Finalize(){
 void RIKENIonizationChamberProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 	//First Cathode
 	hismanager->RegisterPlot<TH2F>("IONCHAMBER_7000","Anode Position vs Anode Energy; Energy (arb.); Position (arb.)",8192,0,4,this->NumAnode,0,this->NumAnode);
-	hismanager->RegisterPlot<TH2F>("IONCHAMBER_7010","First PSD (A/C) vs Total Anode",8192,0,4,1024,0,1.0);
-	hismanager->RegisterPlot<TH2F>("IONCHAMBER_7020","Max PSD (A/C) vs Total Anode",8192,0,4,1024,0,1.0);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_7010","First PSD (A/C) vs Total Anode",8192,0,32,1024,0,1.0);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_7020","Max PSD (A/C) vs Total Anode",8192,0,32,1024,0,1.0);
 	hismanager->RegisterPlot<TH2F>("IONCHAMBER_7030","First PSD (A/C) vs Max Anode",8192,0,4,1024,0,1.0);
 	hismanager->RegisterPlot<TH2F>("IONCHAMBER_7040","Max PSD (A/C) vs Max Anode",8192,0,4,1024,0,1.0);
 	hismanager->RegisterPlot<TH2F>("IONCHAMBER_7050","Anode vs Anode; Energy (arb.); Energy (arb.)",8192,0,4,8192,0,4);
@@ -165,15 +165,15 @@ void RIKENIonizationChamberProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanag
 	hismanager->RegisterPlot<TH1F>("IONCHAMBER_8020","Average Anode Energy; Energy (arb.)",8192,0,4);
 
 	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8000_TIME_S","Max Anode Energy; Energy (arb.); Time since first evt (s)",8192,0,4,1024,0,1024);
-	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8010_TIME_S","Total Anode Energy; Energy (arb.); Time since first evt (s)",8192,0,4,1024,0,1024);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8010_TIME_S","Total Anode Energy; Energy (arb.); Time since first evt (s)",8192,0,32,1024,0,1024);
 	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8020_TIME_S","Average Anode Energy; Energy (arb.); Time since first evt (s)",8192,0,4,1024,0,1024);
 
 	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8000_TIME_M","Max Anode Energy; Energy (arb.); Time since first evt (min)",8192,0,4,1024,0,1024);
-	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8010_TIME_M","Total Anode Energy; Energy (arb.); Time since first evt (min)",8192,0,4,1024,0,1024);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8010_TIME_M","Total Anode Energy; Energy (arb.); Time since first evt (min)",8192,0,32,1024,0,1024);
 	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8020_TIME_M","Average Anode Energy; Energy (arb.); Time since first evt (min)",8192,0,4,1024,0,1024);
 
 	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8000_TIME_H","Max Anode Energy; Energy (arb.); Time since first evt (hr)",8192,0,4,1024,0,1024);
-	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8010_TIME_H","Total Anode Energy; Energy (arb.); Time since first evt (hr)",8192,0,4,1024,0,1024);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8010_TIME_H","Total Anode Energy; Energy (arb.); Time since first evt (hr)",8192,0,32,1024,0,1024);
 	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8020_TIME_H","Average Anode Energy; Energy (arb.); Time since first evt (hr)",8192,0,4,1024,0,1024);
 
 	this->console->info("Finished Declaring Plots");
