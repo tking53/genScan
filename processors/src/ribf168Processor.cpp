@@ -215,8 +215,8 @@ void ribf168Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 	hismanager->RegisterPlot<TH1F>("RIBF168_1003","TDiff",1024,-1000,1000);
 	hismanager->RegisterPlot<TH1F>("RIBF168_1004","TDiff",1024,0,2000);
 
-	hismanager->RegisterPlot<TH2F>("RIBF168_2003","Pid",1000,600,750,1000,4000,5400);
-	hismanager->RegisterPlot<TH2F>("RIBF168_2004","Pid",1000,1540,1660,1000,4000,5400);
+	hismanager->RegisterPlot<TH2F>("RIBF168_2003","Pid",1000,-650,-400,1000,4000,5400);
+	hismanager->RegisterPlot<TH2F>("RIBF168_2004","Pid",1000,300,550,1000,4000,5400);
 
 	this->console->info("Finished Declaring Plots");
 }
