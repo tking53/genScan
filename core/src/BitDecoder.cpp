@@ -353,6 +353,7 @@ double XiaDecoder::DecodeCFDParams(const unsigned int* firstFour,const uint64_t&
 		default:
 			throw std::runtime_error("Unknown Frequency of "+std::to_string(this->Freq)+", Known are 100, 250, 500");
 	}
+	//std::cout << this->Freq << '\t' << mult << '\t' << mult2 << std::setprecision(8) << std::fixed << '\t' << cfdtime << '\t' << ts << '\t' << ts*mult + cfdtime << std::endl;
 	if( cfdforced or cfdfraction == 0 ){
 		return ts*mult2;
 	}
