@@ -27,12 +27,16 @@ class VetoProcessor : public Processor{
 		struct EventInfo{
 			std::vector<double> FrontErg;
 			std::vector<double> FrontTimeStamp;
+			std::vector<double> FrontCFDTimeStamp;
 			std::vector<double> RearErg;
 			std::vector<double> RearTimeStamp;
+			std::vector<double> RearCFDTimeStamp;
 			double MaxFrontErg;
 			double MaxFrontTimeStamp;
+			double MaxFrontCFDTimeStamp;
 			double MaxRearErg;
 			double MaxRearTimeStamp;
+			double MaxRearCFDTimeStamp;
 			bool Pileup;
 			bool Saturate;
 			bool RealEvent;
@@ -55,9 +59,8 @@ class VetoProcessor : public Processor{
 		};
 
 		SUBTYPE currsubtype;
-		
-		std::vector<int> FrontHits;
-		std::vector<int> RearHits;
+		std::vector<std::tuple<double,double,double>> HighestFit;
+		std::vector<std::tuple<double,double,double>> HighestRit;
 };
 
 #endif

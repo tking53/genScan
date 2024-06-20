@@ -9,12 +9,16 @@ VetoProcessor::VetoProcessor(const std::string& log) : Processor(log,"VetoProces
 	this->NewEvt = {
 		.FrontErg = std::vector<double>(2,0.0),
 		.FrontTimeStamp = std::vector<double>(2,0.0),
+		.FrontCFDTimeStamp = std::vector<double>(2,0.0),
 		.RearErg = std::vector<double>(2,0.0),
 		.RearTimeStamp = std::vector<double>(2,0.0),
+		.RearCFDTimeStamp = std::vector<double>(2,0.0),
 		.MaxFrontErg = 0.0,
 		.MaxFrontTimeStamp = 0.0,
+		.MaxFrontCFDTimeStamp = 0.0,
 		.MaxRearErg = 0.0,
 		.MaxRearTimeStamp = 0.0,
+		.MaxRearCFDTimeStamp = 0.0,
 		.Pileup = false,
 		.Saturate = false,
 		.RealEvent = false
@@ -55,20 +59,12 @@ VetoProcessor::VetoProcessor(const std::string& log) : Processor(log,"VetoProces
 		}
 
 		if( this->currsubtype == SUBTYPE::FIT ){
-			if( not this->FrontHits[detloc] ){
-				++this->FrontHits[detloc];
-				this->CurrEvt.FrontErg[detloc] += evt->GetEnergy();
-				this->CurrEvt.FrontTimeStamp[detloc] = evt->GetTimeStamp();
-			}else{
-				++this->FrontHits[detloc];
+			if( evt->GetEnergy() > std::get<0>(this->HighestFit[detloc]) ){
+				this->HighestFit[detloc] = std::make_tuple(evt->GetEnergy(),evt->GetTimeStamp(),evt->GetCFDTimeStamp());
 			}
 		}else if( this->currsubtype == SUBTYPE::RIT ){
-			if( not this->RearHits[detloc] ){
-				++this->RearHits[detloc];
-				this->CurrEvt.RearErg[detloc] += evt->GetEnergy();
-				this->CurrEvt.RearTimeStamp[detloc] = evt->GetTimeStamp();
-			}else{
-				++this->RearHits[detloc];
+			if( evt->GetEnergy() > std::get<0>(this->HighestRit[detloc]) ){
+				this->HighestRit[detloc] = std::make_tuple(evt->GetEnergy(),evt->GetTimeStamp(),evt->GetCFDTimeStamp());
 			}
 		}else{
 			//no-op
@@ -77,17 +73,27 @@ VetoProcessor::VetoProcessor(const std::string& log) : Processor(log,"VetoProces
 	
 	if( (not this->CurrEvt.Saturate) and (not this->CurrEvt.Pileup) ){
 		for( size_t ii = 0; ii < 2; ++ii ){
+			this->CurrEvt.FrontErg[ii] = std::get<0>(this->HighestFit[ii]);
+			this->CurrEvt.FrontTimeStamp[ii] = std::get<1>(this->HighestFit[ii]);
+			this->CurrEvt.FrontCFDTimeStamp[ii] = std::get<2>(this->HighestFit[ii]);
+			
+			this->CurrEvt.RearErg[ii] = std::get<0>(this->HighestRit[ii]);
+			this->CurrEvt.RearTimeStamp[ii] = std::get<1>(this->HighestRit[ii]);
+			this->CurrEvt.RearCFDTimeStamp[ii] = std::get<2>(this->HighestRit[ii]);
+
 			hismanager->Fill("VETO_1000",this->CurrEvt.FrontErg[ii],ii);
 			hismanager->Fill("VETO_2000",this->CurrEvt.RearErg[ii],ii);
 
 			if( this->CurrEvt.FrontErg[ii] > this->CurrEvt.MaxFrontErg ){
 				this->CurrEvt.MaxFrontErg = this->CurrEvt.FrontErg[ii];
 				this->CurrEvt.MaxFrontTimeStamp = this->CurrEvt.FrontTimeStamp[ii];
+				this->CurrEvt.MaxFrontCFDTimeStamp = this->CurrEvt.FrontCFDTimeStamp[ii];
 			}
 
 			if( this->CurrEvt.RearErg[ii] > this->CurrEvt.MaxRearErg ){
 				this->CurrEvt.MaxRearErg = this->CurrEvt.RearErg[ii];
 				this->CurrEvt.MaxRearTimeStamp = this->CurrEvt.RearTimeStamp[ii];
+				this->CurrEvt.MaxRearCFDTimeStamp = this->CurrEvt.RearCFDTimeStamp[ii];
 			}
 
 			for( size_t jj = 0; jj < 2; ++jj ){
@@ -145,8 +151,8 @@ void VetoProcessor::CleanupTree(){
 }
 
 void VetoProcessor::Reset(){
-	this->FrontHits = std::vector<int>(2,0);
-	this->RearHits = std::vector<int>(2,0);
+	this->HighestFit = {{0.0,0.0,0.0},{0.0,0.0,0.0}};
+	this->HighestRit = {{0.0,0.0,0.0},{0.0,0.0,0.0}};
 	this->PrevEvt = this->CurrEvt;
 	this->CurrEvt = this->NewEvt;
 }

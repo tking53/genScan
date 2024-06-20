@@ -2,6 +2,7 @@
 #define __RIKEN_IONIZATION_CHAMBER_PROCESSOR_HPP__
 
 #include <string>
+#include <tuple>
 
 #include "EventSummary.hpp"
 #include "HistogramManager.hpp"
@@ -27,6 +28,7 @@ class RIKENIonizationChamberProcessor : public Processor{
 		struct EventInfo{
 			std::vector<double> AnodeEnergy;
 			std::vector<double> AnodeTimeStamp;
+			std::vector<double> AnodeCFDTimeStamp;
 			double TotalAnodeEnergy;
 			double MaxAnodeEnergy;
 			double AverageEnergy;
@@ -34,6 +36,8 @@ class RIKENIonizationChamberProcessor : public Processor{
 			double MaxPSD;
 			double FirstTimeStamp;
 			double FinalTimeStamp;
+			double FirstCFDTimeStamp;
+			double FinalCFDTimeStamp;
 			bool Saturate;
 			bool Pileup;
 			bool RealEvent;
@@ -53,8 +57,9 @@ class RIKENIonizationChamberProcessor : public Processor{
 		bool FoundFirstEvt;
 		double FirstEvtTime;
 
-		std::vector<std::pair<double,double>> IC;
+		std::vector<std::tuple<double,double,double>> IC;
 		std::vector<double> TimeStamps;
+		std::vector<double> CFDTimeStamps;
 		
 		int NumAnode;
 };

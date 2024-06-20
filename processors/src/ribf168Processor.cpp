@@ -37,7 +37,7 @@ ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf
 	{1001 , { 1024, -1024.0, 1023.0}}, 
 	{1002 , { 1024, -1024.0, 1023.0}}, 
 	{1003 , { 1024, -1024.0, 1023.0}}, 
-	{1004 , { 1000, 0.0, 2000.0}}
+	{1004 , { 1000, -1000.0, 1000.0}}
 	};
 	this->h2dsettings = {
 	{1901 , { 1024, 0.0, 1.0, 1024, 0.0, 1.0}},
@@ -112,13 +112,13 @@ ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf
 	}
 
 	if( this->HasRIKENIonChamber and this->HasRIKENPid ){
-		double tof = this->CurrPid.F7AnalogTimeStamp - this->CurrIonChamber.FirstTimeStamp;
+		double tof = this->CurrPid.F7AnalogCFDTimeStamp - this->CurrIonChamber.FirstCFDTimeStamp;
 		hismanager->Fill("RIBF168_1003",tof);
 		hismanager->Fill("RIBF168_2003",tof,this->CurrIonChamber.AverageEnergy);
 	}
 
 	if( this->HasRIKENIonChamber and this->HasVeto and this->HasRIKENPid ){
-		double tof = this->CurrPid.F7AnalogTimeStamp - this->CurrVeto.MaxFrontTimeStamp;
+		double tof = this->CurrVeto.MaxFrontCFDTimeStamp - this->CurrPid.F7AnalogCFDTimeStamp ;
 		hismanager->Fill("RIBF168_1004",tof);
 		hismanager->Fill("RIBF168_2004",tof,this->CurrIonChamber.AverageEnergy);
 	}

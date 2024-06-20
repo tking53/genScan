@@ -47,9 +47,12 @@ RIKENIonizationChamberProcessor::RIKENIonizationChamberProcessor(const std::stri
 		if( detloc > this->NumAnode ){
 			throw std::runtime_error("found anode group larger than known number of anodes");
 		}else{
-			if( evt->GetEnergy() > this->IC[detloc].first ){
-				this->IC[detloc].first = evt->GetEnergy();
-				this->IC[detloc].second = evt->GetTimeStamp();
+			if( evt->GetEnergy() > std::get<0>(this->IC[detloc]) ){
+				this->IC[detloc] = std::make_tuple(evt->GetEnergy(),evt->GetTimeStamp(),evt->GetCFDTimeStamp());
+				//std::get<0>(this->IC[detloc]) = evt->GetEnergy();
+				//std::get<1>(this->IC[detloc]) = evt->GetTimeStamp();
+				//std::get<2>(this->IC[detloc]) = evt->GetCFDTimeStamp();
+				//this->console->info("{} {}",evt->GetTimeStamp(),evt->GetCFDTimeStamp());
 			}
 		}
 
@@ -59,15 +62,17 @@ RIKENIonizationChamberProcessor::RIKENIonizationChamberProcessor(const std::stri
 		int idx = 0;
 		double curranodenum = 0.0;
 		for( const auto& ic : this->IC ){
-			if( ic.first > 0.0 ){
-				this->TimeStamps.push_back(ic.second);
-				this->CurrEvt.AnodeEnergy[idx] = std::log10(ic.first);
+			auto erg = std::get<0>(ic);
+			if( erg > 0.0 ){
+				this->TimeStamps.push_back(std::get<1>(ic));
+				this->CFDTimeStamps.push_back(std::get<2>(ic));
+				this->CurrEvt.AnodeEnergy[idx] = std::log10(erg);
 				this->CurrEvt.AverageEnergy += this->CurrEvt.AnodeEnergy[idx];
 				this->CurrEvt.TotalAnodeEnergy += this->CurrEvt.AnodeEnergy[idx];
 				curranodenum += 1.0;
 			}
-			if( ic.first > this->CurrEvt.MaxAnodeEnergy ){
-				this->CurrEvt.MaxAnodeEnergy = std::log10(ic.first);
+			if( erg > this->CurrEvt.MaxAnodeEnergy ){
+				this->CurrEvt.MaxAnodeEnergy = std::log10(erg);
 			}
 			hismanager->Fill("IONCHAMBER_7000",this->CurrEvt.AnodeEnergy[idx],idx);
 			++idx;
@@ -77,6 +82,9 @@ RIKENIonizationChamberProcessor::RIKENIonizationChamberProcessor(const std::stri
 
 		this->CurrEvt.FirstTimeStamp = *(std::min_element(this->TimeStamps.begin(),this->TimeStamps.end()));
 		this->CurrEvt.FinalTimeStamp = *(std::max_element(this->TimeStamps.begin(),this->TimeStamps.end()));
+		
+		this->CurrEvt.FirstCFDTimeStamp = *(std::min_element(this->CFDTimeStamps.begin(),this->CFDTimeStamps.end()));
+		this->CurrEvt.FinalCFDTimeStamp = *(std::max_element(this->CFDTimeStamps.begin(),this->CFDTimeStamps.end()));
 
 		this->CurrEvt.FirstPSD = this->CurrEvt.AnodeEnergy[0]/this->CurrEvt.TotalAnodeEnergy;
 		this->CurrEvt.MaxPSD = this->CurrEvt.MaxAnodeEnergy/this->CurrEvt.TotalAnodeEnergy;
@@ -186,20 +194,22 @@ void RIKENIonizationChamberProcessor::CleanupTree(){
 void RIKENIonizationChamberProcessor::Reset(){
 	this->PrevEvt = this->CurrEvt;
 	this->CurrEvt = this->NewEvt;
-	this->IC = { {0.0,0.0}
-		    ,{0.0,0.0}
-		    ,{0.0,0.0}
-		    ,{0.0,0.0}
-		    ,{0.0,0.0}
-		    ,{0.0,0.0}
+	this->IC = { {0.0,0.0,0.0}
+		    ,{0.0,0.0,0.0}
+		    ,{0.0,0.0,0.0}
+		    ,{0.0,0.0,0.0}
+		    ,{0.0,0.0,0.0}
+		    ,{0.0,0.0,0.0}
 	};
 	this->TimeStamps = std::vector<double>();
+	this->CFDTimeStamps = std::vector<double>();
 }
 
 void RIKENIonizationChamberProcessor::InitHelpers(){
 	this->NewEvt = {
 		.AnodeEnergy = std::vector<double>(this->NumAnode,0.0),
 		.AnodeTimeStamp = std::vector<double>(this->NumAnode,0.0),
+		.AnodeCFDTimeStamp = std::vector<double>(this->NumAnode,0.0),
 		.TotalAnodeEnergy = 0.0,
 		.MaxAnodeEnergy = 0.0,
 		.AverageEnergy = 0.0,
@@ -207,6 +217,8 @@ void RIKENIonizationChamberProcessor::InitHelpers(){
 		.MaxPSD = 0.0,
 		.FirstTimeStamp = 0.0,
 		.FinalTimeStamp = 0.0,
+		.FirstCFDTimeStamp = 0.0,
+		.FinalCFDTimeStamp = 0.0,
 		.Saturate = false,
 		.Pileup = false,
 		.RealEvent = false
