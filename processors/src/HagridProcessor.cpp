@@ -196,8 +196,8 @@ void HagridProcessor::CleanupTree(){
 void HagridProcessor::Reset(){
 	this->PrevEvt = this->CurrEvt;
 	this->CurrEvt = this->NewEvt;
-	this->Hits = std::vector<int>(this->NumHagrid,0);
-	this->TimeStamps = std::vector<double>();
+	this->Hits = ZeroHits;
+	this->TimeStamps.clear();
 }
 
 void HagridProcessor::InitHelpers(){
@@ -213,6 +213,8 @@ void HagridProcessor::InitHelpers(){
 		.Pileup = false,
 		.RealEvent = false
 	};
+	this->ZeroHits = std::vector<int>(this->NumHagrid,0);
+	this->TimeStamps = std::vector<double>();
 	this->Reset();
 }
 

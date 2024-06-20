@@ -52,6 +52,7 @@ class HagridProcessor : public Processor{
 		EventInfo PrevEvt;
 
 		std::vector<int> Hits;
+		std::vector<int> ZeroHits;
 		std::vector<double> TimeStamps;
 		unsigned int NumHagrid;
 

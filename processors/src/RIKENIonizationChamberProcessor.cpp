@@ -201,8 +201,8 @@ void RIKENIonizationChamberProcessor::Reset(){
 		    ,{0.0,0.0,0.0}
 		    ,{0.0,0.0,0.0}
 	};
-	this->TimeStamps = std::vector<double>();
-	this->CFDTimeStamps = std::vector<double>();
+	this->TimeStamps.clear();
+	this->CFDTimeStamps.clear();
 }
 
 void RIKENIonizationChamberProcessor::InitHelpers(){
@@ -223,7 +223,18 @@ void RIKENIonizationChamberProcessor::InitHelpers(){
 		.Pileup = false,
 		.RealEvent = false
 	};
-	this->Reset();
+
+	this->PrevEvt = this->CurrEvt;
+	this->CurrEvt = this->NewEvt;
+	this->IC = { {0.0,0.0,0.0}
+		    ,{0.0,0.0,0.0}
+		    ,{0.0,0.0,0.0}
+		    ,{0.0,0.0,0.0}
+		    ,{0.0,0.0,0.0}
+		    ,{0.0,0.0,0.0}
+	};
+	this->TimeStamps = std::vector<double>();
+	this->CFDTimeStamps = std::vector<double>();
 }
 
 RIKENIonizationChamberProcessor::EventInfo& RIKENIonizationChamberProcessor::GetCurrEvt(){

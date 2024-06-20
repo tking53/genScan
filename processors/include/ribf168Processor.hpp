@@ -13,6 +13,7 @@
 #include "PSPMTProcessor.hpp"
 #include "Processor.hpp"
 #include "VetoProcessor.hpp"
+#include "boost/container/devector.hpp"
 
 class ribf168Processor : public Processor{
 	public:
@@ -30,6 +31,19 @@ class ribf168Processor : public Processor{
 		void DeclarePlots(PLOTS::PlotRegistry*) const;
 		virtual void RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>&) final;
 		virtual void CleanupTree() final;
+
+		struct PID{
+			double Z;
+			double AoQ;
+			double TimeStamp;
+		};
+
+		//struct Implant{
+		//	double TimeStamp;
+		//	PSPMTProcessor::EventInfo PSPMT;
+		//	HagridProcessor::EventInfo Hagrid;
+		//};
+
 	private:
 		bool HasHagrid;
 		bool HasRIKENIonChamber;
@@ -37,11 +51,17 @@ class ribf168Processor : public Processor{
 		bool HasPSPMT;
 		bool HasVeto;
 
+		double PreImplantTimeNs;
+		double PostImplantTimeNs;
+		double TotalImplantTimeNs;
+
 		RIKENIonizationChamberProcessor::EventInfo CurrIonChamber;
 		PSPMTProcessor::EventInfo CurrPSPMT;
 		HagridProcessor::EventInfo CurrHagrid;
 		RIKENPidProcessor::EventInfo CurrPid;
 		VetoProcessor::EventInfo CurrVeto;
+
+		boost::container::devector<PID> Ions;
 
 		std::unique_ptr<HagridProcessor> HagridProc;
 		std::unique_ptr<RIKENIonizationChamberProcessor> RIKENIonizationChamberProc;

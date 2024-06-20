@@ -121,6 +121,8 @@ ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf
 		double tof = this->CurrVeto.MaxFrontCFDTimeStamp - this->CurrPid.F7AnalogCFDTimeStamp ;
 		hismanager->Fill("RIBF168_1004",tof);
 		hismanager->Fill("RIBF168_2004",tof,this->CurrIonChamber.AverageEnergy);
+		
+		this->Ions.push_back({this->CurrIonChamber.AverageEnergy,tof,this->CurrVeto.MaxFrontTimeStamp});
 	}
 
 	Processor::EndProcess();
@@ -174,6 +176,26 @@ ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf
 		this->VetoProc->PostProcess(summary,hismanager,cutmanager);
 	}
 
+	if( this->Ions.size() > 1 ){
+		//if(std::abs(this->Ions.front().TimeStamp - this->Ions.back().TimeStamp) > this->TotalImplantTimeNs ){
+		//	this->console->info("begin dump {}:{}",this->TotalImplantTimeNs,std::abs(this->Ions.front().TimeStamp - this->Ions.back().TimeStamp));
+		//	for( const auto& ion : this->Ions){
+		//		this->console->info("{}",ion.TimeStamp);
+		//	}
+		//	this->console->info("end dump");
+		//}
+		while( true ){
+			if(std::abs(this->Ions.front().TimeStamp - this->Ions.back().TimeStamp) > this->TotalImplantTimeNs ){
+				this->Ions.pop_front();
+				if( this->Ions.size() < 2 ){
+					break;
+				}
+			}else{
+				break;
+			}
+		}
+	}
+
 	return true;
 }
 
@@ -215,6 +237,46 @@ void ribf168Processor::Init(const pugi::xml_node& config){
 			throw std::runtime_error("unknown subprocessor declared in ribf168Processor");
 		}
 	}
+
+	double pretime = config.attribute("PreTime").as_double(1.0e5);
+	std::string pretimeunit = config.attribute("PreTimeUnit").as_string("x");
+	if( pretimeunit.compare("ns") == 0 ){
+		this->PreImplantTimeNs = pretime;	
+	}else if( pretimeunit.compare("us") == 0 ){
+		this->PreImplantTimeNs = pretime*1.0e3;	
+	}else if( pretimeunit.compare("ms") == 0 ){
+		this->PreImplantTimeNs = pretime*1.0e6;	
+	}else if( pretimeunit.compare("s") == 0 ){
+		this->PreImplantTimeNs = pretime*1.0e9;	
+	}else if( pretimeunit.compare("min") == 0 ){
+		this->PreImplantTimeNs = pretime*1.0e9*60;	
+	}else if( pretimeunit.compare("hr") == 0 ){
+		this->PreImplantTimeNs = pretime*1.0e9*60*60;	
+	}else{
+		this->console->error("invalid PreTimeUnit {}, expect ns, us, ms, s, min, hr",pretimeunit);
+		throw std::runtime_error("invalid PreTimeUnit");
+	}
+
+	double posttime = config.attribute("PostTime").as_double(1.0e5);
+	std::string posttimeunit = config.attribute("PostTimeUnit").as_string("x");
+	if( posttimeunit.compare("ns") == 0 ){
+		this->PostImplantTimeNs = posttime;	
+	}else if( posttimeunit.compare("us") == 0 ){
+		this->PostImplantTimeNs = posttime*1.0e3;	
+	}else if( posttimeunit.compare("ms") == 0 ){
+		this->PostImplantTimeNs = posttime*1.0e6;	
+	}else if( posttimeunit.compare("s") == 0 ){
+		this->PostImplantTimeNs = posttime*1.0e9;	
+	}else if( posttimeunit.compare("min") == 0 ){
+		this->PostImplantTimeNs = posttime*1.0e9*60;	
+	}else if( posttimeunit.compare("hr") == 0 ){
+		this->PostImplantTimeNs = posttime*1.0e9*60*60;	
+	}else{
+		this->console->error("invalid PostTimeUnit {}, expect ns, us, ms, s, min, hr",posttimeunit);
+		throw std::runtime_error("invalid PostTimeUnit");
+	}
+
+	this->TotalImplantTimeNs = this->PreImplantTimeNs + this->PostImplantTimeNs;
 
 	if( not this->HasHagrid ){
 		throw std::runtime_error("missing HagridProcessor in ribf168Processor");
