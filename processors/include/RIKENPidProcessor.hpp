@@ -27,11 +27,15 @@ class RIKENPidProcessor : public Processor{
 		struct EventInfo{
 			double F7Analog;
 			double F7AnalogTimeStamp;
+			double F7AnalogCFDTimeStamp;
 			double F7Logic;
 			double F7LogicTimeStamp;
+			double F7LogicCFDTimeStamp;
 			std::vector<double> F11LeftRight;
 			std::vector<double> F11LeftRightTimeStamp;
+			std::vector<double> F11LeftRightCFDTimeStamp;
 			std::vector<double> tdiff;
+			std::vector<double> CFDtdiff;
 			bool Pileup;
 			bool Saturate;
 			bool RealEvent;

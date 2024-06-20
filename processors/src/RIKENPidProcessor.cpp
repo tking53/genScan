@@ -10,11 +10,15 @@ RIKENPidProcessor::RIKENPidProcessor(const std::string& log) : Processor(log,"RI
 	this->NewEvt = {
 		.F7Analog = 0.0,
 		.F7AnalogTimeStamp = 0.0,
+		.F7AnalogCFDTimeStamp = 0.0,
 		.F7Logic = 0.0,
 		.F7LogicTimeStamp = 0.0,
+		.F7LogicCFDTimeStamp = 0.0,
 		.F11LeftRight = std::vector<double>(2,0.0),
 		.F11LeftRightTimeStamp = std::vector<double>(2,0.0),
+		.F11LeftRightCFDTimeStamp = std::vector<double>(2,0.0),
 		.tdiff = std::vector<double>(4,0.0),
+		.CFDtdiff = std::vector<double>(4,0.0),
 		.Pileup = false,
 		.Saturate = false,
 		.RealEvent = false
@@ -60,11 +64,13 @@ RIKENPidProcessor::RIKENPidProcessor(const std::string& log) : Processor(log,"RI
 				if( evt->GetEnergy() > this->CurrEvt.F7Analog ){
 					this->CurrEvt.F7Analog = evt->GetEnergy();
 					this->CurrEvt.F7AnalogTimeStamp = evt->GetTimeStamp();
+					this->CurrEvt.F7AnalogCFDTimeStamp = evt->GetCFDTimeStamp();
 				}
 			}else if( evt->HasTag(this->logictag) ){
 				if( evt->GetEnergy() > this->CurrEvt.F7Logic ){
 					this->CurrEvt.F7Logic = evt->GetEnergy();
 					this->CurrEvt.F7LogicTimeStamp = evt->GetTimeStamp();
+					this->CurrEvt.F7LogicCFDTimeStamp = evt->GetCFDTimeStamp();
 				}
 			}else{
 				throw std::runtime_error("malformed xml tag for pid:f7 requires either analog or logic tag");
@@ -74,11 +80,13 @@ RIKENPidProcessor::RIKENPidProcessor(const std::string& log) : Processor(log,"RI
 				if( evt->GetEnergy() > this->CurrEvt.F11LeftRight[0] ){
 					this->CurrEvt.F11LeftRight[0] = evt->GetEnergy();
 					this->CurrEvt.F11LeftRightTimeStamp[0] = evt->GetTimeStamp();
+					this->CurrEvt.F11LeftRightCFDTimeStamp[0] = evt->GetCFDTimeStamp();
 				}
 			}else if( evt->HasTag(righttag) ){
 				if( evt->GetEnergy() > this->CurrEvt.F11LeftRight[1] ){
 					this->CurrEvt.F11LeftRight[1] = evt->GetEnergy();
 					this->CurrEvt.F11LeftRightTimeStamp[1] = evt->GetTimeStamp();
+					this->CurrEvt.F11LeftRightCFDTimeStamp[1] = evt->GetCFDTimeStamp();
 				}
 			}else{
 				throw std::runtime_error("malformed xml tag for pid:f11 requires either left or right tag");
@@ -93,26 +101,38 @@ RIKENPidProcessor::RIKENPidProcessor(const std::string& log) : Processor(log,"RI
 		if( this->CurrEvt.F11LeftRight[0] > 0.0 and this->CurrEvt.F7Analog > 0.0 ){
 			this->CurrEvt.tdiff[0] = this->CurrEvt.F11LeftRightTimeStamp[0] - this->CurrEvt.F7AnalogTimeStamp;
 			hismanager->Fill("PID_4000",this->CurrEvt.tdiff[0]);
+			this->CurrEvt.CFDtdiff[0] = this->CurrEvt.F11LeftRightCFDTimeStamp[0] - this->CurrEvt.F7AnalogCFDTimeStamp;
+			hismanager->Fill("PID_4100",this->CurrEvt.CFDtdiff[0]);
 		}else{
 			this->CurrEvt.tdiff[0] = std::numeric_limits<double>::max();
+			this->CurrEvt.CFDtdiff[0] = std::numeric_limits<double>::max();
 		}
 		if( this->CurrEvt.F11LeftRight[1] > 0.0 and this->CurrEvt.F7Analog > 0.0 ){
 			this->CurrEvt.tdiff[1] = this->CurrEvt.F11LeftRightTimeStamp[1] - this->CurrEvt.F7AnalogTimeStamp;
 			hismanager->Fill("PID_4001",this->CurrEvt.tdiff[1]);
+			this->CurrEvt.CFDtdiff[1] = this->CurrEvt.F11LeftRightCFDTimeStamp[1] - this->CurrEvt.F7AnalogCFDTimeStamp;
+			hismanager->Fill("PID_4101",this->CurrEvt.CFDtdiff[1]);
 		}else{
 			this->CurrEvt.tdiff[1] = std::numeric_limits<double>::max();
+			this->CurrEvt.CFDtdiff[1] = std::numeric_limits<double>::max();
 		}
 		if( this->CurrEvt.F11LeftRight[0] > 0.0 and this->CurrEvt.F7Logic > 0.0 ){
 			this->CurrEvt.tdiff[2] = this->CurrEvt.F11LeftRightTimeStamp[0] - this->CurrEvt.F7LogicTimeStamp;
 			hismanager->Fill("PID_4010",this->CurrEvt.tdiff[2]);
+			this->CurrEvt.CFDtdiff[2] = this->CurrEvt.F11LeftRightCFDTimeStamp[0] - this->CurrEvt.F7LogicCFDTimeStamp;
+			hismanager->Fill("PID_4110",this->CurrEvt.CFDtdiff[2]);
 		}else{
 			this->CurrEvt.tdiff[2] = std::numeric_limits<double>::max();
+			this->CurrEvt.CFDtdiff[2] = std::numeric_limits<double>::max();
 		}
 		if( this->CurrEvt.F11LeftRight[1] > 0.0 and this->CurrEvt.F7Logic > 0.0 ){
 			this->CurrEvt.tdiff[3] = this->CurrEvt.F11LeftRightTimeStamp[1] - this->CurrEvt.F7LogicTimeStamp;
 			hismanager->Fill("PID_4011",this->CurrEvt.tdiff[3]);
+			this->CurrEvt.CFDtdiff[3] = this->CurrEvt.F11LeftRightCFDTimeStamp[1] - this->CurrEvt.F7LogicCFDTimeStamp;
+			hismanager->Fill("PID_4111",this->CurrEvt.CFDtdiff[3]);
 		}else{
 			this->CurrEvt.tdiff[3] = std::numeric_limits<double>::max();
+			this->CurrEvt.CFDtdiff[3] = std::numeric_limits<double>::max();
 		}
 	}
 	
@@ -150,6 +170,11 @@ void RIKENPidProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 	hismanager->RegisterPlot<TH1F>("PID_4001","TDiff F11_Right - F7_Analog; tdiff (ns)",1000,-10000,10000);
 	hismanager->RegisterPlot<TH1F>("PID_4010","TDiff F11_Left - F7_Logic; tdiff (ns)",1000,-10000,10000);
 	hismanager->RegisterPlot<TH1F>("PID_4011","TDiff F11_Right - F7_Logic; tdiff (ns)",1000,-10000,10000);
+	
+	hismanager->RegisterPlot<TH1F>("PID_4100","TDiff F11_Left - F7_Analog; CFD tdiff (ns)",1000,-10000,10000);
+	hismanager->RegisterPlot<TH1F>("PID_4101","TDiff F11_Right - F7_Analog; CFD tdiff (ns)",1000,-10000,10000);
+	hismanager->RegisterPlot<TH1F>("PID_4110","TDiff F11_Left - F7_Logic; CFD tdiff (ns)",1000,-10000,10000);
+	hismanager->RegisterPlot<TH1F>("PID_4111","TDiff F11_Right - F7_Logic; CFD tdiff (ns)",1000,-10000,10000);
 	this->console->info("Finished Declaring Plots");
 }
 
