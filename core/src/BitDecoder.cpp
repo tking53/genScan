@@ -1,7 +1,10 @@
 #include "BitDecoder.hpp"
 #include "ChannelMap.hpp"
+#include <iomanip>
+#include <ios>
 #include <stdexcept>
 #include <string>
+#include <iostream>
 
 XiaDecoder::XiaDecoder(ChannelMap::FirmwareVersion firmware,int Frequency) : 
 	Ver(firmware),	
@@ -331,23 +334,28 @@ double XiaDecoder::DecodeCFDParams(const unsigned int* firstFour,const uint64_t&
 
 	double cfdtime = 0.0;
 	double mult = 1.0;
+	double mult2 = 1.0;
 	switch( this->Freq ){
 		case 100:
-			cfdtime = cfdfraction/this->CFDSize;
+			mult2 = 10.0; 
+			cfdtime = static_cast<double>(cfdfraction)/static_cast<double>(this->CFDSize);
 			break;
 		case 250:
-			mult = 8.0;
-			cfdtime = (cfdfraction/this->CFDSize) - cfdsource;
+			mult = 2.0;
+			mult2 = 8.0;
+			cfdtime = (static_cast<double>(cfdfraction)/static_cast<double>(this->CFDSize)) - cfdsource;
 			break;
 		case 500:
 			mult = 10.0;
-			cfdtime = (cfdfraction/this->CFDSize) + cfdsource - 1;
+			mult2 = 10.0;
+			cfdtime = (static_cast<double>(cfdfraction)/static_cast<double>(this->CFDSize)) + cfdsource - 1;
 			break;
 		default:
 			throw std::runtime_error("Unknown Frequency of "+std::to_string(this->Freq)+", Known are 100, 250, 500");
 	}
-	if( cfdforced or cfdfraction == 0 )
-		return ts*mult;
+	if( cfdforced or cfdfraction == 0 ){
+		return ts*mult2;
+	}
 	return ts*mult + cfdtime;
 }
 
