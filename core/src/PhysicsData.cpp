@@ -51,6 +51,7 @@ PhysicsData::PhysicsData(const PhysicsData& other) :
 	SpillID(other.SpillID),
 	Energy(other.Energy),
 	TimeStamp(other.TimeStamp),
+	CFDTimeStamp(other.CFDTimeStamp),
 	CFDForcedBit(other.CFDForcedBit),
 	CFDFraction(other.CFDFraction),
 	CFDSourceBit(other.CFDSourceBit),
@@ -89,6 +90,7 @@ PhysicsData::PhysicsData(PhysicsData&& other) noexcept :
 	SpillID(other.SpillID),
 	Energy(other.Energy),
 	TimeStamp(other.TimeStamp),
+	CFDTimeStamp(other.CFDTimeStamp),
 	CFDForcedBit(other.CFDForcedBit),
 	CFDFraction(other.CFDFraction),
 	CFDSourceBit(other.CFDSourceBit),
@@ -128,6 +130,7 @@ PhysicsData& PhysicsData::operator=(const PhysicsData& other){
 		SpillID = other.SpillID;
 		Energy = other.Energy;
 		TimeStamp = other.TimeStamp;
+		CFDTimeStamp = other.CFDTimeStamp;
 		CFDForcedBit = other.CFDForcedBit;
 		CFDFraction = other.CFDFraction;
 		CFDSourceBit = other.CFDSourceBit;
@@ -168,6 +171,7 @@ PhysicsData& PhysicsData::operator=(PhysicsData&& other) noexcept{
 		SpillID = other.SpillID;
 		Energy = other.Energy;
 		TimeStamp = other.TimeStamp;
+		CFDTimeStamp = other.CFDTimeStamp;
 		CFDForcedBit = other.CFDForcedBit;
 		CFDFraction = other.CFDFraction;
 		CFDSourceBit = other.CFDSourceBit;
@@ -248,6 +252,15 @@ void PhysicsData::SetTimeStamp(double value){
 
 double PhysicsData::GetTimeStamp() const{
 	return this->TimeStamp;
+}
+
+//CFDTimeStamp
+void PhysicsData::SetCFDTimeStamp(double value){
+	this->CFDTimeStamp = value;
+}
+
+double PhysicsData::GetCFDTimeStamp() const{
+	return this->CFDTimeStamp;
 }
 
 //CFD Forced Bit

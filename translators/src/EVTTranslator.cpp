@@ -130,7 +130,8 @@ int EVTTranslator::ReadHeader(boost::container::devector<PhysicsData>& RawEvents
 	this->console->debug("TS : {}, TS(ns) : {}, CFDTS(ns) : {}",TimeStamp,TimeStampInNS,CFDTimeStampInNS);
 	#endif
 	//always use the cfd based TimeStampInNS to event build, it is the same other if nothing is set
-	RawEvents.back().SetTimeStamp(CFDTimeStampInNS);
+	RawEvents.back().SetTimeStamp(TimeStampInNS);
+	RawEvents.back().SetCFDTimeStamp(CFDTimeStampInNS);
 
 	if( TimeStamp < this->PrevTimeStamp ){
 		this->console->critical("Timestamp out of order current : {}, previous : {}",TimeStamp,this->PrevTimeStamp);

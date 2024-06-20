@@ -43,6 +43,10 @@ class PhysicsData{
 		void SetTimeStamp(double);
 		double GetTimeStamp() const;
 
+		//CFDTimeStamp
+		void SetCFDTimeStamp(double);
+		double GetCFDTimeStamp() const;
+
 		//CFD Forced Bit
 		void SetCFDForcedBit(bool);
 		bool GetCFDForcedBit() const;
@@ -200,6 +204,7 @@ class PhysicsData{
 
 		double Energy;	
 		double TimeStamp;
+		double CFDTimeStamp;
 
 		bool CFDForcedBit;
 		double CFDFraction;
