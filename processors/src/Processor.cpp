@@ -197,11 +197,14 @@ void Processor::LoadHistogramSettings(const pugi::xml_node& config){
 		auto currh1d = this->h1dsettings.find(id);
 		auto currh2d = this->h2dsettings.find(id);
 		if( currh1d != this->h1dsettings.end()){
+			this->console->info("Found Different his settings for 1D histogram : {}",id);
+			this->console->info("original X: {} {} {}",currh1d->second.nbinsx,currh1d->second.xlow,currh1d->second.xhigh);
 			this->h1dsettings[id].nbinsx = histogram.attribute("nbinsx").as_int(currh1d->second.nbinsx);
 			this->h1dsettings[id].xlow = histogram.attribute("xlow").as_double(currh1d->second.xlow);
 			this->h1dsettings[id].xhigh = histogram.attribute("xhigh").as_double(currh1d->second.xhigh);
+			this->console->info("X: {} {} {}",this->h1dsettings[id].nbinsx,this->h1dsettings[id].xlow,this->h1dsettings[id].xhigh);
 		}else if( currh2d != this->h2dsettings.end() ){
-			this->console->info("Found Different his settings for {}",id);
+			this->console->info("Found Different his settings for 2D histogram : {}",id);
 			this->console->info("original X: {} {} {}",currh2d->second.nbinsx,currh2d->second.xlow,currh2d->second.xhigh);
 			this->console->info("original Y: {} {} {}",currh2d->second.nbinsy,currh2d->second.ylow,currh2d->second.yhigh);
 			this->h2dsettings[id].nbinsx = histogram.attribute("nbinsx").as_int(currh2d->second.nbinsx);
@@ -210,6 +213,72 @@ void Processor::LoadHistogramSettings(const pugi::xml_node& config){
 			this->h2dsettings[id].nbinsy = histogram.attribute("nbinsy").as_int(currh2d->second.nbinsy);
 			this->h2dsettings[id].ylow = histogram.attribute("ylow").as_double(currh2d->second.ylow);
 			this->h2dsettings[id].yhigh = histogram.attribute("yhigh").as_double(currh2d->second.yhigh);
+			this->console->info("New his settings for {}",id);
+			this->console->info("X: {} {} {}",this->h2dsettings[id].nbinsx,this->h2dsettings[id].xlow,this->h2dsettings[id].xhigh);
+			this->console->info("Y: {} {} {}",this->h2dsettings[id].nbinsy,this->h2dsettings[id].ylow,this->h2dsettings[id].yhigh);
+		}else{
+			std::string mess = "Unknown histogram id: "+std::to_string(id)+" for "+this->ProcessorName;
+			throw std::runtime_error(mess);
+		}
+	}
+}
+
+void Processor::LoadHistogramSettings(const YAML::Node& config){
+	YAML::Node histogram = config["Histogram"];
+	for( size_t ii = 0; ii < histogram.size(); ++ii ){
+		int id = histogram[ii]["id"].as<int>(0);
+		auto currh1d = this->h1dsettings.find(id);
+		auto currh2d = this->h2dsettings.find(id);
+		if( currh1d != this->h1dsettings.end()){
+			this->console->info("Found Different his settings for 1D histogram : {}",id);
+			this->console->info("original X: {} {} {}",currh1d->second.nbinsx,currh1d->second.xlow,currh1d->second.xhigh);
+			this->h1dsettings[id].nbinsx = histogram[ii]["nbinsx"].as<int>(currh1d->second.nbinsx);
+			this->h1dsettings[id].xlow = histogram[ii]["xlow"].as<double>(currh1d->second.xlow);
+			this->h1dsettings[id].xhigh = histogram[ii]["xhigh"].as<double>(currh1d->second.xhigh);
+			this->console->info("X: {} {} {}",this->h1dsettings[id].nbinsx,this->h1dsettings[id].xlow,this->h1dsettings[id].xhigh);
+		}else if( currh2d != this->h2dsettings.end() ){
+			this->console->info("Found Different his settings for 2D histogram : {}",id);
+			this->console->info("original X: {} {} {}",currh2d->second.nbinsx,currh2d->second.xlow,currh2d->second.xhigh);
+			this->console->info("original Y: {} {} {}",currh2d->second.nbinsy,currh2d->second.ylow,currh2d->second.yhigh);
+			this->h2dsettings[id].nbinsx = histogram[ii]["nbinsx"].as<int>(currh2d->second.nbinsx);
+			this->h2dsettings[id].xlow = histogram[ii]["xlow"].as<double>(currh2d->second.xlow);
+			this->h2dsettings[id].xhigh = histogram[ii]["xhigh"].as<double>(currh2d->second.xhigh);
+			this->h2dsettings[id].nbinsy = histogram[ii]["nbinsy"].as<int>(currh2d->second.nbinsy);
+			this->h2dsettings[id].ylow = histogram[ii]["ylow"].as<double>(currh2d->second.ylow);
+			this->h2dsettings[id].yhigh = histogram[ii]["yhigh"].as<double>(currh2d->second.yhigh);
+			this->console->info("New his settings for {}",id);
+			this->console->info("X: {} {} {}",this->h2dsettings[id].nbinsx,this->h2dsettings[id].xlow,this->h2dsettings[id].xhigh);
+			this->console->info("Y: {} {} {}",this->h2dsettings[id].nbinsy,this->h2dsettings[id].ylow,this->h2dsettings[id].yhigh);
+		}else{
+			std::string mess = "Unknown histogram id: "+std::to_string(id)+" for "+this->ProcessorName;
+			throw std::runtime_error(mess);
+		}
+	}
+}
+
+void Processor::LoadHistogramSettings(const Json::Value& config){
+	Json::Value histogram = config["Histogram"];
+	for( const auto& his : histogram ){
+		int id = his.get("id",0).asInt();
+		auto currh1d = this->h1dsettings.find(id);
+		auto currh2d = this->h2dsettings.find(id);
+		if( currh1d != this->h1dsettings.end()){
+			this->console->info("Found Different his settings for 1D histogram : {}",id);
+			this->console->info("original X: {} {} {}",currh1d->second.nbinsx,currh1d->second.xlow,currh1d->second.xhigh);
+			this->h1dsettings[id].nbinsx = his.get("nbinsx",currh1d->second.nbinsx).asInt();
+			this->h1dsettings[id].xlow = his.get("xlow",currh1d->second.xlow).asDouble();
+			this->h1dsettings[id].xhigh = his.get("xhigh",currh1d->second.xhigh).asDouble();
+			this->console->info("X: {} {} {}",this->h1dsettings[id].nbinsx,this->h1dsettings[id].xlow,this->h1dsettings[id].xhigh);
+		}else if( currh2d != this->h2dsettings.end() ){
+			this->console->info("Found Different his settings for {}",id);
+			this->console->info("original X: {} {} {}",currh2d->second.nbinsx,currh2d->second.xlow,currh2d->second.xhigh);
+			this->console->info("original Y: {} {} {}",currh2d->second.nbinsy,currh2d->second.ylow,currh2d->second.yhigh);
+			this->h2dsettings[id].nbinsx = his.get("nbinsx",currh2d->second.nbinsx).asInt();
+			this->h2dsettings[id].xlow = his.get("xlow",currh2d->second.xlow).asDouble();
+			this->h2dsettings[id].xhigh = his.get("xhigh",currh2d->second.xhigh).asDouble();
+			this->h2dsettings[id].nbinsy = his.get("nbinsy",currh2d->second.nbinsy).asInt();
+			this->h2dsettings[id].ylow = his.get("ylow",currh2d->second.ylow).asDouble();
+			this->h2dsettings[id].yhigh = his.get("yhigh",currh2d->second.yhigh).asDouble();
 			this->console->info("New his settings for {}",id);
 			this->console->info("X: {} {} {}",this->h2dsettings[id].nbinsx,this->h2dsettings[id].xlow,this->h2dsettings[id].xhigh);
 			this->console->info("Y: {} {} {}",this->h2dsettings[id].nbinsy,this->h2dsettings[id].ylow,this->h2dsettings[id].yhigh);

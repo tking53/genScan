@@ -72,6 +72,8 @@ class Processor : public std::enable_shared_from_this<Processor> {
 
 	protected:
 		virtual void LoadHistogramSettings(const pugi::xml_node&) final;
+		virtual void LoadHistogramSettings(const YAML::Node&) final;
+		virtual void LoadHistogramSettings(const Json::Value&) final;
 
 		enum STEP{
 			PREPROCESS,
