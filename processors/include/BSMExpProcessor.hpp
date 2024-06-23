@@ -28,6 +28,12 @@ class BSMExpProcessor : public Processor{
 		virtual void CleanupTree() final;
 	private:
 
+		MtasProcessor::EventInfo CurrMTAS;
+		BSMProcessor::EventInfo CurrBSM;
+
+		bool HasMTAS;
+		bool HasBSM;
+
 		std::unique_ptr<BSMProcessor> BSMProc;
 		std::unique_ptr<MtasProcessor> MtasProc;
 };

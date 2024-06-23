@@ -25,12 +25,20 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 	this->foundfirstevt = false;
 	this->globalfirsttime = 0.0;
 
+	this->h1dsettings = { 
+				{3600 , {16384,0.0,16384}},
+				{3601 , {16384,0.0,16384}},
+				{3602 , {16384,0.0,16384}}
+			    };
+
+	this->h2dsettings = {
+				{3650 , {4096,0.0,4096.0,4096,0.0,4096.0}},
+				{36508 , {2048,0.0,16384.0,2048,0.0,16384.0}}
+			    };
 }
 
 [[maybe_unused]] bool BSMProcessor::PreProcess(EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	Processor::PreProcess();
-
-	this->Reset();
 
 	summary.GetDetectorSummary(this->AllDefaultRegex["bsm"],this->SummaryData);
 	bool setfirsttime = false;
@@ -82,6 +90,11 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 			++this->BSMHits[detectorposition];
 		}
 	}
+	for( size_t ii = 0; ii < this->BSMHits.size(); ++ii ){
+		if( this->BSMHits[ii] > 1 ){
+			this->console->warn("Linearized BSM number {} has {} hits in a single event instead of 1",ii,this->BSMHits[ii]);
+		}
+	}
 	
 	this->CurrEvt.FirstTime = firsttime;
 	this->CurrEvt.LastTime = lasttime;
@@ -114,19 +127,24 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 }
 
 [[maybe_unused]] bool BSMProcessor::PostProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+	this->Reset();
+
 	return true;
 }
 
 void BSMProcessor::Init(const YAML::Node& config){
 	this->console->info("Init called with YAML::Node");
+	this->LoadHistogramSettings(config);
 }
 
 void BSMProcessor::Init(const Json::Value& config){
 	this->console->info("Init called with Json::Value");
+	this->LoadHistogramSettings(config);
 }
 
 void BSMProcessor::Init(const pugi::xml_node& config){
 	this->console->info("Init called with pugi::xml_node");
+	this->LoadHistogramSettings(config);
 }
 		
 void BSMProcessor::Finalize(){
@@ -135,7 +153,14 @@ void BSMProcessor::Finalize(){
 
 void BSMProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 	//BSM diagnostic plots, always want these no matter what
-	hismanager->RegisterPlot<TH1F>("BSM_3600","#betaSM Total; Energy (keV)",16384,0,16384);
+	hismanager->RegisterPlot<TH1F>("BSM_3600","#betaSM Total; Energy (keV)",this->h1dsettings.at(3600));
+	hismanager->RegisterPlot<TH1F>("BSM_3601","#betaSM Total No MTAS; Energy (keV)",this->h1dsettings.at(3601));
+	hismanager->RegisterPlot<TH1F>("BSM_3602","#betaSM Total + MTAS Total; Energy (keV)",this->h1dsettings.at(3602));
+	
+	hismanager->RegisterPlot<TH2F>("BSM_3650","#betaSM Total vs MTAS Total; MTAS Total Energy (keV); #betaSM Energy (keV)",this->h2dsettings.at(3650));
+
+	hismanager->RegisterPlot<TH2F>("BSM_36508","#betaSM Total vs MTAS Total; MTAS Total Energy (8 keV/bin) #betaSM Energy (8 keV/bin)",this->h2dsettings.at(36508));
+
 	this->console->info("Finished Declaring Plots");
 }
 

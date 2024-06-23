@@ -3,6 +3,7 @@
 #include "EventSummary.hpp"
 #include "HistogramManager.hpp"
 #include <TTree.h>
+#include <stdexcept>
 
 BSMExpProcessor::BSMExpProcessor(const std::string& log) : Processor(log,"BSMExpProcessor",{"mtas","bsm"}){
 	this->MtasProc = std::make_unique<MtasProcessor>(log);
@@ -14,13 +15,32 @@ BSMExpProcessor::BSMExpProcessor(const std::string& log) : Processor(log,"BSMExp
 	for( const auto& type : this->BSMProc->GetKnownTypes() ){
 		this->AssociateType(type);
 	}
+
+	this->HasBSM = false;
+	this->HasMTAS = false;
 }
 
 [[maybe_unused]] bool BSMExpProcessor::PreProcess(EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	Processor::PreProcess();
 
-	this->MtasProc->PreProcess(summary,hismanager,cutmanager);
-	this->BSMProc->PreProcess(summary,hismanager,cutmanager);
+	auto types = summary.GetKnownTypes();
+
+	this->HasMTAS = (types.find("mtas") != types.end());
+	this->HasBSM = (types.find("bsm") != types.end());
+
+	if( this->HasMTAS ){
+		this->MtasProc->PreProcess(summary,hismanager,cutmanager);
+	}
+	this->CurrMTAS = this->MtasProc->GetCurrEvt();
+
+	if( this->HasBSM ){
+		this->BSMProc->PreProcess(summary,hismanager,cutmanager);
+	}
+	this->CurrBSM = this->BSMProc->GetCurrEvt();
+
+	if( this->HasBSM /*and this->CurrBSM.TotalEnergy > 0.0*/ ){
+		this->MtasProc->SetIsBeta();
+	}
 
 	Processor::EndProcess();
 	return true;
@@ -28,16 +48,24 @@ BSMExpProcessor::BSMExpProcessor(const std::string& log) : Processor(log,"BSMExp
 
 [[maybe_unused]] bool BSMExpProcessor::Process([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 
-	this->MtasProc->Process(summary,hismanager,cutmanager);
-	this->BSMProc->Process(summary,hismanager,cutmanager);
+	if( this->HasMTAS ){
+		this->MtasProc->Process(summary,hismanager,cutmanager);
+	}
+	if( this->HasBSM ){
+		this->BSMProc->Process(summary,hismanager,cutmanager);
+	}
 
 	return true;
 }
 
 [[maybe_unused]] bool BSMExpProcessor::PostProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 
-	this->MtasProc->PostProcess(summary,hismanager,cutmanager);
-	this->BSMProc->PostProcess(summary,hismanager,cutmanager);
+	if( this->HasMTAS ){
+		this->MtasProc->PostProcess(summary,hismanager,cutmanager);
+	}
+	if( this->HasBSM ){
+		this->BSMProc->PostProcess(summary,hismanager,cutmanager);
+	}
 
 	return true;
 }
@@ -45,21 +73,47 @@ BSMExpProcessor::BSMExpProcessor(const std::string& log) : Processor(log,"BSMExp
 void BSMExpProcessor::Init(const YAML::Node& config){
 	this->MtasProc->Init(config);
 	this->BSMProc->Init(config);
+	this->LoadHistogramSettings(config);
 }
 
 void BSMExpProcessor::Init(const Json::Value& config){
 	this->MtasProc->Init(config);
 	this->BSMProc->Init(config);
+	this->LoadHistogramSettings(config);
 }
 
 void BSMExpProcessor::Init(const pugi::xml_node& config){
-	this->MtasProc->Init(config);
-	this->BSMProc->Init(config);
+	for( pugi::xml_node proc = config.child("Processor"); proc; proc = proc.next_sibling("Processor") ){
+		std::string name = proc.attribute("name").as_string();
+		if( name.compare("MtasProcessor") == 0 ){
+			this->MtasProc->Init(proc);
+			this->HasMTAS = true;
+		}else if( name.compare("BSMProcessor") == 0 ){
+			this->BSMProc->Init(proc);
+			this->HasBSM = true;
+		}else{
+			throw std::runtime_error("unknown subprocessor declared in BSMExpProcessor");
+		}
+	}
+
+	if( not this->HasMTAS ){
+		throw std::runtime_error("missing MtasProcessor in BSMExpProcessor");
+	}
+
+	if( not this->HasBSM ){
+		throw std::runtime_error("missing BSMProcessor in BSMExpProcessor");
+	}
+
+	this->LoadHistogramSettings(config);
 }
 		
 void BSMExpProcessor::Finalize(){
 	this->MtasProc->Finalize();
 	this->BSMProc->Finalize();
+
+	this->CurrMTAS = this->MtasProc->GetCurrEvt();
+	this->CurrBSM = this->BSMProc->GetCurrEvt();
+
 	this->console->info("{} has been finalized",this->ProcessorName);
 }
 
