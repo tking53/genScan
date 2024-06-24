@@ -35,9 +35,7 @@ Processor::Processor(const std::string& log,const std::string& proc,const std::i
 		this->AllDefaultRegex[t] = boost::regex(t+":.*",boost::regex_constants::optimize|boost::regex_constants::nosubs);
 		this->console->info("Type Regex for {}, has been generated and is available",t);
 	}
-	if( this->Types.size() == 1 ){
-		this->DefaultRegexString.pop_back();
-	}
+	this->DefaultRegexString.pop_back();
 	this->DefaultRegexString += ")";
 	this->DefaultRegex = boost::regex(this->DefaultRegexString,boost::regex_constants::optimize|boost::regex_constants::nosubs);
 	this->AllDefaultRegex["ALL"] = this->DefaultRegex;
