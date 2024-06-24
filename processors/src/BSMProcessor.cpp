@@ -35,6 +35,9 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 				{3650 , {4096,0.0,4096.0,4096,0.0,4096.0}},
 				{36508 , {2048,0.0,16384.0,2048,0.0,16384.0}}
 			    };
+	
+	this->UnCorrectedBSM = std::vector<double>(12,0.0);
+	this->BSMHits = std::vector<int>(12,0);
 }
 
 [[maybe_unused]] bool BSMProcessor::PreProcess(EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
@@ -90,11 +93,11 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 			++this->BSMHits[detectorposition];
 		}
 	}
-	for( size_t ii = 0; ii < this->BSMHits.size(); ++ii ){
-		if( this->BSMHits[ii] > 1 ){
-			this->console->warn("Linearized BSM number {} has {} hits in a single event instead of 1",ii,this->BSMHits[ii]);
-		}
-	}
+	//for( size_t ii = 0; ii < this->BSMHits.size(); ++ii ){
+	//	if( this->BSMHits[ii] > 1 ){
+	//		this->console->warn("Linearized BSM number {} has {} hits in a single event instead of 1",ii,this->BSMHits[ii]);
+	//	}
+	//}
 	
 	this->CurrEvt.FirstTime = firsttime;
 	this->CurrEvt.LastTime = lasttime;

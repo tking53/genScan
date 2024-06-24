@@ -86,6 +86,15 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		{33518, {2048,0.0,16384.0,2048,0.0,16384.0}},
 		{33528, {2048,0.0,16384.0,2048,0.0,16384.0}}
 	};
+	
+	this->Center = std::vector<double>(12,0.0);
+	this->Inner = std::vector<double>(12,0.0);
+	this->Middle = std::vector<double>(12,0.0);
+	this->Outer = std::vector<double>(12,0.0);
+	this->CenterHits = std::vector<int>(12,0);
+	this->InnerHits = std::vector<int>(12,0);
+	this->MiddleHits = std::vector<int>(12,0);
+	this->OuterHits = std::vector<int>(12,0);
 }
 
 [[maybe_unused]] bool MtasProcessor::PreProcess(EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
@@ -181,20 +190,20 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		}
 
 	}
-	for( size_t ii = 0; ii < this->CenterHits.size(); ++ii ){
-		if( this->CenterHits[ii] > 1 ){
-			this->console->warn("Linearized MTAS Center number {} has {} hits in a single event instead of 1",ii,this->CenterHits[ii]);
-		}
-		if( this->InnerHits[ii] > 1 ){
-			this->console->warn("Linearized MTAS Inner number {} has {} hits in a single event instead of 1",ii,this->InnerHits[ii]);
-		}
-		if( this->MiddleHits[ii] > 1 ){
-			this->console->warn("Linearized MTAS Middle number {} has {} hits in a single event instead of 1",ii,this->MiddleHits[ii]);
-		}
-		if( this->OuterHits[ii] > 1 ){
-			this->console->warn("Linearized MTAS Outer number {} has {} hits in a single event instead of 1",ii,this->OuterHits[ii]);
-		}
-	}
+	//for( size_t ii = 0; ii < this->CenterHits.size(); ++ii ){
+	//	if( this->CenterHits[ii] > 1 ){
+	//		this->console->warn("Linearized MTAS Center number {} has {} hits in a single event instead of 1",ii,this->CenterHits[ii]);
+	//	}
+	//	if( this->InnerHits[ii] > 1 ){
+	//		this->console->warn("Linearized MTAS Inner number {} has {} hits in a single event instead of 1",ii,this->InnerHits[ii]);
+	//	}
+	//	if( this->MiddleHits[ii] > 1 ){
+	//		this->console->warn("Linearized MTAS Middle number {} has {} hits in a single event instead of 1",ii,this->MiddleHits[ii]);
+	//	}
+	//	if( this->OuterHits[ii] > 1 ){
+	//		this->console->warn("Linearized MTAS Outer number {} has {} hits in a single event instead of 1",ii,this->OuterHits[ii]);
+	//	}
+	//}
 
 	this->CurrEvt.FirstTime = firsttime;
 	this->CurrEvt.LastTime = lasttime;
