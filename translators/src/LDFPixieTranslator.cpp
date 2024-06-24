@@ -458,11 +458,15 @@ int LDFPixieTranslator::UnpackData(unsigned int& nBytes,bool& full_spill,bool& b
 }
 
 int LDFPixieTranslator::CountBuffersWithData() const{
+	//return std::count_if(this->EvtSpillCounter.begin(),this->EvtSpillCounter.end(),[](const int& x){ return x > 0; });
 	int numspill = 0;
-	for( const auto& itr : this->EvtSpillCounter ){
-		if( itr > 0 ){
-			++numspill;
-		}
+	//for( const auto& itr : this->EvtSpillCounter ){
+	for( size_t ii = 0; ii < this->EvtSpillCounter.size(); ++ii ){
+		numspill += (this->EvtSpillCounter[ii] > 0);
+		//numspill += (itr > 0);
+		//if( itr > 0 ){
+		//	++numspill;
+		//}
 	}
 	return numspill;
 	//if( this->EvtSpillCounter.size() == 0 ){
