@@ -13,6 +13,7 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 		.UnCorrectedSumFrontBackEnergy = std::vector<double>(6,0.0),
 		.FirstTime = -1.0,
 		.LastTime = -1.0,
+		.NumValidSegments = 0,
 		.Saturate = false,
 		.Pileup = false,
 		.RealEvt = false
@@ -28,7 +29,8 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 	this->h1dsettings = { 
 				{3600 , {16384,0.0,16384}},
 				{3601 , {16384,0.0,16384}},
-				{3602 , {16384,0.0,16384}}
+				{3602 , {16384,0.0,16384}},
+				{3610 , {16384,0.0,16384}}
 			    };
 
 	this->h2dsettings = {
@@ -104,6 +106,7 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 
 	for( int ii = 0; ii < 6; ++ii ){
 		if( this->BSMHits[2*ii] and this->BSMHits[2*ii + 1] ){
+			++this->CurrEvt.NumValidSegments;
 			this->CurrEvt.UnCorrectedSumFrontBackEnergy[ii] = (this->UnCorrectedBSM[2*ii] + this->UnCorrectedBSM[2*ii + 1])/2.0;
 			this->CurrEvt.Position[ii] = this->CalcPosition(this->UnCorrectedBSM[2*ii],this->UnCorrectedBSM[2*ii + 1]);
 			if( (this->PosCorrectionMap.find(2*ii) != this->PosCorrectionMap.end()) and (this->PosCorrectionMap.find(2*ii + 1) != this->PosCorrectionMap.end() ) ){
@@ -159,6 +162,7 @@ void BSMProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 	hismanager->RegisterPlot<TH1F>("BSM_3600","#betaSM Total; Energy (keV)",this->h1dsettings.at(3600));
 	hismanager->RegisterPlot<TH1F>("BSM_3601","#betaSM Total No MTAS; Energy (keV)",this->h1dsettings.at(3601));
 	hismanager->RegisterPlot<TH1F>("BSM_3602","#betaSM Total + MTAS Total; Energy (keV)",this->h1dsettings.at(3602));
+	hismanager->RegisterPlot<TH1F>("BSM_3610","#betaSM Total; Energy (keV)",this->h1dsettings.at(3610));
 	
 	hismanager->RegisterPlot<TH2F>("BSM_3650","#betaSM Total vs MTAS Total; MTAS Total Energy (keV); #betaSM Energy (keV)",this->h2dsettings.at(3650));
 

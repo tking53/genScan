@@ -33,6 +33,7 @@ class BSMProcessor : public Processor{
 			std::vector<double> UnCorrectedSumFrontBackEnergy;
 			double FirstTime;
 			double LastTime;
+			int NumValidSegments;
 			bool Saturate;
 			bool Pileup;
 			bool RealEvt;

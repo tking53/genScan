@@ -41,6 +41,9 @@ class MtasProcessor : public Processor{
 		EventInfo& GetCurrEvt();
 		EventInfo& GetPrevEvt();
 
+		void FillBetaPlots(PLOTS::PlotRegistry*);
+		void FillNonBetaPlots(PLOTS::PlotRegistry*);
+
 	private:
 		void Reset();
 

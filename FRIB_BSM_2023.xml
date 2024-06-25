@@ -15,7 +15,7 @@
 	<!-- <Global EventWidth="500.0" EventWidthUnit="ns" CorrelationType="rolling-window" /> -->
 
 	<DetectorDriver >
-		<Processor name="BSMExpProcessor" >
+		<Processor name="BSMExpProcessor" betathresh="50.0" >
 			<Processor name="BSMProcessor" />
 			<Processor name="MtasProcessor" />
 		</Processor>

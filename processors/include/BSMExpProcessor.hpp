@@ -34,6 +34,8 @@ class BSMExpProcessor : public Processor{
 		bool HasMTAS;
 		bool HasBSM;
 
+		double BetaThreshold;
+
 		std::unique_ptr<BSMProcessor> BSMProc;
 		std::unique_ptr<MtasProcessor> MtasProc;
 };

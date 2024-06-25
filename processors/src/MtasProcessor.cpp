@@ -275,80 +275,6 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 }
 
 [[maybe_unused]] bool MtasProcessor::Process([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
-	Processor::Process();
-	if( (not this->CurrEvt.Saturate) and (not this->CurrEvt.Pileup) ){
-		if( this->CurrEvt.BetaTriggered ){
-
-			hismanager->Fill("MTAS_3300",this->CurrEvt.TotalEnergy[0]);
-
-			hismanager->Fill("MTAS_3310",this->CurrEvt.TotalEnergy[1]);
-			hismanager->Fill("MTAS_3320",this->CurrEvt.TotalEnergy[2]);
-			hismanager->Fill("MTAS_3330",this->CurrEvt.TotalEnergy[3]);
-			hismanager->Fill("MTAS_3340",this->CurrEvt.TotalEnergy[4]);
-
-			hismanager->Fill("MTAS_3351",this->CurrEvt.TotalEnergy[0],this->CurrEvt.TotalEnergy[1]);
-			hismanager->Fill("MTAS_33518",this->CurrEvt.TotalEnergy[0],this->CurrEvt.TotalEnergy[1]);
-		
-			for( int ii = 0; ii < 24; ++ii ){
-				hismanager->Fill("MTAS_3301",this->CurrEvt.SumFrontBackEnergy[ii],ii);
-			}
-
-			for( int ii = 0; ii < 6; ++ii ){
-				hismanager->Fill("MTAS_3315",this->CurrEvt.SumFrontBackEnergy[ii]);
-				hismanager->Fill("MTAS_3325",this->CurrEvt.SumFrontBackEnergy[ii+6]);
-				hismanager->Fill("MTAS_3335",this->CurrEvt.SumFrontBackEnergy[ii+12]);
-				hismanager->Fill("MTAS_3345",this->CurrEvt.SumFrontBackEnergy[ii+18]);
-
-				hismanager->Fill("MTAS_3350",this->CurrEvt.TotalEnergy[0],this->CurrEvt.SumFrontBackEnergy[ii+6]);
-				hismanager->Fill("MTAS_3350",this->CurrEvt.TotalEnergy[0],this->CurrEvt.SumFrontBackEnergy[ii+12]);
-				hismanager->Fill("MTAS_3350",this->CurrEvt.TotalEnergy[0],this->CurrEvt.SumFrontBackEnergy[ii+18]);
-
-				hismanager->Fill("MTAS_3352",this->CurrEvt.TotalEnergy[0],this->CurrEvt.SumFrontBackEnergy[ii]);
-
-				hismanager->Fill("MTAS_33508",this->CurrEvt.TotalEnergy[0],this->CurrEvt.SumFrontBackEnergy[ii+6]);
-				hismanager->Fill("MTAS_33508",this->CurrEvt.TotalEnergy[0],this->CurrEvt.SumFrontBackEnergy[ii+12]);
-				hismanager->Fill("MTAS_33508",this->CurrEvt.TotalEnergy[0],this->CurrEvt.SumFrontBackEnergy[ii+18]);
-
-				hismanager->Fill("MTAS_33528",this->CurrEvt.TotalEnergy[0],this->CurrEvt.SumFrontBackEnergy[ii]);
-			}
-
-		}else{
-			hismanager->Fill("MTAS_3100",this->CurrEvt.TotalEnergy[0]);
-
-			hismanager->Fill("MTAS_3110",this->CurrEvt.TotalEnergy[1]);
-			hismanager->Fill("MTAS_3120",this->CurrEvt.TotalEnergy[2]);
-			hismanager->Fill("MTAS_3130",this->CurrEvt.TotalEnergy[3]);
-			hismanager->Fill("MTAS_3140",this->CurrEvt.TotalEnergy[4]);
-
-			hismanager->Fill("MTAS_3151",this->CurrEvt.TotalEnergy[0],this->CurrEvt.TotalEnergy[1]);
-			hismanager->Fill("MTAS_31518",this->CurrEvt.TotalEnergy[0],this->CurrEvt.TotalEnergy[1]);
-		
-			for( int ii = 0; ii < 24; ++ii ){
-				hismanager->Fill("MTAS_3101",this->CurrEvt.SumFrontBackEnergy[ii],ii);
-			}
-
-			for( int ii = 0; ii < 6; ++ii ){
-				hismanager->Fill("MTAS_3115",this->CurrEvt.SumFrontBackEnergy[ii]);
-				hismanager->Fill("MTAS_3125",this->CurrEvt.SumFrontBackEnergy[ii+6]);
-				hismanager->Fill("MTAS_3135",this->CurrEvt.SumFrontBackEnergy[ii+12]);
-				hismanager->Fill("MTAS_3145",this->CurrEvt.SumFrontBackEnergy[ii+18]);
-
-				hismanager->Fill("MTAS_3150",this->CurrEvt.TotalEnergy[0],this->CurrEvt.SumFrontBackEnergy[ii+6]);
-				hismanager->Fill("MTAS_3150",this->CurrEvt.TotalEnergy[0],this->CurrEvt.SumFrontBackEnergy[ii+12]);
-				hismanager->Fill("MTAS_3150",this->CurrEvt.TotalEnergy[0],this->CurrEvt.SumFrontBackEnergy[ii+18]);
-
-				hismanager->Fill("MTAS_3152",this->CurrEvt.TotalEnergy[0],this->CurrEvt.SumFrontBackEnergy[ii]);
-
-				hismanager->Fill("MTAS_31508",this->CurrEvt.TotalEnergy[0],this->CurrEvt.SumFrontBackEnergy[ii+6]);
-				hismanager->Fill("MTAS_31508",this->CurrEvt.TotalEnergy[0],this->CurrEvt.SumFrontBackEnergy[ii+12]);
-				hismanager->Fill("MTAS_31508",this->CurrEvt.TotalEnergy[0],this->CurrEvt.SumFrontBackEnergy[ii+18]);
-
-				hismanager->Fill("MTAS_31528",this->CurrEvt.TotalEnergy[0],this->CurrEvt.SumFrontBackEnergy[ii]);
-			}
-
-		}
-	}
-	Processor::EndProcess();
 	return true;
 }
 
@@ -488,4 +414,80 @@ MtasProcessor::EventInfo& MtasProcessor::GetCurrEvt(){
 
 MtasProcessor::EventInfo& MtasProcessor::GetPrevEvt(){
 	return this->PrevEvt;
+}
+
+void MtasProcessor::FillBetaPlots(PLOTS::PlotRegistry* hismanager){
+	if( (not this->CurrEvt.Saturate) and (not this->CurrEvt.Pileup) ){
+		hismanager->Fill("MTAS_3300",this->CurrEvt.TotalEnergy[0]);
+
+		hismanager->Fill("MTAS_3310",this->CurrEvt.TotalEnergy[1]);
+		hismanager->Fill("MTAS_3320",this->CurrEvt.TotalEnergy[2]);
+		hismanager->Fill("MTAS_3330",this->CurrEvt.TotalEnergy[3]);
+		hismanager->Fill("MTAS_3340",this->CurrEvt.TotalEnergy[4]);
+
+		hismanager->Fill("MTAS_3351",this->CurrEvt.TotalEnergy[0],this->CurrEvt.TotalEnergy[1]);
+		hismanager->Fill("MTAS_33518",this->CurrEvt.TotalEnergy[0],this->CurrEvt.TotalEnergy[1]);
+
+		for( int ii = 0; ii < 24; ++ii ){
+			hismanager->Fill("MTAS_3301",this->CurrEvt.SumFrontBackEnergy[ii],ii);
+		}
+
+		for( int ii = 0; ii < 6; ++ii ){
+			hismanager->Fill("MTAS_3315",this->CurrEvt.SumFrontBackEnergy[ii]);
+			hismanager->Fill("MTAS_3325",this->CurrEvt.SumFrontBackEnergy[ii+6]);
+			hismanager->Fill("MTAS_3335",this->CurrEvt.SumFrontBackEnergy[ii+12]);
+			hismanager->Fill("MTAS_3345",this->CurrEvt.SumFrontBackEnergy[ii+18]);
+
+			hismanager->Fill("MTAS_3350",this->CurrEvt.TotalEnergy[0],this->CurrEvt.SumFrontBackEnergy[ii+6]);
+			hismanager->Fill("MTAS_3350",this->CurrEvt.TotalEnergy[0],this->CurrEvt.SumFrontBackEnergy[ii+12]);
+			hismanager->Fill("MTAS_3350",this->CurrEvt.TotalEnergy[0],this->CurrEvt.SumFrontBackEnergy[ii+18]);
+
+			hismanager->Fill("MTAS_3352",this->CurrEvt.TotalEnergy[0],this->CurrEvt.SumFrontBackEnergy[ii]);
+
+			hismanager->Fill("MTAS_33508",this->CurrEvt.TotalEnergy[0],this->CurrEvt.SumFrontBackEnergy[ii+6]);
+			hismanager->Fill("MTAS_33508",this->CurrEvt.TotalEnergy[0],this->CurrEvt.SumFrontBackEnergy[ii+12]);
+			hismanager->Fill("MTAS_33508",this->CurrEvt.TotalEnergy[0],this->CurrEvt.SumFrontBackEnergy[ii+18]);
+
+			hismanager->Fill("MTAS_33528",this->CurrEvt.TotalEnergy[0],this->CurrEvt.SumFrontBackEnergy[ii]);
+		}
+
+	}
+}
+
+void MtasProcessor::FillNonBetaPlots(PLOTS::PlotRegistry* hismanager){
+	if( (not this->CurrEvt.Saturate) and (not this->CurrEvt.Pileup) ){
+		hismanager->Fill("MTAS_3100",this->CurrEvt.TotalEnergy[0]);
+
+		hismanager->Fill("MTAS_3110",this->CurrEvt.TotalEnergy[1]);
+		hismanager->Fill("MTAS_3120",this->CurrEvt.TotalEnergy[2]);
+		hismanager->Fill("MTAS_3130",this->CurrEvt.TotalEnergy[3]);
+		hismanager->Fill("MTAS_3140",this->CurrEvt.TotalEnergy[4]);
+
+		hismanager->Fill("MTAS_3151",this->CurrEvt.TotalEnergy[0],this->CurrEvt.TotalEnergy[1]);
+		hismanager->Fill("MTAS_31518",this->CurrEvt.TotalEnergy[0],this->CurrEvt.TotalEnergy[1]);
+
+		for( int ii = 0; ii < 24; ++ii ){
+			hismanager->Fill("MTAS_3101",this->CurrEvt.SumFrontBackEnergy[ii],ii);
+		}
+
+		for( int ii = 0; ii < 6; ++ii ){
+			hismanager->Fill("MTAS_3115",this->CurrEvt.SumFrontBackEnergy[ii]);
+			hismanager->Fill("MTAS_3125",this->CurrEvt.SumFrontBackEnergy[ii+6]);
+			hismanager->Fill("MTAS_3135",this->CurrEvt.SumFrontBackEnergy[ii+12]);
+			hismanager->Fill("MTAS_3145",this->CurrEvt.SumFrontBackEnergy[ii+18]);
+
+			hismanager->Fill("MTAS_3150",this->CurrEvt.TotalEnergy[0],this->CurrEvt.SumFrontBackEnergy[ii+6]);
+			hismanager->Fill("MTAS_3150",this->CurrEvt.TotalEnergy[0],this->CurrEvt.SumFrontBackEnergy[ii+12]);
+			hismanager->Fill("MTAS_3150",this->CurrEvt.TotalEnergy[0],this->CurrEvt.SumFrontBackEnergy[ii+18]);
+
+			hismanager->Fill("MTAS_3152",this->CurrEvt.TotalEnergy[0],this->CurrEvt.SumFrontBackEnergy[ii]);
+
+			hismanager->Fill("MTAS_31508",this->CurrEvt.TotalEnergy[0],this->CurrEvt.SumFrontBackEnergy[ii+6]);
+			hismanager->Fill("MTAS_31508",this->CurrEvt.TotalEnergy[0],this->CurrEvt.SumFrontBackEnergy[ii+12]);
+			hismanager->Fill("MTAS_31508",this->CurrEvt.TotalEnergy[0],this->CurrEvt.SumFrontBackEnergy[ii+18]);
+
+			hismanager->Fill("MTAS_31528",this->CurrEvt.TotalEnergy[0],this->CurrEvt.SumFrontBackEnergy[ii]);
+		}
+
+	}
 }

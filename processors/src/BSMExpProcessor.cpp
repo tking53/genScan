@@ -18,6 +18,8 @@ BSMExpProcessor::BSMExpProcessor(const std::string& log) : Processor(log,"BSMExp
 
 	this->HasBSM = false;
 	this->HasMTAS = false;
+
+	this->BetaThreshold = 0.0;
 }
 
 [[maybe_unused]] bool BSMExpProcessor::PreProcess(EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
@@ -38,8 +40,26 @@ BSMExpProcessor::BSMExpProcessor(const std::string& log) : Processor(log,"BSMExp
 	}
 	this->CurrBSM = this->BSMProc->GetCurrEvt();
 
-	if( this->HasBSM /*and this->CurrBSM.TotalEnergy > 0.0*/ ){
-		this->MtasProc->SetIsBeta();
+	if( this->HasBSM ){
+		if( (this->CurrBSM.TotalEnergy >= this->BetaThreshold) and (not this->CurrBSM.Saturate) and (not this->CurrBSM.Pileup) ){
+			this->MtasProc->FillBetaPlots(hismanager);
+		}else{
+			this->MtasProc->FillNonBetaPlots(hismanager);
+		}
+	}else{
+		this->MtasProc->FillNonBetaPlots(hismanager);
+	}
+
+	hismanager->Fill("BSM_3650",this->CurrMTAS.TotalEnergy[0],this->CurrBSM.TotalEnergy);
+	hismanager->Fill("BSM_36508",this->CurrMTAS.TotalEnergy[0],this->CurrBSM.TotalEnergy);
+
+	hismanager->Fill("BSM_3610",this->CurrBSM.TotalEnergy);
+	if( (not this->CurrMTAS.Saturate) and (not this->CurrMTAS.Pileup) ){
+		hismanager->Fill("BSM_3600",this->CurrBSM.TotalEnergy);
+		hismanager->Fill("BSM_3602",this->CurrBSM.TotalEnergy+this->CurrMTAS.TotalEnergy[0]);
+		if( (not this->HasMTAS) or this->CurrMTAS.TotalEnergy[0] < 1.0 ){
+			hismanager->Fill("BSM_3601",this->CurrBSM.TotalEnergy);
+		}
 	}
 
 	Processor::EndProcess();
@@ -48,24 +68,12 @@ BSMExpProcessor::BSMExpProcessor(const std::string& log) : Processor(log,"BSMExp
 
 [[maybe_unused]] bool BSMExpProcessor::Process([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 
-	if( this->HasMTAS ){
-		this->MtasProc->Process(summary,hismanager,cutmanager);
-	}
-	if( this->HasBSM ){
-		this->BSMProc->Process(summary,hismanager,cutmanager);
-	}
-
 	return true;
 }
 
 [[maybe_unused]] bool BSMExpProcessor::PostProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
-
-	if( this->HasMTAS ){
-		this->MtasProc->PostProcess(summary,hismanager,cutmanager);
-	}
-	if( this->HasBSM ){
-		this->BSMProc->PostProcess(summary,hismanager,cutmanager);
-	}
+	this->MtasProc->PostProcess(summary,hismanager,cutmanager);
+	this->BSMProc->PostProcess(summary,hismanager,cutmanager);
 
 	return true;
 }
@@ -95,6 +103,8 @@ void BSMExpProcessor::Init(const pugi::xml_node& config){
 			throw std::runtime_error("unknown subprocessor declared in BSMExpProcessor");
 		}
 	}
+
+	this->BetaThreshold = config.attribute("betathresh").as_double(0.0);
 
 	if( not this->HasMTAS ){
 		throw std::runtime_error("missing MtasProcessor in BSMExpProcessor");
