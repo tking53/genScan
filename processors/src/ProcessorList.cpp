@@ -209,7 +209,7 @@ void ProcessorList::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 		anal->DeclarePlots(hismanager);
 }
 
-void ProcessorList::ThreshAndCal(boost::container::deque<PhysicsData>& RawEvents,ChannelMap* cmap){
+void ProcessorList::ThreshAndCal(boost::container::devector<PhysicsData>& RawEvents,ChannelMap* cmap){
 	if( this->FirstTimeStamp < 0 ){
 		this->FirstTimeStamp = RawEvents.front().GetTimeStamp();
 	}
@@ -239,7 +239,7 @@ void ProcessorList::ThreshAndCal(boost::container::deque<PhysicsData>& RawEvents
 	}
 }
 
-void ProcessorList::ProcessRaw(boost::container::deque<PhysicsData>& RawEvents,PLOTS::PlotRegistry* HistogramManager){
+void ProcessorList::ProcessRaw(boost::container::devector<PhysicsData>& RawEvents,PLOTS::PlotRegistry* HistogramManager){
 	auto evtsize = RawEvents.size();
 	double deltats = 0.0;
 	auto scalarsize = HistogramManager->GetScalarBins();

@@ -12,7 +12,7 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-#include <boost/container/deque.hpp>
+#include <boost/container/devector.hpp>
 
 #include "ChannelMap.hpp"
 
@@ -36,7 +36,7 @@ class DataParser{
 		~DataParser() = default;
 		void SetInputFiles(std::vector<std::string>&);
 		
-		Translator::TRANSLATORSTATE Parse(boost::container::deque<PhysicsData>&);
+		Translator::TRANSLATORSTATE Parse(boost::container::devector<PhysicsData>&);
 
 		void SetChannelMap(const std::shared_ptr<ChannelMap>&);
 		void SetCorrelator(const std::shared_ptr<Correlator>&);

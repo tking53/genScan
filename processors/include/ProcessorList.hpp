@@ -26,7 +26,7 @@
 
 #include "Processor.hpp"
 #include "Analyzer.hpp"
-#include "boost/container/deque.hpp"
+#include "boost/container/devector.hpp"
 
 class ProcessorList{
 	public:
@@ -53,8 +53,8 @@ class ProcessorList{
 		void RegisterOutputTrees(RootFileManager*);
 		void DeclarePlots(PLOTS::PlotRegistry*) const;
 
-		void ThreshAndCal(boost::container::deque<PhysicsData>&,ChannelMap*);
-		void ProcessRaw(boost::container::deque<PhysicsData>&,PLOTS::PlotRegistry*);
+		void ThreshAndCal(boost::container::devector<PhysicsData>&,ChannelMap*);
+		void ProcessRaw(boost::container::devector<PhysicsData>&,PLOTS::PlotRegistry*);
 
 		void Finalize();
 

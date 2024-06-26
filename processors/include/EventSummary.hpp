@@ -13,7 +13,7 @@
 
 
 #include <boost/container/flat_map.hpp>
-#include <boost/container/deque.hpp>
+#include <boost/container/devector.hpp>
 #include <boost/regex.hpp>
 
 #include "ChannelMap.hpp"
@@ -32,7 +32,7 @@ class EventSummary{
 		void GetDetectorSummary(const std::string&,std::vector<PhysicsData*>&);
 		void GetDetectorSummary(const boost::regex&,std::vector<PhysicsData*>&);
 
-		boost::container::deque<PhysicsData>& GetRawEvents();
+		boost::container::devector<PhysicsData>& GetRawEvents();
 		void ClearRawEvents();
 
 		const std::set<std::string>& GetKnownTypes() const;
@@ -41,7 +41,7 @@ class EventSummary{
 		std::string LogName;
 		std::shared_ptr<spdlog::logger> console;
 
-		boost::container::deque<PhysicsData> RawEvents;
+		boost::container::devector<PhysicsData> RawEvents;
 		std::set<std::string> KnownTypes;
 		boost::container::flat_map<std::string,std::vector<bool>> MappedUIDs;
 		boost::regex ColonParse;

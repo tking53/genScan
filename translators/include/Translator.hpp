@@ -12,7 +12,7 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-#include <boost/container/deque.hpp>
+#include <boost/container/devector.hpp>
 
 #include "BitDecoder.hpp"
 #include "ChannelMap.hpp"
@@ -31,7 +31,7 @@ class Translator{
 		Translator(const std::string&,const std::string&);
 		virtual ~Translator();
 		virtual bool AddFile(const std::string&);
-		[[noreturn]] virtual TRANSLATORSTATE Parse([[maybe_unused]] boost::container::deque<PhysicsData>&);
+		[[noreturn]] virtual TRANSLATORSTATE Parse([[maybe_unused]] boost::container::devector<PhysicsData>&);
 		virtual void FinalizeFiles();
 		virtual bool OpenNextFile();
 		virtual void SetChannelMap(const std::shared_ptr<ChannelMap>&);
@@ -49,7 +49,7 @@ class Translator{
 		bool FinishedCurrentFile;
 
 		bool LastReadEvtWithin;
-		boost::container::deque<PhysicsData> Leftovers;
+		boost::container::devector<PhysicsData> Leftovers;
 
 		std::shared_ptr<spdlog::logger> console;
 		std::shared_ptr<ChannelMap> CMap;

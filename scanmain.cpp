@@ -15,7 +15,7 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 #include <boost/program_options.hpp>
-#include <boost/container/deque.hpp>
+#include <boost/container/devector.hpp>
 
 #include "AnalogCorrelator.hpp"
 #include "RollingTriggerCorrelator.hpp"

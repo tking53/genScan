@@ -8,7 +8,7 @@ EVTPresortTranslator::EVTPresortTranslator(const std::string& log,const std::str
 	this->CurrEVTPresortBuiltInfo = { .rib_size = 0, .ri_size = 0, .ri_type = 0};
 }	
 
-Translator::TRANSLATORSTATE EVTPresortTranslator::Parse(boost::container::deque<PhysicsData>& RawEvents){
+Translator::TRANSLATORSTATE EVTPresortTranslator::Parse(boost::container::devector<PhysicsData>& RawEvents){
 	if( this->FinishedCurrentFile ){
 		if( !this->OpenNextFile() ){
 			return Translator::TRANSLATORSTATE::COMPLETE;

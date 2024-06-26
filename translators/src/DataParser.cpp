@@ -70,7 +70,7 @@ void DataParser::SetInputFiles(std::vector<std::string>& filelist){
 	this->DataTranslator->FinalizeFiles();
 }
 
-Translator::TRANSLATORSTATE DataParser::Parse(boost::container::deque<PhysicsData>& RawEvents){
+Translator::TRANSLATORSTATE DataParser::Parse(boost::container::devector<PhysicsData>& RawEvents){
 	return this->DataTranslator->Parse(RawEvents);
 }
 

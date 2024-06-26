@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include <boost/container/deque.hpp>
+#include <boost/container/devector.hpp>
 
 #include "Translator.hpp"
 
@@ -13,7 +13,7 @@ class EVTTranslator : public Translator{
 	public:
 		EVTTranslator(const std::string&,const std::string&);
 		~EVTTranslator();
-		Translator::TRANSLATORSTATE Parse(boost::container::deque<PhysicsData>&);
+		Translator::TRANSLATORSTATE Parse(boost::container::devector<PhysicsData>&);
 	private:
 		struct EVT_BUILT_INFO{
 			int rib_size;
@@ -35,8 +35,8 @@ class EVTTranslator : public Translator{
 		int ReadRingItemBody();
 		int FindNextFragment();
 		int ReadNextFragment();
-		int ReadHeader(boost::container::deque<PhysicsData>&);
-		int ReadFull(boost::container::deque<PhysicsData>&);
+		int ReadHeader(boost::container::devector<PhysicsData>&);
+		int ReadFull(boost::container::devector<PhysicsData>&);
 };
 
 #endif

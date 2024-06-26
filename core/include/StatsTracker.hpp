@@ -11,7 +11,7 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 #include <boost/container/flat_map.hpp>
-#include <boost/container/deque.hpp>
+#include <boost/container/devector.hpp>
 
 #include "ChannelMap.hpp"
 #include "PhysicsData.hpp"
@@ -22,7 +22,7 @@ class StatsTracker{
 		~StatsTracker();
 
 		void Init(ChannelMap*);
-		void IncrementStats(const boost::container::deque<PhysicsData>&);
+		void IncrementStats(const boost::container::devector<PhysicsData>&);
 
 		struct StatsObject{
 			unsigned long long Hits = 0;

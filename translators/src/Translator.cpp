@@ -35,7 +35,7 @@ bool Translator::AddFile(const std::string& filename){
 	}
 }
 
-[[noreturn]] Translator::TRANSLATORSTATE Translator::Parse([[maybe_unused]] boost::container::deque<PhysicsData>& RawEvents){
+[[noreturn]] Translator::TRANSLATORSTATE Translator::Parse([[maybe_unused]] boost::container::devector<PhysicsData>& RawEvents){
 	this->console->error("Called Translator::Parse(), not the overload");
 	throw std::runtime_error("Called Translator::Parse(), not the overload");
 }

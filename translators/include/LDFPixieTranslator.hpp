@@ -4,7 +4,7 @@
 #include <string>
 #include <map>
 
-#include <boost/container/deque.hpp>
+#include <boost/container/devector.hpp>
 
 #include "Translator.hpp"
 
@@ -14,7 +14,7 @@ class LDFPixieTranslator : public Translator{
 	public:
 		LDFPixieTranslator(const std::string&,const std::string&);
 		~LDFPixieTranslator();
-		Translator::TRANSLATORSTATE Parse(boost::container::deque<PhysicsData>&);
+		Translator::TRANSLATORSTATE Parse(boost::container::devector<PhysicsData>&);
 
 		enum HRIBF_TYPES{
 			HEAD = 1145128264,

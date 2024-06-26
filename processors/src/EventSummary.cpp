@@ -65,7 +65,7 @@ void EventSummary::GetDetectorTypeSummary(const std::string& key,std::vector<Phy
 	this->GetDetectorSummary(rkey,vec);
 }
 
-boost::container::deque<PhysicsData>& EventSummary::GetRawEvents(){
+boost::container::devector<PhysicsData>& EventSummary::GetRawEvents(){
 	return this->RawEvents;
 }
 

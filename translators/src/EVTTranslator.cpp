@@ -16,7 +16,7 @@ EVTTranslator::~EVTTranslator(){
 	}	
 }
 
-Translator::TRANSLATORSTATE EVTTranslator::Parse(boost::container::deque<PhysicsData>& RawEvents){
+Translator::TRANSLATORSTATE EVTTranslator::Parse(boost::container::devector<PhysicsData>& RawEvents){
 	if( this->FinishedCurrentFile ){
 		if( not this->OpenNextFile() ){
 			return Translator::TRANSLATORSTATE::COMPLETE;
@@ -56,7 +56,7 @@ Translator::TRANSLATORSTATE EVTTranslator::Parse(boost::container::deque<Physics
 	return Translator::TRANSLATORSTATE::PARSING;
 }
 
-int EVTTranslator::ReadFull(boost::container::deque<PhysicsData>& RawEvents){
+int EVTTranslator::ReadFull(boost::container::devector<PhysicsData>& RawEvents){
 	#ifdef TRANSLATOR_DEBUG
 	this->console->debug("{}:{}:{}",this->CurrHeaderLength,this->CurrTraceLength,RawEvents.size());
 	this->correlator->DumpSelf();
@@ -78,7 +78,7 @@ int EVTTranslator::ReadFull(boost::container::deque<PhysicsData>& RawEvents){
 	return 0;
 }
 
-int EVTTranslator::ReadHeader(boost::container::deque<PhysicsData>& RawEvents){
+int EVTTranslator::ReadHeader(boost::container::devector<PhysicsData>& RawEvents){
 	if( this->FindNextFragment() < 0 ){
 		return -1;
 	}
