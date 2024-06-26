@@ -58,12 +58,17 @@ LDFPixieTranslator::LDFPixieTranslator(const std::string& log,const std::string&
 
 LDFPixieTranslator::~LDFPixieTranslator(){
 	this->console->info("good chunks : {}, bad chunks : {}, spills : {}",this->CurrDataBuff.goodchunks,this->CurrDataBuff.missingchunks,this->CurrSpillID);
-	if( not this->Leftovers.empty() ){
-		this->console->critical("Leftover Events : {}",this->Leftovers.size());
+	int idx = 0;
+	for( const auto& mod : this->CustomLeftovers ){
+		if( not mod.empty() ){
+			this->console->critical("Leftover Events Module {} : {}",idx,mod.size());
+		}
+		++idx;
 	}
 }
 
 Translator::TRANSLATORSTATE LDFPixieTranslator::Parse(boost::container::devector<PhysicsData>& RawEvents){
+	//this->console->info("enter");
 	if( this->FinishedCurrentFile ){
 		if( this->OpenNextFile() ){
 			if( this->ParseDirBuffer() == -1 ){
@@ -77,7 +82,7 @@ Translator::TRANSLATORSTATE LDFPixieTranslator::Parse(boost::container::devector
 			this->FinishedReadingFiles = true;
 		}
 	}
-	bool entriesread = false;
+	std::vector<bool> entriesread(this->CustomLeftovers.size(),false);
 	while( not this->FinishedReadingFiles and (this->CountBuffersWithData() < this->NUMCONCURRENTSPILLS) ){
 		if( this->CurrentFile.eof() ){
 			if( this->OpenNextFile() ){
@@ -96,7 +101,6 @@ Translator::TRANSLATORSTATE LDFPixieTranslator::Parse(boost::container::devector
 			break;
 		}
 
-		entriesread = true;
 		bool full_spill;
 		bool bad_spill;
 		unsigned int nBytes = 0;
@@ -105,33 +109,82 @@ Translator::TRANSLATORSTATE LDFPixieTranslator::Parse(boost::container::devector
 			throw std::runtime_error("Invalid Data Buffer in File : "+this->InputFiles.at(this->CurrentFileIndex));
 		}
 		if( full_spill ){
-			this->UnpackData(nBytes,full_spill,bad_spill);
+			this->UnpackData(nBytes,full_spill,bad_spill,entriesread);
 		}
 	}
-	if( entriesread ){
-		boost::sort::pdqsort(this->Leftovers.begin(),this->Leftovers.end());
-		//boost::sort::spinsort(this->Leftovers.begin(),this->Leftovers.end());
+	for( size_t ii = 0; ii < entriesread.size(); ++ii ){
+		if( entriesread[ii] ){
+			boost::sort::pdqsort(this->CustomLeftovers[ii].begin(),this->CustomLeftovers[ii].end());
+		}
 	}
-	if( not this->Leftovers.empty() ){
-		size_t stopidx = 0;
-		for( const auto& evt : this->Leftovers ){
-			this->LastReadEvtWithin = this->correlator->IsWithinCorrelationWindow(evt.GetTimeStamp(),evt.GetCrate(),evt.GetModule(),evt.GetChannel());
-			if( not this->LastReadEvtWithin ){
-				this->correlator->Pop();
-				this->correlator->Clear();
-				break;
-			}else{
-				this->EvtSpillCounter[evt.GetSpillID()%this->NUMCONCURRENTSPILLS] -= 1;
-				++stopidx;
+	double firsttime = std::numeric_limits<double>::max();
+	size_t firsttimeidx = 0;
+	bool allempty = true;
+	for( size_t ii = 0; ii < this->CustomLeftovers.size(); ++ii ){
+		if( this->CustomLeftovers[ii].size() > 0 ){
+			auto ts = this->CustomLeftovers[ii].front().GetTimeStamp();
+			allempty = false;
+			if( ts < firsttime ){
+				firsttime = ts;
+				firsttimeidx = ii;
 			}
 		}
-		RawEvents.insert(RawEvents.end(),boost::make_move_iterator(this->Leftovers.begin()),boost::make_move_iterator(this->Leftovers.begin()+stopidx));
-		this->Leftovers.erase(this->Leftovers.begin(),this->Leftovers.begin()+stopidx);
-		if( not this->Leftovers.empty() ){
+	}
+	//this->console->info("{} {}",firsttimeidx,firsttime);
+	if( not allempty ){
+		allempty = true;
+		for( size_t curridx = firsttimeidx; ;){
+			size_t rollidx = curridx%this->CustomLeftovers.size();
+			//this->console->critical("{} {} {}",curridx,rollidx,this->CustomLeftovers.size());
+			if( this->CustomLeftovers[rollidx].size() > 0 ){
+				for( auto evt = this->CustomLeftovers[rollidx].front();;){
+					this->LastReadEvtWithin = this->correlator->IsWithinCorrelationWindow(evt.GetTimeStamp(),evt.GetCrate(),evt.GetModule(),evt.GetChannel());
+					if( not this->LastReadEvtWithin ){
+						this->correlator->Pop();
+						break;
+					}else{
+						this->EvtSpillCounter[evt.GetSpillID()%this->NUMCONCURRENTSPILLS] -= 1;
+						RawEvents.push_back(boost::move(evt));
+						this->CustomLeftovers[rollidx].pop_front();
+						if( this->CustomLeftovers[rollidx].empty() ){
+							break;
+						}else{
+							evt = this->CustomLeftovers[rollidx].front();
+						}
+					}
+				}
+			}
+			++curridx;
+			if(curridx%this->CustomLeftovers.size() == firsttimeidx){
+				this->correlator->Clear();
+				break;
+			}	
+		}
+		//this->console->info("{}",RawEvents.size());
+		if( RawEvents.size() > 0 ){
 			return Translator::TRANSLATORSTATE::PARSING;
 		}else{
 			return Translator::TRANSLATORSTATE::COMPLETE;
 		}
+		//size_t stopidx = 0;
+		//for( const auto& evt : this->Leftovers ){
+		//	this->LastReadEvtWithin = this->correlator->IsWithinCorrelationWindow(evt.GetTimeStamp(),evt.GetCrate(),evt.GetModule(),evt.GetChannel());
+		//	if( not this->LastReadEvtWithin ){
+		//		this->correlator->Pop();
+		//		this->correlator->Clear();
+		//		break;
+		//	}else{
+		//		this->EvtSpillCounter[evt.GetSpillID()%this->NUMCONCURRENTSPILLS] -= 1;
+		//		++stopidx;
+		//	}
+		//}
+		//RawEvents.insert(RawEvents.end(),boost::make_move_iterator(this->Leftovers.begin()),boost::make_move_iterator(this->Leftovers.begin()+stopidx));
+		//this->Leftovers.erase(this->Leftovers.begin(),this->Leftovers.begin()+stopidx);
+		//if( not this->Leftovers.empty() ){
+		//	return Translator::TRANSLATORSTATE::PARSING;
+		//}else{
+		//	return Translator::TRANSLATORSTATE::COMPLETE;
+		//}
 	}else{
 		return Translator::TRANSLATORSTATE::COMPLETE;
 	}
@@ -324,7 +377,7 @@ int LDFPixieTranslator::ReadNextBuffer(bool force){
 	return 0;
 }
 
-int LDFPixieTranslator::UnpackData(unsigned int& nBytes,bool& full_spill,bool& bad_spill){
+int LDFPixieTranslator::UnpackData(unsigned int& nBytes,bool& full_spill,bool& bad_spill,std::vector<bool>& entriesread){
 	unsigned int nWords = nBytes/4;
 	unsigned int nWords_read = 0;
 	unsigned int lenrec = 0xFFFFFFFF;
@@ -383,40 +436,37 @@ int LDFPixieTranslator::UnpackData(unsigned int& nBytes,bool& full_spill,bool& b
 					TimeStamp = TimeStamp<<32;
 					TimeStamp += TimeStampLow;
 					double TimeStampInNS = TimeStamp*(this->CMap->GetModuleClockTicksToNS(CrateNumber,ModuleNumber));
-					this->Leftovers.push_back(PhysicsData(CurrHeaderLength,EventLength,CrateNumber,ModuleNumber,ChannelNumber,
+					this->CustomLeftovers[ModuleNumber].push_back(PhysicsData(CurrHeaderLength,EventLength,CrateNumber,ModuleNumber,ChannelNumber,
 								this->CMap->GetGlobalBoardID(CrateNumber,ModuleNumber),
 								this->CMap->GetGlobalChanID(CrateNumber,ModuleNumber,ChannelNumber),
 								EventEnergy,TimeStamp));
-					this->Leftovers.back().SetPileup(FinishCode);
-					this->Leftovers.back().SetSaturation(OutOfRange);
+					entriesread[ModuleNumber] = true;
+					this->CustomLeftovers[ModuleNumber].back().SetPileup(FinishCode);
+					this->CustomLeftovers[ModuleNumber].back().SetSaturation(OutOfRange);
 
 					//word2 has CFD things
-					double CFDTimeStampInNS = this->CurrDecoder->DecodeCFDParams(firstWords,TimeStamp,this->Leftovers.back());
+					double CFDTimeStampInNS = this->CurrDecoder->DecodeCFDParams(firstWords,TimeStamp,this->CustomLeftovers[ModuleNumber].back());
 
-#ifdef TRANSLATOR_DEBUG
-					this->console->debug("convert: {},TS : {}, TS(ns) : {}, CFDTS(ns) : {}",this->CMap->GetModuleClockTicksToNS(CrateNumber,ModuleNumber),TimeStamp,TimeStampInNS,CFDTimeStampInNS);
-					this->console->debug("convert: {},cfdfraction: {},cfdforced: {},cfdsource: {}",this->CMap->GetModuleClockTicksToNS(CrateNumber,ModuleNumber),this->Leftovers.back().GetCFDFraction(),this->Leftovers.back().GetCFDForcedBit(),this->Leftovers.back().GetCFDSourceBit());
-#endif
 					//always use the cfd based TimeStampInNS to event build, it is the same other if nothing is set
 					//this->Leftovers.back().SetTimeStamp(CFDTimeStampInNS);
-					this->Leftovers.back().SetTimeStamp(TimeStampInNS);
-					this->Leftovers.back().SetCFDTimeStamp(CFDTimeStampInNS);
+					this->CustomLeftovers[ModuleNumber].back().SetTimeStamp(TimeStampInNS);
+					this->CustomLeftovers[ModuleNumber].back().SetCFDTimeStamp(CFDTimeStampInNS);
 
 					if( this->CurrHeaderLength > 4 ){
 						otherWords = &(this->databuffer[buffpos+4]);
-						this->CurrDecoder->DecodeOtherWords(otherWords,&(this->Leftovers.back()));
+						this->CurrDecoder->DecodeOtherWords(otherWords,&(this->CustomLeftovers[ModuleNumber].back()));
 					}
 
-					if( this->Leftovers.back().GetExternalTimeStamp() != std::numeric_limits<uint64_t>::max() ){
-						this->CurrExtTS = this->Leftovers.back().GetExternalTimeStamp();
+					if( this->CustomLeftovers[ModuleNumber].back().GetExternalTimeStamp() != std::numeric_limits<uint64_t>::max() ){
+						this->CurrExtTS = this->CustomLeftovers[ModuleNumber].back().GetExternalTimeStamp();
 					}else{
-						this->Leftovers.back().SetExternalTimeStamp(this->CurrExtTS);
+						this->CustomLeftovers[ModuleNumber].back().SetExternalTimeStamp(this->CurrExtTS);
 					}
 
 					buffpos += this->CurrHeaderLength;
 
 					if( this->CurrTraceLength > 0 ){
-						this->Leftovers.back().SetRawTraceLength(this->CurrTraceLength);
+						this->CustomLeftovers[ModuleNumber].back().SetRawTraceLength(this->CurrTraceLength);
 						otherWords = &(this->databuffer[buffpos]);
 						buffpos += this->CurrTraceLength/2;
 						uint16_t* sbuf = reinterpret_cast<uint16_t*>(otherWords);
@@ -424,9 +474,10 @@ int LDFPixieTranslator::UnpackData(unsigned int& nBytes,bool& full_spill,bool& b
 						for( unsigned int ii = 0; ii < this->CurrTraceLength; ++ii ){
 							tmp.push_back(sbuf[ii]);	
 						}
-						this->Leftovers.back().SetRawTrace(tmp);
+						this->CustomLeftovers[ModuleNumber].back().SetRawTrace(tmp);
 					}
-					this->Leftovers.back().SetSpillID(this->CurrSpillID);
+					this->CustomLeftovers[ModuleNumber].back().SetSpillID(this->CurrSpillID);
+					++this->EvtSpillCounter[this->CurrSpillID%this->NUMCONCURRENTSPILLS];
 				}
 				nWords_read += lenrec;
 			}
@@ -438,16 +489,14 @@ int LDFPixieTranslator::UnpackData(unsigned int& nBytes,bool& full_spill,bool& b
 			continue;
 		}else if( vsn == 9999 ){
 			//end of readout
-			auto finalsize = this->Leftovers.size();
-			this->EvtSpillCounter[this->CurrSpillID%this->NUMCONCURRENTSPILLS] = (finalsize - currsize);
+			//auto finalsize = this->Leftovers.size();
+			//this->EvtSpillCounter[this->CurrSpillID%this->NUMCONCURRENTSPILLS] = (finalsize - currsize);
 			//this->console->info("evts added {}",(finalsize-currsize));
 			//this->console->info("spill : {} words : {} Total words : {}",this->CurrSpillID,nWords,this->NTotalWords);
 			++(this->CurrSpillID);
 			this->databuffer.clear();
 			break;
 		}else{
-			auto finalsize = this->Leftovers.size();
-			this->EvtSpillCounter[this->CurrSpillID%this->NUMCONCURRENTSPILLS] = (finalsize - currsize);
 			++(this->CurrSpillID);
 			this->databuffer.clear();
 			this->console->critical("UNEXPECTED VSN : {}",vsn);

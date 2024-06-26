@@ -84,7 +84,7 @@ class LDFPixieTranslator : public Translator{
 		int ReadNextBuffer(bool force = false);
 		int ParseDataBuffer(unsigned int&,bool&,bool&);
 
-		int UnpackData(unsigned int&,bool&,bool&);
+		int UnpackData(unsigned int&,bool&,bool&,std::vector<bool>&);
 		int CountBuffersWithData() const;
 
 		std::vector<unsigned int> databuffer;

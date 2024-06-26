@@ -13,6 +13,8 @@ Translator::Translator(const std::string& log,const std::string& translatorname)
 	
 	this->LastReadEvtWithin = false;
 	this->CurrExtTS = std::numeric_limits<uint64_t>::max();
+
+	this->CustomLeftovers = boost::container::vector<boost::container::deque<PhysicsData>>(13,boost::container::deque<PhysicsData>());
 }
 
 Translator::~Translator(){

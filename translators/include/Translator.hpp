@@ -13,6 +13,8 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 #include <boost/container/devector.hpp>
+#include <boost/container/vector.hpp>
+#include <boost/container/deque.hpp>
 
 #include "BitDecoder.hpp"
 #include "ChannelMap.hpp"
@@ -50,6 +52,7 @@ class Translator{
 
 		bool LastReadEvtWithin;
 		boost::container::devector<PhysicsData> Leftovers;
+		boost::container::vector<boost::container::deque<PhysicsData>> CustomLeftovers;
 
 		std::shared_ptr<spdlog::logger> console;
 		std::shared_ptr<ChannelMap> CMap;
