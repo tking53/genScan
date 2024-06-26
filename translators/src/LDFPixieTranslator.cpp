@@ -136,9 +136,12 @@ Translator::TRANSLATORSTATE LDFPixieTranslator::Parse(boost::container::devector
 		for( size_t curridx = firsttimeidx; ;){
 			size_t rollidx = curridx%this->CustomLeftovers.size();
 			//this->console->critical("{} {} {}",curridx,rollidx,this->CustomLeftovers.size());
-			if( this->CustomLeftovers[rollidx].size() > 0 ){
+			if( not this->CustomLeftovers[rollidx].empty() ){
 				for( auto evt = this->CustomLeftovers[rollidx].front();;){
+					auto ts = evt.GetTimeStamp();
+					auto mod = evt.GetModule();
 					this->LastReadEvtWithin = this->correlator->IsWithinCorrelationWindow(evt.GetTimeStamp(),evt.GetCrate(),evt.GetModule(),evt.GetChannel());
+					//this->console->info("{} {} {}",mod,ts,this->LastReadEvtWithin);
 					if( not this->LastReadEvtWithin ){
 						this->correlator->Pop();
 						break;
@@ -162,6 +165,11 @@ Translator::TRANSLATORSTATE LDFPixieTranslator::Parse(boost::container::devector
 		}
 		//this->console->info("{}",RawEvents.size());
 		if( RawEvents.size() > 0 ){
+			//exit(EXIT_SUCCESS);
+			boost::sort::pdqsort(RawEvents.begin(),RawEvents.end());
+			auto first = RawEvents.front().GetTimeStamp();
+			auto last = RawEvents.back().GetTimeStamp();
+			//this->console->info("{} {} {} {}",RawEvents.size(),first,last,last-first);
 			return Translator::TRANSLATORSTATE::PARSING;
 		}else{
 			return Translator::TRANSLATORSTATE::COMPLETE;
