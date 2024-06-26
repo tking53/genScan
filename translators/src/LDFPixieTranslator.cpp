@@ -63,7 +63,7 @@ LDFPixieTranslator::~LDFPixieTranslator(){
 	}
 }
 
-Translator::TRANSLATORSTATE LDFPixieTranslator::Parse(boost::container::devector<PhysicsData>& RawEvents){
+Translator::TRANSLATORSTATE LDFPixieTranslator::Parse(boost::container::deque<PhysicsData>& RawEvents){
 	if( this->FinishedCurrentFile ){
 		if( this->OpenNextFile() ){
 			if( this->ParseDirBuffer() == -1 ){

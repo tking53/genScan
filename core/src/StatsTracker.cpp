@@ -24,7 +24,7 @@ void StatsTracker::Init(ChannelMap* cmap){
 	}
 }
 
-void StatsTracker::IncrementStats(const boost::container::devector<PhysicsData>& data){
+void StatsTracker::IncrementStats(const boost::container::deque<PhysicsData>& data){
 	for( const auto& d : data ){
 		this->StatsInfo[d.GetGlobalChannelID()].IncrementHit();
 		if( d.GetSaturation() )
