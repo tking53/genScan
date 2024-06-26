@@ -483,8 +483,7 @@ int PhysicsData::GetGlobalBoardID() const{
 }
 
 bool PhysicsData::operator<(const PhysicsData& rhs) const{
-	return this->RawTimeStamp < rhs.RawTimeStamp;
-	//return this->TimeStamp < rhs.TimeStamp;
+	return this->TimeStamp < rhs.TimeStamp;
 	//return std::tie(this->TimeStamp,this->CrateNum,this->ModNum,this->ChanNum,this->RawEnergy) < std::tie(rhs.TimeStamp,rhs.CrateNum,rhs.ModNum,rhs.ChanNum,rhs.RawEnergy);
 }
 
