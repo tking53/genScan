@@ -10,9 +10,9 @@
 		The HoneyCombDuo xml
 	</Description>
 
-	<!-- <Global EventWidth="5.0e-7" EventWidthUnit="s" CorrelationType="rolling-trigger" /> -->
+	<Global EventWidth="5.0e-7" EventWidthUnit="s" CorrelationType="rolling-trigger" />
 	<!-- Don't do rolling-window for Mtas, things get weird from the neutrons, IMO tend to trigger twice quite often -->
-	<Global EventWidth="500.0" EventWidthUnit="ns" CorrelationType="rolling-window" />
+	<!-- <Global EventWidth="500.0" EventWidthUnit="ns" CorrelationType="rolling-window" /> -->
 
 	<DetectorDriver >
 		<Processor name="BSMExpProcessor" betathresh="50.0" >
