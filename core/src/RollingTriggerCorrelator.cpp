@@ -44,7 +44,8 @@ bool RollingTriggerCorrelator::IsWithinCorrelationWindow(const double& ts,const 
 			#ifdef CORRELATOR_DEBUG
 				this->console->debug("Found TS: {:.1f} which is outside the correlation window of {} ns, top before clearing is {:.1f}, delta is {} ns",ts,this->Width,this->MinHeap.top(),std::abs(ts - this->MinHeap.top()));
 			#endif
-			this->MinHeap.push(ts);
+			//don't add it, it's bad
+			//this->MinHeap.push(ts);
 			return false;
 		}
 	}

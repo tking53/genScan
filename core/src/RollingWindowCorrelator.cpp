@@ -47,7 +47,8 @@ bool RollingWindowCorrelator::IsWithinCorrelationWindow(const double& ts,const i
 			#ifdef CORRELATOR_DEBUG
 				this->console->debug("Found TS: {:.1f} which is outside the correlation window of {} ns, top before clearing is {:.1f}, delta is {} ns",ts,this->Width,this->MaxHeap.top(),std::abs(ts - this->MaxHeap.top()));
 			#endif
-			this->MaxHeap.push(ts);
+			//don't push it on it was outside the window
+			//this->MaxHeap.push(ts);
 			return false;
 		}
 	}

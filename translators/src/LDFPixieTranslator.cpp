@@ -143,7 +143,7 @@ Translator::TRANSLATORSTATE LDFPixieTranslator::Parse(boost::container::devector
 					this->LastReadEvtWithin = this->correlator->IsWithinCorrelationWindow(evt.GetTimeStamp(),evt.GetCrate(),evt.GetModule(),evt.GetChannel());
 					//this->console->info("{} {} {}",mod,ts,this->LastReadEvtWithin);
 					if( not this->LastReadEvtWithin ){
-						this->correlator->Pop();
+						//this->correlator->Pop();
 						break;
 					}else{
 						this->EvtSpillCounter[evt.GetSpillID()%this->NUMCONCURRENTSPILLS] -= 1;
