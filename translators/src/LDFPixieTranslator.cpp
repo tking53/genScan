@@ -323,7 +323,13 @@ int LDFPixieTranslator::ParseDataBuffer(unsigned int& nBytes,bool& full_spill,bo
 				return 0;
 			}else{
 				unsigned int copied_bytes = 0;
-				if( this_chunk_sizeB <= 12 ){
+				//this is what it is in utkscan
+				//if( this_chunk_sizeB < =12 ){
+				//the fix seems just as simple as ignoring the == 12 case
+				//this does warrant investigation though
+				//would have to compare against uktscanor output though
+				//is probably fine though
+				if( this_chunk_sizeB < 12 ){
 					this->console->critical("invalid number of bytes in chunk {} of {}, {} bytes at spill {}",current_chunk_num+1,total_num_chunks,this_chunk_sizeB,this->CurrSpillID);
 					++this->CurrDataBuff.missingchunks;
 					return 4;
