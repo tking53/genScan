@@ -1,13 +1,16 @@
 #include "TGButton.h"
 #include "TRootEmbeddedCanvas.h"
 #include "TGLayout.h"
-#include "TGComboBox.h"
+#include "TGTextEntry.h"
+#include "TGTextEntry.h"
 #include "TH2.h"
 #include "TCanvas.h"
 #include "TSocket.h"
 #include "TMessage.h"
 #include "RQ_OBJECT.h"
-#include <iostream>
+#include <TGClient.h>
+#include <TGTextBuffer.h>
+#include <set>
 
 class Spy {
 
@@ -28,12 +31,13 @@ class Spy {
 		TGButton            *fConnect;
 		TGButton            *fQuit;
 		TGButton            *fUpdateLists;
-		TGButton            *fPlotSelected1D;
-		TGButton            *fPlotSelected2D;
-		TGComboBox          *fCBox1D;
-		TGComboBox          *fCBox2D;
+		TGButton            *fPlotSelected;
+		TGTextEntry         *fSelectHistogram;
+		TGTextEntry         *fSelectOptions;
 		TSocket             *fSock;
 		TH1                 *fHist;
+		std::set<std::string>    fTemp;
+		std::vector<TH1*> fTempHis;
 
 	public:
 		Spy();
@@ -42,9 +46,7 @@ class Spy {
 		void Connect();
 		void DoButton();
 
-		void PrintSelected1D();
-		void PrintSelected2D();
-		void PrintLists();
+		void PlotSelected();
 };
 
 void Spy::DoButton()
@@ -136,44 +138,32 @@ Spy::Spy()
 	fHorz2 = new TGHorizontalFrame(fMain, 100, 100);
 	fMain->AddFrame(fHorz2, fLhorz);
 		
-	fUpdateLists = new TGTextButton(fHorz2, "UpdateLists");
-	fUpdateLists->Connect("Clicked()", "Spy", this, "PrintLists()");
-	fHorz2->AddFrame(fUpdateLists, fLbut);
+	TGFont *ufont;         // will reflect user font changes
+	ufont = gClient->GetFont("-*-helvetica-medium-r-*-*-12-*-*-*-*-*-iso8859-1");
+
+	TGGC   *uGC;           // will reflect user GC changes
+			       //
+	GCValues_t valEntryBox1D;
+	gClient->GetColorByName("#000000",valEntryBox1D.fForeground);
+	gClient->GetColorByName("#e7e7e7",valEntryBox1D.fBackground);
+	valEntryBox1D.fFillStyle = kFillSolid;
+	valEntryBox1D.fFont = ufont->GetFontHandle();
+	valEntryBox1D.fGraphicsExposures = kFALSE;
+	uGC = gClient->GetGC(&valEntryBox1D,kTRUE);
 		
-	fCBox1D = new TGComboBox(fHorz2,-1,kHorizontalFrame | kSunkenFrame | kOwnBackground);
-	fCBox1D->SetName("fCBox1D");
-	fCBox1D->AddEntry("Entry 1 ",0);
-	fCBox1D->AddEntry("Entry 2 ",1);
-	fCBox1D->AddEntry("Entry 3 ",2);
-	fCBox1D->AddEntry("Entry 4 ",3);
-	fCBox1D->AddEntry("Entry 5 ",4);
-	fCBox1D->AddEntry("Entry 6 ",5);
-	fCBox1D->AddEntry("Entry 7 ",6);
-	fCBox1D->Resize(102,21);
-	fCBox1D->Select(-1);
-	fHorz2->AddFrame(fCBox1D,fLbut);
-
-	fPlotSelected1D = new TGTextButton(fHorz2, "Plot1D");
-	fPlotSelected1D->Connect("Clicked()", "Spy", this, "PrintSelected1D()");
-	fHorz2->AddFrame(fPlotSelected1D, fLbut);
+	fSelectHistogram = new TGTextEntry(fHorz2, new TGTextBuffer(64),-1,uGC->GetGC(),ufont->GetFontStruct(),kHorizontalFrame | kSunkenFrame | kOwnBackground);
+	fSelectHistogram->SetName("fSelectHistogram");
+	fSelectHistogram->Resize(102,21);
+	fHorz2->AddFrame(fSelectHistogram,fLbut);
 		
-	fCBox2D = new TGComboBox(fHorz2,-1,kHorizontalFrame | kSunkenFrame | kOwnBackground);
-	fCBox2D->SetName("fCBox2D");
-	fCBox2D->AddEntry("Entry 1 ",0);
-	fCBox2D->AddEntry("Entry 2 ",1);
-	fCBox2D->AddEntry("Entry 3 ",2);
-	fCBox2D->AddEntry("Entry 4 ",3);
-	fCBox2D->AddEntry("Entry 5 ",4);
-	fCBox2D->AddEntry("Entry 6 ",5);
-	fCBox2D->AddEntry("Entry 7 ",6);
-	fCBox2D->Resize(102,21);
-	fCBox2D->Select(-1);
-	fHorz2->AddFrame(fCBox2D,fLbut);
+	fSelectOptions = new TGTextEntry(fHorz2, new TGTextBuffer(64),-1,uGC->GetGC(),ufont->GetFontStruct(),kHorizontalFrame | kSunkenFrame | kOwnBackground);
+	fSelectOptions->SetName("fSelectOptions");
+	fSelectOptions->Resize(102,21);
+	fHorz2->AddFrame(fSelectOptions,fLbut);
 
-	fPlotSelected2D = new TGTextButton(fHorz2, "Plot2D");
-	fPlotSelected2D->Connect("Clicked()", "Spy", this, "PrintSelected2D()");
-	fHorz2->AddFrame(fPlotSelected2D, fLbut);
-
+	fPlotSelected = new TGTextButton(fHorz2, "Plot", 4);
+	fPlotSelected->Connect("Clicked()", "Spy", this, "PlotSelected()");
+	fHorz2->AddFrame(fPlotSelected, fLbut);
 
 	// Create a horizontal frame containing two text buttons
 	fHorz3 = new TGHorizontalFrame(fMain, 100, 100);
@@ -219,22 +209,74 @@ Spy::~Spy()
 	delete fMain;
 }
 
-void Spy::PrintSelected1D(){
-	auto id = fCBox1D->GetSelected();
-	std::cout << id << std::endl;
-}
+void Spy::PlotSelected(){
+	auto id = std::string(fSelectHistogram->GetText());
+	auto opts = std::string(fSelectOptions->GetText());
+	for (auto& x : opts) {
+		x = tolower(x);
+	}
 
-void Spy::PrintSelected2D(){
-	auto id = fCBox2D->GetSelected();
-	std::cout << id << std::endl;
-}
+	bool hassame = (opts.find("same") != std::string::npos);
+	if( not hassame ){
+		fTemp.clear();
+		fTemp.insert(id);
+	}else{
+		fTemp.insert(id);
+	}
 
-void Spy::PrintLists(){
-	fCBox1D->RemoveAll();
-	fCBox2D->RemoveAll();
+	if( hassame ){
+		if( not fTempHis.empty() ){
+			for( auto& h : fTempHis ){
+				delete h;
+			}
+			fTempHis.clear();
+		}
+		for( const auto& cid : fTemp ){
+			fSock->Send(cid.c_str());
 
-	fCBox1D->AddEntry("new 1",0);
-	fCBox2D->AddEntry("new 1",0);
+			TMessage *mess;
+			if (fSock->Recv(mess) <= 0) {
+				Error("Spy::DoButton", "error receiving message");
+				return;
+			}
+
+			if (mess->GetClass()->InheritsFrom(TH1::Class())) {
+				fTempHis.push_back((TH1*) mess->ReadObject(mess->GetClass()));
+			}
+		}
+		if( not fTempHis.empty() ){
+			fTempHis.at(0)->Draw();
+			for( size_t ii = 1; ii < fTempHis.size(); ++ii ){
+				fTempHis.at(ii)->Draw("same");
+			}
+
+			fCanvas->GetCanvas()->Modified();
+			fCanvas->GetCanvas()->Update();
+		}
+	}else{
+		fSock->Send(id.c_str());
+
+		TMessage *mess;
+		if (fSock->Recv(mess) <= 0) {
+			Error("Spy::DoButton", "error receiving message");
+			return;
+		}
+
+		if (fHist){
+			delete fHist;
+		}
+		if (mess->GetClass()->InheritsFrom(TH1::Class())) {
+			fHist = (TH1*) mess->ReadObject(mess->GetClass());
+			if (mess->GetClass()->InheritsFrom(TH2::Class())){
+				fHist->Draw("colz");
+			}else{
+				fHist->Draw();
+			}
+		}
+		fCanvas->GetCanvas()->Modified();
+		fCanvas->GetCanvas()->Update();
+	}
+
 }
 
 void spy()
