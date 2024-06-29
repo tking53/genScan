@@ -61,6 +61,8 @@ class MtasProcessor : public Processor{
 		std::vector<int> InnerHits;
 		std::vector<int> MiddleHits;
 		std::vector<int> OuterHits;
+
+		std::vector<double> TimeStamps;
 		
 		std::vector<ProcessorStruct::MtasSegment> SegmentDataVec;
 		ProcessorStruct::MtasSegment CurrSegmentData;

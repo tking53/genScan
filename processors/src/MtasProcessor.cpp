@@ -3,6 +3,7 @@
 #include "EventSummary.hpp"
 #include "HistogramManager.hpp"
 #include <TTree.h>
+#include <algorithm>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -115,9 +116,6 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 	Processor::PreProcess();
 
 	summary.GetDetectorSummary(this->AllDefaultRegex["mtas"],this->SummaryData);
-	bool setfirsttime = false;
-	double firsttime = 0.0;
-	double lasttime = 0.0;
 	for( const auto& evt : this->SummaryData ){
 		this->CurrEvt.RealEvt = true;
 		auto subtype = evt->GetSubType();
@@ -147,11 +145,6 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 			throw std::runtime_error("unknown subtype"+subtype+" correct subtypes are center, inner, middle, outer");
 		}
 
-		if( not setfirsttime ){
-			setfirsttime = true;
-			firsttime = evt->GetTimeStamp();
-		}
-		lasttime = evt->GetTimeStamp();
 		if( not foundfirstevt ){
 			foundfirstevt = true;
 			globalfirsttime = evt->GetTimeStamp();
@@ -174,6 +167,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		if( currsubtype == SUBTYPE::CENTER ){
 			if( !this->CenterHits[detectorposition] ){
 				this->CurrEvt.Center[detectorposition] += evt->GetEnergy();
+				this->TimeStamps.push_back(evt->GetTimeStamp());
 				++this->CenterHits[detectorposition];
 			}else{
 				++this->CenterHits[detectorposition];
@@ -181,6 +175,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		}else if( currsubtype == SUBTYPE::INNER ){
 			if( !this->InnerHits[detectorposition] ){
 				this->CurrEvt.Inner[detectorposition] += evt->GetEnergy();
+				this->TimeStamps.push_back(evt->GetTimeStamp());
 				++this->InnerHits[detectorposition];
 			}else{
 				++this->InnerHits[detectorposition];
@@ -188,6 +183,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		}else if( currsubtype == SUBTYPE::MIDDLE ){
 			if( !this->MiddleHits[detectorposition] ){
 				this->CurrEvt.Middle[detectorposition] += evt->GetEnergy();
+				this->TimeStamps.push_back(evt->GetTimeStamp());
 				++this->MiddleHits[detectorposition];
 			}else{
 				++this->MiddleHits[detectorposition];
@@ -195,6 +191,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		}else if( currsubtype == SUBTYPE::OUTER ){
 			if( !this->OuterHits[detectorposition] ){
 				this->CurrEvt.Outer[detectorposition] += evt->GetEnergy();
+				this->TimeStamps.push_back(evt->GetTimeStamp());
 				++this->OuterHits[detectorposition];
 			}else{
 				++this->OuterHits[detectorposition];
@@ -219,8 +216,8 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 	//	}
 	//}
 
-	this->CurrEvt.FirstTime = firsttime;
-	this->CurrEvt.LastTime = lasttime;
+	this->CurrEvt.FirstTime = *(std::min_element(this->TimeStamps.begin(),this->TimeStamps.end()));
+	this->CurrEvt.LastTime = *(std::max_element(this->TimeStamps.begin(),this->TimeStamps.end()));
 
 	for( int ii = 0; ii < 6; ++ii ){
 		if( this->CenterHits[2*ii] and this->CenterHits[2*ii + 1] ){
@@ -473,6 +470,9 @@ void MtasProcessor::CleanupTree(){
 void MtasProcessor::Reset(){
 	this->PrevEvt = this->CurrEvt;
 	this->CurrEvt = this->NewEvt;
+
+	this->TimeStamps.clear();
+
 	this->CenterHits = std::vector<int>(12,0);
 	this->InnerHits = std::vector<int>(12,0);
 	this->MiddleHits = std::vector<int>(12,0);

@@ -67,6 +67,8 @@ class BSMProcessor : public Processor{
 		std::vector<double> UnCorrectedBSM;
 		std::vector<int> BSMHits;
 
+		std::vector<double> TimeStamps;
+
 		std::map<int,PosCorrection> PosCorrectionMap;
 
 		std::string fronttag;

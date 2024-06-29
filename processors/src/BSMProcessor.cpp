@@ -90,6 +90,7 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 
 		if( !this->BSMHits[detectorposition] ){
 			this->UnCorrectedBSM[detectorposition] += evt->GetEnergy();
+			this->TimeStamps.push_back(evt->GetTimeStamp());
 			++this->BSMHits[detectorposition];
 		}else{
 			++this->BSMHits[detectorposition];
@@ -101,8 +102,8 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 	//	}
 	//}
 	
-	this->CurrEvt.FirstTime = firsttime;
-	this->CurrEvt.LastTime = lasttime;
+	this->CurrEvt.FirstTime = *(std::min_element(this->TimeStamps.begin(),this->TimeStamps.end()));
+	this->CurrEvt.LastTime = *(std::max_element(this->TimeStamps.begin(),this->TimeStamps.end()));
 
 	for( int ii = 0; ii < 6; ++ii ){
 		if( this->BSMHits[2*ii] and this->BSMHits[2*ii + 1] ){
@@ -180,6 +181,7 @@ void BSMProcessor::CleanupTree(){
 void BSMProcessor::Reset(){
 	this->PrevEvt = this->CurrEvt;
 	this->CurrEvt = this->NewEvt;
+	this->TimeStamps.clear();
 	this->UnCorrectedBSM = std::vector<double>(12,0.0);
 	this->BSMHits = std::vector<int>(12,0);
 }
