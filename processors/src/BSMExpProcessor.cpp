@@ -19,6 +19,10 @@ BSMExpProcessor::BSMExpProcessor(const std::string& log) : Processor(log,"BSMExp
 	this->HasBSM = false;
 	this->HasMTAS = false;
 
+	this->h1dsettings = {
+		{3600,{16384,0.0,16384.0}}
+	};
+
 	this->BetaThreshold = 0.0;
 }
 
@@ -41,6 +45,13 @@ BSMExpProcessor::BSMExpProcessor(const std::string& log) : Processor(log,"BSMExp
 	this->CurrBSM = this->BSMProc->GetCurrEvt();
 
 	if( this->HasBSM ){
+		for( size_t ii = 0; ii < 6 ; ++ii ){
+			if( cutmanager->IsWithin("PairProduction",this->CurrMTAS.TotalEnergy[0],this->CurrMTAS.SumFrontBackEnergy[ii]) ){
+				hismanager->Fill("BSM_3600_PP",this->CurrBSM.TotalEnergy);
+				break;
+			}
+		}
+
 		if( (this->CurrBSM.TotalEnergy >= this->BetaThreshold) and (not this->CurrBSM.Saturate) and (not this->CurrBSM.Pileup) ){
 			this->MtasProc->FillBetaPlots(hismanager);
 		}else{
@@ -130,6 +141,9 @@ void BSMExpProcessor::Finalize(){
 void BSMExpProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 	this->MtasProc->DeclarePlots(hismanager);
 	this->BSMProc->DeclarePlots(hismanager);
+
+	hismanager->RegisterPlot<TH1F>("BSM_3600_PP","#betaSM Energy [PairProduction]; Energy (keV)",this->h1dsettings.at(3600));
+
 	this->console->info("Finished Declaring Plots");
 }
 
