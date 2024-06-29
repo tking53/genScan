@@ -29,6 +29,11 @@ class MtasProcessor : public Processor{
 		struct EventInfo{
 			std::vector<double> TotalEnergy;
 			std::vector<double> SumFrontBackEnergy;
+			std::vector<double> Position;
+			std::vector<double> Center;
+			std::vector<double> Inner;
+			std::vector<double> Middle;
+			std::vector<double> Outer;
 			double FirstTime;
 			double LastTime;
 			bool Saturate;
@@ -45,16 +50,13 @@ class MtasProcessor : public Processor{
 		void FillNonBetaPlots(PLOTS::PlotRegistry*);
 
 	private:
+		double CalcPosition(double,double);
 		void Reset();
 
 		EventInfo CurrEvt;
 		EventInfo PrevEvt;
 		EventInfo NewEvt;
 
-		std::vector<double> Center;
-		std::vector<double> Inner;
-		std::vector<double> Middle;
-		std::vector<double> Outer;
 		std::vector<int> CenterHits;
 		std::vector<int> InnerHits;
 		std::vector<int> MiddleHits;
