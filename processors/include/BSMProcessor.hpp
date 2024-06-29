@@ -31,6 +31,7 @@ class BSMProcessor : public Processor{
 			std::vector<double> Position;
 			double UnCorrectedTotalEnergy;
 			std::vector<double> UnCorrectedSumFrontBackEnergy;
+			std::vector<double> UnCorrectedBSM;
 			double FirstTime;
 			double LastTime;
 			int NumValidSegments;
@@ -52,7 +53,6 @@ class BSMProcessor : public Processor{
 				return val;
 			}
 		};
-
 
 	private:
 

@@ -3,6 +3,7 @@
 #include "EventSummary.hpp"
 #include "HistogramManager.hpp"
 #include <TTree.h>
+#include <string>
 
 BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor",{"bsm"}){
 	this->NewEvt = {
@@ -11,6 +12,7 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 		.Position = std::vector<double>(6,0.0),
 		.UnCorrectedTotalEnergy = 0.0,
 		.UnCorrectedSumFrontBackEnergy = std::vector<double>(6,0.0),
+		.UnCorrectedBSM = std::vector<double>(12,0.0),
 		.FirstTime = -1.0,
 		.LastTime = -1.0,
 		.NumValidSegments = 0,
@@ -30,15 +32,16 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 				{3600 , {16384,0.0,16384}},
 				{3601 , {16384,0.0,16384}},
 				{3602 , {16384,0.0,16384}},
-				{3610 , {16384,0.0,16384}}
+				{3610 , {16384,0.0,16384}},
+				{3611 , {16384,0.0,16384}}
 			    };
 
 	this->h2dsettings = {
+				{3620 , {1024,-1.0,1.0,8192,0.0,8192.0}},
 				{3650 , {4096,0.0,4096.0,4096,0.0,4096.0}},
 				{36508 , {2048,0.0,16384.0,2048,0.0,16384.0}}
 			    };
 	
-	this->UnCorrectedBSM = std::vector<double>(12,0.0);
 	this->BSMHits = std::vector<int>(12,0);
 }
 
@@ -89,7 +92,7 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 		int detectorposition = 2*position + isback;
 
 		if( !this->BSMHits[detectorposition] ){
-			this->UnCorrectedBSM[detectorposition] += evt->GetEnergy();
+			this->CurrEvt.UnCorrectedBSM[detectorposition] += evt->GetEnergy();
 			this->TimeStamps.push_back(evt->GetTimeStamp());
 			++this->BSMHits[detectorposition];
 		}else{
@@ -108,15 +111,26 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 	for( int ii = 0; ii < 6; ++ii ){
 		if( this->BSMHits[2*ii] and this->BSMHits[2*ii + 1] ){
 			++this->CurrEvt.NumValidSegments;
-			this->CurrEvt.UnCorrectedSumFrontBackEnergy[ii] = (this->UnCorrectedBSM[2*ii] + this->UnCorrectedBSM[2*ii + 1])/2.0;
-			this->CurrEvt.Position[ii] = this->CalcPosition(this->UnCorrectedBSM[2*ii],this->UnCorrectedBSM[2*ii + 1]);
+			this->CurrEvt.UnCorrectedSumFrontBackEnergy[ii] = (this->CurrEvt.UnCorrectedBSM[2*ii] + this->CurrEvt.UnCorrectedBSM[2*ii + 1])/2.0;
+			this->CurrEvt.Position[ii] = this->CalcPosition(this->CurrEvt.UnCorrectedBSM[2*ii],this->CurrEvt.UnCorrectedBSM[2*ii + 1]);
 			if( (this->PosCorrectionMap.find(2*ii) != this->PosCorrectionMap.end()) and (this->PosCorrectionMap.find(2*ii + 1) != this->PosCorrectionMap.end() ) ){
-				auto front = this->PosCorrectionMap[2*ii].Correct(this->UnCorrectedBSM[2*ii],this->CurrEvt.Position[ii]);
-				auto back = this->PosCorrectionMap[2*ii + 1].Correct(this->UnCorrectedBSM[2*ii + 1],this->CurrEvt.Position[ii]);
+				auto front = this->PosCorrectionMap[2*ii].Correct(this->CurrEvt.UnCorrectedBSM[2*ii],this->CurrEvt.Position[ii]);
+				auto back = this->PosCorrectionMap[2*ii + 1].Correct(this->CurrEvt.UnCorrectedBSM[2*ii + 1],this->CurrEvt.Position[ii]);
 				this->CurrEvt.SumFrontBackEnergy[ii] += (front + back)/2.0;
 			}else{
-				this->CurrEvt.SumFrontBackEnergy[ii] += (this->UnCorrectedBSM[2*ii] + this->UnCorrectedBSM[2*ii + 1])/2.0;
+				this->CurrEvt.SumFrontBackEnergy[ii] += (this->CurrEvt.UnCorrectedBSM[2*ii] + this->CurrEvt.UnCorrectedBSM[2*ii + 1])/2.0;
 			}
+		
+			std::string id = std::to_string(ii);
+			std::string name = "BSM_362"+id+"_F";
+
+			hismanager->Fill(name,this->CurrEvt.Position[ii],this->CurrEvt.UnCorrectedBSM[2*ii]);
+			
+			name = "BSM_362"+id+"_B";
+			hismanager->Fill(name,this->CurrEvt.Position[ii],this->CurrEvt.UnCorrectedBSM[2*ii + 1]);
+			
+			name = "BSM_362"+id;
+			hismanager->Fill(name,this->CurrEvt.Position[ii],this->CurrEvt.SumFrontBackEnergy[ii]);
 		}
 	}
 
@@ -164,6 +178,21 @@ void BSMProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 	hismanager->RegisterPlot<TH1F>("BSM_3601","#betaSM Total No MTAS; Energy (keV)",this->h1dsettings.at(3601));
 	hismanager->RegisterPlot<TH1F>("BSM_3602","#betaSM Total + MTAS Total; Energy (keV)",this->h1dsettings.at(3602));
 	hismanager->RegisterPlot<TH1F>("BSM_3610","#betaSM Total; Energy (keV)",this->h1dsettings.at(3610));
+	hismanager->RegisterPlot<TH1F>("BSM_3611","#betaSM Total [MTAS Pileup|MTAS Saturate]; Energy (keV)",this->h1dsettings.at(3611));
+
+	for( size_t ii = 0; ii < 6; ++ii ){
+		std::string name = "BSM_362"+std::to_string(ii)+"_F";
+		std::string title = "#betaSM"+std::to_string(ii+1)+"_F Energy vs #betaSM Position; Position (arb.); Energy (keV)";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3620));
+		
+		name = "BSM_362"+std::to_string(ii)+"_B";
+		title = "#betaSM"+std::to_string(ii+1)+"_B Energy vs #betaSM Position; Position (arb.); Energy (keV)";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3620));
+		
+		name = "BSM_362"+std::to_string(ii);
+		title = "#betaSM"+std::to_string(ii+1)+" Energy vs #betaSM Position; Position (arb.); Energy (keV)";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3620));
+	}
 	
 	hismanager->RegisterPlot<TH2F>("BSM_3650","#betaSM Total vs MTAS Total; MTAS Total Energy (keV); #betaSM Energy (keV)",this->h2dsettings.at(3650));
 
@@ -182,7 +211,6 @@ void BSMProcessor::Reset(){
 	this->PrevEvt = this->CurrEvt;
 	this->CurrEvt = this->NewEvt;
 	this->TimeStamps.clear();
-	this->UnCorrectedBSM = std::vector<double>(12,0.0);
 	this->BSMHits = std::vector<int>(12,0);
 }
 

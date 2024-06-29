@@ -74,6 +74,8 @@ BSMExpProcessor::BSMExpProcessor(const std::string& log) : Processor(log,"BSMExp
 		if( (not this->HasMTAS) or this->CurrMTAS.TotalEnergy[0] < 1.0 ){
 			hismanager->Fill("BSM_3601",this->CurrBSM.TotalEnergy);
 		}
+	}else{
+		hismanager->Fill("BSM_3611",this->CurrBSM.TotalEnergy);
 	}
 
 	Processor::EndProcess();
