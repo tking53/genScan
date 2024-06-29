@@ -1,12 +1,13 @@
 #include "TGButton.h"
 #include "TRootEmbeddedCanvas.h"
 #include "TGLayout.h"
+#include "TGComboBox.h"
 #include "TH2.h"
 #include "TCanvas.h"
 #include "TSocket.h"
 #include "TMessage.h"
 #include "RQ_OBJECT.h"
-
+#include <iostream>
 
 class Spy {
 
@@ -17,6 +18,7 @@ class Spy {
 		TRootEmbeddedCanvas *fCanvas;
 		TGHorizontalFrame   *fHorz;
 		TGHorizontalFrame   *fHorz2;
+		TGHorizontalFrame   *fHorz3;
 		TGLayoutHints       *fLbut;
 		TGLayoutHints       *fLhorz;
 		TGLayoutHints       *fLcan;
@@ -25,6 +27,11 @@ class Spy {
 		TGButton            *fHprof;
 		TGButton            *fConnect;
 		TGButton            *fQuit;
+		TGButton            *fUpdateLists;
+		TGButton            *fPlotSelected1D;
+		TGButton            *fPlotSelected2D;
+		TGComboBox          *fCBox1D;
+		TGComboBox          *fCBox2D;
 		TSocket             *fSock;
 		TH1                 *fHist;
 
@@ -34,6 +41,10 @@ class Spy {
 
 		void Connect();
 		void DoButton();
+
+		void PrintSelected1D();
+		void PrintSelected2D();
+		void PrintLists();
 };
 
 void Spy::DoButton()
@@ -105,14 +116,17 @@ Spy::Spy()
 	// Create three text buttons to get objects from server
 	// Add to horizontal frame
 	fLbut = new TGLayoutHints(kLHintsCenterX, 10, 10, 0, 0);
+
 	fHpx = new TGTextButton(fHorz, "Raw", 1);
 	fHpx->SetState(kButtonDisabled);
 	fHpx->Connect("Clicked()", "Spy", this, "DoButton()");
 	fHorz->AddFrame(fHpx, fLbut);
+
 	fHpxpy = new TGTextButton(fHorz, "Scalar", 2);
 	fHpxpy->SetState(kButtonDisabled);
 	fHpxpy->Connect("Clicked()", "Spy", this, "DoButton()");
 	fHorz->AddFrame(fHpxpy, fLbut);
+
 	fHprof = new TGTextButton(fHorz, "Cal", 3);
 	fHprof->SetState(kButtonDisabled);
 	fHprof->Connect("Clicked()", "Spy", this, "DoButton()");
@@ -121,15 +135,59 @@ Spy::Spy()
 	// Create a horizontal frame containing two text buttons
 	fHorz2 = new TGHorizontalFrame(fMain, 100, 100);
 	fMain->AddFrame(fHorz2, fLhorz);
+		
+	fUpdateLists = new TGTextButton(fHorz2, "UpdateLists");
+	fUpdateLists->Connect("Clicked()", "Spy", this, "PrintLists()");
+	fHorz2->AddFrame(fUpdateLists, fLbut);
+		
+	fCBox1D = new TGComboBox(fHorz2,-1,kHorizontalFrame | kSunkenFrame | kOwnBackground);
+	fCBox1D->SetName("fCBox1D");
+	fCBox1D->AddEntry("Entry 1 ",0);
+	fCBox1D->AddEntry("Entry 2 ",1);
+	fCBox1D->AddEntry("Entry 3 ",2);
+	fCBox1D->AddEntry("Entry 4 ",3);
+	fCBox1D->AddEntry("Entry 5 ",4);
+	fCBox1D->AddEntry("Entry 6 ",5);
+	fCBox1D->AddEntry("Entry 7 ",6);
+	fCBox1D->Resize(102,21);
+	fCBox1D->Select(-1);
+	fHorz2->AddFrame(fCBox1D,fLbut);
+
+	fPlotSelected1D = new TGTextButton(fHorz2, "Plot1D");
+	fPlotSelected1D->Connect("Clicked()", "Spy", this, "PrintSelected1D()");
+	fHorz2->AddFrame(fPlotSelected1D, fLbut);
+		
+	fCBox2D = new TGComboBox(fHorz2,-1,kHorizontalFrame | kSunkenFrame | kOwnBackground);
+	fCBox2D->SetName("fCBox2D");
+	fCBox2D->AddEntry("Entry 1 ",0);
+	fCBox2D->AddEntry("Entry 2 ",1);
+	fCBox2D->AddEntry("Entry 3 ",2);
+	fCBox2D->AddEntry("Entry 4 ",3);
+	fCBox2D->AddEntry("Entry 5 ",4);
+	fCBox2D->AddEntry("Entry 6 ",5);
+	fCBox2D->AddEntry("Entry 7 ",6);
+	fCBox2D->Resize(102,21);
+	fCBox2D->Select(-1);
+	fHorz2->AddFrame(fCBox2D,fLbut);
+
+	fPlotSelected2D = new TGTextButton(fHorz2, "Plot2D");
+	fPlotSelected2D->Connect("Clicked()", "Spy", this, "PrintSelected2D()");
+	fHorz2->AddFrame(fPlotSelected2D, fLbut);
+
+
+	// Create a horizontal frame containing two text buttons
+	fHorz3 = new TGHorizontalFrame(fMain, 100, 100);
+	fMain->AddFrame(fHorz3, fLhorz);
 
 	// Create "Connect" and "Quit" buttons
 	// Add to horizontal frame
-	fConnect = new TGTextButton(fHorz2, "Connect");
+	fConnect = new TGTextButton(fHorz3, "Connect");
 	fConnect->Connect("Clicked()", "Spy", this, "Connect()");
-	fHorz2->AddFrame(fConnect, fLbut);
-	fQuit = new TGTextButton(fHorz2, "Quit");
+	fHorz3->AddFrame(fConnect, fLbut);
+
+	fQuit = new TGTextButton(fHorz3, "Quit");
 	fQuit->SetCommand("gApplication->Terminate()");
-	fHorz2->AddFrame(fQuit, fLbut);
+	fHorz3->AddFrame(fQuit, fLbut);
 
 	// Set main frame name, map sub windows (buttons), initialize layout
 	// algorithm via Resize() and map main frame
@@ -159,6 +217,24 @@ Spy::~Spy()
 	delete fHorz2;
 	delete fCanvas;
 	delete fMain;
+}
+
+void Spy::PrintSelected1D(){
+	auto id = fCBox1D->GetSelected();
+	std::cout << id << std::endl;
+}
+
+void Spy::PrintSelected2D(){
+	auto id = fCBox2D->GetSelected();
+	std::cout << id << std::endl;
+}
+
+void Spy::PrintLists(){
+	fCBox1D->RemoveAll();
+	fCBox2D->RemoveAll();
+
+	fCBox1D->AddEntry("new 1",0);
+	fCBox2D->AddEntry("new 1",0);
 }
 
 void spy()
