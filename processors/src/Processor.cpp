@@ -136,17 +136,17 @@ void Processor::AssociateType(const std::string& t){
 	return true;
 }
 
-[[noreturn]] bool Processor::PreProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,CUTS::CutRegistry* cutmanager){
+[[noreturn]] bool Processor::PreProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]]CUTS::CutRegistry* cutmanager){
 	this->console->error("Called Processor::PreProcess(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*), not the overload");
 	throw std::runtime_error("Called Processor::PreProcess(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*), not the overload");
 }
 
-[[noreturn]] bool Processor::Process([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,CUTS::CutRegistry* cutmanager){
+[[noreturn]] bool Processor::Process([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]]CUTS::CutRegistry* cutmanager){
 	this->console->error("Called Processor::Process(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*), not the overload");
 	throw std::runtime_error("Called Processor::Process(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*), not the overload");
 }
 
-[[noreturn]] bool Processor::PostProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,CUTS::CutRegistry* cutmanager){
+[[noreturn]] bool Processor::PostProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]]CUTS::CutRegistry* cutmanager){
 	this->console->error("Called Processor::PostProcess(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*), not the overload");
 	throw std::runtime_error("Called Processor::PostProcess(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*), not the overload");
 }
