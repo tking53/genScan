@@ -36,9 +36,6 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 	Processor::PreProcess();
 
 	summary.GetDetectorSummary(this->AllDefaultRegex["bsm"],this->SummaryData);
-	bool setfirsttime = false;
-	double firsttime = 0.0;
-	double lasttime = 0.0;
 	for( const auto& evt : this->SummaryData ){
 		auto subtype = evt->GetSubType();
 		auto group = evt->GetGroup();
@@ -54,11 +51,6 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 			throw std::runtime_error("evt in MtasProcessor is malformed in xml, and has either both front and back tag or neither");
 		}
 
-		if( not setfirsttime ){
-			setfirsttime = true;
-			firsttime = evt->GetTimeStamp();
-		}
-		lasttime = evt->GetTimeStamp();
 		if( not foundfirstevt ){
 			foundfirstevt = true;
 			globalfirsttime = evt->GetTimeStamp();
