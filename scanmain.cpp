@@ -238,7 +238,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	console->info("Generating Plot Registry");
-	std::shared_ptr<PLOTS::PlotRegistry> HistogramManager(new PLOTS::PlotRegistry(logname,StringManip::GetFileBaseName(outputfile),port));
+	std::shared_ptr<PLOTS::PlotRegistry> HistogramManager(new PLOTS::PlotRegistry(logname,StringManip::StripFileExtension(outputfile),port));
 	auto ebins = PLOTS::SG;
 	auto sbins = PLOTS::SE;
 	auto wbins = PLOTS::SE;
@@ -247,7 +247,7 @@ int main(int argc, char *argv[]) {
 	HistogramManager->Initialize(MAX_CHANNELS,ebins,sbins,wbins,zbins,rbins);
 	console->info("Generated Raw, Scalar, and Cal plots for {} Channels, There are {} bins for Raw and Cal, and {} bins for Scalar",MAX_CHANNELS,ebins,sbins);
 	
-	std::shared_ptr<RootFileManager> RootManager(new RootFileManager(logname,StringManip::GetFileBaseName(outputfile),enabletree));
+	std::shared_ptr<RootFileManager> RootManager(new RootFileManager(logname,StringManip::StripFileExtension(outputfile),enabletree));
 	console->info("Created Root File Manager");
 	
 	//Init the processors/analyzers
