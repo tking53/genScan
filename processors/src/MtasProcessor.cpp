@@ -92,6 +92,11 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		{33538, {2048,0.0,16384.0,2048,0.0,16384.0}}
 	};
 
+	this->Position = std::vector<double>(24,0.0);
+	this->Center = std::vector<double>(12,0.0);
+	this->Inner = std::vector<double>(12,0.0);
+	this->Middle = std::vector<double>(12,0.0);
+	this->Outer = std::vector<double>(12,0.0);
 	this->CenterHits = std::vector<int>(12,0);
 	this->InnerHits = std::vector<int>(12,0);
 	this->MiddleHits = std::vector<int>(12,0);
@@ -152,7 +157,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 
 		if( currsubtype == SUBTYPE::CENTER ){
 			if( !this->CenterHits[detectorposition] ){
-				this->CurrEvt.Center[detectorposition] += evt->GetEnergy();
+				this->Center[detectorposition] += evt->GetEnergy();
 				this->TimeStamps.push_back(evt->GetTimeStamp());
 				++this->CenterHits[detectorposition];
 			}else{
@@ -160,7 +165,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 			}
 		}else if( currsubtype == SUBTYPE::INNER ){
 			if( !this->InnerHits[detectorposition] ){
-				this->CurrEvt.Inner[detectorposition] += evt->GetEnergy();
+				this->Inner[detectorposition] += evt->GetEnergy();
 				this->TimeStamps.push_back(evt->GetTimeStamp());
 				++this->InnerHits[detectorposition];
 			}else{
@@ -168,7 +173,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 			}
 		}else if( currsubtype == SUBTYPE::MIDDLE ){
 			if( !this->MiddleHits[detectorposition] ){
-				this->CurrEvt.Middle[detectorposition] += evt->GetEnergy();
+				this->Middle[detectorposition] += evt->GetEnergy();
 				this->TimeStamps.push_back(evt->GetTimeStamp());
 				++this->MiddleHits[detectorposition];
 			}else{
@@ -176,7 +181,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 			}
 		}else if( currsubtype == SUBTYPE::OUTER ){
 			if( !this->OuterHits[detectorposition] ){
-				this->CurrEvt.Outer[detectorposition] += evt->GetEnergy();
+				this->Outer[detectorposition] += evt->GetEnergy();
 				this->TimeStamps.push_back(evt->GetTimeStamp());
 				++this->OuterHits[detectorposition];
 			}else{
@@ -207,20 +212,20 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 
 	for( int ii = 0; ii < 6; ++ii ){
 		if( this->CenterHits[2*ii] and this->CenterHits[2*ii + 1] ){
-			this->CurrEvt.SumFrontBackEnergy[ii] += (this->CurrEvt.Center[2*ii] + this->CurrEvt.Center[2*ii + 1])/2.0;
-			this->CurrEvt.Position[ii] = this->CalcPosition(this->CurrEvt.Center[2*ii],this->CurrEvt.Center[2*ii + 1]);
+			this->CurrEvt.SumFrontBackEnergy[ii] += (this->Center[2*ii] + this->Center[2*ii + 1])/2.0;
+			this->Position[ii] = this->CalcPosition(this->Center[2*ii],this->Center[2*ii + 1]);
 		}
 		if( this->InnerHits[2*ii] and this->InnerHits[2*ii + 1] ){
-			this->CurrEvt.SumFrontBackEnergy[ii+6] += (this->CurrEvt.Inner[2*ii] + this->CurrEvt.Inner[2*ii + 1])/2.0;
-			this->CurrEvt.Position[ii + 6] = this->CalcPosition(this->CurrEvt.Inner[2*ii],this->CurrEvt.Inner[2*ii + 1]);
+			this->CurrEvt.SumFrontBackEnergy[ii+6] += (this->Inner[2*ii] + this->Inner[2*ii + 1])/2.0;
+			this->Position[ii + 6] = this->CalcPosition(this->Inner[2*ii],this->Inner[2*ii + 1]);
 		}
 		if( this->MiddleHits[2*ii] and this->MiddleHits[2*ii + 1] ){
-			this->CurrEvt.SumFrontBackEnergy[ii+12] += (this->CurrEvt.Middle[2*ii] + this->CurrEvt.Middle[2*ii + 1])/2.0;
-			this->CurrEvt.Position[ii + 12] = this->CalcPosition(this->CurrEvt.Middle[2*ii],this->CurrEvt.Middle[2*ii + 1]);
+			this->CurrEvt.SumFrontBackEnergy[ii+12] += (this->Middle[2*ii] + this->Middle[2*ii + 1])/2.0;
+			this->Position[ii + 12] = this->CalcPosition(this->Middle[2*ii],this->Middle[2*ii + 1]);
 		}
 		if( this->OuterHits[2*ii] and this->OuterHits[2*ii + 1] ){
-			this->CurrEvt.SumFrontBackEnergy[ii+18] += (this->CurrEvt.Outer[2*ii] + this->CurrEvt.Outer[2*ii + 1])/2.0;
-			this->CurrEvt.Position[ii + 18] = this->CalcPosition(this->CurrEvt.Outer[2*ii],this->CurrEvt.Outer[2*ii + 1]);
+			this->CurrEvt.SumFrontBackEnergy[ii+18] += (this->Outer[2*ii] + this->Outer[2*ii + 1])/2.0;
+			this->Position[ii + 18] = this->CalcPosition(this->Outer[2*ii],this->Outer[2*ii + 1]);
 		}
 	}
 
@@ -255,13 +260,13 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 			std::string id = std::to_string(ii);
 
 			std::string name = "MTAS_326"+id+"_F";
-			hismanager->Fill(name,this->CurrEvt.Position[ii],this->CurrEvt.Center[2*ii]);
+			hismanager->Fill(name,this->Position[ii],this->Center[2*ii]);
 			
 			name = "MTAS_326"+id+"_B";
-			hismanager->Fill(name,this->CurrEvt.Position[ii],this->CurrEvt.Center[2*ii + 1]);
+			hismanager->Fill(name,this->Position[ii],this->Center[2*ii + 1]);
 			
 			name = "MTAS_326"+id;
-			hismanager->Fill(name,this->CurrEvt.Position[ii],this->CurrEvt.SumFrontBackEnergy[ii]);
+			hismanager->Fill(name,this->Position[ii],this->CurrEvt.SumFrontBackEnergy[ii]);
 
 			hismanager->Fill("MTAS_3215",this->CurrEvt.SumFrontBackEnergy[ii]);
 			hismanager->Fill("MTAS_3225",this->CurrEvt.SumFrontBackEnergy[ii+6]);
@@ -459,6 +464,11 @@ void MtasProcessor::Reset(){
 
 	this->TimeStamps.clear();
 
+	this->Position = std::vector<double>(24,0.0);
+	this->Center = std::vector<double>(12,0.0);
+	this->Inner = std::vector<double>(12,0.0);
+	this->Middle = std::vector<double>(12,0.0);
+	this->Outer = std::vector<double>(12,0.0);
 	this->CenterHits = std::vector<int>(12,0);
 	this->InnerHits = std::vector<int>(12,0);
 	this->MiddleHits = std::vector<int>(12,0);
@@ -497,13 +507,13 @@ void MtasProcessor::FillBetaPlots(PLOTS::PlotRegistry* hismanager){
 			std::string id = std::to_string(ii);
 
 			std::string name = "MTAS_336"+id+"_F";
-			hismanager->Fill(name,this->CurrEvt.Position[ii],this->CurrEvt.Center[2*ii]);
+			hismanager->Fill(name,this->Position[ii],this->Center[2*ii]);
 			
 			name = "MTAS_336"+id+"_B";
-			hismanager->Fill(name,this->CurrEvt.Position[ii],this->CurrEvt.Center[2*ii + 1]);
+			hismanager->Fill(name,this->Position[ii],this->Center[2*ii + 1]);
 			
 			name = "MTAS_336"+id;
-			hismanager->Fill(name,this->CurrEvt.Position[ii],this->CurrEvt.SumFrontBackEnergy[ii]);
+			hismanager->Fill(name,this->Position[ii],this->CurrEvt.SumFrontBackEnergy[ii]);
 
 			hismanager->Fill("MTAS_3315",this->CurrEvt.SumFrontBackEnergy[ii]);
 			hismanager->Fill("MTAS_3325",this->CurrEvt.SumFrontBackEnergy[ii+6]);
@@ -550,13 +560,13 @@ void MtasProcessor::FillNonBetaPlots(PLOTS::PlotRegistry* hismanager){
 			std::string id = std::to_string(ii);
 
 			std::string name = "MTAS_316"+id+"_F";
-			hismanager->Fill(name,this->CurrEvt.Position[ii],this->CurrEvt.Center[2*ii]);
+			hismanager->Fill(name,this->Position[ii],this->Center[2*ii]);
 			
 			name = "MTAS_316"+id+"_B";
-			hismanager->Fill(name,this->CurrEvt.Position[ii],this->CurrEvt.Center[2*ii + 1]);
+			hismanager->Fill(name,this->Position[ii],this->Center[2*ii + 1]);
 			
 			name = "MTAS_316"+id;
-			hismanager->Fill(name,this->CurrEvt.Position[ii],this->CurrEvt.SumFrontBackEnergy[ii]);
+			hismanager->Fill(name,this->Position[ii],this->CurrEvt.SumFrontBackEnergy[ii]);
 
 			hismanager->Fill("MTAS_3115",this->CurrEvt.SumFrontBackEnergy[ii]);
 			hismanager->Fill("MTAS_3125",this->CurrEvt.SumFrontBackEnergy[ii+6]);

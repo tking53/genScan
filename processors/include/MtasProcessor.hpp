@@ -30,11 +30,6 @@ class MtasProcessor : public Processor{
 		struct EventInfo{
 			std::vector<double> TotalEnergy;
 			std::vector<double> SumFrontBackEnergy;
-			std::vector<double> Position;
-			std::vector<double> Center;
-			std::vector<double> Inner;
-			std::vector<double> Middle;
-			std::vector<double> Outer;
 			double FirstTime;
 			double LastTime;
 			bool Saturate;
@@ -45,11 +40,6 @@ class MtasProcessor : public Processor{
 			EventInfo(){
 				TotalEnergy = std::vector<double>(5,0.0);
 				SumFrontBackEnergy = std::vector<double>(24,0.0);
-				Position = std::vector<double>(12,0);
-				Center = std::vector<double>(12,0);
-				Inner = std::vector<double>(12,0);
-				Middle = std::vector<double>(12,0);
-				Outer = std::vector<double>(12,0);
 				FirstTime = -1.0;
 				LastTime = -1.0;
 				Saturate = false;
@@ -79,6 +69,11 @@ class MtasProcessor : public Processor{
 		EventInfo PrevEvt;
 		EventInfo NewEvt;
 
+		std::vector<double> Position;
+		std::vector<double> Center;
+		std::vector<double> Inner;
+		std::vector<double> Middle;
+		std::vector<double> Outer;
 		std::vector<int> CenterHits;
 		std::vector<int> InnerHits;
 		std::vector<int> MiddleHits;
