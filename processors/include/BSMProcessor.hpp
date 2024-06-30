@@ -58,7 +58,7 @@ class BSMProcessor : public Processor{
 
 			double Correct(double erg,double pos){
 				double val = mean/std::exp(constant + slope*pos);
-				return val;
+				return val*erg;
 			}
 
 			PosCorrection() = default;
