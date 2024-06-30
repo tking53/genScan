@@ -6,20 +6,7 @@
 #include <string>
 
 BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor",{"bsm"}){
-	this->NewEvt = {
-		.TotalEnergy = 0.0,
-		.SumFrontBackEnergy = std::vector<double>(6,0.0),
-		.Position = std::vector<double>(6,0.0),
-		.UnCorrectedTotalEnergy = 0.0,
-		.UnCorrectedSumFrontBackEnergy = std::vector<double>(6,0.0),
-		.UnCorrectedBSM = std::vector<double>(12,0.0),
-		.FirstTime = -1.0,
-		.LastTime = -1.0,
-		.NumValidSegments = 0,
-		.Saturate = false,
-		.Pileup = false,
-		.RealEvt = false
-	};
+	this->NewEvt = EventInfo();
 	this->PrevEvt = this->NewEvt;
 	this->CurrEvt = this->NewEvt;
 

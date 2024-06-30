@@ -25,6 +25,9 @@ BSMExpProcessor::BSMExpProcessor(const std::string& log) : Processor(log,"BSMExp
 	};
 
 	this->BetaThreshold = 0.0;
+
+	this->CurrMTAS = MtasProcessor::EventInfo();
+	this->CurrBSM = BSMProcessor::EventInfo();
 }
 
 [[maybe_unused]] bool BSMExpProcessor::PreProcess(EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){

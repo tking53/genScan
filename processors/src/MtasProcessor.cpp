@@ -9,21 +9,7 @@
 #include <vector>
 
 MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProcessor",{"mtas"}){
-	this->NewEvt = {
-		.TotalEnergy = std::vector<double>(5,0.0),
-		.SumFrontBackEnergy = std::vector<double>(24,0.0),
-		.Position = std::vector<double>(12,0),
-		.Center = std::vector<double>(12,0),
-		.Inner = std::vector<double>(12,0),
-		.Middle = std::vector<double>(12,0),
-		.Outer = std::vector<double>(12,0),
-		.FirstTime = -1.0,
-		.LastTime = -1.0,
-		.Saturate = false,
-		.Pileup = false,
-		.BetaTriggered = false,
-		.RealEvt = false
-	};
+	this->NewEvt = EventInfo();
 	this->PrevEvt = this->NewEvt;
 	this->CurrEvt = this->NewEvt;
 

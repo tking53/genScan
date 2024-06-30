@@ -40,7 +40,20 @@ class BSMProcessor : public Processor{
 			bool Pileup;
 			bool RealEvt;
 
-			EventInfo() = default;
+			EventInfo(){
+				TotalEnergy = 0.0;
+				SumFrontBackEnergy = std::vector<double>(6,0.0);
+				Position = std::vector<double>(6,0.0);
+				UnCorrectedTotalEnergy = 0.0;
+				UnCorrectedSumFrontBackEnergy = std::vector<double>(6,0.0);
+				UnCorrectedBSM = std::vector<double>(12,0.0);
+				FirstTime = -1.0;
+				LastTime = -1.0;
+				NumValidSegments = 0;
+				Saturate = false;
+				Pileup = false;
+				RealEvt = false;
+			}
 			~EventInfo() = default;
 			EventInfo(const EventInfo&) = default;
 			EventInfo(EventInfo&&) = default;
