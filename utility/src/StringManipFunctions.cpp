@@ -3,7 +3,7 @@
 #include "StringManipFunctions.hpp"
 
 namespace StringManip{
-	std::string StripFileExtension(const std::string File){
+	std::string StripFileExtension(const std::string& File){
 		auto basefile = GetFileBaseName(File);
 		return GetFilePath(File) + basefile.substr(0,basefile.find_last_of("."));
 	}
