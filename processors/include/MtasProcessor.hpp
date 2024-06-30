@@ -41,6 +41,12 @@ class MtasProcessor : public Processor{
 			bool Pileup;
 			bool BetaTriggered;
 			bool RealEvt;
+
+			~EventInfo() = default;
+			EventInfo(const EventInfo&) = default;
+			EventInfo(EventInfo&&) = default;
+			EventInfo& operator=(const EventInfo&) = default;
+			EventInfo& operator=(EventInfo&&) = default;
 		};
 
 		void SetIsBeta();

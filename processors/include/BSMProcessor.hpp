@@ -39,6 +39,12 @@ class BSMProcessor : public Processor{
 			bool Saturate;
 			bool Pileup;
 			bool RealEvt;
+
+			~EventInfo() = default;
+			EventInfo(const EventInfo&) = default;
+			EventInfo(EventInfo&&) = default;
+			EventInfo& operator=(const EventInfo&) = default;
+			EventInfo& operator=(EventInfo&&) = default;
 		};
 
 		EventInfo& GetCurrEvt();
@@ -53,6 +59,12 @@ class BSMProcessor : public Processor{
 				double val = mean/std::exp(constant + slope*pos);
 				return val;
 			}
+
+			~PosCorrection() = default;
+			PosCorrection(const PosCorrection&) = default;
+			PosCorrection(PosCorrection&&) = default;
+			PosCorrection& operator=(const PosCorrection&) = default;
+			PosCorrection& operator=(PosCorrection&&) = default;
 		};
 
 	private:
