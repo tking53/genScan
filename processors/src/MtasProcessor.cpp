@@ -307,14 +307,17 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 
 void MtasProcessor::Init(const YAML::Node& config){
 	this->console->info("Init called with YAML::Node");
+	this->LoadHistogramSettings(config);
 }
 
 void MtasProcessor::Init(const Json::Value& config){
 	this->console->info("Init called with Json::Value");
+	this->LoadHistogramSettings(config);
 }
 
 void MtasProcessor::Init(const pugi::xml_node& config){
 	this->console->info("Init called with pugi::xml_node");
+	this->LoadHistogramSettings(config);
 }
 		
 void MtasProcessor::Finalize(){
