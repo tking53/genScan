@@ -40,6 +40,7 @@ class BSMProcessor : public Processor{
 			bool Pileup;
 			bool RealEvt;
 
+			EventInfo() = default;
 			~EventInfo() = default;
 			EventInfo(const EventInfo&) = default;
 			EventInfo(EventInfo&&) = default;
@@ -60,6 +61,7 @@ class BSMProcessor : public Processor{
 				return val;
 			}
 
+			PosCorrection() = default;
 			~PosCorrection() = default;
 			PosCorrection(const PosCorrection&) = default;
 			PosCorrection(PosCorrection&&) = default;

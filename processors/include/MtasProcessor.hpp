@@ -42,6 +42,7 @@ class MtasProcessor : public Processor{
 			bool BetaTriggered;
 			bool RealEvt;
 
+			EventInfo() = default;
 			~EventInfo() = default;
 			EventInfo(const EventInfo&) = default;
 			EventInfo(EventInfo&&) = default;
