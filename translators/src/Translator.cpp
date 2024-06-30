@@ -62,7 +62,7 @@ bool Translator::OpenNextFile(){
 		return false;
 	}else{
 		this->console->info("Swapping input File from : {} to : {}",this->InputFiles.at(this->CurrentFileIndex-1),this->InputFiles.at(this->CurrentFileIndex));
-		this->console->info("{}/{} Files Processed",this->CurrentFileIndex,this->InputFiles.size()+1);
+		this->console->info("{}/{} Files Processed",this->CurrentFileIndex,this->InputFiles.size());
 		this->CurrentFile.close();
 		this->CurrentFile.open(this->InputFiles.at(this->CurrentFileIndex),std::ifstream::binary);
 		++(this->CurrentFileIndex);
