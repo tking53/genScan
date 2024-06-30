@@ -7,10 +7,49 @@ add_library(RootDevStruct SHARED RootDevStruct_root.cxx RootDevStruct_root)
 target_link_libraries(RootDevStruct ${ROOT_LIBRARIES})
 add_dependencies(RootDevStruct ${EXTERNAL_PROCESSOR_DEPS} ${EXTERNAL_LOG_DEPS})
 
+if( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
+	add_custom_command(TARGET RootDevStruct
+		POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E create_symlink
+		$<TARGET_FILE_NAME:RootDevStruct>
+		libRootDevStruct_root.dylib
+		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/processors
+		COMMENT "Creating symlink for RootDevStruct"
+		)
+else()
+	add_custom_command(TARGET RootDevStruct
+		POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E create_symlink
+		$<TARGET_FILE_NAME:RootDevStruct>
+		libRootDevStruct_root.so
+		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/processors
+		COMMENT "Creating symlink for RootDevStruct"
+		)
+endif()
+
 ROOT_GENERATE_DICTIONARY(MtasStruct_root MtasStruct.hpp LINKDEF include/MtasStructLinkDef.hpp )
 add_library(MtasStruct SHARED MtasStruct_root.cxx MtasStruct_root)
 target_link_libraries(MtasStruct ${ROOT_LIBRARIES})
 add_dependencies(MtasStruct ${EXTERNAL_PROCESSOR_DEPS} ${EXTERNAL_LOG_DEPS})
+if( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
+	add_custom_command(TARGET MtasStruct
+		POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E create_symlink
+		$<TARGET_FILE_NAME:MtasStruct>
+		libMtasStruct_root.dylib
+		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/processors
+		COMMENT "Creating symlink for MtasStruct"
+		)
+else()
+	add_custom_command(TARGET MtasStruct
+		POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E create_symlink
+		$<TARGET_FILE_NAME:MtasStruct>
+		libMtasStruct_root.so
+		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/processors
+		COMMENT "Creating symlink for MtasStruct"
+		)
+endif()
 
 add_library(PROCESSOR_LIB ${src_files})
 if( USE_SYSTEM_YAMLCPP )
