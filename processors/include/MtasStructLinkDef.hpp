@@ -1,5 +1,5 @@
-#ifndef __MTAS_STRUCT_LINKDEF_HPP
-#define __MTAS_STRUCT_LINKDEF_HPP
+#ifndef __MTAS_STRUCT_LINKDEF_HPP__
+#define __MTAS_STRUCT_LINKDEF_HPP__
 #ifdef __CINT__
 
 #pragma link C++ struct ProcessorStruct::MtasSegment+;
