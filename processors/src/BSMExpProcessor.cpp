@@ -24,6 +24,10 @@ BSMExpProcessor::BSMExpProcessor(const std::string& log) : Processor(log,"BSMExp
 		{3600,{16384,0.0,16384.0}}
 	};
 
+	this->h2dsettings = {
+		{3352,{2048,0.0,2048.0,2048,0.0,2048.0}}
+	};
+
 	this->BetaThreshold = 0.0;
 
 	this->CurrMTAS = MtasProcessor::EventInfo();
@@ -53,8 +57,9 @@ BSMExpProcessor::BSMExpProcessor(const std::string& log) : Processor(log,"BSMExp
 		for( size_t ii = 0; ii < 6 ; ++ii ){
 			if( cutmanager->IsWithin("PairProduction",this->CurrMTAS.TotalEnergy[0],this->CurrMTAS.SumFrontBackEnergy[ii]) ){
 				hismanager->Fill("BSMEXP_2000_PP",this->CurrMTAS.FirstTime - this->CurrBSM.FirstTime);
+				hismanager->Fill("BSMEXP_3352_PP",this->CurrMTAS.TotalEnergy[0],this->CurrMTAS.SumFrontBackEnergy[ii]);
 				hismanager->Fill("BSM_3600_PP",this->CurrBSM.TotalEnergy);
-				break;
+				//break;
 			}
 		}
 
@@ -153,6 +158,8 @@ void BSMExpProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 	hismanager->RegisterPlot<TH1F>("BSM_3600_PP","#betaSM Energy [PairProduction]; Energy (keV)",this->h1dsettings.at(3600));
 	hismanager->RegisterPlot<TH1F>("BSMEXP_2000","TDiff (#betaSM - Mtas); TDiff (ns)",this->h1dsettings.at(2000));
 	hismanager->RegisterPlot<TH1F>("BSMEXP_2000_PP","TDiff (#betaSM - Mtas) [PairProduction]; TDiff (ns)",this->h1dsettings.at(2000));
+
+	hismanager->RegisterPlot<TH2F>("BSMEXP_3352_PP","Mtas C Segment vs Mtas Total; Energy (kev); Energy (kev)",this->h2dsettings.at(3352));
 
 	this->console->info("Finished Declaring Plots");
 }
