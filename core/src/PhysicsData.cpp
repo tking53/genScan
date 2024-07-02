@@ -518,3 +518,39 @@ void PhysicsData::SetExternalTimeStamp(uint64_t val){
 uint64_t PhysicsData::GetExternalTimeStamp() const{
 	return this->ExternalTimestamp;
 }
+
+void PhysicsData::AnalyzeWaveform(const std::pair<size_t,size_t>& pretriggerbounds,const std::pair<size_t,size_t>& posttriggerbounds,const std::vector<size_t>& tqdcbounds){
+	this->Trace.AnalyzeWaveform(pretriggerbounds,posttriggerbounds,tqdcbounds);
+}
+
+std::pair<float,float> PhysicsData::GetTracePreTriggerBaseline(){
+	return this->Trace.GetPreTriggerBaselineInfo();
+}
+
+std::pair<float,float> PhysicsData::GetTracePostTriggerBaseline(){
+	return this->Trace.GetPostTriggerBaselineInfo();
+}
+
+std::pair<size_t,float> PhysicsData::GetTraceMaxInfo(){
+	return this->Trace.GetMaxInfo();
+}
+
+float PhysicsData::InegrateRawTrace(const std::pair<size_t,size_t>& bounds){
+	return this->Trace.IntegrateRawTrace(bounds);
+}
+
+float PhysicsData::AverageRawTrace(const std::pair<size_t,size_t>& bounds){
+	return this->Trace.AverageRawTrace(bounds);
+}
+
+float PhysicsData::IntegrateBaselineSubtractedTrace(const std::pair<size_t,size_t>& bounds){
+	return this->Trace.IntegrateBaselineSubtractedTrace(bounds);
+}
+
+float PhysicsData::AverageBaselineSubtractedTrace(const std::pair<size_t,size_t>& bounds){
+	return this->Trace.AverageBaselineSubtractedTrace(bounds);
+}
+
+std::tuple<float,float,float> PhysicsData::CalcTracePSD(const size_t& start,const size_t& mid,const size_t& end){
+	return this->Trace.CalcPSD(start,mid,end);
+}

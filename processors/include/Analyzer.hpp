@@ -59,8 +59,14 @@ class Analyzer : public std::enable_shared_from_this<Analyzer>{
 
 	  	[[nodiscard]] virtual const boost::regex& GetDefaultRegex() const;
 		[[nodiscard]] virtual const std::unordered_map<std::string,boost::regex>& GetAllDefaultRegex() const;
+		
+		[[nodiscard]] virtual std::set<std::string> GetKnownTypes() const;
 
 	protected:
+		virtual void LoadHistogramSettings(const pugi::xml_node&) final;
+		virtual void LoadHistogramSettings(const YAML::Node&) final;
+		virtual void LoadHistogramSettings(const Json::Value&) final;
+
 		enum STEP{
 			PREPROCESS,
 			PROCESS,
@@ -89,6 +95,9 @@ class Analyzer : public std::enable_shared_from_this<Analyzer>{
 		std::unordered_map<std::string,boost::regex> AllDefaultRegex;
 		
 		std::shared_ptr<spdlog::logger> console;
+
+		std::map<int,PLOTS::HisHelper1D> h1dsettings;
+		std::map<int,PLOTS::HisHelper2D> h2dsettings;
 };
 
 #endif

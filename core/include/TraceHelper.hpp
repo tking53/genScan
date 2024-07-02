@@ -8,6 +8,7 @@
 #include <string>
 #include <initializer_list>
 #include <utility>
+#include <tuple>
 
 template<class T,class U>
 class TraceHelper final{
@@ -25,6 +26,7 @@ class TraceHelper final{
 		}
 
 		TraceHelper(const TraceHelper& other) : data(other.data), 
+							data_baselinesub(other.data_baselinesub),
 							TQDCSums(other.TQDCSums), 
 							PreTriggerBaselineInfo(other.PreTriggerBaselineInfo),
 							PostTriggerBaselineInfo(other.PostTriggerBaselineInfo),
@@ -36,6 +38,8 @@ class TraceHelper final{
 			if( this != &other ){
 				data.clear();
 				data = other.data;
+				data_baselinesub.clear();
+				data_baselinesub = other.data_baselinesub;
 				TQDCSums = other.TQDCSums;
 				PreTriggerBaselineInfo = other.PreTriggerBaselineInfo;
 				PostTriggerBaselineInfo = other.PostTriggerBaselineInfo;
@@ -45,6 +49,7 @@ class TraceHelper final{
 		}
 
 		TraceHelper(TraceHelper&& other) noexcept : data(std::move(other.data)),
+							    data_baselinesub(std::move(other.data_baselinesub)),
 							    TQDCSums(std::move(other.TQDCSums)),
 							    PreTriggerBaselineInfo(std::move(other.PreTriggerBaselineInfo)),
 							    PostTriggerBaselineInfo(std::move(other.PostTriggerBaselineInfo)),
@@ -56,6 +61,8 @@ class TraceHelper final{
 			if( this != &other ){
 				data.clear();
 				data = std::move(other.data);
+				data_baselinesub.clear();
+				data_baselinesub = std::move(other.data_baselinesub);
 				TQDCSums = std::move(other.TQDCSums);
 				PreTriggerBaselineInfo = std::move(other.PreTriggerBaselineInfo);
 				PostTriggerBaselineInfo = std::move(other.PostTriggerBaselineInfo);
@@ -118,14 +125,21 @@ class TraceHelper final{
 				}
 			}
 
-			PreTriggerBaselineInfo = CalcAVGSTDDev(PreTrigRegion);
-			PostTriggerBaselineInfo = CalcAVGSTDDev(PostTrigRegion);
+			PreTriggerBaselineInfo = CalcAVGSTDDev(PreTrigRegion,data);
+			PostTriggerBaselineInfo = CalcAVGSTDDev(PostTrigRegion,data);
 			for( size_t ii = 1; ii < QDCBounds.size(); ++ii ){
-				TQDCSums.push_back(Sum(QDCBounds.at(ii-1),QDCBounds.at(ii)));
+				TQDCSums.push_back(Sum(QDCBounds.at(ii-1),QDCBounds.at(ii),data));
 			}
 
 			auto maxval = std::max_element(data.begin(),data.end());
 			MaxInfo = std::make_pair(std::distance(data.begin(),maxval),*maxval);
+
+			data_baselinesub = std::vector<U>(data.size(),0.0);
+			size_t idx = 0;
+			for( const auto& val : data ){
+				data_baselinesub[idx] = static_cast<U>(val) - PreTriggerBaselineInfo.first;
+				++idx;
+			}
 		}
 
 		U GetPreTriggerBaseline() const{
@@ -167,31 +181,75 @@ class TraceHelper final{
 		std::pair<U,U> GetPostTriggerBaselineInfo() const{
 			return PostTriggerBaselineInfo;
 		}
+		
+		U IntegrateRawTrace(const std::pair<size_t,size_t>& bounds){
+			return this->Sum(bounds.first,bounds.second,data);
+		}
+
+		U IntegrateRawTrace(const size_t& start, const size_t& end){
+			return static_cast<U>(this->Sum(start,end,data));
+		}
+		
+		U AverageRawTrace(const std::pair<size_t,size_t>& bounds){
+			return this->Average(bounds,data);
+		}
+
+		U AverageRawTrace(const size_t& start,const size_t& end){
+		       return this->Average(start,end,data);
+		}
+		
+		U IntegrateBaselineSubtractedTrace(const std::pair<size_t,size_t>& bounds){
+			return this->Sum(bounds.first,bounds.second,data_baselinesub);
+		}
+
+		U IntegrateBaselineSubtractedTrace(const size_t& start, const size_t& end){
+			return static_cast<U>(this->Sum(start,end,data_baselinesub));
+		}
+		
+		U AverageBaselineSubtractedTrace(const std::pair<size_t,size_t>& bounds){
+			return this->Average(bounds,data_baselinesub);
+		}
+
+		U AverageBaselineSubtractedTrace(const size_t& start,const size_t& end){
+		       return this->Average(start,end,data_baselinesub);
+		}
+
+		std::tuple<U,U,U> CalcPSD(const size_t& start, const size_t& mid, const size_t& end){
+			U pre = this->IntegrateBaselineSubtractedTrace(start,mid);
+			U post = this->IntegrateBaselineSubtractedTrace(mid,end);
+			return std::make_tuple(pre,post,post/(pre+post));
+		}
 
 	private:
 		std::vector<T> data;
+		std::vector<U> data_baselinesub;
 		std::vector<T> TQDCSums;
 		std::pair<U,U> PreTriggerBaselineInfo;
 		std::pair<U,U> PostTriggerBaselineInfo;
 		std::pair<size_t,T> MaxInfo;
 
-		T Sum(const size_t& start,const size_t& end){
-			return std::accumulate(data.begin()+start,data.begin()+end,0);
+		template<class V>
+		T Sum(const size_t& start,const size_t& end,const std::vector<V>& arr){
+			return std::accumulate(arr.begin()+start,arr.begin()+end,0);
 		}
 
-		U Average(const std::pair<size_t,size_t>& bounds){
-			return Average(bounds.first,bounds.second);
+		template<class V>
+		U Average(const std::pair<size_t,size_t>& bounds,const std::vector<V>& arr){
+			return Average(bounds.first,bounds.second,arr);
 		}
 
-		U Average(const size_t& start,const size_t& end){
-			return std::accumulate(data.begin()+start,data.begin()+end,0.0)/static_cast<U>(end - start);
+		template<class V>
+		U Average(const size_t& start,const size_t& end,const std::vector<V>& arr){
+			return std::accumulate(arr.begin()+start,arr.begin()+end,0.0)/static_cast<U>(end - start);
 		}
 
-		U STDDev(const std::pair<size_t,size_t>& bounds,const U& avg){
-			return STDDev(bounds.first,bounds.second,avg);
+		template<class V>
+		U STDDev(const std::pair<size_t,size_t>& bounds,const U& avg,const std::vector<V>& arr){
+			return STDDev(bounds.first,bounds.second,avg,arr);
 		}
 
-		U STDDev(const size_t& start,const size_t& end,const U& avg){
+		template<class V>
+		U STDDev(const size_t& start,const size_t& end,const U& avg,const std::vector<V>& arr){
 			if( (end == (start+1)) or ((end-1) == start) )
 				return 0.0;
 			size_t sz = end - start;
@@ -199,12 +257,13 @@ class TraceHelper final{
 				return accumulator + ((val - avg)*(val - avg) / static_cast<U>(sz - 1));
 			};
 
-			return std::sqrt(std::accumulate(data.begin()+start,data.begin()+end,0.0,dev));
+			return std::sqrt(std::accumulate(arr.begin()+start,arr.begin()+end,0.0,dev));
 		}
 
-		std::pair<U,U> CalcAVGSTDDev(const std::pair<size_t,size_t>& bounds){
-			U avg = Average(bounds);
-			return std::make_pair(avg,STDDev(bounds,avg));
+		template<class V>
+		std::pair<U,U> CalcAVGSTDDev(const std::pair<size_t,size_t>& bounds,const std::vector<V>& arr){
+			U avg = Average(bounds,arr);
+			return std::make_pair(avg,STDDev(bounds,avg,arr));
 		}
 };	
 

@@ -190,6 +190,16 @@ class PhysicsData{
 		bool operator>=(const PhysicsData&) const;
 		bool operator==(const PhysicsData&) const;
 		bool operator!=(const PhysicsData&) const;
+
+		void AnalyzeWaveform(const std::pair<size_t,size_t>&,const std::pair<size_t,size_t>&,const std::vector<size_t>&);
+		std::pair<float,float> GetTracePreTriggerBaseline();
+		std::pair<float,float> GetTracePostTriggerBaseline();
+		std::pair<size_t,float> GetTraceMaxInfo();
+		float InegrateRawTrace(const std::pair<size_t,size_t>&);
+		float AverageRawTrace(const std::pair<size_t,size_t>&);
+		float IntegrateBaselineSubtractedTrace(const std::pair<size_t,size_t>&);
+		float AverageBaselineSubtractedTrace(const std::pair<size_t,size_t>&);
+		std::tuple<float,float,float> CalcTracePSD(const size_t&,const size_t&, const size_t&);
 	private:
 		//this is info decoded from the data files
 		int HeaderLength;	
