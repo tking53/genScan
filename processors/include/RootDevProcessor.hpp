@@ -1,28 +1,24 @@
 #ifndef __ROOTDEV_PROCESSOR_HPP__
 #define __ROOTDEV_PROCESSOR_HPP__
 
-#include <string>
-#include <unordered_map>
-
 #include "RootDevStruct.hpp"
-#include "EventSummary.hpp"
-#include "HistogramManager.hpp"
 #include "Processor.hpp"
 
 class RootDevProcessor : public Processor{
 	public:
 		RootDevProcessor(const std::string&);
-		[[maybe_unused]] bool PreProcess([[maybe_unused]] EventSummary&,[[maybe_unused]] PLOTS::PlotRegistry*,[[maybe_unused]] CUTS::CutRegistry*) final;
-		[[maybe_unused]] bool Process(EventSummary&,[[maybe_unused]] PLOTS::PlotRegistry*,[[maybe_unused]] CUTS::CutRegistry*) final;
-		[[maybe_unused]] bool PostProcess([[maybe_unused]] EventSummary&,[[maybe_unused]] PLOTS::PlotRegistry*,[[maybe_unused]] CUTS::CutRegistry*) final;
+		virtual ~RootDevProcessor() = default;
+		[[maybe_unused]] virtual bool PreProcess([[maybe_unused]] EventSummary&,[[maybe_unused]] PLOTS::PlotRegistry*,[[maybe_unused]] CUTS::CutRegistry*) final;
+		[[maybe_unused]] virtual bool Process(EventSummary&,[[maybe_unused]] PLOTS::PlotRegistry*,[[maybe_unused]] CUTS::CutRegistry*) final;
+		[[maybe_unused]] virtual bool PostProcess([[maybe_unused]] EventSummary&,[[maybe_unused]] PLOTS::PlotRegistry*,[[maybe_unused]] CUTS::CutRegistry*) final;
 
 		virtual void Finalize() final;
 
-		void Init(const YAML::Node&);
-		void Init(const Json::Value&);
-		void Init(const pugi::xml_node&);
+		virtual void Init(const YAML::Node&);
+		virtual void Init(const Json::Value&);
+		virtual void Init(const pugi::xml_node&);
 
-		void DeclarePlots(PLOTS::PlotRegistry*) const;
+		virtual void DeclarePlots(PLOTS::PlotRegistry*) const;
 		virtual void RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>&) final;
 		virtual void CleanupTree() final;
 	private:
