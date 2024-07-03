@@ -1,7 +1,4 @@
 #include "GenericAnalyzer.hpp"
-#include "Analyzer.hpp"
-#include "EventSummary.hpp"
-#include "HistogramManager.hpp"
 
 GenericAnalyzer::GenericAnalyzer(const std::string& log) : Analyzer(log,"GenericAnalyzer",{"generic"}){
 }
@@ -24,16 +21,19 @@ GenericAnalyzer::GenericAnalyzer(const std::string& log) : Analyzer(log,"Generic
 	return true;
 }
 
-void GenericAnalyzer::Init(const YAML::Node&){
+void GenericAnalyzer::Init(const YAML::Node& config){
 	console->info("Init called with YAML::Node");
+	this->LoadHistogramSettings(config);
 }
 
-void GenericAnalyzer::Init(const Json::Value&){
+void GenericAnalyzer::Init(const Json::Value& config){
 	console->info("Init called with Json::Value");
+	this->LoadHistogramSettings(config);
 }
 
-void GenericAnalyzer::Init(const pugi::xml_node&){
+void GenericAnalyzer::Init(const pugi::xml_node& config){
 	console->info("Init called with pugi::xml_node");
+	this->LoadHistogramSettings(config);
 }
 
 void GenericAnalyzer::Finalize(){
@@ -41,7 +41,6 @@ void GenericAnalyzer::Finalize(){
 }
 
 
-void GenericAnalyzer::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
-	(void) hismanager;
+void GenericAnalyzer::DeclarePlots([[maybe_unused]] PLOTS::PlotRegistry* hismanager) const{
 	console->info("Finished Declaring Plots");
 }

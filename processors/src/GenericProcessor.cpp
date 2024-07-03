@@ -1,6 +1,4 @@
 #include "GenericProcessor.hpp"
-#include "EventSummary.hpp"
-#include "HistogramManager.hpp"
 
 GenericProcessor::GenericProcessor(const std::string& log) : Processor(log,"GenericProcessor",{"generic"}){
 }
@@ -26,23 +24,25 @@ GenericProcessor::GenericProcessor(const std::string& log) : Processor(log,"Gene
 	return true;
 }
 
-void GenericProcessor::Init(const YAML::Node&){
+void GenericProcessor::Init(const YAML::Node& config){
 	this->console->info("Init called with YAML::Node");
+	this->LoadHistogramSettings(config);
 }
 
-void GenericProcessor::Init(const Json::Value&){
+void GenericProcessor::Init(const Json::Value& config){
 	this->console->info("Init called with Json::Value");
+	this->LoadHistogramSettings(config);
 }
 
-void GenericProcessor::Init(const pugi::xml_node&){
+void GenericProcessor::Init(const pugi::xml_node& config){
 	this->console->info("Init called with pugi::xml_node");
+	this->LoadHistogramSettings(config);
 }
 
 void GenericProcessor::Finalize(){
 	this->console->info("{} has been finalized",this->ProcessorName);
 }
 
-void GenericProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
-	(void) hismanager;
+void GenericProcessor::DeclarePlots([[maybe_unused]] PLOTS::PlotRegistry* hismanager) const{
 	this->console->info("Finished Declaring Plots");
 }
