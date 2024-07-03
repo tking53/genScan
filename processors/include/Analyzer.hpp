@@ -5,9 +5,6 @@
 //this will act on every piece of data no matter what, will output to special root tree and make generic
 //histograms inside root
 
-#include "HistogramManager.hpp"
-#include "CutManager.hpp"
-#include "EventSummary.hpp"
 #include <initializer_list>
 #include <unordered_map>
 #include <string>
@@ -29,6 +26,10 @@
 #include <json/json.h>
 
 #include <boost/regex.hpp>
+
+#include "HistogramManager.hpp"
+#include "CutManager.hpp"
+#include "EventSummary.hpp"
 
 class Analyzer : public std::enable_shared_from_this<Analyzer>{
 	public:
@@ -86,6 +87,8 @@ class Analyzer : public std::enable_shared_from_this<Analyzer>{
 		unsigned long long postprocesscalls;
 
 		std::set<std::string> Types;
+		
+		std::vector<PhysicsData*> SummaryData;
 
 		std::string AnalyzerName;
 		std::string LogName;

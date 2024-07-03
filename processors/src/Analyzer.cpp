@@ -30,7 +30,9 @@ Analyzer::Analyzer(const std::string& log,const std::string& analyzer,const std:
 		this->AllDefaultRegex[t] = boost::regex(t+":.*",boost::regex_constants::optimize|boost::regex_constants::nosubs);
 		this->console->info("Type Regex for {}, has been generated and is available",t);
 	}
-	this->DefaultRegexString.pop_back();
+	if( this->DefaultRegexString.size() > 1 ){
+		this->DefaultRegexString.pop_back();
+	}
 	this->DefaultRegexString += ")";
 	this->DefaultRegex = boost::regex(this->DefaultRegexString,boost::regex_constants::optimize|boost::regex_constants::nosubs);
 	this->AllDefaultRegex["ALL"] = this->DefaultRegex;

@@ -69,7 +69,7 @@ class Processor : public std::enable_shared_from_this<Processor> {
 		[[nodiscard]] virtual const std::unordered_map<std::string,boost::regex>& GetAllDefaultRegex() const final;
 		
 		[[nodiscard]] virtual std::set<std::string> GetKnownTypes() const final;
-
+		
 	protected:
 		virtual void LoadHistogramSettings(const pugi::xml_node&) final;
 		virtual void LoadHistogramSettings(const YAML::Node&) final;

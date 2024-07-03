@@ -15,6 +15,9 @@
 	<!-- <Global EventWidth="500.0" EventWidthUnit="ns" CorrelationType="rolling-window" /> -->
 
 	<DetectorDriver >
+		<Analyzer name="WaveformAnalyzer" included_types="bsm" >
+			<settings crate="[0-9]" module="[0-9]" channel="[0,1]" />
+		</Analyzer>
 		<Processor name="BSMExpProcessor" betathresh="50.0" >
 			<Processor name="BSMProcessor" />
 			<Processor name="MtasProcessor" />

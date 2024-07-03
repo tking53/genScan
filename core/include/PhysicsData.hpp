@@ -144,6 +144,10 @@ class PhysicsData{
 
 		const std::string& GetTags() const;
 
+		//CMapID
+		//shouldn't be settable
+		const std::string& GetCMapID() const;
+
 		//SummaryID
 		void SetSummaryID(const std::string&);
 
@@ -245,6 +249,7 @@ class PhysicsData{
 		std::string Tags;
 		std::string SummaryID;
 		std::string UniqueID;
+		std::string CMapID;
 		std::set<std::string> TagList;
 
 		//Trace Helper, should probably hide this from end user though

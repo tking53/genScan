@@ -25,11 +25,13 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 
 	this->h2dsettings = {
 				{3620 , {1024,-1.0,1.0,8192,0.0,8192.0}},
+				{3630 , {8192,0.0,8192.0,1024,0.0,1.0}},
 				{3650 , {4096,0.0,4096.0,4096,0.0,4096.0}},
 				{36508 , {2048,0.0,16384.0,2048,0.0,16384.0}}
 			    };
 	
 	this->BSMHits = std::vector<int>(12,0);
+	this->TraceSettings = std::vector<TraceAnalysis*>(12,nullptr);
 }
 
 [[maybe_unused]] bool BSMProcessor::PreProcess(EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
@@ -71,6 +73,8 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 		int detectorposition = 2*position + isback;
 
 		if( !this->BSMHits[detectorposition] ){
+			if( this->TraceSettings[detectorposition] != nullptr ){
+			}
 			this->CurrEvt.UnCorrectedBSM[detectorposition] += evt->GetEnergy();
 			this->TimeStamps.push_back(evt->GetTimeStamp());
 			++this->BSMHits[detectorposition];
@@ -144,6 +148,30 @@ void BSMProcessor::Init(const Json::Value& config){
 
 void BSMProcessor::Init(const pugi::xml_node& config){
 	this->console->info("Init called with pugi::xml_node");
+	for( pugi::xml_node trace = config.child("PulseAnalysis"); trace; trace = trace.next_sibling("PulseAnalysis") ){
+		int id = trace.attribute("id").as_int(-1);
+		if( id >= this->TraceSettings.size() or id < 0 ){
+			std::string mess = "Invalid PulseAnalysis Setting in BSMProcessor id="+std::to_string(id)+" does not fall within the range [0,"+std::to_string(this->TraceSettings.size())+")";
+			throw mess;
+		}else{
+			if( this->TraceSettings[id] != nullptr ){
+				std::string mess = "Duplicate PulseAnalysis Setting in BSMProcessor id="+std::to_string(id);
+				throw mess;
+			}else{
+				this->TraceSettings[id] = new TraceAnalysis();
+
+				this->TraceSettings[id]->lowerbound = trace.attribute("lowerbound").as_int(-1);
+				this->TraceSettings[id]->upperbound = trace.attribute("upperbound").as_int(-1);
+				this->TraceSettings[id]->lowthresh = trace.attribute("lowthresh").as_float(0.0);
+				this->TraceSettings[id]->highthresh = trace.attribute("highthresh").as_float(1.0e10);
+				this->TraceSettings[id]->integralthreshold = trace.attribute("integralthreshold").as_float(0.0);
+				if( not this->TraceSettings[id]->ValidateSelf() ){
+					std::string mess = "PulseAnalysis Setting in BSMProcessor for id="+std::to_string(id)+" is misconfigured, doesn't pass (lowerbound < upperbound) and (lowerbound >= 0) and (upperbound >= 0) and (lowthresh <= highthresh)";
+					throw mess;
+				}
+			}
+		}
+	}
 	this->LoadHistogramSettings(config);
 }
 		
@@ -171,6 +199,14 @@ void BSMProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 		name = "BSM_362"+std::to_string(ii);
 		title = "#betaSM"+std::to_string(ii+1)+" Energy vs #betaSM Position; Position (arb.); Energy (keV)";
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3620));
+		
+		name = "BSM_363"+std::to_string(ii)+"_F";
+		title = "#betaSM"+std::to_string(ii+1)+"_F PSD vs #betaSM Integral; Integral (arb.); PSD (arb.)";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3630));
+		
+		name = "BSM_363"+std::to_string(ii)+"_B";
+		title = "#betaSM"+std::to_string(ii+1)+"_B PSD vs #betaSM Integral; Integral (arb.); PSD (arb.)";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3630));
 	}
 	
 	hismanager->RegisterPlot<TH2F>("BSM_3650","#betaSM Total vs MTAS Total; MTAS Total Energy (keV); #betaSM Energy (keV)",this->h2dsettings.at(3650));
@@ -191,6 +227,11 @@ void BSMProcessor::Reset(){
 	this->CurrEvt = this->NewEvt;
 	this->TimeStamps.clear();
 	this->BSMHits = std::vector<int>(12,0);
+	for( const auto& t : this->TraceSettings ){
+		if( t != nullptr ){
+			t->Reset();
+		}
+	}
 }
 
 double BSMProcessor::CalcPosition(double front,double back){

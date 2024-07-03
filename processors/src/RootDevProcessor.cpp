@@ -86,8 +86,7 @@ void RootDevProcessor::Finalize(){
 	this->console->info("{} has been finalized",this->ProcessorName);
 }
 
-void RootDevProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
-	(void) hismanager;
+void RootDevProcessor::DeclarePlots([[maybe_unused]] PLOTS::PlotRegistry* hismanager) const{
 	this->console->info("Finished Declaring Plots");
 }
 

@@ -1,4 +1,5 @@
 #include <limits>
+#include <string>
 #include <tuple>
 
 #include "PhysicsData.hpp"
@@ -15,6 +16,8 @@ PhysicsData::PhysicsData(int headerlength,int eventlength,int cratenum,int modnu
 	this->RawEnergy = rawerg;
 	this->RawTimeStamp = rawts;
 	this->SpillID = 0;
+
+	this->CMapID = std::to_string(cratenum)+":"+std::to_string(modnum)+":"+std::to_string(channum); 
 
 	this->Location = -1;
 
@@ -76,6 +79,7 @@ PhysicsData::PhysicsData(const PhysicsData& other) :
 	Tags(other.Tags),
 	SummaryID(other.SummaryID),
 	UniqueID(other.UniqueID),
+	CMapID(other.CMapID),
 	TagList(other.TagList)
 {
 }
@@ -115,6 +119,7 @@ PhysicsData::PhysicsData(PhysicsData&& other) noexcept :
 	Tags(std::move(other.Tags)),
 	SummaryID(std::move(other.SummaryID)),
 	UniqueID(std::move(other.UniqueID)),
+	CMapID(std::move(other.CMapID)),
 	TagList(std::move(other.TagList))
 {
 }
@@ -155,6 +160,7 @@ PhysicsData& PhysicsData::operator=(const PhysicsData& other){
 		Tags = other.Tags;
 		SummaryID = other.SummaryID;
 		UniqueID = other.UniqueID;
+		CMapID = other.CMapID;
 		TagList = other.TagList;
 	}
 	return *this;
@@ -196,6 +202,7 @@ PhysicsData& PhysicsData::operator=(PhysicsData&& other) noexcept{
 		Tags = std::move(other.Tags);
 		SummaryID = std::move(other.SummaryID);
 		UniqueID = std::move(other.UniqueID);
+		CMapID = std::move(other.CMapID);
 		TagList = std::move(other.TagList);
 	}
 	return *this;
@@ -553,4 +560,8 @@ float PhysicsData::AverageBaselineSubtractedTrace(const std::pair<size_t,size_t>
 
 std::tuple<float,float,float> PhysicsData::CalcTracePSD(const size_t& start,const size_t& mid,const size_t& end){
 	return this->Trace.CalcPSD(start,mid,end);
+}
+
+const std::string& PhysicsData::GetCMapID() const{
+	return this->CMapID;
 }
