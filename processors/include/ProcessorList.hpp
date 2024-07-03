@@ -31,6 +31,7 @@
 class ProcessorList{
 	public:
 		ProcessorList(const std::string&);
+		~ProcessorList() = default;
 
 		void InitializeProcessors(XMLConfigParser*);
 		void InitializeAnalyzers(XMLConfigParser*);
@@ -59,8 +60,6 @@ class ProcessorList{
 		void Finalize();
 
 		void CleanupTrees();
-
-		~ProcessorList();
 
 		const std::vector<std::shared_ptr<Processor>>& GetProcessors() const;
 		const std::vector<std::shared_ptr<Analyzer>>& GetAnalyzers() const;

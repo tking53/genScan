@@ -38,17 +38,17 @@
 class Processor : public std::enable_shared_from_this<Processor> {
 	public:
 		Processor(const std::string&,const std::string&,const std::initializer_list<std::string>&);
-		[[maybe_unused]] virtual bool PreProcess();
-		[[maybe_unused]] virtual bool Process();
-		[[maybe_unused]] virtual bool PostProcess();
+		[[maybe_unused]] virtual bool PreProcess() final;
+		[[maybe_unused]] virtual bool Process() final;
+		[[maybe_unused]] virtual bool PostProcess() final;
 		[[noreturn]] virtual bool PreProcess(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
 		[[noreturn]] virtual bool Process(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
 		[[noreturn]] virtual bool PostProcess(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
-		virtual void EndProcess();
+		virtual void EndProcess() final;
 		virtual ~Processor();
 
 		std::shared_ptr<Processor> GetPtr();
-		virtual std::string GetProcessorName() const;
+		virtual std::string GetProcessorName() const final;
 		virtual void RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>&);
 
 		[[nodiscard]] virtual bool ContainsType(const std::string&) const final;
@@ -65,10 +65,10 @@ class Processor : public std::enable_shared_from_this<Processor> {
 
 		virtual void CleanupTree();
 
-		[[nodiscard]] virtual const boost::regex& GetDefaultRegex() const;
-		[[nodiscard]] virtual const std::unordered_map<std::string,boost::regex>& GetAllDefaultRegex() const;
+		[[nodiscard]] virtual const boost::regex& GetDefaultRegex() const final;
+		[[nodiscard]] virtual const std::unordered_map<std::string,boost::regex>& GetAllDefaultRegex() const final;
 		
-		[[nodiscard]] virtual std::set<std::string> GetKnownTypes() const;
+		[[nodiscard]] virtual std::set<std::string> GetKnownTypes() const final;
 
 	protected:
 		virtual void LoadHistogramSettings(const pugi::xml_node&) final;

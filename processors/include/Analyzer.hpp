@@ -33,17 +33,17 @@
 class Analyzer : public std::enable_shared_from_this<Analyzer>{
 	public:
 		Analyzer(const std::string&,const std::string&,const std::initializer_list<std::string>&);
-		[[maybe_unused]] virtual bool PreProcess();
-		[[maybe_unused]] virtual bool Process();
-		[[maybe_unused]] virtual bool PostProcess();
+		virtual ~Analyzer();
+		[[maybe_unused]] virtual bool PreProcess() final;
+		[[maybe_unused]] virtual bool Process() final;
+		[[maybe_unused]] virtual bool PostProcess() final;
 		[[noreturn]] virtual bool PreProcess(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
 		[[noreturn]] virtual bool Process(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
 		[[noreturn]] virtual bool PostProcess(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
-		virtual void EndProcess();
-		virtual ~Analyzer();
+		virtual void EndProcess() final;
 
 		std::shared_ptr<Analyzer> GetPtr();
-		virtual std::string GetAnalyzerName() const;
+		virtual std::string GetAnalyzerName() const final;
 
 		[[nodiscard]] virtual bool ContainsType(const std::string&) const final;
 		[[nodiscard]] virtual bool ContainsAnyType(const std::set<std::string>&) const final;
@@ -57,10 +57,10 @@ class Analyzer : public std::enable_shared_from_this<Analyzer>{
 
 		[[noreturn]] virtual void DeclarePlots([[maybe_unused]] PLOTS::PlotRegistry*) const;
 
-	  	[[nodiscard]] virtual const boost::regex& GetDefaultRegex() const;
-		[[nodiscard]] virtual const std::unordered_map<std::string,boost::regex>& GetAllDefaultRegex() const;
+	  	[[nodiscard]] virtual const boost::regex& GetDefaultRegex() const final;
+		[[nodiscard]] virtual const std::unordered_map<std::string,boost::regex>& GetAllDefaultRegex() const final;
 		
-		[[nodiscard]] virtual std::set<std::string> GetKnownTypes() const;
+		[[nodiscard]] virtual std::set<std::string> GetKnownTypes() const final;
 
 	protected:
 		virtual void LoadHistogramSettings(const pugi::xml_node&) final;

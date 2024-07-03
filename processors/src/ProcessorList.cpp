@@ -5,8 +5,8 @@
 #include "ProcessorList.hpp"
 
 #include "EventSummary.hpp"
-#include "GenericProcessor.hpp"
 
+#include "GenericProcessor.hpp"
 #include "GenericAnalyzer.hpp"
 
 #include "BSMExpProcessor.hpp"
@@ -25,6 +25,8 @@
 #include "RootDevProcessor.hpp"
 #include "VetoProcessor.hpp"
 
+#include "WaveformAnalyzer.hpp"
+
 ProcessorList::ProcessorList(const std::string& log){
 	this->LogName = log;
 	this->console = spdlog::get(this->LogName)->clone("ProcessorList");
@@ -34,8 +36,6 @@ ProcessorList::ProcessorList(const std::string& log){
 	this->FirstTimeStamp = -1;
 	this->EventStamp = 0;
 }
-
-ProcessorList::~ProcessorList() = default;
 
 void ProcessorList::PreAnalyze(EventSummary& Summary,PLOTS::PlotRegistry* HistogramManager,CUTS::CutRegistry* CutManager){
 	auto knowntypes = Summary.GetKnownTypes();
@@ -141,6 +141,8 @@ void ProcessorList::CreateProc(const std::string& name){
 void ProcessorList::CreateAnal(const std::string& name){
 	if( name.compare("GenericAnalyzer") == 0 ){
 		known_analyzers.push_back(std::make_shared<GenericAnalyzer>(this->LogName));
+	}else if( name.compare("WaveformAnalyzer") == 0 ){
+		known_analyzers.push_back(std::make_shared<WaveformAnalyzer>(this->LogName));
 	}else{
 		std::stringstream ss;
 		ss << "ProcessorList::InitializeAnalyzers() Unknown analyzer named \""
@@ -181,6 +183,7 @@ void ProcessorList::InitializeAnalyzers(YAMLConfigParser* cmap){
 		known_analyzers.back()->Init(cmap->GetAnalyzerYAMLInfo(name));
 	}
 }
+
 void ProcessorList::InitializeProcessors(JSONConfigParser* cmap){
 	auto procnames = cmap->GetProcessorNames();
 	for( auto& name : procnames ){
