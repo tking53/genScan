@@ -28,14 +28,16 @@ class WaveformAnalyzer : public Analyzer {
 			std::vector<size_t> QDCBounds;
 
 			bool HasPSD;
-			std::tuple<size_t,size_t,size_t,float> PSDBounds;
+			std::tuple<size_t,size_t,size_t> FixedPSDBounds;
+			std::tuple<size_t,size_t,float> FractionalPSDBounds;
 
 			WaveFormParams(){
 				PreTriggerBounds = {0,0};
 				PostTriggerBounds = {0,0};
 				QDCBounds = {};
 				HasPSD = false;
-				PSDBounds = {0,0,0,1.0};
+				FixedPSDBounds = {0,0,0};
+				FractionalPSDBounds = {0,0,2.0};
 			}
 
 			~WaveFormParams() = default;

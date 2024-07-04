@@ -300,14 +300,14 @@ int main(int argc, char *argv[]) {
 
 				CorrelatedEvents.BuildDetectorSummary();
 
-				processorlist->PreProcess(CorrelatedEvents,HistogramManager.get(),CutManager.get());
 				processorlist->PreAnalyze(CorrelatedEvents,HistogramManager.get(),CutManager.get());
+				processorlist->PreProcess(CorrelatedEvents,HistogramManager.get(),CutManager.get());
 
-				processorlist->Process(CorrelatedEvents,HistogramManager.get(),CutManager.get());
 				processorlist->Analyze(CorrelatedEvents,HistogramManager.get(),CutManager.get());
+				processorlist->Process(CorrelatedEvents,HistogramManager.get(),CutManager.get());
 
-				processorlist->PostProcess(CorrelatedEvents,HistogramManager.get(),CutManager.get());
 				processorlist->PostAnalyze(CorrelatedEvents,HistogramManager.get(),CutManager.get());
+				processorlist->PostProcess(CorrelatedEvents,HistogramManager.get(),CutManager.get());
 
 				RootManager->Fill();
 				processorlist->CleanupTrees();

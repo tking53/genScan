@@ -2,6 +2,17 @@
 #include "boost/regex/v5/regex_iterator.hpp"
 
 WaveformAnalyzer::WaveformAnalyzer(const std::string& log) : Analyzer(log,"WaveformAnalyzer",{}){
+	this->h2dsettings = {
+		{1000, {1024,0,1024.0,512,0,512.0}},
+		{1001, {16384,0,16384.0,512,0,512.0}},
+		{1002, {1024,0,1024.0,512,0,512.0}},
+		{1010, {1024,0,1024.0,512,0,512.0}},
+		{1011, {16384,0,16384.0,512,0,512.0}},
+		{1012, {1024,0,1024.0,512,0,512.0}},
+		{1020, {1024,0,1024.0,512,0,512.0}},
+		{1021, {16384,0,16384.0,512,0,512.0}},
+		{1022, {16384,0,16384.0,512,0,512.0}}
+	};
 }
 
 [[maybe_unused]] bool WaveformAnalyzer::PreProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
@@ -11,6 +22,48 @@ WaveformAnalyzer::WaveformAnalyzer(const std::string& log) : Analyzer(log,"Wavef
 		summary.GetDetectorSummary(this->AllDefaultRegex[key],this->SummaryData);
 		//this->console->info("ROOTDEV Size for type {} : {}",key,this->SummaryData.size());
 		for( const auto& evt : this->SummaryData ){
+			for( const auto& s : this->WaveSettings ){
+				boost::smatch cmapmatch;
+				if( boost::regex_match(evt->GetCMapID(),cmapmatch,s.first,boost::regex_constants::match_continuous) ){
+					evt->AnalyzeWaveform(s.second.PreTriggerBounds,s.second.PostTriggerBounds,s.second.QDCBounds);
+					if( s.second.HasPSD ){
+						//auto fraction = std::get<2>(s.second.FractionalPSDBounds);
+						//if( fraction <= 1.0 ){
+						//	auto pre = std::get<0>(s.second.FractionalPSDBounds);
+						//	auto post = std::get<1>(s.second.FractionalPSDBounds);
+						//	evt->CalcTraceFractionalPSD(pre,post,fraction);
+						//}
+						
+						auto mid = std::get<1>(s.second.FixedPSDBounds);
+						if( mid > 0 ){
+							auto begin = std::get<0>(s.second.FixedPSDBounds);
+							auto end = std::get<2>(s.second.FixedPSDBounds);
+							evt->CalcTraceFixedPSD(begin,mid,end);
+						}
+					}
+					auto pre = evt->GetTracePreTriggerBaseline();
+					auto post = evt->GetTracePostTriggerBaseline();
+					auto maxval = evt->GetTraceMaxInfo();
+					auto blmax = evt->GetBaselineSubtractedMaxValue();
+					auto gcid = evt->GetGlobalChannelID();
+
+					hismanager->Fill("WAVE_1000",s.second.PreTriggerBounds.first,gcid);
+					hismanager->Fill("WAVE_1000",s.second.PreTriggerBounds.second,gcid);
+					hismanager->Fill("WAVE_1001",pre.first,gcid);
+					hismanager->Fill("WAVE_1002",pre.second,gcid);
+					
+					hismanager->Fill("WAVE_1010",s.second.PostTriggerBounds.first,gcid);
+					hismanager->Fill("WAVE_1010",s.second.PostTriggerBounds.second,gcid);
+					hismanager->Fill("WAVE_1011",post.first,gcid);
+					hismanager->Fill("WAVE_1012",post.second,gcid);
+
+					hismanager->Fill("WAVE_1020",maxval.first,gcid);
+					hismanager->Fill("WAVE_1021",maxval.second,gcid);
+					hismanager->Fill("WAVE_1022",blmax,gcid);
+
+					break;
+				}
+			}
 			//this->console->info("{} {}",evt->GetType(),this->SummaryData.size());
 		}
 	}
@@ -72,8 +125,19 @@ void WaveformAnalyzer::Finalize(){
 }
 
 
-void WaveformAnalyzer::DeclarePlots([[maybe_unused]] PLOTS::PlotRegistry* hismanager) const{
+void WaveformAnalyzer::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 	console->info("Finished Declaring Plots");
+	hismanager->RegisterPlot<TH2F>("WAVE_1000","PreTriggerRegion Bounds; Trace position (arb.); Linearized Channel Number (arb.)",this->h2dsettings.at(1000));
+	hismanager->RegisterPlot<TH2F>("WAVE_1001","PreTriggerRegion Baseline; Trace baseline (arb.); Linearized Channel Number (arb.)",this->h2dsettings.at(1001));
+	hismanager->RegisterPlot<TH2F>("WAVE_1002","PreTriggerRegion Baseline Std. Dev.; Trace baseline std. dev. (arb.); Linearized Channel Number (arb.)",this->h2dsettings.at(1002));
+
+	hismanager->RegisterPlot<TH2F>("WAVE_1010","PostTriggerRegion Bounds; Trace position (arb.); Linearized Channel Number (arb.)",this->h2dsettings.at(1010));
+	hismanager->RegisterPlot<TH2F>("WAVE_1011","PostTriggerRegion Baseline; Trace baseline (arb.); Linearized Channel Number (arb.)",this->h2dsettings.at(1011));
+	hismanager->RegisterPlot<TH2F>("WAVE_1012","PostTriggerRegion Baseline Std. Dev.; Trace baseline std. dev. (arb.); Linearized Channel Number (arb.)",this->h2dsettings.at(1012));
+	
+	hismanager->RegisterPlot<TH2F>("WAVE_1020","Max Trace Location; Trace position (arb.); Linearized Channel Number (arb.)",this->h2dsettings.at(1020));
+	hismanager->RegisterPlot<TH2F>("WAVE_1021","Max Trace Value; adc value (arb.); Linearized Channel Number (arb.)",this->h2dsettings.at(1021));
+	hismanager->RegisterPlot<TH2F>("WAVE_1022","Baseline Subtraced Max Trace Value; adc value (arb.); Linearized Channel Number (arb.)",this->h2dsettings.at(1022));
 }
 
 void WaveformAnalyzer::InsertAdditionalTypes(const std::string& typestring){
@@ -158,8 +222,10 @@ void WaveformAnalyzer::ParseQDC(const pugi::xml_node& settings,WaveFormParams& w
 void WaveformAnalyzer::ParsePSD(const pugi::xml_node& settings,WaveFormParams& wav){
 	if( pugi::xml_node curr = settings.child("PSD") ){
 		wav.HasPSD = true;
-		wav.PSDBounds = std::make_tuple<size_t,size_t,size_t,float>(curr.attribute("begin").as_int(0),curr.attribute("middle").as_int(0),curr.attribute("end").as_int(0),curr.attribute("fraction").as_float(1.0));
-		this->console->info("Found PSD node : [begin,middle,end,fraction)",std::get<0>(wav.PSDBounds),std::get<1>(wav.PSDBounds),std::get<2>(wav.PSDBounds),std::get<3>(wav.PSDBounds));
+		wav.FixedPSDBounds = std::make_tuple<size_t,size_t,size_t>(curr.attribute("begin").as_int(0),curr.attribute("middle").as_int(0),curr.attribute("end").as_int(0));
+		wav.FractionalPSDBounds = std::make_tuple<size_t,size_t,float>(curr.attribute("pre").as_int(0),curr.attribute("post").as_int(0),curr.attribute("fraction").as_float(2.0));
+		this->console->info("Found PSD node : [begin,middle,end)",std::get<0>(wav.FixedPSDBounds),std::get<1>(wav.FixedPSDBounds),std::get<2>(wav.FixedPSDBounds));
+		this->console->info("Found PSD node : [pre,post) fraction",std::get<0>(wav.FractionalPSDBounds),std::get<1>(wav.FractionalPSDBounds),std::get<2>(wav.FractionalPSDBounds));
 
 	}
 }

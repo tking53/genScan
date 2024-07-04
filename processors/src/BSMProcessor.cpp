@@ -73,8 +73,6 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 		int detectorposition = 2*position + isback;
 
 		if( !this->BSMHits[detectorposition] ){
-			if( this->TraceSettings[detectorposition] != nullptr ){
-			}
 			this->CurrEvt.UnCorrectedBSM[detectorposition] += evt->GetEnergy();
 			this->TimeStamps.push_back(evt->GetTimeStamp());
 			++this->BSMHits[detectorposition];

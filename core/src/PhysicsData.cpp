@@ -530,38 +530,54 @@ void PhysicsData::AnalyzeWaveform(const std::pair<size_t,size_t>& pretriggerboun
 	this->Trace.AnalyzeWaveform(pretriggerbounds,posttriggerbounds,tqdcbounds);
 }
 
-std::pair<float,float> PhysicsData::GetTracePreTriggerBaseline(){
+const std::pair<float,float>& PhysicsData::GetTracePreTriggerBaseline() const{
 	return this->Trace.GetPreTriggerBaselineInfo();
 }
 
-std::pair<float,float> PhysicsData::GetTracePostTriggerBaseline(){
+const std::pair<float,float>& PhysicsData::GetTracePostTriggerBaseline() const{
 	return this->Trace.GetPostTriggerBaselineInfo();
 }
 
-std::pair<size_t,float> PhysicsData::GetTraceMaxInfo(){
+const std::pair<size_t,uint16_t>& PhysicsData::GetTraceMaxInfo() const{
 	return this->Trace.GetMaxInfo();
 }
 
-float PhysicsData::InegrateRawTrace(const std::pair<size_t,size_t>& bounds){
+float PhysicsData::InegrateRawTrace(const std::pair<size_t,size_t>& bounds) const{
 	return this->Trace.IntegrateRawTrace(bounds);
 }
 
-float PhysicsData::AverageRawTrace(const std::pair<size_t,size_t>& bounds){
+float PhysicsData::AverageRawTrace(const std::pair<size_t,size_t>& bounds) const{
 	return this->Trace.AverageRawTrace(bounds);
 }
 
-float PhysicsData::IntegrateBaselineSubtractedTrace(const std::pair<size_t,size_t>& bounds){
+float PhysicsData::IntegrateBaselineSubtractedTrace(const std::pair<size_t,size_t>& bounds) const{
 	return this->Trace.IntegrateBaselineSubtractedTrace(bounds);
 }
 
-float PhysicsData::AverageBaselineSubtractedTrace(const std::pair<size_t,size_t>& bounds){
+float PhysicsData::AverageBaselineSubtractedTrace(const std::pair<size_t,size_t>& bounds) const{
 	return this->Trace.AverageBaselineSubtractedTrace(bounds);
 }
 
-std::tuple<float,float,float> PhysicsData::CalcTracePSD(const size_t& start,const size_t& mid,const size_t& end){
-	return this->Trace.CalcPSD(start,mid,end);
+void PhysicsData::CalcTraceFixedPSD(const size_t& start,const size_t& mid,const size_t& end){
+	this->Trace.CalcFixedPSD(start,mid,end);
+}
+
+const std::tuple<float,float,float>& PhysicsData::GetTraceFixedPSD() const{
+	return this->Trace.GetFixedPSD();
+}
+
+void PhysicsData::CalcTraceFractionalPSD(const size_t& start,const size_t& end,const float& fraction){
+	this->Trace.CalcFractionalPSD(start,end,fraction);
+}
+
+const std::tuple<float,float,float>& PhysicsData::GetTraceFractionalPSD() const{
+	return this->Trace.GetFractionalPSD();
 }
 
 const std::string& PhysicsData::GetCMapID() const{
 	return this->CMapID;
+}
+
+const float& PhysicsData::GetBaselineSubtractedMaxValue() const{
+	return this->Trace.GetBaselineSubtractedMaxValue();
 }
