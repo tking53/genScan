@@ -1,5 +1,3 @@
-#include <cmath>
-
 #include "MathFunctions.hpp"
 
 namespace Math{
