@@ -99,7 +99,11 @@ std::shared_ptr<Processor> Processor::GetPtr(){
 void Processor::AssociateType(const std::string& t){
 	if( this->Types.find(t) == this->Types.end() ){
 		this->DefaultRegexString.pop_back();
-		this->DefaultRegexString += "|"+t+":.*)";
+		if( this->DefaultRegexString.size() > 1 ){
+			this->DefaultRegexString += "|"+t+":.*)";
+		}else{
+			this->DefaultRegexString += t+":.*)";
+		}
 		this->DefaultRegex = boost::regex(this->DefaultRegexString,boost::regex_constants::optimize|boost::regex_constants::nosubs);
 		this->Types.insert(t);
 		this->console->info("Type : [{}] has been associated with this Processor",t);

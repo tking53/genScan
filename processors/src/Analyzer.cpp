@@ -91,7 +91,11 @@ std::string Analyzer::GetAnalyzerName() const{
 void Analyzer::AssociateType(const std::string& t){
 	if( this->Types.find(t) == this->Types.end() ){
 		this->DefaultRegexString.pop_back();
-		this->DefaultRegexString += "|"+t+":.*)";
+		if( this->DefaultRegexString.size() > 1 ){
+			this->DefaultRegexString += "|"+t+":.*)";
+		}else{
+			this->DefaultRegexString += t+":.*)";
+		}
 		this->Types.insert(t);
 		this->DefaultRegex = boost::regex(this->DefaultRegexString,boost::regex_constants::optimize|boost::regex_constants::nosubs);
 		this->console->info("Type : [{}] has been associated with this Analyzer",t);
