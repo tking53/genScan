@@ -20,7 +20,7 @@ void StatsTracker::Init(ChannelMap* cmap){
 	auto chaninfo  = cmap->GetChannelConfig();
 	for( const auto& it : chaninfo ){
 		StatsObject curr;
-		auto res = this->StatsInfo[it.first] = curr;
+		this->StatsInfo[it.first] = curr;
 	}
 }
 
