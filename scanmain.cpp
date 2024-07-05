@@ -267,6 +267,7 @@ int main(int argc, char *argv[]) {
 			exit(EXIT_FAILURE);
 		}
 		processorlist->DeclarePlots(HistogramManager.get());
+		processorlist->RegisterCuts(CutManager.get());
 		processorlist->RegisterOutputTrees(RootManager.get());
 		processorlist->Finalize();
 	}catch(std::runtime_error const& e){

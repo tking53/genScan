@@ -292,3 +292,38 @@ void Processor::LoadHistogramSettings(const Json::Value& config){
 		}
 	}
 }
+
+void Processor::RegisterCuts(CUTS::CutRegistry* CutManager){
+	for( const auto& kv : this->customcuts ){
+		CutManager->AddCut(kv.first,kv.second);
+	}
+}
+
+void Processor::LoadCustomCuts(const pugi::xml_node& config){
+	for(pugi::xml_node cut = config.child("Cut"); cut; cut = cut.next_sibling("Cut")){
+		std::string id = cut.attribute("name").as_string("");
+		std::string file = cut.attribute("filename").as_string("");
+		this->customcuts[id] = file;
+		this->console->info("Found Cut {} : {}",id,file);
+	}
+}
+
+void Processor::LoadCustomCuts(const YAML::Node& config){
+	YAML::Node cut = config["Cut"];
+	for( size_t ii = 0; ii < cut.size(); ++ii ){
+		std::string name = cut[ii]["name"].as<std::string>();
+		std::string filename = cut[ii]["filename"].as<std::string>();
+		this->customcuts[name] = filename;
+		this->console->info("Found Cut {} : {}",name,filename);
+	}
+}
+
+void Processor::LoadCustomCuts(const Json::Value& config){
+	Json::Value cut = config["Cut"];
+	for( const auto& c : cut ){
+		std::string name = c["name"].asString();
+		std::string filename = c["filename"].asString();
+		this->customcuts[name] = filename;
+		this->console->info("Found Cut {} : {}",name,filename);
+	}
+}

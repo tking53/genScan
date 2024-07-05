@@ -51,6 +51,7 @@ class ProcessorList{
 		void PostAnalyze(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
 		void PostProcess(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
 
+		void RegisterCuts(CUTS::CutRegistry*);
 		void RegisterOutputTrees(RootFileManager*);
 		void DeclarePlots(PLOTS::PlotRegistry*) const;
 

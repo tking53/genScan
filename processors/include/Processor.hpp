@@ -62,6 +62,7 @@ class Processor : public std::enable_shared_from_this<Processor> {
 		[[noreturn]] virtual void Finalize();
 
 		[[noreturn]] virtual void DeclarePlots([[maybe_unused]] PLOTS::PlotRegistry*) const;
+		virtual void RegisterCuts(CUTS::CutRegistry*) final;
 
 		virtual void CleanupTree();
 
@@ -74,6 +75,10 @@ class Processor : public std::enable_shared_from_this<Processor> {
 		virtual void LoadHistogramSettings(const pugi::xml_node&) final;
 		virtual void LoadHistogramSettings(const YAML::Node&) final;
 		virtual void LoadHistogramSettings(const Json::Value&) final;
+		
+		virtual void LoadCustomCuts(const pugi::xml_node&) final;
+		virtual void LoadCustomCuts(const YAML::Node&) final;
+		virtual void LoadCustomCuts(const Json::Value&) final;
 
 		enum STEP{
 			PREPROCESS,
@@ -111,6 +116,7 @@ class Processor : public std::enable_shared_from_this<Processor> {
 
 		std::map<int,PLOTS::HisHelper1D> h1dsettings;
 		std::map<int,PLOTS::HisHelper2D> h2dsettings;
+		std::map<std::string,std::string> customcuts;
 };
 
 #endif

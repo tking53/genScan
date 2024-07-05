@@ -110,12 +110,14 @@ void BSMExpProcessor::Init(const YAML::Node& config){
 	this->MtasProc->Init(config);
 	this->BSMProc->Init(config);
 	this->LoadHistogramSettings(config);
+	this->LoadCustomCuts(config);
 }
 
 void BSMExpProcessor::Init(const Json::Value& config){
 	this->MtasProc->Init(config);
 	this->BSMProc->Init(config);
 	this->LoadHistogramSettings(config);
+	this->LoadCustomCuts(config);
 }
 
 void BSMExpProcessor::Init(const pugi::xml_node& config){
@@ -143,6 +145,7 @@ void BSMExpProcessor::Init(const pugi::xml_node& config){
 	}
 
 	this->LoadHistogramSettings(config);
+	this->LoadCustomCuts(config);
 }
 		
 void BSMExpProcessor::Finalize(){

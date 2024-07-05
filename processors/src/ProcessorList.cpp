@@ -200,6 +200,11 @@ void ProcessorList::InitializeAnalyzers(JSONConfigParser* cmap){
 	}
 }
 
+void ProcessorList::RegisterCuts(CUTS::CutRegistry* CutManager){
+	for( auto& proc : this->known_processors )
+		proc->RegisterCuts(CutManager);
+}
+
 void ProcessorList::RegisterOutputTrees(RootFileManager* rootnamager){
 	for( auto& proc : this->known_processors )
 		rootnamager->RegisterProcessor(proc.get());

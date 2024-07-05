@@ -159,11 +159,13 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 void BSMProcessor::Init(const YAML::Node& config){
 	this->console->info("Init called with YAML::Node");
 	this->LoadHistogramSettings(config);
+	this->LoadCustomCuts(config);
 }
 
 void BSMProcessor::Init(const Json::Value& config){
 	this->console->info("Init called with Json::Value");
 	this->LoadHistogramSettings(config);
+	this->LoadCustomCuts(config);
 }
 
 void BSMProcessor::Init(const pugi::xml_node& config){
@@ -193,6 +195,7 @@ void BSMProcessor::Init(const pugi::xml_node& config){
 		}
 	}
 	this->LoadHistogramSettings(config);
+	this->LoadCustomCuts(config);
 }
 		
 void BSMProcessor::Finalize(){
