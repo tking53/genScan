@@ -25,7 +25,24 @@
 		</Analyzer>
 		<Processor name="BSMExpProcessor" betathresh="50.0" PlotAllTraces="false" >
 			<Processor name="BSMProcessor" />
-			<Processor name="MtasProcessor" />
+			<Processor name="MtasProcessor" >
+				<!-- This uses the calibrated energy, this may cause issues in the future, but should be fine once calibrated? -->
+				<PositionCorrection id="0" p0="6.53713" p1="1.06084" cross="691.04374" tag="C1F" />
+				<PositionCorrection id="1" p0="6.53916" p1="-0.945923" cross="691.04374" tag="C1B" />
+				<PositionCorrection id="2" p0="6.53438" p1="1.03888" cross="688.63145" tag="C2F" />
+				<PositionCorrection id="3" p0="6.53501" p1="-0.967364" cross="688.63145" tag="C2B" />
+				<PositionCorrection id="4" p0="6.53372" p1="1.1504" cross="688.27891" tag="C3F" />
+				<PositionCorrection id="5" p0="6.53455" p1="-0.863393" cross="688.27891" tag="C3B" />
+				<PositionCorrection id="6" p0="6.53682" p1="1.07639" cross="690.36136" tag="C4F" />
+				<PositionCorrection id="7" p0="6.53756" p1="-0.939243" cross="690.36136" tag="C4B" />
+				<PositionCorrection id="8" p0="6.53725" p1="1.04802" cross="690.12037" tag="C5F" />
+				<PositionCorrection id="9" p0="6.53651" p1="-0.971753" cross="690.12037" tag="C5B" />
+				<PositionCorrection id="10" p0="6.54065" p1="1.12048" cross="692.89959" tag="C6F" />
+				<PositionCorrection id="11" p0="6.54108" p1="-0.928865" cross="692.89959" tag="C6B" />
+				<!-- The above used the 32XX series, uses a simple exp([0]+[1]*x), is what was seen as needed for BSM -->
+				<!-- Note that when I look at the average of the two PMTs I don't see any quadratic dependence, like one would expect. -->
+				<!-- plotting direct fitted functions you do see very small quadratic shape -->
+			</Processor>
 			<Cut name="PairProduction" filename="/Users/truland/Analysis/GENSCAN/BSM/Sr90/Cuts/PairProduction.C" />		
 			<!-- <Cut name="PairProduction" filename="/home/trul/Analysis/GENSCAN/BSM/Sr90/Cuts/PairProduction.C" /> -->		
 		</Processor>

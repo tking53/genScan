@@ -3,6 +3,8 @@
 
 #include "Processor.hpp"
 
+#include "Correction.hpp"
+
 class BSMProcessor : public Processor{
 	public:
 		BSMProcessor(const std::string&);
@@ -59,24 +61,6 @@ class BSMProcessor : public Processor{
 		EventInfo& GetCurrEvt();
 		EventInfo& GetPrevEvt();
 
-		struct PosCorrection{
-			double constant;
-			double slope;
-			double mean;
-
-			double Correct(double erg,double pos){
-				double val = mean/std::exp(constant + slope*pos);
-				return val*erg;
-			}
-
-			PosCorrection() = default;
-			~PosCorrection() = default;
-			PosCorrection(const PosCorrection&) = default;
-			PosCorrection(PosCorrection&&) = default;
-			PosCorrection& operator=(const PosCorrection&) = default;
-			PosCorrection& operator=(PosCorrection&&) = default;
-		};
-
 		struct TraceAnalysis{
 			int lowerbound;
 			int upperbound;
@@ -100,11 +84,11 @@ class BSMProcessor : public Processor{
 				psd = 0.0;
 			}
 
-			~TraceAnalysis() = default;
-			TraceAnalysis(const TraceAnalysis&) = default;
-			TraceAnalysis(TraceAnalysis&&) = default;
-			TraceAnalysis& operator=(const TraceAnalysis&) = default;
-			TraceAnalysis& operator=(TraceAnalysis&&) = default;
+			//~TraceAnalysis() = default;
+			//TraceAnalysis(const TraceAnalysis&) = default;
+			//TraceAnalysis(TraceAnalysis&&) = default;
+			//TraceAnalysis& operator=(const TraceAnalysis&) = default;
+			//TraceAnalysis& operator=(TraceAnalysis&&) = default;
 
 			void Reset(){
 				baseline = {0.0,0.0};
@@ -130,11 +114,11 @@ class BSMProcessor : public Processor{
 
 		std::vector<double> UnCorrectedBSM;
 		std::vector<int> BSMHits;
-		std::vector<TraceAnalysis*> TraceSettings;
+		std::vector<std::unique_ptr<TraceAnalysis>> TraceSettings;
 
 		std::vector<double> TimeStamps;
 
-		std::map<int,PosCorrection> PosCorrectionMap;
+		std::vector<std::unique_ptr<Correction::ExpoPosCorrection>> PosCorrectionMap;
 
 		std::string fronttag;
 		std::string backtag;

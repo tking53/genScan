@@ -1,6 +1,7 @@
 #ifndef __MTAS_PROCESSOR_HPP__
 #define __MTAS_PROCESSOR_HPP__
 
+#include "Correction.hpp"
 #include "MtasStruct.hpp"
 #include "Processor.hpp"
 
@@ -96,6 +97,8 @@ class MtasProcessor : public Processor{
 
 		bool foundfirstevt;
 		double globalfirsttime;
+
+		std::vector<std::unique_ptr<Correction::ExpoPosCorrection>> PosCorrectionMap;
 };
 
 #endif

@@ -35,7 +35,10 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 			    };
 	
 	this->BSMHits = std::vector<int>(12,0);
-	this->TraceSettings = std::vector<TraceAnalysis*>(12,nullptr);
+	for( size_t ii = 0; ii < 12; ++ii ){
+		this->TraceSettings.push_back(nullptr);
+		this->PosCorrectionMap.push_back(nullptr);
+	}
 }
 
 [[maybe_unused]] bool BSMProcessor::PreProcess(EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
@@ -125,9 +128,9 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 			++this->CurrEvt.NumValidSegments;
 			this->CurrEvt.UnCorrectedSumFrontBackEnergy[ii] = (this->CurrEvt.UnCorrectedBSM[2*ii] + this->CurrEvt.UnCorrectedBSM[2*ii + 1])/2.0;
 			this->CurrEvt.Position[ii] = this->CalcPosition(this->CurrEvt.UnCorrectedBSM[2*ii],this->CurrEvt.UnCorrectedBSM[2*ii + 1]);
-			if( (this->PosCorrectionMap.find(2*ii) != this->PosCorrectionMap.end()) and (this->PosCorrectionMap.find(2*ii + 1) != this->PosCorrectionMap.end() ) ){
-				auto front = this->PosCorrectionMap[2*ii].Correct(this->CurrEvt.UnCorrectedBSM[2*ii],this->CurrEvt.Position[ii]);
-				auto back = this->PosCorrectionMap[2*ii + 1].Correct(this->CurrEvt.UnCorrectedBSM[2*ii + 1],this->CurrEvt.Position[ii]);
+			if( (this->PosCorrectionMap[2*ii] != nullptr) and (this->PosCorrectionMap[2*ii + 1] != nullptr ) ){
+				auto front = this->PosCorrectionMap[2*ii]->Correct(this->CurrEvt.UnCorrectedBSM[2*ii],this->CurrEvt.Position[ii]);
+				auto back = this->PosCorrectionMap[2*ii + 1]->Correct(this->CurrEvt.UnCorrectedBSM[2*ii + 1],this->CurrEvt.Position[ii]);
 				this->CurrEvt.SumFrontBackEnergy[ii] += (front + back)/2.0;
 			}else{
 				this->CurrEvt.SumFrontBackEnergy[ii] += (this->CurrEvt.UnCorrectedBSM[2*ii] + this->CurrEvt.UnCorrectedBSM[2*ii + 1])/2.0;
@@ -190,7 +193,7 @@ void BSMProcessor::Init(const pugi::xml_node& config){
 				std::string mess = "Duplicate PulseAnalysis Setting in BSMProcessor id="+std::to_string(id);
 				throw mess;
 			}else{
-				this->TraceSettings[id] = new TraceAnalysis();
+				this->TraceSettings[id].reset(new TraceAnalysis());
 
 				this->TraceSettings[id]->lowerbound = trace.attribute("lowerbound").as_int(20);
 				this->TraceSettings[id]->upperbound = trace.attribute("upperbound").as_int(50);

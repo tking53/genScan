@@ -101,6 +101,10 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 	this->InnerHits = std::vector<int>(12,0);
 	this->MiddleHits = std::vector<int>(12,0);
 	this->OuterHits = std::vector<int>(12,0);
+
+	for( size_t ii = 0; ii < 12; ++ii ){
+		this->PosCorrectionMap.push_back(nullptr);
+	}
 }
 
 [[maybe_unused]] bool MtasProcessor::PreProcess(EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
@@ -192,6 +196,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		}
 
 	}
+
 	//for( size_t ii = 0; ii < this->CenterHits.size(); ++ii ){
 	//	if( this->CenterHits[ii] > 1 ){
 	//		this->console->warn("Linearized MTAS Center number {} has {} hits in a single event instead of 1",ii,this->CenterHits[ii]);
@@ -227,6 +232,23 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 			this->CurrEvt.SumFrontBackEnergy[ii+18] += (this->Outer[2*ii] + this->Outer[2*ii + 1])/2.0;
 			this->Position[ii + 18] = this->CalcPosition(this->Outer[2*ii],this->Outer[2*ii + 1]);
 		}
+	}
+
+	for( size_t ii = 0; ii < 6; ++ii ){
+		if( ( this->PosCorrectionMap[2*ii] != nullptr ) and ( this->PosCorrectionMap[2*ii + 1] != nullptr ) ){
+			if( this->CenterHits[2*ii] and this->CenterHits[2*ii + 1] ){
+				auto front = this->Center[2*ii];
+				auto back = this->Center[2*ii + 1];
+				this->Center[2*ii] = this->PosCorrectionMap[2*ii]->Correct(this->Center[2*ii],this->Position[ii]);
+				this->Center[2*ii + 1] = this->PosCorrectionMap[2*ii + 1]->Correct(this->Center[2*ii + 1],this->Position[ii]);
+				auto front2 = this->Center[2*ii];
+				auto back2 = this->Center[2*ii + 1];
+				this->console->info("Front {}->{} , Back {}->{}",front,front2,back,back2);
+				this->CurrEvt.SumFrontBackEnergy[ii] += (this->Center[2*ii] + this->Center[2*ii + 1])/2.0;
+				//don't update the position
+				//this->Position[ii] = this->CalcPosition(this->Center[2*ii],this->Center[2*ii + 1]);
+			}
+		}	
 	}
 
 	for( int ii = 0; ii < 6; ++ii ){
@@ -319,6 +341,20 @@ void MtasProcessor::Init(const Json::Value& config){
 
 void MtasProcessor::Init(const pugi::xml_node& config){
 	this->console->info("Init called with pugi::xml_node");
+
+	for( pugi::xml_node pos = config.child("PositionCorrection"); pos; pos = pos.next_sibling("PositionCorrection") ){
+		int id = pos.attribute("id").as_int(-1);
+		double p0 = pos.attribute("p0").as_double(0.0);
+		double p1 = pos.attribute("p1").as_double(0.0);
+		double cross = pos.attribute("cross").as_double(1.0);
+		std::string tag = pos.attribute("tag").as_string("");
+		this->PosCorrectionMap[id].reset(new Correction::ExpoPosCorrection());
+		this->PosCorrectionMap[id]->constant = p0;
+		this->PosCorrectionMap[id]->slope = p1;
+		this->PosCorrectionMap[id]->mean = cross;
+		this->console->info("Found PositionCorrection Node for {} : p0:{} p1:{} cross:{}, E'= E*(cross/exp(p0+p1*P)); P = (Efront-Eback)/(Efront+Eback)",tag,p0,p1,cross);
+	}
+
 	this->LoadHistogramSettings(config);
 	this->LoadCustomCuts(config);
 }
