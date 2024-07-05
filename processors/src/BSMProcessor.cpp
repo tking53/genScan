@@ -20,7 +20,8 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 				{3601 , {16384,0.0,16384}},
 				{3602 , {16384,0.0,16384}},
 				{3610 , {16384,0.0,16384}},
-				{3611 , {16384,0.0,16384}}
+				{3611 , {16384,0.0,16384}},
+				{3612 , {16384,0.0,16384}}
 			    };
 
 	this->h2dsettings = {
@@ -217,7 +218,8 @@ void BSMProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 	hismanager->RegisterPlot<TH1F>("BSM_3601","#betaSM Total No MTAS; Energy (keV)",this->h1dsettings.at(3601));
 	hismanager->RegisterPlot<TH1F>("BSM_3602","#betaSM Total + MTAS Total; Energy (keV)",this->h1dsettings.at(3602));
 	hismanager->RegisterPlot<TH1F>("BSM_3610","#betaSM Total; Energy (keV)",this->h1dsettings.at(3610));
-	hismanager->RegisterPlot<TH1F>("BSM_3611","#betaSM Total [MTAS Pileup|MTAS Saturate]; Energy (keV)",this->h1dsettings.at(3611));
+	hismanager->RegisterPlot<TH1F>("BSM_3611","#betaSM Total [MTAS Pileup]; Energy (keV)",this->h1dsettings.at(3611));
+	hismanager->RegisterPlot<TH1F>("BSM_3612","#betaSM Total [MTAS Saturate]; Energy (keV)",this->h1dsettings.at(3612));
 
 	for( size_t ii = 0; ii < 6; ++ii ){
 		std::string name = "BSM_362"+std::to_string(ii)+"_F";

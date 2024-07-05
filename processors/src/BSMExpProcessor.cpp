@@ -21,7 +21,8 @@ BSMExpProcessor::BSMExpProcessor(const std::string& log) : Processor(log,"BSMExp
 
 	this->h1dsettings = {
 		{2000,{2048,-1024.0,1023.0}},
-		{3600,{16384,0.0,16384.0}}
+		{3600,{16384,0.0,16384.0}},
+		{3300,{16384,0.0,16384}}
 	};
 
 	this->h2dsettings = {
@@ -53,6 +54,9 @@ BSMExpProcessor::BSMExpProcessor(const std::string& log) : Processor(log,"BSMExp
 	this->CurrBSM = this->BSMProc->GetCurrEvt();
 
 	if( this->HasBSM ){
+		if( this->CurrBSM.Pileup ){
+			hismanager->Fill("BSMEXP_3300_PILEUP",this->CurrMTAS.TotalEnergy[0]);
+		}
 		hismanager->Fill("BSMEXP_2000",this->CurrMTAS.FirstTime - this->CurrBSM.FirstTime);
 		for( size_t ii = 0; ii < 6 ; ++ii ){
 			if( cutmanager->IsWithin("PairProduction",this->CurrMTAS.TotalEnergy[0],this->CurrMTAS.SumFrontBackEnergy[ii]) ){
@@ -87,7 +91,12 @@ BSMExpProcessor::BSMExpProcessor(const std::string& log) : Processor(log,"BSMExp
 			hismanager->Fill("BSM_3601",this->CurrBSM.TotalEnergy);
 		}
 	}else{
-		hismanager->Fill("BSM_3611",this->CurrBSM.TotalEnergy);
+		if( this->CurrMTAS.Pileup ){
+			hismanager->Fill("BSM_3611",this->CurrBSM.TotalEnergy);
+		}
+		if( this->CurrMTAS.Saturate ){
+			hismanager->Fill("BSM_3612",this->CurrBSM.TotalEnergy);
+		}
 	}
 
 	Processor::EndProcess();
@@ -167,6 +176,8 @@ void BSMExpProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 	hismanager->RegisterPlot<TH1F>("BSMEXP_2000_PP","TDiff (#betaSM - Mtas) [PairProduction]; TDiff (ns)",this->h1dsettings.at(2000));
 
 	hismanager->RegisterPlot<TH2F>("BSMEXP_3352_PP","Mtas C Segment vs Mtas Total; Energy (kev); Energy (kev)",this->h2dsettings.at(3352));
+
+	hismanager->RegisterPlot<TH1F>("BSMEXP_3300_PILEUP","MTAS Total #betaSM Pileup; Energy (kev)",this->h1dsettings.at(3300));
 
 	this->console->info("Finished Declaring Plots");
 }
