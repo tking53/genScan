@@ -73,7 +73,7 @@ namespace PIXIE{
 	const Mask ModuleNumberMask(0x000000F0,4);
 	const Mask CrateNumberMask(0x00000F00,8);
 	const Mask HeaderLengthMask(0x0001F000, 12);
-	const Mask FinishCodeMask(0x8000000, 31);
+	const Mask FinishCodeMask(0x80000000, 31);
 }
 
 #endif
