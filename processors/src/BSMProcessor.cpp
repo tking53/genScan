@@ -25,9 +25,11 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 
 	this->h2dsettings = {
 				{3620 , {1024,-1.0,1.0,8192,0.0,8192.0}},
-				{3630 , {8192,0.0,8192.0,1024,0.0,1.0}},
 				{3650 , {4096,0.0,4096.0,4096,0.0,4096.0}},
-				{36508 , {2048,0.0,16384.0,2048,0.0,16384.0}}
+				{36508 , {2048,0.0,16384.0,2048,0.0,16384.0}},
+				{3700 , {512,0,512,16384,0.0,16384.0}},
+				{3710 , {16384,0.0,16384.0,1024,0,1.0}},
+				{3720 , {1024,0,32,16384,0.0,16384.0}}
 			    };
 	
 	this->BSMHits = std::vector<int>(12,0);
@@ -73,6 +75,26 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 		int detectorposition = 2*position + isback;
 
 		if( !this->BSMHits[detectorposition] ){
+			std::string tracehis = (isfront) ? ("BSM_370"+std::to_string(position)+"_F") :  ("BSM_370"+std::to_string(position)+"_B");
+			size_t idx = 0;
+			for( const auto& tracevalue : evt->GetRawTrace() ){
+				hismanager->Fill(tracehis,idx,tracevalue);
+				++idx;
+			}
+
+			auto psdvals = evt->GetTraceFixedPSD();
+
+			auto integral = std::get<0>(psdvals)+std::get<1>(psdvals);
+			auto tmax = evt->GetBaselineSubtractedMaxValue();
+			auto psd = tmax/integral;
+			
+			std::string psdhis = (isfront) ?  ("BSM_371"+std::to_string(position)+"_F") :  ("BSM_371"+std::to_string(position)+"_B");
+			hismanager->Fill(psdhis,integral,psd);
+
+			std::string baselinehis = (isfront) ?  ("BSM_372"+std::to_string(position)+"_F") :  ("BSM_372"+std::to_string(position)+"_B");
+			auto baseline = evt->GetTracePreTriggerBaseline();
+			hismanager->Fill(baselinehis,baseline.second,baseline.first);
+			
 			this->CurrEvt.UnCorrectedBSM[detectorposition] += evt->GetEnergy();
 			this->TimeStamps.push_back(evt->GetTimeStamp());
 			++this->BSMHits[detectorposition];
@@ -158,8 +180,8 @@ void BSMProcessor::Init(const pugi::xml_node& config){
 			}else{
 				this->TraceSettings[id] = new TraceAnalysis();
 
-				this->TraceSettings[id]->lowerbound = trace.attribute("lowerbound").as_int(-1);
-				this->TraceSettings[id]->upperbound = trace.attribute("upperbound").as_int(-1);
+				this->TraceSettings[id]->lowerbound = trace.attribute("lowerbound").as_int(20);
+				this->TraceSettings[id]->upperbound = trace.attribute("upperbound").as_int(50);
 				this->TraceSettings[id]->lowthresh = trace.attribute("lowthresh").as_float(0.0);
 				this->TraceSettings[id]->highthresh = trace.attribute("highthresh").as_float(1.0e10);
 				this->TraceSettings[id]->integralthreshold = trace.attribute("integralthreshold").as_float(0.0);
@@ -197,14 +219,30 @@ void BSMProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 		name = "BSM_362"+std::to_string(ii);
 		title = "#betaSM"+std::to_string(ii+1)+" Energy vs #betaSM Position; Position (arb.); Energy (keV)";
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3620));
+
+		name = "BSM_370"+std::to_string(ii)+"_F";
+		title = "#betaSM"+std::to_string(ii+1)+"_F Trace; Clock Ticks (arb.); adc (arb.)";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3700));
+
+		name = "BSM_370"+std::to_string(ii)+"_B";
+		title = "#betaSM"+std::to_string(ii+1)+"_B Trace; Clock Ticks (arb.); adc (arb.)";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3700));
 		
-		name = "BSM_363"+std::to_string(ii)+"_F";
-		title = "#betaSM"+std::to_string(ii+1)+"_F PSD vs #betaSM Integral; Integral (arb.); PSD (arb.)";
-		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3630));
+		name = "BSM_371"+std::to_string(ii)+"_F";
+		title = "#betaSM"+std::to_string(ii+1)+"_F (Peak/Integral) vs #betaSM Integral; Integral (arb.); Ratio (arb.)";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3710));
 		
-		name = "BSM_363"+std::to_string(ii)+"_B";
-		title = "#betaSM"+std::to_string(ii+1)+"_B PSD vs #betaSM Integral; Integral (arb.); PSD (arb.)";
-		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3630));
+		name = "BSM_371"+std::to_string(ii)+"_B";
+		title = "#betaSM"+std::to_string(ii+1)+"_B (Peak/Integral) vs #betaSM Integral; Integral (arb.); Ratio (arb.)";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3710));
+		
+		name = "BSM_372"+std::to_string(ii)+"_F";
+		title = "#betaSM"+std::to_string(ii+1)+"_F (Peak/Integral) vs #betaSM Integral; StdDev. (arb.); Avg. (arb.)";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3720));
+		
+		name = "BSM_372"+std::to_string(ii)+"_B";
+		title = "#betaSM"+std::to_string(ii+1)+"_B Baseline Avg vs #betaSM Baseline StdDev; StdDev. (arb.); Avg. (arb.)";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3720));
 	}
 	
 	hismanager->RegisterPlot<TH2F>("BSM_3650","#betaSM Total vs MTAS Total; MTAS Total Energy (keV); #betaSM Energy (keV)",this->h2dsettings.at(3650));
