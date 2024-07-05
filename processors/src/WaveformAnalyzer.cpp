@@ -211,7 +211,7 @@ void WaveformAnalyzer::ParseQDC(const pugi::xml_node& settings,WaveFormParams& w
 				this->console->error("need at least two value for the QDC bounds attribute");
 				throw "need at least two value for the QDC bounds attribute";
 			}
-			this->console->info("Found QDC node : NumSums -> {}, BoundsString -> {})",wav.QDCBounds.size()-1,vals);
+			this->console->info("Found QDC node : NumSums -> {}, BoundsString -> [{})",wav.QDCBounds.size()-1,vals);
 		}
 	}else{
 		this->console->error("missing QDC node in settings node {}",settings);
