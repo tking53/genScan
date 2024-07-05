@@ -14,11 +14,6 @@
 	<!-- Don't do rolling-window for Mtas, things get weird from the neutrons, IMO tend to trigger twice quite often -->
 	<!-- <Global EventWidth="500.0" EventWidthUnit="ns" CorrelationType="rolling-window" /> -->
 
-	<Cuts>
-		<Cut name="PairProduction" filename="/Users/truland/Analysis/GENSCAN/BSM/Sr90/Cuts/PairProduction.C" />		
-		<!-- <Cut name="PairProduction" filename="/home/trul/Analysis/GENSCAN/BSM/Sr90/Cuts/PairProduction.C" /> -->		
-	</Cuts>
-
 	<DetectorDriver >
 		<Analyzer name="WaveformAnalyzer" included_types="bsm" >
 			<settings Crate="[0]" Module="[0]" Channel="[0,1]" >
@@ -31,6 +26,7 @@
 		<Processor name="BSMExpProcessor" betathresh="50.0" >
 			<Processor name="BSMProcessor" />
 			<Processor name="MtasProcessor" />
+			<Cut name="PairProduction" filename="/Users/truland/Analysis/GENSCAN/BSM/Sr90/Cuts/PairProduction.C" />		
 		</Processor>
 		<!-- <Processor name="RootDevProcessor" included_types="mtas,bsm"/> -->
 	</DetectorDriver>
