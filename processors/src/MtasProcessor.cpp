@@ -243,7 +243,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 				this->Center[2*ii + 1] = this->PosCorrectionMap[2*ii + 1]->Correct(this->Center[2*ii + 1],this->Position[ii]);
 				auto front2 = this->Center[2*ii];
 				auto back2 = this->Center[2*ii + 1];
-				this->console->info("Front {}->{} , Back {}->{}",front,front2,back,back2);
+				//this->console->info("Front {}->{} , Back {}->{}",front,front2,back,back2);
 				this->CurrEvt.SumFrontBackEnergy[ii] += (this->Center[2*ii] + this->Center[2*ii + 1])/2.0;
 				//don't update the position
 				//this->Position[ii] = this->CalcPosition(this->Center[2*ii],this->Center[2*ii + 1]);
