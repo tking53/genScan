@@ -161,7 +161,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 
 		if( currsubtype == SUBTYPE::CENTER ){
 			if( !this->CenterHits[detectorposition] ){
-				this->Center[detectorposition] += evt->GetEnergy();
+				this->Center[detectorposition] = evt->GetEnergy();
 				this->TimeStamps.push_back(evt->GetTimeStamp());
 				++this->CenterHits[detectorposition];
 			}else{
@@ -169,7 +169,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 			}
 		}else if( currsubtype == SUBTYPE::INNER ){
 			if( !this->InnerHits[detectorposition] ){
-				this->Inner[detectorposition] += evt->GetEnergy();
+				this->Inner[detectorposition] = evt->GetEnergy();
 				this->TimeStamps.push_back(evt->GetTimeStamp());
 				++this->InnerHits[detectorposition];
 			}else{
@@ -177,7 +177,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 			}
 		}else if( currsubtype == SUBTYPE::MIDDLE ){
 			if( !this->MiddleHits[detectorposition] ){
-				this->Middle[detectorposition] += evt->GetEnergy();
+				this->Middle[detectorposition] = evt->GetEnergy();
 				this->TimeStamps.push_back(evt->GetTimeStamp());
 				++this->MiddleHits[detectorposition];
 			}else{
@@ -185,7 +185,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 			}
 		}else if( currsubtype == SUBTYPE::OUTER ){
 			if( !this->OuterHits[detectorposition] ){
-				this->Outer[detectorposition] += evt->GetEnergy();
+				this->Outer[detectorposition] = evt->GetEnergy();
 				this->TimeStamps.push_back(evt->GetTimeStamp());
 				++this->OuterHits[detectorposition];
 			}else{
@@ -217,19 +217,19 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 
 	for( int ii = 0; ii < 6; ++ii ){
 		if( this->CenterHits[2*ii] and this->CenterHits[2*ii + 1] ){
-			this->CurrEvt.SumFrontBackEnergy[ii] += (this->Center[2*ii] + this->Center[2*ii + 1])/2.0;
+			this->CurrEvt.SumFrontBackEnergy[ii] = (this->Center[2*ii] + this->Center[2*ii + 1])/2.0;
 			this->Position[ii] = this->CalcPosition(this->Center[2*ii],this->Center[2*ii + 1]);
 		}
 		if( this->InnerHits[2*ii] and this->InnerHits[2*ii + 1] ){
-			this->CurrEvt.SumFrontBackEnergy[ii+6] += (this->Inner[2*ii] + this->Inner[2*ii + 1])/2.0;
+			this->CurrEvt.SumFrontBackEnergy[ii+6] = (this->Inner[2*ii] + this->Inner[2*ii + 1])/2.0;
 			this->Position[ii + 6] = this->CalcPosition(this->Inner[2*ii],this->Inner[2*ii + 1]);
 		}
 		if( this->MiddleHits[2*ii] and this->MiddleHits[2*ii + 1] ){
-			this->CurrEvt.SumFrontBackEnergy[ii+12] += (this->Middle[2*ii] + this->Middle[2*ii + 1])/2.0;
+			this->CurrEvt.SumFrontBackEnergy[ii+12] = (this->Middle[2*ii] + this->Middle[2*ii + 1])/2.0;
 			this->Position[ii + 12] = this->CalcPosition(this->Middle[2*ii],this->Middle[2*ii + 1]);
 		}
 		if( this->OuterHits[2*ii] and this->OuterHits[2*ii + 1] ){
-			this->CurrEvt.SumFrontBackEnergy[ii+18] += (this->Outer[2*ii] + this->Outer[2*ii + 1])/2.0;
+			this->CurrEvt.SumFrontBackEnergy[ii+18] = (this->Outer[2*ii] + this->Outer[2*ii + 1])/2.0;
 			this->Position[ii + 18] = this->CalcPosition(this->Outer[2*ii],this->Outer[2*ii + 1]);
 		}
 	}
@@ -244,7 +244,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 				auto front2 = this->Center[2*ii];
 				auto back2 = this->Center[2*ii + 1];
 				//this->console->info("Front {}->{} , Back {}->{}",front,front2,back,back2);
-				this->CurrEvt.SumFrontBackEnergy[ii] += (this->Center[2*ii] + this->Center[2*ii + 1])/2.0;
+				this->CurrEvt.SumFrontBackEnergy[ii] = (this->Center[2*ii] + this->Center[2*ii + 1])/2.0;
 				//don't update the position
 				//this->Position[ii] = this->CalcPosition(this->Center[2*ii],this->Center[2*ii + 1]);
 			}

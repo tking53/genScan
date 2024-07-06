@@ -107,7 +107,7 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 			auto baseline = evt->GetTracePreTriggerBaseline();
 			hismanager->Fill(baselinehis,baseline.second,baseline.first);
 			
-			this->CurrEvt.UnCorrectedBSM[detectorposition] += evt->GetEnergy();
+			this->CurrEvt.UnCorrectedBSM[detectorposition] = evt->GetEnergy();
 			this->TimeStamps.push_back(evt->GetTimeStamp());
 			++this->BSMHits[detectorposition];
 		}else{
@@ -131,9 +131,9 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 			if( (this->PosCorrectionMap[2*ii] != nullptr) and (this->PosCorrectionMap[2*ii + 1] != nullptr ) ){
 				auto front = this->PosCorrectionMap[2*ii]->Correct(this->CurrEvt.UnCorrectedBSM[2*ii],this->CurrEvt.Position[ii]);
 				auto back = this->PosCorrectionMap[2*ii + 1]->Correct(this->CurrEvt.UnCorrectedBSM[2*ii + 1],this->CurrEvt.Position[ii]);
-				this->CurrEvt.SumFrontBackEnergy[ii] += (front + back)/2.0;
+				this->CurrEvt.SumFrontBackEnergy[ii] = (front + back)/2.0;
 			}else{
-				this->CurrEvt.SumFrontBackEnergy[ii] += (this->CurrEvt.UnCorrectedBSM[2*ii] + this->CurrEvt.UnCorrectedBSM[2*ii + 1])/2.0;
+				this->CurrEvt.SumFrontBackEnergy[ii] = (this->CurrEvt.UnCorrectedBSM[2*ii] + this->CurrEvt.UnCorrectedBSM[2*ii + 1])/2.0;
 			}
 		
 			std::string id = std::to_string(ii);
