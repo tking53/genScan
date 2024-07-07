@@ -274,7 +274,7 @@ void BSMProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 	
 	hismanager->RegisterPlot<TH2F>("BSM_3650","#betaSM Total vs MTAS Total; MTAS Total Energy (keV); #betaSM Energy (keV)",this->h2dsettings.at(3650));
 
-	hismanager->RegisterPlot<TH2F>("BSM_36508","#betaSM Total vs MTAS Total; MTAS Total Energy (8 keV/bin) #betaSM Energy (8 keV/bin)",this->h2dsettings.at(36508));
+	hismanager->RegisterPlot<TH2F>("BSM_36508","#betaSM Total vs MTAS Total; MTAS Total Energy (8 keV/bin); #betaSM Energy (8 keV/bin)",this->h2dsettings.at(36508));
 
 	this->console->info("Finished Declaring Plots");
 }
