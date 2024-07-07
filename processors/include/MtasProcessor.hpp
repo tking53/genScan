@@ -70,6 +70,10 @@ class MtasProcessor : public Processor{
 		std::vector<double> Inner;
 		std::vector<double> Middle;
 		std::vector<double> Outer;
+		std::vector<double> RawCenter;
+		std::vector<double> RawInner;
+		std::vector<double> RawMiddle;
+		std::vector<double> RawOuter;
 		std::vector<int> CenterHits;
 		std::vector<int> InnerHits;
 		std::vector<int> MiddleHits;
