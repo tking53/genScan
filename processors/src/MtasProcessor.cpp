@@ -619,8 +619,8 @@ void MtasProcessor::FillBetaPlots(PLOTS::PlotRegistry* hismanager){
 			hismanager->Fill("MTAS_3433",this->RawMiddle[2*ii],2*ii);
 			hismanager->Fill("MTAS_3433",this->RawMiddle[2*ii + 1],2*ii + 1);
 
-			hismanager->Fill("MTAS_3433",this->RawOuter[2*ii],2*ii);
-			hismanager->Fill("MTAS_3433",this->RawOuter[2*ii + 1],2*ii + 1);
+			hismanager->Fill("MTAS_3434",this->RawOuter[2*ii],2*ii);
+			hismanager->Fill("MTAS_3434",this->RawOuter[2*ii + 1],2*ii + 1);
 		}
 
 	}
@@ -684,8 +684,8 @@ void MtasProcessor::FillNonBetaPlots(PLOTS::PlotRegistry* hismanager){
 			hismanager->Fill("MTAS_3413",this->RawMiddle[2*ii],2*ii);
 			hismanager->Fill("MTAS_3413",this->RawMiddle[2*ii + 1],2*ii + 1);
 
-			hismanager->Fill("MTAS_3413",this->RawOuter[2*ii],2*ii);
-			hismanager->Fill("MTAS_3413",this->RawOuter[2*ii + 1],2*ii + 1);
+			hismanager->Fill("MTAS_3414",this->RawOuter[2*ii],2*ii);
+			hismanager->Fill("MTAS_3414",this->RawOuter[2*ii + 1],2*ii + 1);
 		}
 
 	}
