@@ -99,7 +99,17 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		{3431, {8192,0.0,8192.0,12,0,12}},
 		{3432, {8192,0.0,8192.0,12,0,12}},
 		{3433, {8192,0.0,8192.0,12,0,12}},
-		{3434, {8192,0.0,8192.0,12,0,12}}
+		{3434, {8192,0.0,8192.0,12,0,12}},
+		
+		{3511, {8192,0.0,8192.0,12,0,12}},
+		{3512, {8192,0.0,8192.0,12,0,12}},
+		{3513, {8192,0.0,8192.0,12,0,12}},
+		{3514, {8192,0.0,8192.0,12,0,12}},
+		
+		{3531, {8192,0.0,8192.0,12,0,12}},
+		{3532, {8192,0.0,8192.0,12,0,12}},
+		{3533, {8192,0.0,8192.0,12,0,12}},
+		{3534, {8192,0.0,8192.0,12,0,12}}
 	};
 
 	this->Position = std::vector<double>(24,0.0);
@@ -107,10 +117,19 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 	this->Inner = std::vector<double>(12,0.0);
 	this->Middle = std::vector<double>(12,0.0);
 	this->Outer = std::vector<double>(12,0.0);
+
+	this->diagnosticplots = false;
+
 	this->RawCenter = std::vector<double>(12,0.0);
 	this->RawInner = std::vector<double>(12,0.0);
 	this->RawMiddle = std::vector<double>(12,0.0);
 	this->RawOuter = std::vector<double>(12,0.0);
+
+	this->CalCenter = std::vector<double>(12,0.0);
+	this->CalInner = std::vector<double>(12,0.0);
+	this->CalMiddle = std::vector<double>(12,0.0);
+	this->CalOuter = std::vector<double>(12,0.0);
+
 	this->CenterHits = std::vector<int>(12,0);
 	this->InnerHits = std::vector<int>(12,0);
 	this->MiddleHits = std::vector<int>(12,0);
@@ -177,6 +196,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 			if( !this->CenterHits[detectorposition] ){
 				this->Center[detectorposition] = evt->GetEnergy();
 				this->RawCenter[detectorposition] = evt->GetRawEnergy();
+				this->CalCenter[detectorposition] = evt->GetEnergy();
 				this->TimeStamps.push_back(evt->GetTimeStamp());
 				++this->CenterHits[detectorposition];
 			}else{
@@ -186,6 +206,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 			if( !this->InnerHits[detectorposition] ){
 				this->Inner[detectorposition] = evt->GetEnergy();
 				this->RawInner[detectorposition] = evt->GetRawEnergy();
+				this->CalInner[detectorposition] = evt->GetEnergy();
 				this->TimeStamps.push_back(evt->GetTimeStamp());
 				++this->InnerHits[detectorposition];
 			}else{
@@ -195,6 +216,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 			if( !this->MiddleHits[detectorposition] ){
 				this->Middle[detectorposition] = evt->GetEnergy();
 				this->RawMiddle[detectorposition] = evt->GetRawEnergy();
+				this->CalMiddle[detectorposition] = evt->GetEnergy();
 				this->TimeStamps.push_back(evt->GetTimeStamp());
 				++this->MiddleHits[detectorposition];
 			}else{
@@ -204,6 +226,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 			if( !this->OuterHits[detectorposition] ){
 				this->Outer[detectorposition] = evt->GetEnergy();
 				this->RawOuter[detectorposition] = evt->GetRawEnergy();
+				this->CalOuter[detectorposition] = evt->GetEnergy();
 				this->TimeStamps.push_back(evt->GetTimeStamp());
 				++this->OuterHits[detectorposition];
 			}else{
@@ -373,6 +396,8 @@ void MtasProcessor::Init(const pugi::xml_node& config){
 		this->console->info("Found PositionCorrection Node for {} : p0:{} p1:{} cross:{}, E'= E*(cross/exp(p0+p1*P)); P = (Efront-Eback)/(Efront+Eback)",tag,p0,p1,cross);
 	}
 
+	this->diagnosticplots = config.attribute("diagnostic").as_bool(false);
+
 	this->LoadHistogramSettings(config);
 	this->LoadCustomCuts(config);
 }
@@ -436,10 +461,17 @@ void MtasProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 	hismanager->RegisterPlot<TH2F>("MTAS_33528","C Segment vs Mtas Total #beta-gated; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(33528));
 	hismanager->RegisterPlot<TH2F>("MTAS_33538","C Segment vs C #beta-gated; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(33538));
 
-	hismanager->RegisterPlot<TH2F>("MTAS_3431","Individual C PMTs #beta-gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3431));
-	hismanager->RegisterPlot<TH2F>("MTAS_3432","Individual I PMTs #beta-gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3432));
-	hismanager->RegisterPlot<TH2F>("MTAS_3433","Individual M PMTs #beta-gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3433));
-	hismanager->RegisterPlot<TH2F>("MTAS_3434","Individual O PMTs #beta-gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3434));
+	if( this->diagnosticplots ){
+		hismanager->RegisterPlot<TH2F>("MTAS_3431","Raw Individual C PMTs #beta-gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3431));
+		hismanager->RegisterPlot<TH2F>("MTAS_3432","Raw Individual I PMTs #beta-gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3432));
+		hismanager->RegisterPlot<TH2F>("MTAS_3433","Raw Individual M PMTs #beta-gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3433));
+		hismanager->RegisterPlot<TH2F>("MTAS_3434","Raw Individual O PMTs #beta-gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3434));
+
+		hismanager->RegisterPlot<TH2F>("MTAS_3531","Calibrated Individual C PMTs #beta-gated; Energy (keV); PMT (arb.)",this->h2dsettings.at(3531));
+		hismanager->RegisterPlot<TH2F>("MTAS_3532","Calibrated Individual I PMTs #beta-gated; Energy (keV); PMT (arb.)",this->h2dsettings.at(3532));
+		hismanager->RegisterPlot<TH2F>("MTAS_3533","Calibrated Individual M PMTs #beta-gated; Energy (keV); PMT (arb.)",this->h2dsettings.at(3533));
+		hismanager->RegisterPlot<TH2F>("MTAS_3534","Calibrated Individual O PMTs #beta-gated; Energy (keV); PMT (arb.)",this->h2dsettings.at(3534));
+	}
 
 	//not beta event
 	hismanager->RegisterPlot<TH1F>("MTAS_3100","Mtas Total anti-#beta-gated; Energy (keV)",this->h1dsettings.at(3100));
@@ -467,10 +499,17 @@ void MtasProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 	hismanager->RegisterPlot<TH2F>("MTAS_31528","C Segment vs Mtas Total anti-#beta-gated; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(31528));
 	hismanager->RegisterPlot<TH2F>("MTAS_31538","C Segment vs Mtas Total anti-#beta-gated; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(31538));
 
-	hismanager->RegisterPlot<TH2F>("MTAS_3411","Individual C PMTs anti-#beta-gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3411));
-	hismanager->RegisterPlot<TH2F>("MTAS_3412","Individual I PMTs anti-#beta-gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3412));
-	hismanager->RegisterPlot<TH2F>("MTAS_3413","Individual M PMTs anti-#beta-gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3413));
-	hismanager->RegisterPlot<TH2F>("MTAS_3414","Individual O PMTs anti-#beta-gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3414));
+	if( this->diagnosticplots ){
+		hismanager->RegisterPlot<TH2F>("MTAS_3411","Raw Individual C PMTs anti-#beta-gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3411));
+		hismanager->RegisterPlot<TH2F>("MTAS_3412","Raw Individual I PMTs anti-#beta-gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3412));
+		hismanager->RegisterPlot<TH2F>("MTAS_3413","Raw Individual M PMTs anti-#beta-gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3413));
+		hismanager->RegisterPlot<TH2F>("MTAS_3414","Raw Individual O PMTs anti-#beta-gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3414));
+
+		hismanager->RegisterPlot<TH2F>("MTAS_3511","Calibrated Individual C PMTs anti-#beta-gated; Energy (keV); PMT (arb.)",this->h2dsettings.at(3511));
+		hismanager->RegisterPlot<TH2F>("MTAS_3512","Calibrated Individual I PMTs anti-#beta-gated; Energy (keV); PMT (arb.)",this->h2dsettings.at(3512));
+		hismanager->RegisterPlot<TH2F>("MTAS_3513","Calibrated Individual M PMTs anti-#beta-gated; Energy (keV); PMT (arb.)",this->h2dsettings.at(3513));
+		hismanager->RegisterPlot<TH2F>("MTAS_3514","Calibrated Individual O PMTs anti-#beta-gated; Energy (keV); PMT (arb.)",this->h2dsettings.at(3514));
+	}
 
 	//center position correction plots
 	for( size_t ii = 0; ii < 6; ++ii ){
@@ -539,10 +578,17 @@ void MtasProcessor::Reset(){
 	this->Inner = std::vector<double>(12,0.0);
 	this->Middle = std::vector<double>(12,0.0);
 	this->Outer = std::vector<double>(12,0.0);
+
 	this->RawCenter = std::vector<double>(12,0.0);
 	this->RawInner = std::vector<double>(12,0.0);
 	this->RawMiddle = std::vector<double>(12,0.0);
 	this->RawOuter = std::vector<double>(12,0.0);
+
+	this->CalCenter = std::vector<double>(12,0.0);
+	this->CalInner = std::vector<double>(12,0.0);
+	this->CalMiddle = std::vector<double>(12,0.0);
+	this->CalOuter = std::vector<double>(12,0.0);
+
 	this->CenterHits = std::vector<int>(12,0);
 	this->InnerHits = std::vector<int>(12,0);
 	this->MiddleHits = std::vector<int>(12,0);
@@ -610,17 +656,31 @@ void MtasProcessor::FillBetaPlots(PLOTS::PlotRegistry* hismanager){
 			
 			hismanager->Fill("MTAS_33538",this->CurrEvt.TotalEnergy[1],this->CurrEvt.SumFrontBackEnergy[ii]);
 
-			hismanager->Fill("MTAS_3431",this->RawCenter[2*ii],2*ii);
-			hismanager->Fill("MTAS_3431",this->RawCenter[2*ii + 1],2*ii + 1);
-			
-			hismanager->Fill("MTAS_3432",this->RawInner[2*ii],2*ii);
-			hismanager->Fill("MTAS_3432",this->RawInner[2*ii + 1],2*ii + 1);
+			if( this->diagnosticplots ){
+				hismanager->Fill("MTAS_3431",this->RawCenter[2*ii],2*ii);
+				hismanager->Fill("MTAS_3431",this->RawCenter[2*ii + 1],2*ii + 1);
 
-			hismanager->Fill("MTAS_3433",this->RawMiddle[2*ii],2*ii);
-			hismanager->Fill("MTAS_3433",this->RawMiddle[2*ii + 1],2*ii + 1);
+				hismanager->Fill("MTAS_3432",this->RawInner[2*ii],2*ii);
+				hismanager->Fill("MTAS_3432",this->RawInner[2*ii + 1],2*ii + 1);
 
-			hismanager->Fill("MTAS_3434",this->RawOuter[2*ii],2*ii);
-			hismanager->Fill("MTAS_3434",this->RawOuter[2*ii + 1],2*ii + 1);
+				hismanager->Fill("MTAS_3433",this->RawMiddle[2*ii],2*ii);
+				hismanager->Fill("MTAS_3433",this->RawMiddle[2*ii + 1],2*ii + 1);
+
+				hismanager->Fill("MTAS_3434",this->RawOuter[2*ii],2*ii);
+				hismanager->Fill("MTAS_3434",this->RawOuter[2*ii + 1],2*ii + 1);
+
+				hismanager->Fill("MTAS_3531",this->CalCenter[2*ii],2*ii);
+				hismanager->Fill("MTAS_3531",this->CalCenter[2*ii + 1],2*ii + 1);
+
+				hismanager->Fill("MTAS_3532",this->CalInner[2*ii],2*ii);
+				hismanager->Fill("MTAS_3532",this->CalInner[2*ii + 1],2*ii + 1);
+
+				hismanager->Fill("MTAS_3533",this->CalMiddle[2*ii],2*ii);
+				hismanager->Fill("MTAS_3533",this->CalMiddle[2*ii + 1],2*ii + 1);
+
+				hismanager->Fill("MTAS_3534",this->CalOuter[2*ii],2*ii);
+				hismanager->Fill("MTAS_3534",this->CalOuter[2*ii + 1],2*ii + 1);
+			}
 		}
 
 	}
@@ -675,17 +735,31 @@ void MtasProcessor::FillNonBetaPlots(PLOTS::PlotRegistry* hismanager){
 			
 			hismanager->Fill("MTAS_31538",this->CurrEvt.TotalEnergy[1],this->CurrEvt.SumFrontBackEnergy[ii]);
 
-			hismanager->Fill("MTAS_3411",this->RawCenter[2*ii],2*ii);
-			hismanager->Fill("MTAS_3411",this->RawCenter[2*ii + 1],2*ii + 1);
-			
-			hismanager->Fill("MTAS_3412",this->RawInner[2*ii],2*ii);
-			hismanager->Fill("MTAS_3412",this->RawInner[2*ii + 1],2*ii + 1);
+			if( this->diagnosticplots ){
+				hismanager->Fill("MTAS_3411",this->RawCenter[2*ii],2*ii);
+				hismanager->Fill("MTAS_3411",this->RawCenter[2*ii + 1],2*ii + 1);
 
-			hismanager->Fill("MTAS_3413",this->RawMiddle[2*ii],2*ii);
-			hismanager->Fill("MTAS_3413",this->RawMiddle[2*ii + 1],2*ii + 1);
+				hismanager->Fill("MTAS_3412",this->RawInner[2*ii],2*ii);
+				hismanager->Fill("MTAS_3412",this->RawInner[2*ii + 1],2*ii + 1);
 
-			hismanager->Fill("MTAS_3414",this->RawOuter[2*ii],2*ii);
-			hismanager->Fill("MTAS_3414",this->RawOuter[2*ii + 1],2*ii + 1);
+				hismanager->Fill("MTAS_3413",this->RawMiddle[2*ii],2*ii);
+				hismanager->Fill("MTAS_3413",this->RawMiddle[2*ii + 1],2*ii + 1);
+
+				hismanager->Fill("MTAS_3414",this->RawOuter[2*ii],2*ii);
+				hismanager->Fill("MTAS_3414",this->RawOuter[2*ii + 1],2*ii + 1);
+
+				hismanager->Fill("MTAS_3511",this->CalCenter[2*ii],2*ii);
+				hismanager->Fill("MTAS_3511",this->CalCenter[2*ii + 1],2*ii + 1);
+
+				hismanager->Fill("MTAS_3512",this->CalInner[2*ii],2*ii);
+				hismanager->Fill("MTAS_3512",this->CalInner[2*ii + 1],2*ii + 1);
+
+				hismanager->Fill("MTAS_3513",this->CalMiddle[2*ii],2*ii);
+				hismanager->Fill("MTAS_3513",this->CalMiddle[2*ii + 1],2*ii + 1);
+
+				hismanager->Fill("MTAS_3514",this->CalOuter[2*ii],2*ii);
+				hismanager->Fill("MTAS_3514",this->CalOuter[2*ii + 1],2*ii + 1);
+			}
 		}
 
 	}

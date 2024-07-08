@@ -74,6 +74,10 @@ class MtasProcessor : public Processor{
 		std::vector<double> RawInner;
 		std::vector<double> RawMiddle;
 		std::vector<double> RawOuter;
+		std::vector<double> CalCenter;
+		std::vector<double> CalInner;
+		std::vector<double> CalMiddle;
+		std::vector<double> CalOuter;
 		std::vector<int> CenterHits;
 		std::vector<int> InnerHits;
 		std::vector<int> MiddleHits;
@@ -101,6 +105,8 @@ class MtasProcessor : public Processor{
 
 		bool foundfirstevt;
 		double globalfirsttime;
+
+		bool diagnosticplots;
 
 		std::vector<std::unique_ptr<Correction::ExpoPosCorrection>> PosCorrectionMap;
 };
