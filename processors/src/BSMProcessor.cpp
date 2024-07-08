@@ -207,6 +207,20 @@ void BSMProcessor::Init(const pugi::xml_node& config){
 			}
 		}
 	}
+
+	for( pugi::xml_node pos = config.child("PositionCorrection"); pos; pos = pos.next_sibling("PositionCorrection") ){
+		int id = pos.attribute("id").as_int(-1);
+		double p0 = pos.attribute("p0").as_double(0.0);
+		double p1 = pos.attribute("p1").as_double(0.0);
+		double cross = pos.attribute("cross").as_double(1.0);
+		std::string tag = pos.attribute("tag").as_string("");
+		this->PosCorrectionMap[id].reset(new Correction::ExpoPosCorrection());
+		this->PosCorrectionMap[id]->constant = p0;
+		this->PosCorrectionMap[id]->slope = p1;
+		this->PosCorrectionMap[id]->mean = cross;
+		this->console->info("Found PositionCorrection Node for {} : p0:{} p1:{} cross:{}, E'= E*(cross/exp(p0+p1*P)); P = (Efront-Eback)/(Efront+Eback)",tag,p0,p1,cross);
+	}
+
 	this->LoadHistogramSettings(config);
 	this->LoadCustomCuts(config);
 }

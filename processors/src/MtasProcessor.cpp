@@ -607,7 +607,7 @@ MtasProcessor::EventInfo& MtasProcessor::GetPrevEvt(){
 	return this->PrevEvt;
 }
 
-void MtasProcessor::FillBetaPlots(PLOTS::PlotRegistry* hismanager){
+void MtasProcessor::FillBetaPlots(PLOTS::PlotRegistry* hismanager) const{
 	if( (not this->CurrEvt.Saturate) and (not this->CurrEvt.Pileup) ){
 		hismanager->Fill("MTAS_3300",this->CurrEvt.TotalEnergy[0]);
 
@@ -686,7 +686,7 @@ void MtasProcessor::FillBetaPlots(PLOTS::PlotRegistry* hismanager){
 	}
 }
 
-void MtasProcessor::FillNonBetaPlots(PLOTS::PlotRegistry* hismanager){
+void MtasProcessor::FillNonBetaPlots(PLOTS::PlotRegistry* hismanager) const{
 	if( (not this->CurrEvt.Saturate) and (not this->CurrEvt.Pileup) ){
 		hismanager->Fill("MTAS_3100",this->CurrEvt.TotalEnergy[0]);
 

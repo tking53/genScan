@@ -54,8 +54,8 @@ class MtasProcessor : public Processor{
 		EventInfo& GetCurrEvt();
 		EventInfo& GetPrevEvt();
 
-		void FillBetaPlots(PLOTS::PlotRegistry*);
-		void FillNonBetaPlots(PLOTS::PlotRegistry*);
+		void FillBetaPlots(PLOTS::PlotRegistry*) const;
+		void FillNonBetaPlots(PLOTS::PlotRegistry*) const;
 
 	private:
 		double CalcPosition(double,double);

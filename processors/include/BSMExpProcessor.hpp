@@ -32,6 +32,8 @@ class BSMExpProcessor : public Processor{
 
 		double BetaThreshold;
 
+		bool PPCutExists;
+
 		std::unique_ptr<BSMProcessor> BSMProc;
 		std::unique_ptr<MtasProcessor> MtasProc;
 };
