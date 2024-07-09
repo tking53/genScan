@@ -26,12 +26,12 @@
 	<Map>
 		<Crate number="0">
 			<Module number="0" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="264">
-				<Channel number="0" type="bsm" subtype="bsm" group="1" tags="front">
+				<Channel number="0" type="puck" subtype="puck" group="1" tags="front">
 					<Calibration model="linear" min="0">	
 						0.0 1.0	
 					</Calibration>
 				</Channel>
-				<Channel number="1" type="bsm" subtype="bsm" group="1" tags="back">
+				<Channel number="1" type="puck" subtype="puck" group="1" tags="back">
 					<Calibration model="linear" min="0">	
 						0.0 1.0	
 					</Calibration>
