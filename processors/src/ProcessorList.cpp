@@ -12,6 +12,7 @@
 #include "BSMExpProcessor.hpp"
 #include "e21069b_fp2Processor.hpp"
 #include "ribf168Processor.hpp"
+#include "YAPProcessor.hpp"
 
 #include "BSMProcessor.hpp"
 #include "HagridProcessor.hpp"
@@ -20,6 +21,7 @@
 #include "MtasImplantProcessor.hpp"
 #include "PidProcessor.hpp"
 #include "PSPMTProcessor.hpp"
+#include "PuckProcessor.hpp"
 #include "RIKENIonizationChamberProcessor.hpp"
 #include "RIKENPidProcessor.hpp"
 #include "RootDevProcessor.hpp"
@@ -106,6 +108,8 @@ void ProcessorList::CreateProc(const std::string& name){
 		known_processors.push_back(std::make_shared<e21069b_fp2Processor>(this->LogName));
 	}else if( name.compare("ribf168Processor") == 0 ){
 		known_processors.push_back(std::make_shared<ribf168Processor>(this->LogName));
+	}else if( name.compare("YAPProcessor") == 0 ){
+		known_processors.push_back(std::make_shared<YAPProcessor>(this->LogName));
 	}else if( name.compare("BSMProcessor") == 0 ){
 		known_processors.push_back(std::make_shared<BSMProcessor>(this->LogName));
 	}else if( name.compare("HagridProcessor") == 0 ){
@@ -120,6 +124,8 @@ void ProcessorList::CreateProc(const std::string& name){
 		known_processors.push_back(std::make_shared<PidProcessor>(this->LogName));
 	}else if( name.compare("PSPMTProcessor") == 0 ){
 		known_processors.push_back(std::make_shared<PSPMTProcessor>(this->LogName));
+	}else if( name.compare("PuckProcessor") == 0 ){
+		known_processors.push_back(std::make_shared<PuckProcessor>(this->LogName));
 	}else if( name.compare("RIKENIonizationChamberProcessor") == 0 ){
 		known_processors.push_back(std::make_shared<RIKENIonizationChamberProcessor>(this->LogName));
 	}else if( name.compare("RIKENPidProcessor") == 0 ){
