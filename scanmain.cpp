@@ -310,7 +310,9 @@ int main(int argc, char *argv[]) {
 				processorlist->PostAnalyze(CorrelatedEvents,HistogramManager.get(),CutManager.get());
 				processorlist->PostProcess(CorrelatedEvents,HistogramManager.get(),CutManager.get());
 
-				RootManager->Fill();
+				if( enabletree ){
+					RootManager->Fill();
+				}
 				processorlist->CleanupTrees();
 
 				CorrelatedEvents.ClearRawEvents();
