@@ -175,8 +175,11 @@
 				</Channel>
 				<Channel number="5" type="mtas" subtype="inner" group="5" tags="back">
 					<Calibration model="linear" min="0">
-						0.0 1.12738
+						0.0 1.3132620
 					</Calibration>
+					<!-- <Calibration model="linear" min="0"> -->
+					<!-- 	0.0 1.12738 -->
+					<!-- </Calibration> -->
 				</Channel>
 				<Channel number="6" type="mtas" subtype="inner" group="6" tags="front">
 					<Calibration model="linear" min="0">
