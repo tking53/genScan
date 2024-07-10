@@ -44,6 +44,8 @@ YAPProcessor::YAPProcessor(const std::string& log) : Processor(log,"YAPProcessor
 	}
 	this->CurrMTAS = this->MtasProc->GetCurrEvt();
 	this->MTASTotal = this->CurrMTAS.TotalEnergy[0];
+	this->MTASSaturate = this->CurrMTAS.Saturate;
+	this->MTASPileup = this->CurrMTAS.Pileup;
 
 	if( this->HasPuck ){
 		this->PuckProc->PreProcess(summary,hismanager,cutmanager);
