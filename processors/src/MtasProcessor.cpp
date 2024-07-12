@@ -195,7 +195,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		if( currsubtype == SUBTYPE::CENTER ){
 			if( !this->CenterHits[detectorposition] ){
 				this->Center[detectorposition] = evt->GetEnergy();
-				this->RawCenter[detectorposition] = evt->GetRawEnergy();
+				this->RawCenter[detectorposition] = evt->GetRawEnergyWRandom();
 				this->CalCenter[detectorposition] = evt->GetEnergy();
 				this->TimeStamps.push_back(evt->GetTimeStamp());
 				++this->CenterHits[detectorposition];
@@ -205,7 +205,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		}else if( currsubtype == SUBTYPE::INNER ){
 			if( !this->InnerHits[detectorposition] ){
 				this->Inner[detectorposition] = evt->GetEnergy();
-				this->RawInner[detectorposition] = evt->GetRawEnergy();
+				this->RawInner[detectorposition] = evt->GetRawEnergyWRandom();
 				this->CalInner[detectorposition] = evt->GetEnergy();
 				this->TimeStamps.push_back(evt->GetTimeStamp());
 				++this->InnerHits[detectorposition];
@@ -215,7 +215,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		}else if( currsubtype == SUBTYPE::MIDDLE ){
 			if( !this->MiddleHits[detectorposition] ){
 				this->Middle[detectorposition] = evt->GetEnergy();
-				this->RawMiddle[detectorposition] = evt->GetRawEnergy();
+				this->RawMiddle[detectorposition] = evt->GetRawEnergyWRandom();
 				this->CalMiddle[detectorposition] = evt->GetEnergy();
 				this->TimeStamps.push_back(evt->GetTimeStamp());
 				++this->MiddleHits[detectorposition];
@@ -225,7 +225,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		}else if( currsubtype == SUBTYPE::OUTER ){
 			if( !this->OuterHits[detectorposition] ){
 				this->Outer[detectorposition] = evt->GetEnergy();
-				this->RawOuter[detectorposition] = evt->GetRawEnergy();
+				this->RawOuter[detectorposition] = evt->GetRawEnergyWRandom();
 				this->CalOuter[detectorposition] = evt->GetEnergy();
 				this->TimeStamps.push_back(evt->GetTimeStamp());
 				++this->OuterHits[detectorposition];

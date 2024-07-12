@@ -2,8 +2,14 @@
 #define __BSM_PROCESSOR_HPP__
 
 #include "Processor.hpp"
+#include "PulseFitFunctions.hpp"
 
 #include "Correction.hpp"
+
+namespace PulseFit{
+	double BSMSingleTraceFit(double*,double*);
+	double BSMDoubleTraceFit(double*,double*);
+}
 
 class BSMProcessor : public Processor{
 	public:

@@ -5,6 +5,18 @@
 #include <TTree.h>
 #include <string>
 
+namespace PulseFit{
+
+	double BSMSingleTraceFit(double* x,double* par){
+		return PulseFit::Constant(x,par)+PulseFit::Sin(x,par+1)+PulseFit::Pulse(x,par+2);
+	}
+
+	double BSMDoubleTraceFit(double* x,double* par){
+		return PulseFit::Constant(x,par)+PulseFit::Sin(x,par+1)+PulseFit::Pulse(x,par+3)+PulseFit::Pulse(x,par+7);
+	}
+
+}
+
 BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor",{"bsm"}){
 	this->NewEvt = EventInfo();
 	this->PrevEvt = this->NewEvt;
@@ -31,7 +43,14 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 				{3700 , {512,0,512,16384,0.0,16384.0}},
 				{3710 , {16384,0.0,16384.0,1024,0,1.0}},
 				{3720 , {1024,0,32,16384,0.0,16384.0}},
-				{3800 , {512,0,512,16384,0.0,16384.0}}
+				{3730 , {1024,0,1024,16384,0.0,16384.0}},
+				{3740 , {1024,0,1024,1024,0,32}},
+				{3750 , {16384,0,16384.0,1024,0,1024}},
+				{3800 , {512,0,512,16384,0.0,16384.0}},
+				{3810 , {16384,0.0,16384.0,1024,0,1.0}},
+				{3820 , {1024,0,32,16384,0.0,16384.0}},
+				{3830 , {1024,0,1024,16384,0.0,16384.0}},
+				{3840 , {1024,0,1024,1024,0,32}}
 			    };
 	
 	this->BSMHits = std::vector<int>(12,0);
@@ -77,6 +96,26 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 					hismanager->Fill(tracehis,idx,tracevalue);
 					++idx;
 				}
+
+				auto psdvals = evt->GetTraceFixedPSD();
+
+				auto integral = std::get<0>(psdvals)+std::get<1>(psdvals);
+				auto tmax = evt->GetBaselineSubtractedMaxValue();
+				auto psd = tmax/integral;
+
+				std::string psdhis = (isfront) ?  ("BSM_381"+std::to_string(position)+"_F") :  ("BSM_381"+std::to_string(position)+"_B");
+				hismanager->Fill(psdhis,integral,psd);
+
+				std::string baselinehis = (isfront) ?  ("BSM_382"+std::to_string(position)+"_F") :  ("BSM_382"+std::to_string(position)+"_B");
+				auto baseline = evt->GetTracePreTriggerBaseline();
+				hismanager->Fill(baselinehis,baseline.second,baseline.first);
+
+				std::string peakhis = (isfront) ?  ("BSM_383"+std::to_string(position)+"_F") :  ("BSM_383"+std::to_string(position)+"_B");
+				auto pk = evt->GetTraceMaxInfo();
+				hismanager->Fill(peakhis,pk.first,pk.second);
+
+				std::string pklocbstddevhis = (isfront) ?  ("BSM_384"+std::to_string(position)+"_F") :  ("BSM_384"+std::to_string(position)+"_B");
+				hismanager->Fill(pklocbstddevhis,pk.first,baseline.second);
 			}
 			if( evt->GetSaturation() ){
 				this->CurrEvt.Saturate = true;
@@ -106,6 +145,16 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 			std::string baselinehis = (isfront) ?  ("BSM_372"+std::to_string(position)+"_F") :  ("BSM_372"+std::to_string(position)+"_B");
 			auto baseline = evt->GetTracePreTriggerBaseline();
 			hismanager->Fill(baselinehis,baseline.second,baseline.first);
+			
+			std::string peakhis = (isfront) ?  ("BSM_373"+std::to_string(position)+"_F") :  ("BSM_373"+std::to_string(position)+"_B");
+			auto pk = evt->GetTraceMaxInfo();
+			hismanager->Fill(peakhis,pk.first,pk.second);
+			
+			std::string pklocbstddevhis = (isfront) ?  ("BSM_374"+std::to_string(position)+"_F") :  ("BSM_374"+std::to_string(position)+"_B");
+			hismanager->Fill(pklocbstddevhis,pk.first,baseline.second);
+			
+			std::string pkmaxerghis = (isfront) ?  ("BSM_375"+std::to_string(position)+"_F") :  ("BSM_375"+std::to_string(position)+"_B");
+			hismanager->Fill(pkmaxerghis,evt->GetRawEnergyWRandom(),pk.first);
 			
 			this->CurrEvt.UnCorrectedBSM[detectorposition] = evt->GetEnergy();
 			this->TimeStamps.push_back(evt->GetTimeStamp());
@@ -277,6 +326,30 @@ void BSMProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 		title = "#betaSM"+std::to_string(ii+1)+"_B Baseline Avg vs Baseline StdDev; StdDev. (arb.); Avg. (arb.)";
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3720));
 
+		name = "BSM_373"+std::to_string(ii)+"_F";
+		title = "#betaSM"+std::to_string(ii+1)+"_F Max Peak Value vs Peak Location; Peak Location (ticks); Max (adc)";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3730));
+		
+		name = "BSM_373"+std::to_string(ii)+"_B";
+		title = "#betaSM"+std::to_string(ii+1)+"_B Max Peak Value vs Peak Location; Peak Location (ticks); Max (adc)";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3730));
+
+		name = "BSM_374"+std::to_string(ii)+"_F";
+		title = "#betaSM"+std::to_string(ii+1)+"_F Baseline StdDev vs Peak Location; Peak Location (ticks); StdDev. (arb.);";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3740));
+		
+		name = "BSM_374"+std::to_string(ii)+"_B";
+		title = "#betaSM"+std::to_string(ii+1)+"_B Baseline StdDev vs Peak Location; Peak Location (ticks); StdDev. (arb.)";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3740));
+
+		name = "BSM_375"+std::to_string(ii)+"_F";
+		title = "#betaSM"+std::to_string(ii+1)+"_F Peak Max Location vs Raw Energy; Energy (channel); Peak Max Location (ticks);";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3750));
+		
+		name = "BSM_375"+std::to_string(ii)+"_B";
+		title = "#betaSM"+std::to_string(ii+1)+"_B Peak Max Location vs Raw Energy; Energy (channel); Peak Max Location (ticks);";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3750));
+
 		name = "BSM_380"+std::to_string(ii)+"_F";
 		title = "#betaSM"+std::to_string(ii+1)+"_F Pileup Trace; Clock Ticks (arb.); adc (arb.)";
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3800));
@@ -284,6 +357,38 @@ void BSMProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 		name = "BSM_380"+std::to_string(ii)+"_B";
 		title = "#betaSM"+std::to_string(ii+1)+"_B Pileup Trace; Clock Ticks (arb.); adc (arb.)";
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3800));
+
+		name = "BSM_381"+std::to_string(ii)+"_F";
+		title = "#betaSM"+std::to_string(ii+1)+"_F Pileup Trace (Peak/Integral) vs Integral; Integral (arb.); Ratio (arb.)";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3810));
+		
+		name = "BSM_381"+std::to_string(ii)+"_B";
+		title = "#betaSM"+std::to_string(ii+1)+"_B Pileup Trace (Peak/Integral) vs Integral; Integral (arb.); Ratio (arb.)";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3810));
+		
+		name = "BSM_382"+std::to_string(ii)+"_F";
+		title = "#betaSM"+std::to_string(ii+1)+"_F Pileup Trace (Peak/Integral) vs Integral; StdDev. (arb.); Avg. (arb.)";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3820));
+		
+		name = "BSM_382"+std::to_string(ii)+"_B";
+		title = "#betaSM"+std::to_string(ii+1)+"_B Pileup Trace Baseline Avg vs Baseline StdDev; StdDev. (arb.); Avg. (arb.)";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3820));
+
+		name = "BSM_383"+std::to_string(ii)+"_F";
+		title = "#betaSM"+std::to_string(ii+1)+"_F Pileup Trace Max Peak Value vs Peak Location; Peak Location (ticks); Max (adc)";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3830));
+		
+		name = "BSM_383"+std::to_string(ii)+"_B";
+		title = "#betaSM"+std::to_string(ii+1)+"_B Pileup Trace Max Peak Value vs Peak Location; Peak Location (ticks); Max (adc)";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3830));
+
+		name = "BSM_384"+std::to_string(ii)+"_F";
+		title = "#betaSM"+std::to_string(ii+1)+"_F Pileup Trace Baseline StdDev vs Peak Location; Peak Location (ticks); StdDev. (arb.);";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3840));
+		
+		name = "BSM_384"+std::to_string(ii)+"_B";
+		title = "#betaSM"+std::to_string(ii+1)+"_B Pileup Trace Baseline StdDev vs Peak Location; Peak Location (ticks); StdDev. (arb.)";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3840));
 	}
 	
 	hismanager->RegisterPlot<TH2F>("BSM_3650","#betaSM Total vs MTAS Total; MTAS Total Energy (keV); #betaSM Energy (keV)",this->h2dsettings.at(3650));
