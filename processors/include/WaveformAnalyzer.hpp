@@ -31,6 +31,8 @@ class WaveformAnalyzer : public Analyzer {
 			std::tuple<size_t,size_t,size_t> FixedPSDBounds;
 			std::tuple<size_t,size_t,float> FractionalPSDBounds;
 
+			bool CalcDerivative;
+
 			WaveFormParams(){
 				PreTriggerBounds = {0,0};
 				PostTriggerBounds = {0,0};
@@ -38,6 +40,7 @@ class WaveformAnalyzer : public Analyzer {
 				HasPSD = false;
 				FixedPSDBounds = {0,0,0};
 				FractionalPSDBounds = {0,0,2.0};
+				CalcDerivative = false;
 			}
 
 			~WaveFormParams() = default;

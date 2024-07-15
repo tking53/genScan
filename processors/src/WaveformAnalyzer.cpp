@@ -26,6 +26,9 @@ WaveformAnalyzer::WaveformAnalyzer(const std::string& log) : Analyzer(log,"Wavef
 				boost::smatch cmapmatch;
 				if( boost::regex_match(evt->GetCMapID(),cmapmatch,s.first,boost::regex_constants::match_continuous) ){
 					evt->AnalyzeWaveform(s.second.PreTriggerBounds,s.second.PostTriggerBounds,s.second.QDCBounds);
+					if( s.second.CalcDerivative ){
+						evt->CalculateTraceDerivatives();
+					}
 					if( s.second.HasPSD ){
 						//auto fraction = std::get<2>(s.second.FractionalPSDBounds);
 						//if( fraction <= 1.0 ){
@@ -105,6 +108,7 @@ void WaveformAnalyzer::Init(const pugi::xml_node& config){
 		this->console->info("Found settings node regex:{}",re.str());
 
 		this->WaveSettings.push_back(std::make_pair(re,WaveFormParams()));
+		this->WaveSettings.back().second.CalcDerivative = settings.attribute("CalcDerivative").as_bool(false);
 		this->ParsePreTrigger(settings,this->WaveSettings.back().second);
 		this->ParsePostTrigger(settings,this->WaveSettings.back().second);
 		this->ParseQDC(settings,this->WaveSettings.back().second);
