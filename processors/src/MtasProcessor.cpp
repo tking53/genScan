@@ -396,7 +396,7 @@ void MtasProcessor::Init(const pugi::xml_node& config){
 		this->console->info("Found PositionCorrection Node for {} : p0:{} p1:{} cross:{}, E'= E*(cross/exp(p0+p1*P)); P = (Efront-Eback)/(Efront+Eback)",tag,p0,p1,cross);
 	}
 
-	this->diagnosticplots = config.attribute("diagnostic").as_bool(false);
+	this->diagnosticplots = config.attribute("diagnostic").as_bool(true);
 
 	this->LoadHistogramSettings(config);
 	this->LoadCustomCuts(config);

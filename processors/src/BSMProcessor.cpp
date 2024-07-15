@@ -46,11 +46,13 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 				{3730 , {1024,0,1024,16384,0.0,16384.0}},
 				{3740 , {1024,0,1024,1024,0,32}},
 				{3750 , {16384,0,16384.0,1024,0,1024}},
+				{3760 , {512,0,512,16384,-16384.0,16384.0}},
 				{3800 , {512,0,512,16384,0.0,16384.0}},
 				{3810 , {16384,0.0,16384.0,1024,0,1.0}},
 				{3820 , {1024,0,32,16384,0.0,16384.0}},
 				{3830 , {1024,0,1024,16384,0.0,16384.0}},
-				{3840 , {1024,0,1024,1024,0,32}}
+				{3840 , {1024,0,1024,1024,0,32}},
+				{3860 , {512,0,512,16384,-16384.0,16384.0}}
 			    };
 	
 	this->BSMHits = std::vector<int>(12,0);
@@ -97,6 +99,13 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 					++idx;
 				}
 
+				std::string tracederivativehis = (isfront) ? ("BSM_386"+std::to_string(position)+"_F") :  ("BSM_386"+std::to_string(position)+"_B");
+				idx = 0;
+				for( const auto& tracevalue : evt->GetTraceDerivative() ){
+					hismanager->Fill(tracederivativehis,idx,tracevalue);
+					++idx;
+				}
+
 				auto psdvals = evt->GetTraceFixedPSD();
 
 				auto integral = std::get<0>(psdvals)+std::get<1>(psdvals);
@@ -131,6 +140,14 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 					hismanager->Fill(tracehis,idx,tracevalue);
 					++idx;
 				}
+
+				std::string tracederivativehis = (isfront) ? ("BSM_376"+std::to_string(position)+"_F") :  ("BSM_376"+std::to_string(position)+"_B");
+				idx = 0;
+				for( const auto& tracevalue : evt->GetTraceDerivative() ){
+					hismanager->Fill(tracederivativehis,idx,tracevalue);
+					++idx;
+				}
+
 			}
 
 			auto psdvals = evt->GetTraceFixedPSD();
@@ -231,7 +248,7 @@ void BSMProcessor::Init(const Json::Value& config){
 
 void BSMProcessor::Init(const pugi::xml_node& config){
 	this->console->info("Init called with pugi::xml_node");
-	this->PlotAllTraces = config.attribute("PlotAllTraces").as_bool(false);
+	this->PlotAllTraces = config.attribute("PlotAllTraces").as_bool(true);
 	for( pugi::xml_node trace = config.child("PulseAnalysis"); trace; trace = trace.next_sibling("PulseAnalysis") ){
 		int id = trace.attribute("id").as_int(-1);
 		if( id >= this->TraceSettings.size() or id < 0 ){
@@ -350,6 +367,16 @@ void BSMProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 		title = "#betaSM"+std::to_string(ii+1)+"_B Peak Max Location vs Raw Energy; Energy (channel); Peak Max Location (ticks);";
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3750));
 
+		if( this->PlotAllTraces ){
+			name = "BSM_376"+std::to_string(ii)+"_F";
+			title = "#betaSM"+std::to_string(ii+1)+"_F Trace Derivative; Clock Ticks (arb.); adc (arb.)";
+			hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3760));
+
+			name = "BSM_376"+std::to_string(ii)+"_B";
+			title = "#betaSM"+std::to_string(ii+1)+"_B Trace Derivative; Clock Ticks (arb.); adc (arb.)";
+			hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3760));
+		}
+	
 		name = "BSM_380"+std::to_string(ii)+"_F";
 		title = "#betaSM"+std::to_string(ii+1)+"_F Pileup Trace; Clock Ticks (arb.); adc (arb.)";
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3800));
@@ -389,6 +416,16 @@ void BSMProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 		name = "BSM_384"+std::to_string(ii)+"_B";
 		title = "#betaSM"+std::to_string(ii+1)+"_B Pileup Trace Baseline StdDev vs Peak Location; Peak Location (ticks); StdDev. (arb.)";
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3840));
+	
+		name = "BSM_386"+std::to_string(ii)+"_F";
+		title = "#betaSM"+std::to_string(ii+1)+"_F Pileup Trace Derivative; Clock Ticks (arb.); adc (arb.)";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3860));
+
+		name = "BSM_386"+std::to_string(ii)+"_B";
+		title = "#betaSM"+std::to_string(ii+1)+"_B Pileup Trace Derivative; Clock Ticks (arb.); adc (arb.)";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3860));
+
+
 	}
 	
 	hismanager->RegisterPlot<TH2F>("BSM_3650","#betaSM Total vs MTAS Total; MTAS Total Energy (keV); #betaSM Energy (keV)",this->h2dsettings.at(3650));
