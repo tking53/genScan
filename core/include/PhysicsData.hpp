@@ -113,6 +113,8 @@ class PhysicsData{
 		void SetRawTrace(std::vector<uint16_t>&&);
 
 		const std::vector<uint16_t>& GetRawTrace() const;
+		const std::vector<float>& GetTraceDerivative() const;
+		const std::vector<uint16_t>& GetRawTraceDerivative() const;
 
 		//QDC Sums
 		void SetQDCSums(const std::vector<unsigned int>&);
@@ -208,6 +210,7 @@ class PhysicsData{
 		const std::tuple<float,float,float>& GetTraceFixedPSD() const;
 		void CalcTraceFractionalPSD(const size_t&,const size_t&, const float&);
 		const std::tuple<float,float,float>& GetTraceFractionalPSD() const;
+		void CalculateTraceDerivatives();
 	private:
 		//this is info decoded from the data files
 		int HeaderLength;	

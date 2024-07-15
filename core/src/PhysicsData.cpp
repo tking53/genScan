@@ -581,3 +581,16 @@ const std::string& PhysicsData::GetCMapID() const{
 const float& PhysicsData::GetBaselineSubtractedMaxValue() const{
 	return this->Trace.GetBaselineSubtractedMaxValue();
 }
+
+void PhysicsData::CalculateTraceDerivatives(){
+	this->Trace.CalcRawDerivative();
+	this->Trace.CalcBaselineSubtractedDerivative();
+}
+
+const std::vector<float>& PhysicsData::GetTraceDerivative() const{
+	return this->Trace.GetBaselineSubtractedDataDerivative();
+}
+
+const std::vector<uint16_t>& PhysicsData::GetRawTraceDerivative() const{
+	return this->Trace.GetDataDerivative();
+}

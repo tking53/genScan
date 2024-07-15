@@ -7,6 +7,7 @@
 #include <initializer_list>
 #include <utility>
 #include <tuple>
+#include <numeric>
 #include <iostream>
 
 #include "MathFunctions.hpp"
@@ -27,7 +28,9 @@ class TraceHelper final{
 		}
 
 		TraceHelper(const TraceHelper& other) : data(other.data), 
+							derivative_data(other.derivative_data),
 							data_baselinesub(other.data_baselinesub),
+							derivative_data_baselinesub(other.derivative_data_baselinesub),
 							TQDCSums(other.TQDCSums), 
 							PreTriggerBaselineInfo(other.PreTriggerBaselineInfo),
 							PostTriggerBaselineInfo(other.PostTriggerBaselineInfo),
@@ -42,8 +45,12 @@ class TraceHelper final{
 			if( this != &other ){
 				data.clear();
 				data = other.data;
+				derivative_data.clear();
+				derivative_data = other.derivative_data;
 				data_baselinesub.clear();
 				data_baselinesub = other.data_baselinesub;
+				derivative_data_baselinesub.clear();
+				derivative_data_baselinesub = other.derivative_data_baselinesub;
 				TQDCSums = other.TQDCSums;
 				PreTriggerBaselineInfo = other.PreTriggerBaselineInfo;
 				PostTriggerBaselineInfo = other.PostTriggerBaselineInfo;
@@ -56,7 +63,9 @@ class TraceHelper final{
 		}
 
 		TraceHelper(TraceHelper&& other) noexcept : data(std::move(other.data)),
+							    derivative_data(std::move(other.derivative_data)),
 							    data_baselinesub(std::move(other.data_baselinesub)),
+							    derivative_data_baselinesub(std::move(other.derivative_data_baselinesub)),
 							    TQDCSums(std::move(other.TQDCSums)),
 							    PreTriggerBaselineInfo(std::move(other.PreTriggerBaselineInfo)),
 							    PostTriggerBaselineInfo(std::move(other.PostTriggerBaselineInfo)),
@@ -71,8 +80,12 @@ class TraceHelper final{
 			if( this != &other ){
 				data.clear();
 				data = std::move(other.data);
+				derivative_data.clear();
+				derivative_data = std::move(other.derivative_data);
 				data_baselinesub.clear();
 				data_baselinesub = std::move(other.data_baselinesub);
+				derivative_data_baselinesub.clear();
+				derivative_data_baselinesub = std::move(other.derivative_data_baselinesub);
 				TQDCSums = std::move(other.TQDCSums);
 				PreTriggerBaselineInfo = std::move(other.PreTriggerBaselineInfo);
 				PostTriggerBaselineInfo = std::move(other.PostTriggerBaselineInfo);
@@ -92,6 +105,13 @@ class TraceHelper final{
 			return data;
 		}
 
+		const std::vector<T>& GetDataDerivative() const{
+			return derivative_data;
+		}
+
+		const std::vector<U>& GetBaselineSubtractedDataDerivative() const{
+			return derivative_data_baselinesub;
+		}
 
 		size_t GetSize() const{
 			return data.size();
@@ -165,6 +185,18 @@ class TraceHelper final{
 			//	  << ") max: (" << MaxInfo.first << ',' << MaxInfo.second 
 			//	  << ") maxsub: " << BaselineSubMax 
 			//	  << std::endl; 
+		}
+
+		void CalcRawDerivative(){
+			derivative_data.clear();
+			derivative_data = data;
+			std::adjacent_difference(derivative_data.begin(),derivative_data.end(),derivative_data.begin());
+		}
+
+		void CalcBaselineSubtractedDerivative(){
+			derivative_data_baselinesub.clear();
+			derivative_data_baselinesub = data_baselinesub;
+			std::adjacent_difference(derivative_data_baselinesub.begin(),derivative_data_baselinesub.end(),derivative_data_baselinesub.begin());
 		}
 
 		const U& GetPreTriggerBaseline() const{
@@ -291,7 +323,9 @@ class TraceHelper final{
 
 	private:
 		std::vector<T> data;
+		std::vector<T> derivative_data;
 		std::vector<U> data_baselinesub;
+		std::vector<U> derivative_data_baselinesub;
 		std::vector<T> TQDCSums;
 		std::pair<U,U> PreTriggerBaselineInfo;
 		std::pair<U,U> PostTriggerBaselineInfo;
