@@ -346,8 +346,10 @@ double XiaDecoder::DecodeCFDParams(const unsigned int* firstFour,const uint64_t&
 			cfdtime = (static_cast<double>(cfdfraction)/static_cast<double>(this->CFDSize)) - cfdsource;
 			break;
 		case 500:
-			mult = 10.0;
-			mult2 = 10.0;
+			//this may fix the issue, but have to double check
+			//it may need to still have to be scaled into ns aftewards though
+			mult = 5.0;
+			mult2 = 5.0;
 			cfdtime = (static_cast<double>(cfdfraction)/static_cast<double>(this->CFDSize)) + cfdsource - 1;
 			break;
 		default:
