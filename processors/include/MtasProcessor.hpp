@@ -66,22 +66,31 @@ class MtasProcessor : public Processor{
 		EventInfo NewEvt;
 
 		std::vector<double> Position;
+
 		std::vector<double> Center;
 		std::vector<double> Inner;
 		std::vector<double> Middle;
 		std::vector<double> Outer;
+
 		std::vector<double> RawCenter;
 		std::vector<double> RawInner;
 		std::vector<double> RawMiddle;
 		std::vector<double> RawOuter;
+
 		std::vector<double> CalCenter;
 		std::vector<double> CalInner;
 		std::vector<double> CalMiddle;
 		std::vector<double> CalOuter;
+
 		std::vector<int> CenterHits;
 		std::vector<int> InnerHits;
 		std::vector<int> MiddleHits;
 		std::vector<int> OuterHits;
+
+		bool CenterFire;
+		bool InnerFire;
+		bool MiddleFire;
+		bool OuterFire;
 
 		std::vector<double> TimeStamps;
 		
