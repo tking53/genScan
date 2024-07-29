@@ -27,18 +27,18 @@
 			<Processor name="BSMProcessor" PlotAllTraces="false" />
 			<Processor name="MtasProcessor" diagnostic="true" >
 				<!-- This uses the calibrated energy, this may cause issues in the future, but should be fine once calibrated? -->
-				<PositionCorrection id="0" p0="6.53713" p1="1.06084" cross="691.04374" tag="C1F" />
-				<PositionCorrection id="1" p0="6.53916" p1="-0.945923" cross="691.04374" tag="C1B" />
-				<PositionCorrection id="2" p0="6.53438" p1="1.03888" cross="688.63145" tag="C2F" />
-				<PositionCorrection id="3" p0="6.53501" p1="-0.967364" cross="688.63145" tag="C2B" />
-				<PositionCorrection id="4" p0="6.53372" p1="1.1504" cross="688.27891" tag="C3F" />
-				<PositionCorrection id="5" p0="6.53455" p1="-0.863393" cross="688.27891" tag="C3B" />
-				<PositionCorrection id="6" p0="6.53682" p1="1.07639" cross="690.36136" tag="C4F" />
-				<PositionCorrection id="7" p0="6.53756" p1="-0.939243" cross="690.36136" tag="C4B" />
-				<PositionCorrection id="8" p0="6.53725" p1="1.04802" cross="690.12037" tag="C5F" />
-				<PositionCorrection id="9" p0="6.53651" p1="-0.971753" cross="690.12037" tag="C5B" />
-				<PositionCorrection id="10" p0="6.54065" p1="1.12048" cross="692.89959" tag="C6F" />
-				<PositionCorrection id="11" p0="6.54108" p1="-0.928865" cross="692.89959" tag="C6B" />
+				<!-- <PositionCorrection id="0" p0="6.53713" p1="1.06084" cross="691.04374" tag="C1F" /> -->
+				<!-- <PositionCorrection id="1" p0="6.53916" p1="-0.945923" cross="691.04374" tag="C1B" /> -->
+				<!-- <PositionCorrection id="2" p0="6.53438" p1="1.03888" cross="688.63145" tag="C2F" /> -->
+				<!-- <PositionCorrection id="3" p0="6.53501" p1="-0.967364" cross="688.63145" tag="C2B" /> -->
+				<!-- <PositionCorrection id="4" p0="6.53372" p1="1.1504" cross="688.27891" tag="C3F" /> -->
+				<!-- <PositionCorrection id="5" p0="6.53455" p1="-0.863393" cross="688.27891" tag="C3B" /> -->
+				<!-- <PositionCorrection id="6" p0="6.53682" p1="1.07639" cross="690.36136" tag="C4F" /> --> 
+				<!-- <PositionCorrection id="7" p0="6.53756" p1="-0.939243" cross="690.36136" tag="C4B" /> -->
+				<!-- <PositionCorrection id="8" p0="6.53725" p1="1.04802" cross="690.12037" tag="C5F" /> -->
+				<!-- <PositionCorrection id="9" p0="6.53651" p1="-0.971753" cross="690.12037" tag="C5B" /> -->
+				<!-- <PositionCorrection id="10" p0="6.54065" p1="1.12048" cross="692.89959" tag="C6F" /> -->
+				<!-- <PositionCorrection id="11" p0="6.54108" p1="-0.928865" cross="692.89959" tag="C6B" /> -->
 				<!-- The above used the 32XX series, uses a simple exp([0]+[1]*x), is what was seen as needed for BSM -->
 				<!-- Note that when I look at the average of the two PMTs I don't see any quadratic dependence, like one would expect. -->
 				<!-- plotting direct fitted functions you do see very small quadratic shape -->
@@ -67,82 +67,82 @@
 			<Module number="2" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="264">
 				<Channel number="0" type="mtas" subtype="center" group="1" tags="front">
 					<Calibration model="linear" min="0">	
-						0.0 1.02236 	
+						0	1.01478
 					</Calibration>
 				</Channel>
 				<Channel number="1" type="mtas" subtype="center" group="1" tags="back">
 					<Calibration model="linear" min="0">	
-						0.0 1.03826 	
+						0	1.02257
 					</Calibration>
 				</Channel>
 				<Channel number="2" type="mtas" subtype="center" group="2" tags="front">
 					<Calibration model="linear" min="0">	
-						0.0 1.00981	
+						0	1.00538
 					</Calibration>
 				</Channel>
 				<Channel number="3" type="mtas" subtype="center" group="2" tags="back">
 					<Calibration model="linear" min="0">	
-						0.0 1.04012 	
+						0	1.04124
 					</Calibration>
 				</Channel>
 				<Channel number="4" type="mtas" subtype="center" group="3" tags="front">
 					<Calibration model="linear" min="0">	
-						0.0 1.06376	
+						0	1.05392
 					</Calibration>
 				</Channel>
 				<Channel number="5" type="mtas" subtype="center" group="3" tags="back">
 					<Calibration model="linear" min="0">	
-						0.0 1.01572	
+						0	1.01916
 					</Calibration>
 				</Channel>
 				<Channel number="6" type="mtas" subtype="center" group="4" tags="front">
 					<Calibration model="linear" min="0">	
-						0.0 1.02875	
+						0	1.00737
 					</Calibration>
 				</Channel>
 				<Channel number="7" type="mtas" subtype="center" group="4" tags="back">
 					<Calibration model="linear" min="0">	
-						0.0 1.07145	
+						0	1.06225
 					</Calibration>
 				</Channel>
 				<Channel number="8" type="mtas" subtype="center" group="5" tags="front">
 					<Calibration model="linear" min="0">	
-						0.0 0.999326	
+						0	0.997225
 					</Calibration>
 				</Channel>
 				<Channel number="9" type="mtas" subtype="center" group="5" tags="back">
 					<Calibration model="linear" min="0">	
-						0.0 1.05882	
+						0	1.00856
 					</Calibration>
 				</Channel>
 				<Channel number="10" type="mtas" subtype="center" group="6" tags="front">
 					<Calibration model="linear" min="0">	
-						0.0 1.04059	
+						0	1.03717
 					</Calibration>
 				</Channel>
 				<Channel number="11" type="mtas" subtype="center" group="6" tags="back">
 					<Calibration model="linear" min="0">	
-						0.0 1.07895 	
+						0	1.04158
 					</Calibration>
 				</Channel>
 				<Channel number="12" type="mtas" subtype="inner" group="1" tags="front">
 					<Calibration model="linear" min="0">	
-						0.0 0.983588 	
+						0	1.00899
 					</Calibration>
 				</Channel>
 				<Channel number="13" type="mtas" subtype="inner" group="1" tags="back">
 					<Calibration model="linear" min="0">	
-						0.0 0.983667	
+						0	1.00821
 					</Calibration>
 				</Channel>
 				<Channel number="14" type="mtas" subtype="inner" group="2" tags="front">
 					<Calibration model="linear" min="0">	
-						0.0 0.994624	
+						0	1.0081
 					</Calibration>
 				</Channel>
 				<Channel number="15" type="mtas" subtype="inner" group="2" tags="back">
 					<Calibration model="linear" min="0">	
-						0.0 0.992481	
+						0	1.00091
 					</Calibration>
 				</Channel>
 			</Module>
@@ -150,92 +150,83 @@
 			<Module number="3" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="264">
 				<Channel number="0" type="mtas" subtype="inner" group="3" tags="front">
 					<Calibration model="linear" min="0"> 
-						0.0 0.996983
+						0	1.00174
 					</Calibration>
 				</Channel>
 				<Channel number="1" type="mtas" subtype="inner" group="3" tags="back">
 					<Calibration model="linear" min="0"> 
-						0.0 0.99912
+						0	1.00352
 					</Calibration>
 				</Channel>
 				<Channel number="2" type="mtas" subtype="inner" group="4" tags="front">
 					<Calibration model="linear" min="0">
-						0.0 1.00907
+						0	1.01051
 					</Calibration>
 				</Channel>
 				<Channel number="3" type="mtas" subtype="inner" group="4" tags="back">
 					<Calibration model="linear" min="0"> 
-						0.0 1.0015961
+						0	1.00629
 					</Calibration>
-					<!-- <Calibration model="linear" min="0"> --> 
-					<!-- 	0.0 1.01445 -->
-					<!-- </Calibration> -->
 				</Channel>
 				<Channel number="4" type="mtas" subtype="inner" group="5" tags="front">
 					<Calibration model="linear" min="0">
-						0.0 1.00051
+						0	0.999772
 					</Calibration>
 				</Channel>
 				<Channel number="5" type="mtas" subtype="inner" group="5" tags="back">
 					<Calibration model="linear" min="0">
-						0.0 1.1659610
+						0	1.02466
 					</Calibration>
-					<!-- <Calibration model="linear" min="0"> -->
-					<!-- 	0.0 1.3132620 -->
-					<!-- </Calibration> -->
-					<!-- <Calibration model="linear" min="0"> -->
-					<!-- 	0.0 1.12738 -->
-					<!-- </Calibration> -->
 				</Channel>
 				<Channel number="6" type="mtas" subtype="inner" group="6" tags="front">
 					<Calibration model="linear" min="0">
-						0.0 0.993434	
+						0	0.998181
 					</Calibration>
 				</Channel>
 				<Channel number="7" type="mtas" subtype="inner" group="6" tags="back">
 					<Calibration model="linear" min="0">	
-						0.0 0.993633	
+						0	1.01005
 					</Calibration>
 				</Channel>
 
 				<Channel number="8" type="mtas" subtype="middle" group="1" tags="front">
 					<Calibration model="linear" min="0">	    
-					0.0 0.99852484 	
+						0	0.996568
 					</Calibration>
 				</Channel>
 				<Channel number="9" type="mtas" subtype="middle" group="1" tags="back">
 					<Calibration model="linear" min="0">	    
-					0.0 0.99106856 	
+						0	0.994579
 					</Calibration>
 				</Channel>
 				<Channel number="10" type="mtas" subtype="middle" group="2" tags="front">
 					<Calibration model="linear" min="0">	
-						0.0 1.0185292 	
+						0	1.08381
 					</Calibration>
 				</Channel>
 				<Channel number="11" type="mtas" subtype="middle" group="2" tags="back">
 					<Calibration model="linear" min="0">	
-						0.0 1.0142112 	
+						0	1.07665
 					</Calibration>
 				</Channel>
 				<Channel number="12" type="mtas" subtype="middle" group="3" tags="front">
 					<Calibration model="linear" min="0">	
-						0.0 0.99649847	
+						0	0.999996
 					</Calibration>
 				</Channel>
 				<Channel number="13" type="mtas" subtype="middle" group="3" tags="back">
 					<Calibration model="linear" min="0">	
-						0.0 0.99538855	
+						0	0.98957
 					</Calibration>
 				</Channel>
 				<Channel number="14" type="mtas" subtype="middle" group="4" tags="front">
 					<Calibration model="linear" min="0">	
-						0.0 1.0070611	
+						0	1.01888
 					</Calibration>
 				</Channel>
 				<Channel number="15" type="mtas" subtype="middle" group="4" tags="back">
 					<Calibration model="linear" min="0">	
-						0.0 1.0360605	
+						0	1.01888
 					</Calibration>
 				</Channel>
 			</Module>
@@ -243,82 +234,82 @@
 			<Module number="4" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="264">
 				<Channel number="0" type="mtas" subtype="middle" group="5" tags="front">
 					<Calibration model="linear" min="0">	    
-					0.0 0.94259528	
+						0	0.951601
 					</Calibration>
 				</Channel>
 				<Channel number="1" type="mtas" subtype="middle" group="5" tags="back">
 					<Calibration model="linear" min="0">	    
-					0.0 1.0061836	
+						0	1.01271
 					</Calibration>
 				</Channel>
 				<Channel number="2" type="mtas" subtype="middle" group="6" tags="front">
 					<Calibration model="linear" min="0">	    
-					0.0 1.0020750	
+						0	1.01268
 					</Calibration>
 				</Channel>
 				<Channel number="3" type="mtas" subtype="middle" group="6" tags="back">
 					<Calibration model="linear" min="0">	    
-					0.0 1.0062833	
+						0	1.01983
 					</Calibration>
 				</Channel>
 				<Channel number="4" type="mtas" subtype="outer" group="1" tags="front">
 					<Calibration model="linear" min="0">	    
-					0.0 0.99751441	
+						0	1.0036
 					</Calibration>
 				</Channel>
 				<Channel number="5" type="mtas" subtype="outer" group="1" tags="back">
 					<Calibration model="linear" min="0">	    
-					0.0 1.0009969	
+						0	1.00712
 					</Calibration>
 				</Channel>
 				<Channel number="6" type="mtas" subtype="outer" group="2" tags="front">
 					<Calibration model="linear" min="0">	    
-					0.0 1.0023236	
+						0	1.00588
 					</Calibration>
 				</Channel>
 				<Channel number="7" type="mtas" subtype="outer" group="2" tags="back">
 					<Calibration model="linear" min="0">	    
-					0.0 1.0036005	
+						0	1.02282
 					</Calibration>
 				</Channel>
 				<Channel number="8" type="mtas" subtype="outer" group="3" tags="front">
 					<Calibration model="linear" min="0">	    
-					0.0 1.0004582	
+						0	1.00749
 					</Calibration>
 				</Channel>
 				<Channel number="9" type="mtas" subtype="outer" group="3" tags="back">
 					<Calibration model="linear" min="0">	    
-					0.0 1.0052066	
+						0	1.02177
 					</Calibration>
 				</Channel>
 				<Channel number="10" type="mtas" subtype="outer" group="4" tags="front">
 					<Calibration model="linear" min="0">    
-					0.0 1.0016652	
+						0	1.00471
 					</Calibration>
 				</Channel>
 				<Channel number="11" type="mtas" subtype="outer" group="4" tags="back">
 					<Calibration model="linear" min="0">    
-					0.0 1.0008073	
+						0	0.994153
 					</Calibration>
 				</Channel>
 				<Channel number="12" type="mtas" subtype="outer" group="5" tags="front">
 					<Calibration model="linear" min="0">    
-					0.0 0.99843316	
+						0	1.02779
 					</Calibration>
 				</Channel>
 				<Channel number="13" type="mtas" subtype="outer" group="5" tags="back">
 					<Calibration model="linear" min="0">    
-					0.0 0.99824362	
+						0	1.00407
 					</Calibration>
 				</Channel>
 				<Channel number="14" type="mtas" subtype="outer" group="6" tags="front">
 					<Calibration model="linear" min="0">    
-					0.0 1.0027027	
+						0	1.02228
 					</Calibration>
 				</Channel>
 				<Channel number="15" type="mtas" subtype="outer" group="6" tags="back">
 					<Calibration model="linear" min="0">    
-					0.0 1.0012562	
+						0	1.00551
 					</Calibration>
 				</Channel>
 			</Module>
