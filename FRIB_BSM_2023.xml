@@ -54,8 +54,11 @@
 			<Module number="0" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="264">
 				<Channel number="0" type="bsm" subtype="bsm" group="1" tags="front">
 					<Calibration model="linear" min="0">	
-						0.0 1.0091478	
+						0.0 0.93967816	
 					</Calibration>
+					<!-- <Calibration model="linear" min="0"> -->	
+					<!-- 	0.0 1.0091478 -->	
+					<!-- </Calibration> -->
 				</Channel>
 				<Channel number="1" type="bsm" subtype="bsm" group="1" tags="back">
 					<Calibration model="linear" min="0">	
