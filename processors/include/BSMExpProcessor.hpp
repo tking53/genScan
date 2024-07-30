@@ -31,6 +31,7 @@ class BSMExpProcessor : public Processor{
 		bool HasBSM;
 
 		double BetaThreshold;
+		double QBeta;
 
 		bool PPCutExists;
 

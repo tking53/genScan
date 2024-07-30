@@ -52,10 +52,12 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 				{3820 , {1024,0,32,16384,0.0,16384.0}},
 				{3830 , {1024,0,1024,16384,0.0,16384.0}},
 				{3840 , {1024,0,1024,1024,0,32}},
-				{3860 , {512,0,512,16384,-16384.0,16384.0}}
+				{3860 , {512,0,512,16384,-16384.0,16384.0}},
+				{3900 , {512,0,512,16384,0.0,16384.0}}
 			    };
 	
 	this->BSMHits = std::vector<int>(12,0);
+	this->Traces = std::vector<std::vector<uint16_t>>(12,std::vector<uint16_t>());
 	for( size_t ii = 0; ii < 12; ++ii ){
 		this->TraceSettings.push_back(nullptr);
 		this->PosCorrectionMap.push_back(nullptr);
@@ -173,6 +175,7 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 			std::string pkmaxerghis = (isfront) ?  ("BSM_375"+std::to_string(position)+"_F") :  ("BSM_375"+std::to_string(position)+"_B");
 			hismanager->Fill(pkmaxerghis,evt->GetRawEnergyWRandom(),pk.first);
 			
+			this->Traces[detectorposition] = evt->GetRawTraceData();
 			this->CurrEvt.UnCorrectedBSM[detectorposition] = evt->GetEnergy();
 			this->TimeStamps.push_back(evt->GetTimeStamp());
 			++this->BSMHits[detectorposition];
@@ -425,6 +428,13 @@ void BSMProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 		title = "#betaSM"+std::to_string(ii+1)+"_B Pileup Trace Derivative; Clock Ticks (arb.); adc (arb.)";
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3860));
 
+		name = "BSM_390"+std::to_string(ii)+"_F";
+		title = "#betaSM"+std::to_string(ii+1)+"_F G.S. Pileup; Clock Ticks (arb.); adc (arb.)";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3900));
+
+		name = "BSM_390"+std::to_string(ii)+"_B";
+		title = "#betaSM"+std::to_string(ii+1)+"_B G.S. Pileup; Clock Ticks (arb.); adc (arb.)";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3900));
 
 	}
 	
@@ -449,6 +459,24 @@ void BSMProcessor::Reset(){
 	for( const auto& t : this->TraceSettings ){
 		if( t != nullptr ){
 			t->Reset();
+		}
+	}
+}
+
+void BSMProcessor::FillGSPileupTracePlots(PLOTS::PlotRegistry* hismanager) const{
+	for( int ii = 0; ii < 6; ++ii ){
+		std::string fronthis = "BSM_390"+std::to_string(ii)+"_F";
+		size_t idx = 0;
+		for( const auto& val : this->Traces[2*ii] ){
+			hismanager->Fill(fronthis,idx,val);
+			++idx;
+		}
+		
+		std::string backhis = "BSM_390"+std::to_string(ii)+"_B";
+		idx = 0;
+		for( const auto& val : this->Traces[2*ii + 1] ){
+			hismanager->Fill(backhis,idx,val);
+			++idx;
 		}
 	}
 }

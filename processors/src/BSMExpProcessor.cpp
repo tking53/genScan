@@ -26,6 +26,7 @@ BSMExpProcessor::BSMExpProcessor(const std::string& log) : Processor(log,"BSMExp
 	};
 
 	this->BetaThreshold = 0.0;
+	this->QBeta = 8192.0;
 	this->PPCutExists = false;
 
 	this->CurrMTAS = MtasProcessor::EventInfo();
@@ -84,6 +85,9 @@ BSMExpProcessor::BSMExpProcessor(const std::string& log) : Processor(log,"BSMExp
 		hismanager->Fill("BSM_3602",this->CurrBSM.TotalEnergy+this->CurrMTAS.TotalEnergy[0]);
 		if( (not this->HasMTAS) or this->CurrMTAS.TotalEnergy[0] < 1.0 ){
 			hismanager->Fill("BSM_3601",this->CurrBSM.TotalEnergy);
+			if( this->CurrBSM.TotalEnergy > this->QBeta ){
+				this->BSMProc->FillGSPileupTracePlots(hismanager);
+			}
 		}
 	}else{
 		if( this->CurrMTAS.Pileup ){
@@ -139,6 +143,7 @@ void BSMExpProcessor::Init(const pugi::xml_node& config){
 	}
 
 	this->BetaThreshold = config.attribute("betathresh").as_double(0.0);
+	this->QBeta = config.attribute("qvalue").as_double(8192.0);
 
 	if( not this->HasMTAS ){
 		throw std::runtime_error("missing MtasProcessor in BSMExpProcessor");

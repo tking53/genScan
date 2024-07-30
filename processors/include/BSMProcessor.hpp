@@ -29,6 +29,8 @@ class BSMProcessor : public Processor{
 		virtual void RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>&) final;
 		virtual void CleanupTree() final;
 
+		void FillGSPileupTracePlots(PLOTS::PlotRegistry*) const;
+
 		struct EventInfo{
 			double TotalEnergy;
 			std::vector<double> SumFrontBackEnergy;
@@ -123,6 +125,7 @@ class BSMProcessor : public Processor{
 		std::vector<std::unique_ptr<TraceAnalysis>> TraceSettings;
 
 		std::vector<double> TimeStamps;
+		std::vector<std::vector<uint16_t>> Traces;
 
 		std::vector<std::unique_ptr<Correction::ExpoPosCorrection>> PosCorrectionMap;
 
