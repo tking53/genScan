@@ -200,52 +200,55 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 	//	}
 	//}
 	
-	this->CurrEvt.FirstTime = *(std::min_element(this->TimeStamps.begin(),this->TimeStamps.end()));
-	this->CurrEvt.LastTime = *(std::max_element(this->TimeStamps.begin(),this->TimeStamps.end()));
+	if( not this->TimeStamps.empty() ){
+		this->CurrEvt.FirstTime = *(std::min_element(this->TimeStamps.begin(),this->TimeStamps.end()));
+		this->CurrEvt.LastTime = *(std::max_element(this->TimeStamps.begin(),this->TimeStamps.end()));
 
-	for( int ii = 0; ii < 6; ++ii ){
-		if( this->BSMHits[2*ii] and this->BSMHits[2*ii + 1] ){
-			++this->CurrEvt.NumValidSegments;
-			this->CurrEvt.UnCorrectedSumFrontBackEnergy[ii] = (this->CurrEvt.UnCorrectedBSM[2*ii] + this->CurrEvt.UnCorrectedBSM[2*ii + 1])/2.0;
-			this->CurrEvt.Position[ii] = this->CalcPosition(this->CurrEvt.UnCorrectedBSM[2*ii],this->CurrEvt.UnCorrectedBSM[2*ii + 1]);
-			if( (this->PosCorrectionMap[2*ii] != nullptr) and (this->PosCorrectionMap[2*ii + 1] != nullptr ) ){
-				auto front = this->PosCorrectionMap[2*ii]->Correct(this->CurrEvt.UnCorrectedBSM[2*ii],this->CurrEvt.Position[ii]);
-				auto back = this->PosCorrectionMap[2*ii + 1]->Correct(this->CurrEvt.UnCorrectedBSM[2*ii + 1],this->CurrEvt.Position[ii]);
-				this->CurrEvt.CorrectedBSM[2*ii] = front;
-				this->CurrEvt.CorrectedBSM[2*ii + 1] = back;
-				this->CurrEvt.SumFrontBackEnergy[ii] = (front + back)/2.0;
-			}else{
-				this->CurrEvt.SumFrontBackEnergy[ii] = (this->CurrEvt.UnCorrectedBSM[2*ii] + this->CurrEvt.UnCorrectedBSM[2*ii + 1])/2.0;
-				this->CurrEvt.CorrectedBSM[2*ii] = this->CurrEvt.UnCorrectedBSM[2*ii];
-				this->CurrEvt.CorrectedBSM[2*ii + 1] = this->CurrEvt.UnCorrectedBSM[2*ii + 1];
+		for( int ii = 0; ii < 6; ++ii ){
+			if( this->BSMHits[2*ii] and this->BSMHits[2*ii + 1] ){
+				this->CurrEvt.RealEvt = true;
+				++this->CurrEvt.NumValidSegments;
+				this->CurrEvt.UnCorrectedSumFrontBackEnergy[ii] = (this->CurrEvt.UnCorrectedBSM[2*ii] + this->CurrEvt.UnCorrectedBSM[2*ii + 1])/2.0;
+				this->CurrEvt.Position[ii] = this->CalcPosition(this->CurrEvt.UnCorrectedBSM[2*ii],this->CurrEvt.UnCorrectedBSM[2*ii + 1]);
+				if( (this->PosCorrectionMap[2*ii] != nullptr) and (this->PosCorrectionMap[2*ii + 1] != nullptr ) ){
+					auto front = this->PosCorrectionMap[2*ii]->Correct(this->CurrEvt.UnCorrectedBSM[2*ii],this->CurrEvt.Position[ii]);
+					auto back = this->PosCorrectionMap[2*ii + 1]->Correct(this->CurrEvt.UnCorrectedBSM[2*ii + 1],this->CurrEvt.Position[ii]);
+					this->CurrEvt.CorrectedBSM[2*ii] = front;
+					this->CurrEvt.CorrectedBSM[2*ii + 1] = back;
+					this->CurrEvt.SumFrontBackEnergy[ii] = (front + back)/2.0;
+				}else{
+					this->CurrEvt.SumFrontBackEnergy[ii] = (this->CurrEvt.UnCorrectedBSM[2*ii] + this->CurrEvt.UnCorrectedBSM[2*ii + 1])/2.0;
+					this->CurrEvt.CorrectedBSM[2*ii] = this->CurrEvt.UnCorrectedBSM[2*ii];
+					this->CurrEvt.CorrectedBSM[2*ii + 1] = this->CurrEvt.UnCorrectedBSM[2*ii + 1];
+				}
+
+				std::string id = std::to_string(ii);
+				std::string name = "BSM_362"+id+"_F";
+
+				hismanager->Fill(name,this->CurrEvt.Position[ii],this->CurrEvt.UnCorrectedBSM[2*ii]);
+
+				name = "BSM_362"+id+"_B";
+				hismanager->Fill(name,this->CurrEvt.Position[ii],this->CurrEvt.UnCorrectedBSM[2*ii + 1]);
+
+				name = "BSM_362"+id;
+				hismanager->Fill(name,this->CurrEvt.Position[ii],this->CurrEvt.SumFrontBackEnergy[ii]);
 			}
-		
-			std::string id = std::to_string(ii);
-			std::string name = "BSM_362"+id+"_F";
-
-			hismanager->Fill(name,this->CurrEvt.Position[ii],this->CurrEvt.UnCorrectedBSM[2*ii]);
-			
-			name = "BSM_362"+id+"_B";
-			hismanager->Fill(name,this->CurrEvt.Position[ii],this->CurrEvt.UnCorrectedBSM[2*ii + 1]);
-			
-			name = "BSM_362"+id;
-			hismanager->Fill(name,this->CurrEvt.Position[ii],this->CurrEvt.SumFrontBackEnergy[ii]);
 		}
-	}
 
-	for( int ii = 0; ii < 6; ++ii ){
-		this->CurrEvt.TotalEnergy += this->CurrEvt.SumFrontBackEnergy[ii];
-		this->CurrEvt.UnCorrectedTotalEnergy += this->CurrEvt.UnCorrectedSumFrontBackEnergy[ii];
-	}
+		for( int ii = 0; ii < 6; ++ii ){
+			this->CurrEvt.TotalEnergy += this->CurrEvt.SumFrontBackEnergy[ii];
+			this->CurrEvt.UnCorrectedTotalEnergy += this->CurrEvt.UnCorrectedSumFrontBackEnergy[ii];
+		}
 
-	for( int ii = 0; ii < 6; ++ii ){
-		std::string id = std::to_string(ii);
-		std::string name = "BSM_366"+id;
+		for( int ii = 0; ii < 6; ++ii ){
+			std::string id = std::to_string(ii);
+			std::string name = "BSM_366"+id;
 
-		hismanager->Fill(name,this->CurrEvt.CorrectedBSM[2*ii+1],this->CurrEvt.CorrectedBSM[2*ii]);
-		
-		name = "BSM_366"+id+"8";
-		hismanager->Fill(name,this->CurrEvt.CorrectedBSM[2*ii+1],this->CurrEvt.CorrectedBSM[2*ii]);
+			hismanager->Fill(name,this->CurrEvt.CorrectedBSM[2*ii+1],this->CurrEvt.CorrectedBSM[2*ii]);
+
+			name = "BSM_366"+id+"8";
+			hismanager->Fill(name,this->CurrEvt.CorrectedBSM[2*ii+1],this->CurrEvt.CorrectedBSM[2*ii]);
+		}
 	}
 
 	Processor::EndProcess();
