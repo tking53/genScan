@@ -72,43 +72,12 @@ class BSMProcessor : public Processor{
 		EventInfo& GetPrevEvt();
 
 		struct TraceAnalysis{
-			int lowerbound;
-			int upperbound;
 			float integralthreshold;
-			float lowthresh;
-			float highthresh;
-			std::pair<float,float> baseline;
-			std::pair<float,float> integrals;
-			std::pair<size_t,float> peakmax;
-			float psd;
+			std::string cutid;
 
 			TraceAnalysis(){
-				lowerbound = -1;
-				upperbound = -1;
 				integralthreshold = 0.0;
-				lowthresh = 0.0;
-				highthresh = 0.0;
-				baseline = {0.0,0.0};
-				integrals = {0.0,0.0};
-				peakmax = {0,0.0};
-				psd = 0.0;
-			}
-
-			//~TraceAnalysis() = default;
-			//TraceAnalysis(const TraceAnalysis&) = default;
-			//TraceAnalysis(TraceAnalysis&&) = default;
-			//TraceAnalysis& operator=(const TraceAnalysis&) = default;
-			//TraceAnalysis& operator=(TraceAnalysis&&) = default;
-
-			void Reset(){
-				baseline = {0.0,0.0};
-				integrals = {0.0,0.0};
-				peakmax = {0,0.0};
-				psd = 0.0;
-			}
-
-			bool ValidateSelf(){
-				return (lowerbound < upperbound) and (lowerbound >= 0) and (upperbound >= 0) and (lowthresh <= highthresh);
+				cutid = "";
 			}
 		};
 

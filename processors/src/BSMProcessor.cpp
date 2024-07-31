@@ -162,6 +162,15 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 			
 			std::string psdhis = (isfront) ?  ("BSM_371"+std::to_string(position)+"_F") :  ("BSM_371"+std::to_string(position)+"_B");
 			hismanager->Fill(psdhis,integral,psd);
+			if( this->TraceSettings[detectorposition] != nullptr ){
+				if( integral < this->TraceSettings[detectorposition]->integralthreshold ){
+					continue;
+				}else{
+					if( cutmanager->IsWithin(this->TraceSettings[detectorposition]->cutid,integral,psd) ){
+						continue;
+					}
+				}
+			}
 
 			std::string baselinehis = (isfront) ?  ("BSM_372"+std::to_string(position)+"_F") :  ("BSM_372"+std::to_string(position)+"_B");
 			auto baseline = evt->GetTracePreTriggerBaseline();
@@ -280,13 +289,10 @@ void BSMProcessor::Init(const pugi::xml_node& config){
 			}else{
 				this->TraceSettings[id].reset(new TraceAnalysis());
 
-				this->TraceSettings[id]->lowerbound = trace.attribute("lowerbound").as_int(20);
-				this->TraceSettings[id]->upperbound = trace.attribute("upperbound").as_int(50);
-				this->TraceSettings[id]->lowthresh = trace.attribute("lowthresh").as_float(0.0);
-				this->TraceSettings[id]->highthresh = trace.attribute("highthresh").as_float(1.0e10);
 				this->TraceSettings[id]->integralthreshold = trace.attribute("integralthreshold").as_float(0.0);
-				if( not this->TraceSettings[id]->ValidateSelf() ){
-					std::string mess = "PulseAnalysis Setting in BSMProcessor for id="+std::to_string(id)+" is misconfigured, doesn't pass (lowerbound < upperbound) and (lowerbound >= 0) and (upperbound >= 0) and (lowthresh <= highthresh)";
+				this->TraceSettings[id]->cutid = trace.attribute("cutid").as_string("");
+				if( this->TraceSettings[id]->cutid.empty() ){
+					std::string mess = "Invalid PulseAnalysis Setting in BSMProcessor id="+std::to_string(id)+" missing cutid attribute";
 					throw mess;
 				}
 			}
@@ -480,11 +486,6 @@ void BSMProcessor::Reset(){
 	this->CurrEvt = this->NewEvt;
 	this->TimeStamps.clear();
 	this->BSMHits = std::vector<int>(12,0);
-	for( const auto& t : this->TraceSettings ){
-		if( t != nullptr ){
-			t->Reset();
-		}
-	}
 }
 
 void BSMProcessor::FillGSPileupTracePlots(PLOTS::PlotRegistry* hismanager) const{
