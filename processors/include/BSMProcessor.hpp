@@ -35,6 +35,7 @@ class BSMProcessor : public Processor{
 			double TotalEnergy;
 			std::vector<double> SumFrontBackEnergy;
 			std::vector<double> Position;
+			std::vector<double> CorrectedBSM;
 			double UnCorrectedTotalEnergy;
 			std::vector<double> UnCorrectedSumFrontBackEnergy;
 			std::vector<double> UnCorrectedBSM;
@@ -49,6 +50,7 @@ class BSMProcessor : public Processor{
 				TotalEnergy = 0.0;
 				SumFrontBackEnergy = std::vector<double>(6,0.0);
 				Position = std::vector<double>(6,0.0);
+				CorrectedBSM = std::vector<double>(12,0.0);
 				UnCorrectedTotalEnergy = 0.0;
 				UnCorrectedSumFrontBackEnergy = std::vector<double>(6,0.0);
 				UnCorrectedBSM = std::vector<double>(12,0.0);

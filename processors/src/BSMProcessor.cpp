@@ -40,15 +40,17 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 				{3620 , {1024,-1.0,1.0,8192,0.0,8192.0}},
 				{3650 , {4096,0.0,4096.0,4096,0.0,4096.0}},
 				{36508 , {2048,0.0,16384.0,2048,0.0,16384.0}},
+				{3660 , {4096,0.0,4096.0,4096,0.0,4096.0}},
+				{36608 , {2048,0.0,16384.0,2048,0.0,16384.0}},
 				{3700 , {512,0,512,16384,0.0,16384.0}},
-				{3710 , {16384,0.0,16384.0,1024,0,1.0}},
+				{3710 , {16384,0.0,16384.0,1024,0,10.0}},
 				{3720 , {1024,0,32,16384,0.0,16384.0}},
 				{3730 , {1024,0,1024,16384,0.0,16384.0}},
 				{3740 , {1024,0,1024,1024,0,32}},
 				{3750 , {16384,0,16384.0,1024,0,1024}},
 				{3760 , {512,0,512,16384,-16384.0,16384.0}},
 				{3800 , {512,0,512,16384,0.0,16384.0}},
-				{3810 , {16384,0.0,16384.0,1024,0,1.0}},
+				{3810 , {16384,0.0,16384.0,1024,0,10.0}},
 				{3820 , {1024,0,32,16384,0.0,16384.0}},
 				{3830 , {1024,0,1024,16384,0.0,16384.0}},
 				{3840 , {1024,0,1024,1024,0,32}},
@@ -200,9 +202,13 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 			if( (this->PosCorrectionMap[2*ii] != nullptr) and (this->PosCorrectionMap[2*ii + 1] != nullptr ) ){
 				auto front = this->PosCorrectionMap[2*ii]->Correct(this->CurrEvt.UnCorrectedBSM[2*ii],this->CurrEvt.Position[ii]);
 				auto back = this->PosCorrectionMap[2*ii + 1]->Correct(this->CurrEvt.UnCorrectedBSM[2*ii + 1],this->CurrEvt.Position[ii]);
+				this->CurrEvt.CorrectedBSM[2*ii] = front;
+				this->CurrEvt.CorrectedBSM[2*ii + 1] = back;
 				this->CurrEvt.SumFrontBackEnergy[ii] = (front + back)/2.0;
 			}else{
 				this->CurrEvt.SumFrontBackEnergy[ii] = (this->CurrEvt.UnCorrectedBSM[2*ii] + this->CurrEvt.UnCorrectedBSM[2*ii + 1])/2.0;
+				this->CurrEvt.CorrectedBSM[2*ii] = this->CurrEvt.UnCorrectedBSM[2*ii];
+				this->CurrEvt.CorrectedBSM[2*ii + 1] = this->CurrEvt.UnCorrectedBSM[2*ii + 1];
 			}
 		
 			std::string id = std::to_string(ii);
@@ -221,6 +227,16 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 	for( int ii = 0; ii < 6; ++ii ){
 		this->CurrEvt.TotalEnergy += this->CurrEvt.SumFrontBackEnergy[ii];
 		this->CurrEvt.UnCorrectedTotalEnergy += this->CurrEvt.UnCorrectedSumFrontBackEnergy[ii];
+	}
+
+	for( int ii = 0; ii < 6; ++ii ){
+		std::string id = std::to_string(ii);
+		std::string name = "BSM_366"+id;
+
+		hismanager->Fill(name,this->CurrEvt.CorrectedBSM[2*ii+1],this->CurrEvt.CorrectedBSM[2*ii]);
+		
+		name = "BSM_366"+id+"8";
+		hismanager->Fill(name,this->CurrEvt.CorrectedBSM[2*ii+1],this->CurrEvt.CorrectedBSM[2*ii]);
 	}
 
 	Processor::EndProcess();
@@ -319,6 +335,14 @@ void BSMProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 		name = "BSM_362"+std::to_string(ii);
 		title = "#betaSM"+std::to_string(ii+1)+" Energy vs #betaSM Position; Position (arb.); Energy (keV)";
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3620));
+		
+		name = "BSM_366"+std::to_string(ii);
+		title = "#betaSM"+std::to_string(ii+1)+"_F Energy vs #betaSM"+std::to_string(ii+1)+"_B; Energy (keV); Energy (keV)";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3660));
+
+		name = "BSM_366"+std::to_string(ii)+"8";
+		title = "#betaSM"+std::to_string(ii+1)+"_F Energy vs #betaSM"+std::to_string(ii+1)+"_B; Energy (8 keV/bin); Energy (8 keV/bin)";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(36608));
 
 		if( this->PlotAllTraces ){
 			name = "BSM_370"+std::to_string(ii)+"_F";
@@ -339,7 +363,7 @@ void BSMProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3710));
 		
 		name = "BSM_372"+std::to_string(ii)+"_F";
-		title = "#betaSM"+std::to_string(ii+1)+"_F (Peak/Integral) vs Integral; StdDev. (arb.); Avg. (arb.)";
+		title = "#betaSM"+std::to_string(ii+1)+"_F Baseline Avg vs Baseline StdDev; StdDev. (arb.); Avg. (arb.)";
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3720));
 		
 		name = "BSM_372"+std::to_string(ii)+"_B";
