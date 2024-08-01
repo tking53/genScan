@@ -46,12 +46,12 @@
 				<!-- Note that when I look at the average of the two PMTs I don't see any quadratic dependence, like one would expect. -->
 				<!-- plotting direct fitted functions you do see very small quadratic shape -->
 			</Processor>
-			<!-- <Cut name="PairProduction" filename="/Users/truland/Analysis/GENSCAN/BSM/Sr90/Cuts/PairProduction.C" /> -->		
-			<!-- <Cut name="BF1PACut" filename="/Users/truland/Analysis/GENSCAN/BSM/Rh106/Cuts/BF1PACut.C" /> -->
-			<!-- <Cut name="BB1PACut" filename="/Users/truland/Analysis/GENSCAN/BSM/Rh106/Cuts/BB1PACut.C" /> -->
-			<Cut name="PairProduction" filename="/home/trul/Analysis/GENSCAN/BSM/Sr90/Cuts/PairProduction.C" />		
-			<Cut name="BF1PACut" filename="/home/trul/Analysis/GENSCAN/BSM/Rh106/Cuts/BF1PACut.C" />
-			<Cut name="BB1PACut" filename="/home/trul/Analysis/GENSCAN/BSM/Rh106/Cuts/BB1PACut.C" />
+			<!-- <Cut name="PairProduction" filename="/Users/truland/Analysis/BSM/Sr90/Cuts/PairProduction.C" /> -->		
+			<!-- <Cut name="BF1PACut" filename="/Users/truland/Analysis/BSM/Rh106/Cuts/BF1PACut.C" /> -->
+			<!-- <Cut name="BB1PACut" filename="/Users/truland/Analysis/BSM/Rh106/Cuts/BB1PACut.C" /> -->
+			<Cut name="PairProduction" filename="/home/trul/Analysis/BSM/Sr90/Cuts/PairProduction.C" />		
+			<Cut name="BF1PACut" filename="/home/trul/Analysis/BSM/Rh106/Cuts/BF1PACut.C" />
+			<Cut name="BB1PACut" filename="/home/trul/Analysis/BSM/Rh106/Cuts/BB1PACut.C" />
 		</Processor>
 		<!-- <Processor name="RootDevProcessor" included_types="mtas,bsm"/> -->
 	</DetectorDriver>
