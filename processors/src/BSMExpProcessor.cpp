@@ -52,7 +52,9 @@ BSMExpProcessor::BSMExpProcessor(const std::string& log) : Processor(log,"BSMExp
 	this->CurrBSM = this->BSMProc->GetCurrEvt();
 
 	if( this->HasBSM ){
-		hismanager->Fill("BSMEXP_2000",this->CurrMTAS.FirstTime - this->CurrBSM.FirstTime);
+		if( this->CurrMTAS.FirstTime > 0.0 and this->CurrBSM.FirstTime > 0.0 ){
+			hismanager->Fill("BSMEXP_2000",this->CurrMTAS.FirstTime - this->CurrBSM.FirstTime);
+		}
 		
 		if( this->PPCutExists ){
 			if( this->CurrBSM.Pileup ){
@@ -60,9 +62,11 @@ BSMExpProcessor::BSMExpProcessor(const std::string& log) : Processor(log,"BSMExp
 			}
 			for( size_t ii = 0; ii < 6 ; ++ii ){
 				if( cutmanager->IsWithin("PairProduction",this->CurrMTAS.TotalEnergy[0],this->CurrMTAS.SumFrontBackEnergy[ii]) ){
-					hismanager->Fill("BSMEXP_2000_PP",this->CurrMTAS.FirstTime - this->CurrBSM.FirstTime);
-					hismanager->Fill("BSM_3600_PP",this->CurrBSM.TotalEnergy);
-					break;
+					if( this->CurrMTAS.FirstTime > 0.0 and this->CurrBSM.FirstTime > 0.0 ){
+						hismanager->Fill("BSMEXP_2000_PP",this->CurrMTAS.FirstTime - this->CurrBSM.FirstTime);
+						hismanager->Fill("BSM_3600_PP",this->CurrBSM.TotalEnergy);
+						break;
+					}
 				}
 			}
 		}
