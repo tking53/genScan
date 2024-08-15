@@ -182,6 +182,12 @@ namespace PLOTS{
 				static_assert(std::is_base_of<TH1,T>::value,"T must inherit from TH1");
 				if( not PlotExist(name) ){
 					this->Plots_1D[name] = new T(name.c_str(),title.c_str(),nbinsx,xmin,xmax);
+					this->Plots_1D[name]->GetXaxis()->SetTitleSize(0.04);
+					this->Plots_1D[name]->GetXaxis()->SetLabelSize(0.04);
+					this->Plots_1D[name]->GetXaxis()->CenterTitle(true);
+					this->Plots_1D[name]->GetYaxis()->SetTitleSize(0.04);
+					this->Plots_1D[name]->GetYaxis()->SetLabelSize(0.04);
+					this->Plots_1D[name]->GetYaxis()->CenterTitle(true);
 					this->PlotIDs.push_back(name);
 				}else{
 					std::string mess = "Unable to register plot "+name+" as it already exists";
@@ -195,6 +201,12 @@ namespace PLOTS{
 				static_assert(std::is_base_of<TH2,T>::value,"T must inherit from TH2");
 				if( not PlotExist(name) ){
 					this->Plots_2D[name] = new T(name.c_str(),title.c_str(),nbinsx,xmin,xmax,nbinsy,ymin,ymax);
+					this->Plots_2D[name]->GetXaxis()->SetTitleSize(0.04);
+					this->Plots_2D[name]->GetXaxis()->SetLabelSize(0.04);
+					this->Plots_2D[name]->GetYaxis()->CenterTitle(true);
+					this->Plots_2D[name]->GetYaxis()->SetTitleSize(0.04);
+					this->Plots_2D[name]->GetYaxis()->SetLabelSize(0.04);
+					this->Plots_2D[name]->GetYaxis()->CenterTitle(true);
 					this->PlotIDs.push_back(name);
 				}else{
 					std::string mess = "Unable to register plot "+name+" as it already exists";
