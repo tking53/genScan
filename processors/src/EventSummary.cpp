@@ -65,6 +65,18 @@ void EventSummary::GetDetectorTypeSummary(const std::string& key,std::vector<Phy
 	this->GetDetectorSummary(rkey,vec);
 }
 
+PhysicsData* EventSummary::GetDetectorMaxEvent(const std::vector<PhysicsData*>& evtlist) const{
+	PhysicsData* maxevt = nullptr;
+	double maxerg = 0.0;
+	for( const auto& evt : evtlist ){
+		if( evt->GetEnergy() > maxerg ){
+			maxevt = evt;
+			maxerg = evt->GetEnergy();
+		}
+	}
+	return maxevt;
+}
+
 boost::container::devector<PhysicsData>& EventSummary::GetRawEvents(){
 	return this->RawEvents;
 }

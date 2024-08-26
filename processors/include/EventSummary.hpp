@@ -3,6 +3,7 @@
 
 #include <set>
 #include <string>
+#include <tuple>
 
 #include <spdlog/common.h>
 #include <spdlog/spdlog.h>
@@ -36,6 +37,8 @@ class EventSummary{
 		void ClearRawEvents();
 
 		const std::set<std::string>& GetKnownTypes() const;
+
+		PhysicsData* GetDetectorMaxEvent(const std::vector<PhysicsData*>&) const;
 
 	private:
 		std::string LogName;
