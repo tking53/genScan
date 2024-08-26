@@ -19,6 +19,8 @@
 #include "IonizationChamberProcessor.hpp"
 #include "MtasProcessor.hpp"
 #include "MtasImplantProcessor.hpp"
+#include "MtasSSDProcessor.hpp"
+#include "MtasTapeProcessor.hpp"
 #include "PidProcessor.hpp"
 #include "PSPMTProcessor.hpp"
 #include "PuckProcessor.hpp"
@@ -108,8 +110,6 @@ void ProcessorList::CreateProc(const std::string& name){
 		known_processors.push_back(std::make_shared<e21069b_fp2Processor>(this->LogName));
 	}else if( name.compare("ribf168Processor") == 0 ){
 		known_processors.push_back(std::make_shared<ribf168Processor>(this->LogName));
-	}else if( name.compare("YAPProcessor") == 0 ){
-		known_processors.push_back(std::make_shared<YAPProcessor>(this->LogName));
 	}else if( name.compare("BSMProcessor") == 0 ){
 		known_processors.push_back(std::make_shared<BSMProcessor>(this->LogName));
 	}else if( name.compare("HagridProcessor") == 0 ){
@@ -120,6 +120,10 @@ void ProcessorList::CreateProc(const std::string& name){
 		known_processors.push_back(std::make_shared<MtasProcessor>(this->LogName));
 	}else if( name.compare("MtasImplantProcessor") == 0 ){
 		known_processors.push_back(std::make_shared<MtasImplantProcessor>(this->LogName));
+	}else if( name.compare("MtasSSDProcessor") == 0 ){
+		known_processors.push_back(std::make_shared<MtasSSDProcessor>(this->LogName));
+	}else if( name.compare("MtasTapeProcessor") == 0 ){
+		known_processors.push_back(std::make_shared<MtasTapeProcessor>(this->LogName));
 	}else if( name.compare("PidProcessor") == 0 ){
 		known_processors.push_back(std::make_shared<PidProcessor>(this->LogName));
 	}else if( name.compare("PSPMTProcessor") == 0 ){
@@ -134,6 +138,8 @@ void ProcessorList::CreateProc(const std::string& name){
 		known_processors.push_back(std::make_shared<RootDevProcessor>(this->LogName));
 	}else if( name.compare("VetoProcessor") == 0 ){
 		known_processors.push_back(std::make_shared<VetoProcessor>(this->LogName));
+	}else if( name.compare("YAPProcessor") == 0 ){
+		known_processors.push_back(std::make_shared<YAPProcessor>(this->LogName));
 	}else{
 		std::stringstream ss;
 		ss << "ProcessorList::InitializeProcessors() Unknown processor named \""
