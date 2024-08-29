@@ -267,9 +267,21 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 		}
 	}
 
+
 	for( int ii = 0; ii < 12; ++ii ){
 		hismanager->Fill("BSM_3500",this->TotalMult[ii],ii);
 		hismanager->Fill("BSM_3501",this->BSMHits[ii],ii);
+	}
+	if( this->SummaryData.size() > 2 ){
+		int sum = 0;
+		for( int ii = 0; ii < 12; ++ii ){
+			sum += this->TotalMult[ii];
+			this->console->info("channel {} : {}",ii,this->TotalMult[ii]);
+		}
+		for( const auto& evt : this->SummaryData ){
+			this->console->info("id : {}, ts : {} erg : {} pileup : {} saturate : {}",evt->GetSpillID(),evt->GetTimeStamp(),evt->GetRawEnergy(),evt->GetPileup(),evt->GetSaturation());
+		}
+		this->console->info("Total: {}/{}",sum,this->SummaryData.size());
 	}
 
 	Processor::EndProcess();
