@@ -35,6 +35,7 @@ class BSMProcessor : public Processor{
 			double TotalEnergy;
 			std::vector<double> SumFrontBackEnergy;
 			std::vector<double> Position;
+			std::vector<double> TDiff;
 			std::vector<double> CorrectedBSM;
 			double UnCorrectedTotalEnergy;
 			std::vector<double> UnCorrectedSumFrontBackEnergy;
@@ -50,6 +51,7 @@ class BSMProcessor : public Processor{
 				TotalEnergy = 0.0;
 				SumFrontBackEnergy = std::vector<double>(6,0.0);
 				Position = std::vector<double>(6,0.0);
+				TDiff = std::vector<double>(6,-1.0e9);
 				CorrectedBSM = std::vector<double>(12,0.0);
 				UnCorrectedTotalEnergy = 0.0;
 				UnCorrectedSumFrontBackEnergy = std::vector<double>(6,0.0);
@@ -93,9 +95,11 @@ class BSMProcessor : public Processor{
 
 		std::vector<double> UnCorrectedBSM;
 		std::vector<int> BSMHits;
+		std::vector<int> TotalMult;
 		std::vector<std::unique_ptr<TraceAnalysis>> TraceSettings;
 
 		std::vector<double> TimeStamps;
+		std::vector<double> HitTimeStamps;
 		std::vector<std::vector<uint16_t>> Traces;
 
 		std::vector<std::unique_ptr<Correction::ExpoPosCorrection>> PosCorrectionMap;
