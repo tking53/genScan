@@ -108,7 +108,7 @@ Translator::TRANSLATORSTATE LDFPixieTranslator::Parse(boost::container::devector
 		if( retval == -1 ){
 			throw std::runtime_error("Invalid Data Buffer in File : "+this->InputFiles.at(this->CurrentFileIndex));
 		}
-		if( full_spill ){
+		if( full_spill and retval != 2){
 			this->UnpackData(nBytes,full_spill,bad_spill,entriesread);
 		}
 	}
