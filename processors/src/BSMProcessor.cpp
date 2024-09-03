@@ -63,6 +63,7 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 	this->TotalMult = std::vector<int>(12,0);
 	this->HitTimeStamps = std::vector<double>(12,0.0);
 	this->Traces = std::vector<std::vector<uint16_t>>(12,std::vector<uint16_t>());
+	this->Pairs = std::vector<PhysicsData*>(12,nullptr);
 	for( size_t ii = 0; ii < 12; ++ii ){
 		this->TraceSettings.push_back(nullptr);
 		this->PosCorrectionMap.push_back(nullptr);
@@ -142,6 +143,9 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 		}
 
 		if( !this->BSMHits[detectorposition] ){
+			if( this->Pairs[detectorposition] == nullptr ){
+				this->Pairs[detectorposition] = evt;
+			}
 			if( this->PlotAllTraces ){
 				std::string tracehis = (isfront) ? ("BSM_370"+std::to_string(position)+"_F") :  ("BSM_370"+std::to_string(position)+"_B");
 				size_t idx = 0;
@@ -210,6 +214,39 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 		this->CurrEvt.FirstTime = *(std::min_element(this->TimeStamps.begin(),this->TimeStamps.end()));
 		this->CurrEvt.LastTime = *(std::max_element(this->TimeStamps.begin(),this->TimeStamps.end()));
 
+		if( this->Pairs[0] != nullptr and this->Pairs[1] != nullptr ){
+			auto psdvals = this->Pairs[0]->GetTraceFixedPSD();
+			auto integral = std::get<0>(psdvals)+std::get<1>(psdvals);
+			auto tmax = this->Pairs[0]->GetBaselineSubtractedMaxValue();
+			auto psd = tmax/integral;
+			std::string psdhis = "BSM_3710_F_CORRELATED";
+			hismanager->Fill(psdhis,integral,psd);
+			
+			psdvals = this->Pairs[0]->GetTraceFixedPSD();
+			integral = std::get<0>(psdvals)+std::get<1>(psdvals);
+			tmax = this->Pairs[0]->GetBaselineSubtractedMaxValue();
+			psd = tmax/integral;
+			psdhis = "BSM_3710_B_CORRELATED";
+			hismanager->Fill(psdhis,integral,psd);
+		}
+
+		if( (this->Pairs[0] != nullptr and this->Pairs[1] != nullptr) and (this->BSMHits[0] and not this->BSMHits[1]) ){
+			auto psdvals = this->Pairs[0]->GetTraceFixedPSD();
+			auto integral = std::get<0>(psdvals)+std::get<1>(psdvals);
+			auto tmax = this->Pairs[0]->GetBaselineSubtractedMaxValue();
+			auto psd = tmax/integral;
+			std::string psdhis = "BSM_3710_F_SINGLE_PASS";
+			hismanager->Fill(psdhis,integral,psd);
+			
+			psdvals = this->Pairs[0]->GetTraceFixedPSD();
+			integral = std::get<0>(psdvals)+std::get<1>(psdvals);
+			tmax = this->Pairs[0]->GetBaselineSubtractedMaxValue();
+			psd = tmax/integral;
+			psdhis = "BSM_3710_B_SINGLE_PASS";
+			hismanager->Fill(psdhis,integral,psd);
+		}
+
+
 		for( int ii = 0; ii < 6; ++ii ){
 			if( this->BSMHits[2*ii] and this->BSMHits[2*ii + 1] ){
 				this->CurrEvt.RealEvt = true;
@@ -248,6 +285,7 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 
 				name = "BSM_363"+id+"_B";
 				hismanager->Fill(name,this->CurrEvt.TDiff[ii],this->CurrEvt.UnCorrectedBSM[2*ii + 1]);
+			//}else if( this->BSMHits[2*ii] and this->TotalMult[2*ii + 1] ){
 			}
 		}
 
@@ -418,6 +456,22 @@ void BSMProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 		title = "#betaSM"+std::to_string(ii+1)+"_B (Peak/Integral) vs Integral; Integral (arb.); Ratio (arb.)";
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3710));
 		
+		name = "BSM_371"+std::to_string(ii)+"_F_CORRELATED";
+		title = "#betaSM"+std::to_string(ii+1)+"_F (Peak/Integral) vs Integral; Integral (arb.); Ratio (arb.)";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3710));
+		
+		name = "BSM_371"+std::to_string(ii)+"_B_CORRELATED";
+		title = "#betaSM"+std::to_string(ii+1)+"_B (Peak/Integral) vs Integral; Integral (arb.); Ratio (arb.)";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3710));
+		
+		name = "BSM_371"+std::to_string(ii)+"_F_SINGLE_PASS";
+		title = "#betaSM"+std::to_string(ii+1)+"_F (Peak/Integral) vs Integral; Integral (arb.); Ratio (arb.)";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3710));
+		
+		name = "BSM_371"+std::to_string(ii)+"_B_SINGLE_PASS";
+		title = "#betaSM"+std::to_string(ii+1)+"_B (Peak/Integral) vs Integral; Integral (arb.); Ratio (arb.)";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3710));
+		
 		name = "BSM_372"+std::to_string(ii)+"_F";
 		title = "#betaSM"+std::to_string(ii+1)+"_F Baseline Avg vs Baseline StdDev; StdDev. (arb.); Avg. (arb.)";
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3720));
@@ -538,6 +592,7 @@ void BSMProcessor::Reset(){
 	this->BSMHits = std::vector<int>(12,0);
 	this->HitTimeStamps = std::vector<double>(12,0.0);
 	this->TotalMult = std::vector<int>(12,0);
+	this->Pairs = std::vector<PhysicsData*>(12,nullptr);
 }
 
 void BSMProcessor::FillGSPileupTracePlots(PLOTS::PlotRegistry* hismanager) const{

@@ -93,6 +93,8 @@ class BSMProcessor : public Processor{
 		EventInfo PrevEvt;
 		EventInfo NewEvt;
 
+		std::vector<PhysicsData*> Pairs;
+
 		std::vector<double> UnCorrectedBSM;
 		std::vector<int> BSMHits;
 		std::vector<int> TotalMult;
