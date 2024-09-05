@@ -692,7 +692,11 @@ void MtasProcessor::FillBetaPlots(PLOTS::PlotRegistry* hismanager) const{
 				hismanager->Fill("MTAS_33548",this->CurrEvt.TotalEnergy[0],this->CurrEvt.SumFrontBackEnergy[ii]);
 			}
 
-			if( this->diagnosticplots ){
+		
+		}
+
+		if( this->diagnosticplots ){
+			for( int ii = 0; ii < 6; ++ii ){
 				hismanager->Fill("MTAS_3431",this->RawCenter[2*ii],2*ii);
 				hismanager->Fill("MTAS_3431",this->RawCenter[2*ii + 1],2*ii + 1);
 
@@ -776,7 +780,11 @@ void MtasProcessor::FillNonBetaPlots(PLOTS::PlotRegistry* hismanager) const{
 				hismanager->Fill("MTAS_31548",this->CurrEvt.TotalEnergy[0],this->CurrEvt.SumFrontBackEnergy[ii]);
 			}
 
-			if( this->diagnosticplots ){
+			
+		}
+
+		if( this->diagnosticplots ){
+			for( int ii = 0; ii < 6; ++ii ){
 				hismanager->Fill("MTAS_3411",this->RawCenter[2*ii],2*ii);
 				hismanager->Fill("MTAS_3411",this->RawCenter[2*ii + 1],2*ii + 1);
 
@@ -802,7 +810,6 @@ void MtasProcessor::FillNonBetaPlots(PLOTS::PlotRegistry* hismanager) const{
 				hismanager->Fill("MTAS_3514",this->CalOuter[2*ii + 1],2*ii + 1);
 			}
 		}
-
 	}
 }
 
