@@ -119,18 +119,18 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 				auto psdvals = evt->GetTraceFixedPSD();
 
 				auto integral = std::get<0>(psdvals)+std::get<1>(psdvals);
-				auto tmax = evt->GetBaselineSubtractedMaxValue();
+				auto tmax = evt->GetBaselineSubtractedPSDBoundedMaxValue();
 				auto psd = tmax/integral;
+				auto baseline = evt->GetTracePreTriggerBaseline();
+				auto pk = evt->GetPSDBoundedTraceMaxInfo();
 
 				std::string psdhis = (isfront) ?  ("BSM_381"+std::to_string(position)+"_F") :  ("BSM_381"+std::to_string(position)+"_B");
 				hismanager->Fill(psdhis,integral,psd);
 
 				std::string baselinehis = (isfront) ?  ("BSM_382"+std::to_string(position)+"_F") :  ("BSM_382"+std::to_string(position)+"_B");
-				auto baseline = evt->GetTracePreTriggerBaseline();
 				hismanager->Fill(baselinehis,baseline.second,baseline.first);
 
 				std::string peakhis = (isfront) ?  ("BSM_383"+std::to_string(position)+"_F") :  ("BSM_383"+std::to_string(position)+"_B");
-				auto pk = evt->GetTraceMaxInfo();
 				hismanager->Fill(peakhis,pk.first,pk.second);
 
 				std::string pklocbstddevhis = (isfront) ?  ("BSM_384"+std::to_string(position)+"_F") :  ("BSM_384"+std::to_string(position)+"_B");
@@ -166,11 +166,14 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 			auto psdvals = evt->GetTraceFixedPSD();
 
 			auto integral = std::get<0>(psdvals)+std::get<1>(psdvals);
-			auto tmax = evt->GetBaselineSubtractedMaxValue();
+			auto tmax = evt->GetBaselineSubtractedPSDBoundedMaxValue();
+			auto baseline = evt->GetTracePreTriggerBaseline();
+			auto pk = evt->GetPSDBoundedTraceMaxInfo();
 			auto psd = tmax/integral;
 			
 			std::string psdhis = (isfront) ?  ("BSM_371"+std::to_string(position)+"_F") :  ("BSM_371"+std::to_string(position)+"_B");
 			hismanager->Fill(psdhis,integral,psd);
+			//hismanager->Fill(psdhis,evt->GetRawEnergyWRandom(),psd);
 			if( this->TraceSettings[detectorposition] != nullptr ){
 				if( integral < this->TraceSettings[detectorposition]->integralthreshold ){
 					continue;
@@ -182,11 +185,9 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 			}
 
 			std::string baselinehis = (isfront) ?  ("BSM_372"+std::to_string(position)+"_F") :  ("BSM_372"+std::to_string(position)+"_B");
-			auto baseline = evt->GetTracePreTriggerBaseline();
 			hismanager->Fill(baselinehis,baseline.second,baseline.first);
 			
 			std::string peakhis = (isfront) ?  ("BSM_373"+std::to_string(position)+"_F") :  ("BSM_373"+std::to_string(position)+"_B");
-			auto pk = evt->GetTraceMaxInfo();
 			hismanager->Fill(peakhis,pk.first,pk.second);
 			
 			std::string pklocbstddevhis = (isfront) ?  ("BSM_374"+std::to_string(position)+"_F") :  ("BSM_374"+std::to_string(position)+"_B");
@@ -204,11 +205,6 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 			++this->BSMHits[detectorposition];
 		}
 	}
-	//for( size_t ii = 0; ii < this->BSMHits.size(); ++ii ){
-	//	if( this->BSMHits[ii] > 1 ){
-	//		this->console->warn("Linearized BSM number {} has {} hits in a single event instead of 1",ii,this->BSMHits[ii]);
-	//	}
-	//}
 	
 	if( not this->TimeStamps.empty() ){
 		this->CurrEvt.FirstTime = *(std::min_element(this->TimeStamps.begin(),this->TimeStamps.end()));
@@ -217,14 +213,14 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 		if( this->Pairs[0] != nullptr and this->Pairs[1] != nullptr ){
 			auto psdvals = this->Pairs[0]->GetTraceFixedPSD();
 			auto integral = std::get<0>(psdvals)+std::get<1>(psdvals);
-			auto tmax = this->Pairs[0]->GetBaselineSubtractedMaxValue();
+			auto tmax = this->Pairs[0]->GetBaselineSubtractedPSDBoundedMaxValue();
 			auto psd = tmax/integral;
 			std::string psdhis = "BSM_3710_F_CORRELATED";
 			hismanager->Fill(psdhis,integral,psd);
 			
-			psdvals = this->Pairs[0]->GetTraceFixedPSD();
+			psdvals = this->Pairs[1]->GetTraceFixedPSD();
 			integral = std::get<0>(psdvals)+std::get<1>(psdvals);
-			tmax = this->Pairs[0]->GetBaselineSubtractedMaxValue();
+			tmax = this->Pairs[1]->GetBaselineSubtractedPSDBoundedMaxValue();
 			psd = tmax/integral;
 			psdhis = "BSM_3710_B_CORRELATED";
 			hismanager->Fill(psdhis,integral,psd);
@@ -233,14 +229,14 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 		if( (this->Pairs[0] != nullptr and this->Pairs[1] != nullptr) and (this->BSMHits[0] and not this->BSMHits[1]) ){
 			auto psdvals = this->Pairs[0]->GetTraceFixedPSD();
 			auto integral = std::get<0>(psdvals)+std::get<1>(psdvals);
-			auto tmax = this->Pairs[0]->GetBaselineSubtractedMaxValue();
+			auto tmax = this->Pairs[0]->GetBaselineSubtractedPSDBoundedMaxValue();
 			auto psd = tmax/integral;
 			std::string psdhis = "BSM_3710_F_SINGLE_PASS";
 			hismanager->Fill(psdhis,integral,psd);
 			
-			psdvals = this->Pairs[0]->GetTraceFixedPSD();
+			psdvals = this->Pairs[1]->GetTraceFixedPSD();
 			integral = std::get<0>(psdvals)+std::get<1>(psdvals);
-			tmax = this->Pairs[0]->GetBaselineSubtractedMaxValue();
+			tmax = this->Pairs[1]->GetBaselineSubtractedPSDBoundedMaxValue();
 			psd = tmax/integral;
 			psdhis = "BSM_3710_B_SINGLE_PASS";
 			hismanager->Fill(psdhis,integral,psd);
