@@ -231,6 +231,19 @@ class TraceHelper final{
 			return this->MaxInfo;
 		}
 
+		const size_t& GetPSDBoundedMaxPos() const{
+			return this->PSDBoundedMaxInfo.first;
+		}
+
+		const T& GetPSDBoundedMaxVal() const{
+			return this->PSDBoundedMaxInfo.second;
+		}
+
+		const std::pair<size_t,T>& GetPSDBoundedMaxInfo() const{
+			return this->PSDBoundedMaxInfo;
+		}
+
+
 		const std::pair<U,U>& GetPreTriggerBaselineInfo() const{
 			return this->PreTriggerBaselineInfo;
 		}
@@ -291,9 +304,20 @@ class TraceHelper final{
 			return this->BaselineSubMax;
 		}
 
+		const U& GetBaselineSubtractedPSDBoundedMaxValue() const{
+			return this->BaselineSubPSDBoundedMax;
+		}
+
 		void CalcFixedPSD(const size_t& start, const size_t& mid, const size_t& end){
+			//U pre = this->IntegrateRawTrace(start,mid);
+			//U post = this->IntegrateRawTrace(mid,end);
 			U pre = this->IntegrateBaselineSubtractedTrace(start,mid);
 			U post = this->IntegrateBaselineSubtractedTrace(mid,end);
+			
+			auto maxval = std::max_element(this->data.begin()+start,this->data.begin()+end);
+			this->PSDBoundedMaxInfo = std::make_pair(std::distance(this->data.begin(),maxval),*maxval);
+			this->BaselineSubPSDBoundedMax = this->data_baselinesub[this->PSDBoundedMaxInfo.first];
+
 			this->FixedPSD = std::make_tuple(pre,post,post/(pre+post));
 		}
 
@@ -330,9 +354,11 @@ class TraceHelper final{
 		std::pair<U,U> PreTriggerBaselineInfo;
 		std::pair<U,U> PostTriggerBaselineInfo;
 		std::pair<size_t,T> MaxInfo;
+		std::pair<size_t,T> PSDBoundedMaxInfo;
 		std::tuple<U,U,U> FixedPSD;
 		std::tuple<U,U,U> FractionalPSD;
 		U BaselineSubMax;
+		U BaselineSubPSDBoundedMax;
 };	
 
 #endif

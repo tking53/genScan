@@ -201,7 +201,9 @@ class PhysicsData{
 		const std::pair<float,float>& GetTracePreTriggerBaseline() const;
 		const std::pair<float,float>& GetTracePostTriggerBaseline() const;
 		const std::pair<size_t,uint16_t>& GetTraceMaxInfo() const;
+		const std::pair<size_t,uint16_t>& GetPSDBoundedTraceMaxInfo() const;
 		const float& GetBaselineSubtractedMaxValue() const;
+		const float& GetBaselineSubtractedPSDBoundedMaxValue() const;
 		float InegrateRawTrace(const std::pair<size_t,size_t>&) const;
 		float AverageRawTrace(const std::pair<size_t,size_t>&) const;
 		float IntegrateBaselineSubtractedTrace(const std::pair<size_t,size_t>&) const;

@@ -542,6 +542,10 @@ const std::pair<size_t,uint16_t>& PhysicsData::GetTraceMaxInfo() const{
 	return this->Trace.GetMaxInfo();
 }
 
+const std::pair<size_t,uint16_t>& PhysicsData::GetPSDBoundedTraceMaxInfo() const{
+	return this->Trace.GetPSDBoundedMaxInfo();
+}
+
 float PhysicsData::InegrateRawTrace(const std::pair<size_t,size_t>& bounds) const{
 	return this->Trace.IntegrateRawTrace(bounds);
 }
@@ -580,6 +584,10 @@ const std::string& PhysicsData::GetCMapID() const{
 
 const float& PhysicsData::GetBaselineSubtractedMaxValue() const{
 	return this->Trace.GetBaselineSubtractedMaxValue();
+}
+
+const float& PhysicsData::GetBaselineSubtractedPSDBoundedMaxValue() const{
+	return this->Trace.GetBaselineSubtractedPSDBoundedMaxValue();
 }
 
 void PhysicsData::CalculateTraceDerivatives(){
