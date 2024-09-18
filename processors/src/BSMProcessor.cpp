@@ -41,6 +41,18 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 				{3630 , {256,-1024,1023,8192,0.0,8192.0}},
 				{3650 , {4096,0.0,4096.0,4096,0.0,4096.0}},
 				{36508 , {2048,0.0,16384.0,2048,0.0,16384.0}},
+				{3651 , {4096,0.0,4096.0,4096,0.0,4096.0}},
+				{36518 , {2048,0.0,16384.0,2048,0.0,16384.0}},
+				{3652 , {4096,0.0,4096.0,4096,0.0,4096.0}},
+				{36528 , {2048,0.0,16384.0,2048,0.0,16384.0}},
+				{3653 , {4096,0.0,4096.0,4096,0.0,4096.0}},
+				{36538 , {2048,0.0,16384.0,2048,0.0,16384.0}},
+				{3654 , {4096,0.0,4096.0,4096,0.0,4096.0}},
+				{36548 , {2048,0.0,16384.0,2048,0.0,16384.0}},
+				{3655 , {4096,0.0,4096.0,4096,0.0,4096.0}},
+				{36558 , {2048,0.0,16384.0,2048,0.0,16384.0}},
+				{3656 , {4096,0.0,4096.0,4096,0.0,4096.0}},
+				{36568 , {2048,0.0,16384.0,2048,0.0,16384.0}},
 				{3660 , {4096,0.0,4096.0,4096,0.0,4096.0}},
 				{36608 , {2048,0.0,16384.0,2048,0.0,16384.0}},
 				{3700 , {512,0,512,16384,0.0,16384.0}},
@@ -56,7 +68,13 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 				{3830 , {1024,0,1024,16384,0.0,16384.0}},
 				{3840 , {1024,0,1024,1024,0,32}},
 				{3860 , {512,0,512,16384,-16384.0,16384.0}},
-				{3900 , {512,0,512,16384,0.0,16384.0}}
+				{3900 , {512,0,512,16384,0.0,16384.0}},
+				
+				{4000 , {8192,0,8192.0,1024,0.0,1024.0}},
+				{4001 , {8192,0,8192.0,1024,0.0,1024.0}},
+				{4002 , {8192,0,8192.0,1024,0.0,1024.0}},
+				{4003 , {8192,0,8192.0,1024,0.0,1024.0}},
+				{4004 , {8192,0,8192.0,1024,0.0,1024.0}}
 			    };
 	
 	this->BSMHits = std::vector<int>(12,0);
@@ -210,6 +228,8 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 		this->CurrEvt.FirstTime = *(std::min_element(this->TimeStamps.begin(),this->TimeStamps.end()));
 		this->CurrEvt.LastTime = *(std::max_element(this->TimeStamps.begin(),this->TimeStamps.end()));
 
+		this->currevttime = (this->CurrEvt.FirstTime - globalfirsttime)*1.0e-9;
+
 		if( this->Pairs[0] != nullptr and this->Pairs[1] != nullptr ){
 			auto psdvals = this->Pairs[0]->GetTraceFixedPSD();
 			auto integral = std::get<0>(psdvals)+std::get<1>(psdvals);
@@ -289,6 +309,12 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 			this->CurrEvt.TotalEnergy += this->CurrEvt.SumFrontBackEnergy[ii];
 			this->CurrEvt.UnCorrectedTotalEnergy += this->CurrEvt.UnCorrectedSumFrontBackEnergy[ii];
 		}
+
+		hismanager->Fill("BSM_4000",this->CurrEvt.TotalEnergy,this->currevttime*1000.0);
+		hismanager->Fill("BSM_4001",this->CurrEvt.TotalEnergy,this->currevttime);
+		hismanager->Fill("BSM_4002",this->CurrEvt.TotalEnergy,this->currevttime/60.0);
+		hismanager->Fill("BSM_4003",this->CurrEvt.TotalEnergy,this->currevttime/(60.0*60.0));
+		hismanager->Fill("BSM_4004",this->CurrEvt.TotalEnergy,this->currevttime/(60.0*60.0*24.0));
 
 		for( int ii = 0; ii < 6; ++ii ){
 			std::string id = std::to_string(ii);
@@ -571,6 +597,36 @@ void BSMProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 	hismanager->RegisterPlot<TH2F>("BSM_3650","#betaSM Total vs MTAS Total; MTAS Total Energy (keV); #betaSM Energy (keV)",this->h2dsettings.at(3650));
 
 	hismanager->RegisterPlot<TH2F>("BSM_36508","#betaSM Total vs MTAS Total; MTAS Total Energy (8 keV/bin); #betaSM Energy (8 keV/bin)",this->h2dsettings.at(36508));
+
+	hismanager->RegisterPlot<TH2F>("BSM_3651","#betaSM Total vs MTAS I,M,O; MTAS I,M,O Energy (keV); #betaSM Energy (keV)",this->h2dsettings.at(3651));
+
+	hismanager->RegisterPlot<TH2F>("BSM_36518","#betaSM Total vs MTAS I,M,O; MTAS I,M,O Energy (8 keV/bin); #betaSM Energy (8 keV/bin)",this->h2dsettings.at(36518));
+
+	hismanager->RegisterPlot<TH2F>("BSM_3652","#betaSM Total vs MTAS Center Sum; MTAS Center Sum Energy (keV); #betaSM Energy (keV)",this->h2dsettings.at(3651));
+
+	hismanager->RegisterPlot<TH2F>("BSM_36528","#betaSM Total vs MTAS Center Sum; MTAS Center Sum Energy (8 keV/bin); #betaSM Energy (8 keV/bin)",this->h2dsettings.at(36518));
+
+	hismanager->RegisterPlot<TH2F>("BSM_3653","#betaSM Total vs MTAS C; MTAS C Energy (keV); #betaSM Energy (keV)",this->h2dsettings.at(3653));
+
+	hismanager->RegisterPlot<TH2F>("BSM_36538","#betaSM Total vs MTAS C; MTAS C Energy (8 keV/bin); #betaSM Energy (8 keV/bin)",this->h2dsettings.at(36538));
+
+	hismanager->RegisterPlot<TH2F>("BSM_3654","#betaSM Total vs MTAS Total Veto M,O; MTAS Total Energy (keV); #betaSM Energy (keV)",this->h2dsettings.at(3654));
+
+	hismanager->RegisterPlot<TH2F>("BSM_36548","#betaSM Total vs MTAS Total Veot M,O; MTAS Total Energy (8 keV/bin); #betaSM Energy (8 keV/bin)",this->h2dsettings.at(36548));
+
+	hismanager->RegisterPlot<TH2F>("BSM_3655","#betaSM Total vs MTAS Center Sum Veto M,O; MTAS Center Sum Energy (keV); #betaSM Energy (keV)",this->h2dsettings.at(3655));
+
+	hismanager->RegisterPlot<TH2F>("BSM_36558","#betaSM Total vs MTAS Center Sum Veto M,O; MTAS Center Sum Energy (8 keV/bin); #betaSM Energy (8 keV/bin)",this->h2dsettings.at(36558));
+
+	hismanager->RegisterPlot<TH2F>("BSM_3656","#betaSM Total vs MTAS C Veto M,O; MTAS C Energy (keV); #betaSM Energy (keV)",this->h2dsettings.at(3656));
+
+	hismanager->RegisterPlot<TH2F>("BSM_36568","#betaSM Total vs MTAS C Veto M,O; MTAS C Energy (8 keV/bin); #betaSM Energy (8 keV/bin)",this->h2dsettings.at(36568));
+	
+	hismanager->RegisterPlot<TH2F>("BSM_4000","Run Time vs #betaSM Total; #betaSM Energy (keV); Run Time (ms)",this->h2dsettings.at(4000));
+	hismanager->RegisterPlot<TH2F>("BSM_4001","Run Time vs #betaSM Total; #betaSM Energy (keV); Run Time (s)",this->h2dsettings.at(4001));
+	hismanager->RegisterPlot<TH2F>("BSM_4002","Run Time vs #betaSM Total; #betaSM Energy (keV); Run Time (min)",this->h2dsettings.at(4002));
+	hismanager->RegisterPlot<TH2F>("BSM_4003","Run Time vs #betaSM Total; #betaSM Energy (keV); Run Time (hr)",this->h2dsettings.at(4003));
+	hismanager->RegisterPlot<TH2F>("BSM_4004","Run Time vs #betaSM Total; #betaSM Energy (keV); Run Time (day)",this->h2dsettings.at(4004));
 
 	this->console->info("Finished Declaring Plots");
 }

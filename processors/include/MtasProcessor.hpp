@@ -114,6 +114,7 @@ class MtasProcessor : public Processor{
 
 		bool foundfirstevt;
 		double globalfirsttime;
+		double currevttime;
 
 		bool diagnosticplots;
 

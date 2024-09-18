@@ -111,6 +111,7 @@ class BSMProcessor : public Processor{
 
 		bool foundfirstevt;
 		double globalfirsttime;
+		double currevttime;
 
 		bool PlotAllTraces;
 };

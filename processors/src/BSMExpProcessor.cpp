@@ -80,11 +80,42 @@ BSMExpProcessor::BSMExpProcessor(const std::string& log) : Processor(log,"BSMExp
 		this->MtasProc->FillNonBetaPlots(hismanager);
 	}
 
-	hismanager->Fill("BSM_3650",this->CurrMTAS.TotalEnergy[0],this->CurrBSM.TotalEnergy);
-	hismanager->Fill("BSM_36508",this->CurrMTAS.TotalEnergy[0],this->CurrBSM.TotalEnergy);
-
 	hismanager->Fill("BSM_3610",this->CurrBSM.TotalEnergy);
 	if( (not this->CurrMTAS.Saturate) and (not this->CurrMTAS.Pileup) ){
+	
+		hismanager->Fill("BSM_3650",this->CurrMTAS.TotalEnergy[0],this->CurrBSM.TotalEnergy);
+		hismanager->Fill("BSM_36508",this->CurrMTAS.TotalEnergy[0],this->CurrBSM.TotalEnergy);
+
+		hismanager->Fill("BSM_3652",this->CurrMTAS.TotalEnergy[1],this->CurrBSM.TotalEnergy);
+		hismanager->Fill("BSM_36528",this->CurrMTAS.TotalEnergy[1],this->CurrBSM.TotalEnergy);
+
+		bool HasMiddleOutter = ( (this->CurrMTAS.TotalEnergy[3] + this->CurrMTAS.TotalEnergy[4]) > 0.0 );
+
+		if( not HasMiddleOutter ){
+			hismanager->Fill("BSM_3654",this->CurrMTAS.TotalEnergy[0],this->CurrBSM.TotalEnergy);
+			hismanager->Fill("BSM_36548",this->CurrMTAS.TotalEnergy[0],this->CurrBSM.TotalEnergy);
+
+			hismanager->Fill("BSM_3655",this->CurrMTAS.TotalEnergy[1],this->CurrBSM.TotalEnergy);
+			hismanager->Fill("BSM_36558",this->CurrMTAS.TotalEnergy[1],this->CurrBSM.TotalEnergy);
+		}
+
+		for( int ii = 0; ii < 6; ++ii ){
+			hismanager->Fill("BSM_3651",this->CurrMTAS.SumFrontBackEnergy[ii+6],this->CurrBSM.TotalEnergy);
+			hismanager->Fill("BSM_3651",this->CurrMTAS.SumFrontBackEnergy[ii+12],this->CurrBSM.TotalEnergy);
+			hismanager->Fill("BSM_3651",this->CurrMTAS.SumFrontBackEnergy[ii+18],this->CurrBSM.TotalEnergy);
+			hismanager->Fill("BSM_36518",this->CurrMTAS.SumFrontBackEnergy[ii+6],this->CurrBSM.TotalEnergy);
+			hismanager->Fill("BSM_36518",this->CurrMTAS.SumFrontBackEnergy[ii+12],this->CurrBSM.TotalEnergy);
+			hismanager->Fill("BSM_36518",this->CurrMTAS.SumFrontBackEnergy[ii+18],this->CurrBSM.TotalEnergy);
+			
+			hismanager->Fill("BSM_3653",this->CurrMTAS.SumFrontBackEnergy[ii],this->CurrBSM.TotalEnergy);
+			hismanager->Fill("BSM_36538",this->CurrMTAS.SumFrontBackEnergy[ii],this->CurrBSM.TotalEnergy);
+			
+			if( not HasMiddleOutter ){
+				hismanager->Fill("BSM_3656",this->CurrMTAS.SumFrontBackEnergy[ii],this->CurrBSM.TotalEnergy);
+				hismanager->Fill("BSM_36568",this->CurrMTAS.SumFrontBackEnergy[ii],this->CurrBSM.TotalEnergy);
+			}
+		}
+
 		hismanager->Fill("BSM_3600",this->CurrBSM.TotalEnergy);
 		hismanager->Fill("BSM_3602",this->CurrBSM.TotalEnergy+this->CurrMTAS.TotalEnergy[0]);
 		if( (not this->HasMTAS) or this->CurrMTAS.TotalEnergy[0] < 1.0 ){
