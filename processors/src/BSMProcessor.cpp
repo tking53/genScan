@@ -3,7 +3,9 @@
 #include "EventSummary.hpp"
 #include "HistogramManager.hpp"
 #include <TTree.h>
+#include <algorithm>
 #include <string>
+#include <tuple>
 
 namespace PulseFit{
 
@@ -92,6 +94,50 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 	Processor::PreProcess();
 
 	summary.GetDetectorSummary(this->AllDefaultRegex["bsm"],this->SummaryData);
+
+	//std::vector<std::vector<PhysicsData*>> FrontHits = std::vector<std::vector<PhysicsData*>>(6,std::vector<PhysicsData*>());
+	//std::vector<std::vector<PhysicsData*>> BackHits = std::vector<std::vector<PhysicsData*>>(6,std::vector<PhysicsData*>());
+
+	//for( auto& evt : this->SummaryData ){
+	//	auto group = evt->GetGroup();
+	//	int segmentid = std::stoi(group);
+	//	int position = segmentid - 1; 	
+	//	if( evt->HasTag(fronttag) ){
+	//		FrontHits[position].push_back(evt);
+	//	}else if( evt->HasTag(backtag) ){
+	//		BackHits[position].push_back(evt);
+	//	}else{
+	//		throw std::runtime_error("evt in BSMProcessor is malformed in xml, and has neither front tag or back tag");
+	//	}
+	//}
+
+	//std::vector<PhysicsData*> GoodHits;
+	//for( size_t ii = 0; ii < 6; ++ii ){
+	//	std::vector<std::tuple<size_t,size_t,double>> TDiff;
+	//	for( size_t jj = 0; jj < FrontHits[ii].size(); ++jj ){
+	//		for( size_t kk = 0; kk < BackHits[ii].size(); ++kk ){
+	//			TDiff.push_back(std::make_tuple(jj,kk,std::abs(FrontHits[ii][jj]->GetTimeStamp() - BackHits[ii][kk]->GetTimeStamp())));
+	//		}
+	//	}
+
+	//	for( const auto& e : TDiff ){
+	//		this->console->info("before: {} {} {}",std::get<0>(e),std::get<1>(e),std::get<2>(e));
+	//	}
+
+	//	std::sort(TDiff.begin(),TDiff.end(),[](const std::tuple<size_t,size_t,double>& a,const std::tuple<size_t,size_t,double>& b){
+	//			return std::get<2>(a) < std::get<2>(b);
+	//			} );
+
+	//	for( const auto& e : TDiff ){
+	//		this->console->info("after: {} {} {}",std::get<0>(e),std::get<1>(e),std::get<2>(e));
+	//	}
+	//	//throw "help";
+	//}
+	
+	//if( this->SummaryData.size() > 2 ){
+	//	this->console->info("{}",this->SummaryData.size());
+	//}
+	
 	for( const auto& evt : this->SummaryData ){
 		auto subtype = evt->GetSubType();
 		auto group = evt->GetGroup();
@@ -108,7 +154,7 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 		++(this->TotalMult[detectorposition]);
 
 		if( (not isfront and not isback) or (isfront and isback) ){
-			throw std::runtime_error("evt in MtasProcessor is malformed in xml, and has either both front and back tag or neither");
+			throw std::runtime_error("evt in BSMProcessor is malformed in xml, and has either both front and back tag or neither");
 		}
 
 		if( not foundfirstevt ){
@@ -261,7 +307,6 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 			psdhis = "BSM_3710_B_SINGLE_PASS";
 			hismanager->Fill(psdhis,integral,psd);
 		}
-
 
 		for( int ii = 0; ii < 6; ++ii ){
 			if( this->BSMHits[2*ii] and this->BSMHits[2*ii + 1] ){
