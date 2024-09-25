@@ -32,6 +32,7 @@ class BSMExpProcessor : public Processor{
 
 		double BetaThreshold;
 		double QBeta;
+		std::pair<double,double> BSMPosBounds;
 
 		bool PPCutExists;
 

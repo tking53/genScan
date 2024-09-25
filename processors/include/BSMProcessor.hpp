@@ -30,6 +30,7 @@ class BSMProcessor : public Processor{
 		virtual void CleanupTree() final;
 
 		void FillGSPileupTracePlots(PLOTS::PlotRegistry*) const;
+		void FillPositionPlots(PLOTS::PlotRegistry*) const;
 
 		struct EventInfo{
 			double TotalEnergy;
@@ -112,6 +113,9 @@ class BSMProcessor : public Processor{
 		bool foundfirstevt;
 		double globalfirsttime;
 		double currevttime;
+
+		int NumPairs;
+		int NumPMTs;
 
 		bool PlotAllTraces;
 };

@@ -4,6 +4,7 @@
 #include "HistogramManager.hpp"
 #include <TTree.h>
 #include <stdexcept>
+#include <utility>
 
 BSMExpProcessor::BSMExpProcessor(const std::string& log) : Processor(log,"BSMExpProcessor",{"mtas","bsm"}){
 	this->MtasProc = std::make_unique<MtasProcessor>(log);
@@ -52,13 +53,14 @@ BSMExpProcessor::BSMExpProcessor(const std::string& log) : Processor(log,"BSMExp
 	this->CurrBSM = this->BSMProc->GetCurrEvt();
 
 	bool AllWithinTDiff = (std::abs(this->CurrBSM.TDiff[0]) <= 80.0);
+	bool AllWithinPos = ((this->CurrBSM.Position[0] >= this->BSMPosBounds.first) and (this->CurrBSM.Position[0] <= this->BSMPosBounds.second));
 	//for( int ii = 0; ii < 6; ++ii ){
 	//	if( std::abs(this->CurrBSM.TDiff[ii]) > 80.0 ){ 
 	//		AllWithinTDiff = false;
 	//	}
 	//}
 
-	if( this->HasBSM and AllWithinTDiff ){
+	if( this->HasBSM and AllWithinTDiff and AllWithinPos ){
 		if( this->CurrMTAS.FirstTime > 0.0 and this->CurrBSM.FirstTime > 0.0 ){
 			hismanager->Fill("BSMEXP_2000",this->CurrMTAS.FirstTime - this->CurrBSM.FirstTime);
 		}
@@ -88,7 +90,8 @@ BSMExpProcessor::BSMExpProcessor(const std::string& log) : Processor(log,"BSMExp
 	}
 
 	hismanager->Fill("BSM_3610",this->CurrBSM.TotalEnergy);
-	if( (not this->CurrMTAS.Saturate) and (not this->CurrMTAS.Pileup) and AllWithinTDiff ){
+	if( (not this->CurrMTAS.Saturate) and (not this->CurrMTAS.Pileup) and AllWithinTDiff and AllWithinPos ){
+		this->BSMProc->FillPositionPlots(hismanager);
 	
 		hismanager->Fill("BSM_3650",this->CurrMTAS.TotalEnergy[0],this->CurrBSM.TotalEnergy);
 		hismanager->Fill("BSM_36508",this->CurrMTAS.TotalEnergy[0],this->CurrBSM.TotalEnergy);
@@ -186,6 +189,7 @@ void BSMExpProcessor::Init(const pugi::xml_node& config){
 
 	this->BetaThreshold = config.attribute("betathresh").as_double(0.0);
 	this->QBeta = config.attribute("qvalue").as_double(8192.0);
+	this->BSMPosBounds = std::make_pair<double,double>(config.attribute("posmin").as_double(-1.0),config.attribute("posmax").as_double(1.0));
 
 	if( not this->HasMTAS ){
 		throw std::runtime_error("missing MtasProcessor in BSMExpProcessor");
