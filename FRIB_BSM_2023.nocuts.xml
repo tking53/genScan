@@ -25,12 +25,12 @@
 		</Analyzer>
 		<Processor name="BSMExpProcessor" betathresh="20.0" >
 			<Processor name="BSMProcessor" PlotAllTraces="false" >
-				<PulseAnalysis id="0" cutid="BF1PACut" integralthreshold="9.0" />
-				<PulseAnalysis id="1" cutid="BB1PACut" integralthreshold="18.0" />
 				<!-- <PulseAnalysis id="0" cutid="BF1PACut" integralthreshold="50.0" /> -->
 				<!-- <PulseAnalysis id="1" cutid="BB1PACut" integralthreshold="100.0" /> -->
+				<Histogram id="3810" nbinsx="16384" xlow="0.0" xhigh="16384.0" nbinsy="4096" ylow="0.0" yhigh="32.0" />
+				<Histogram id="3710" nbinsx="16384" xlow="0.0" xhigh="16384.0" nbinsy="4096" ylow="0.0" yhigh="32.0" />
 			</Processor>
-			<Processor name="MtasProcessor" diagnostic="true" >
+			<Processor name="MtasProcessor" diagnostic="false" >
 				<!-- This uses the calibrated energy, this may cause issues in the future, but should be fine once calibrated? -->
 				<!-- <PositionCorrection id="0" p0="6.53713" p1="1.06084" cross="691.04374" tag="C1F" /> -->
 				<!-- <PositionCorrection id="1" p0="6.53916" p1="-0.945923" cross="691.04374" tag="C1B" /> -->
@@ -52,10 +52,8 @@
 			<!-- <Cut name="BF1PACut" filename="/Users/truland/Analysis/BSM/Rh106/Cuts/BF1PACut.C" /> -->
 			<!-- <Cut name="BB1PACut" filename="/Users/truland/Analysis/BSM/Rh106/Cuts/BB1PACut.C" /> -->
 			<Cut name="PairProduction" filename="/home/trul/Analysis/BSM/Sr90/Cuts/PairProduction.C" />		
-			<Cut name="BF1PACut" filename="/home/trul/Analysis/BSM/Rh106/Cuts/NewBF1PACut.C" />
-			<Cut name="BB1PACut" filename="/home/trul/Analysis/BSM/Rh106/Cuts/NewBB1PACut.C" />
-			<!-- <Cut name="BF1PACut" filename="/home/trul/Analysis/BSM/Rh106/Cuts/BF1PACut.C" /> -->
-			<!-- <Cut name="BB1PACut" filename="/home/trul/Analysis/BSM/Rh106/Cuts/BB1PACut.C" /> -->
+			<Cut name="BF1PACut" filename="/home/trul/Analysis/BSM/Rh106/Cuts/BF1PACut.C" />
+			<Cut name="BB1PACut" filename="/home/trul/Analysis/BSM/Rh106/Cuts/BB1PACut.C" />
 		</Processor>
 		<!-- <Processor name="RootDevProcessor" included_types="mtas,bsm"/> -->
 	</DetectorDriver>
