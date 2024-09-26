@@ -28,6 +28,7 @@
 #include "TList.h"
 #include "TError.h"
 #include "TROOT.h"
+#include "TColor.h"
 
 namespace PLOTS{
 	const int S0 = 1;
@@ -71,6 +72,34 @@ namespace PLOTS{
 				this->console = spdlog::get(this->LogName)->clone("HistogramManager");
 				this->FillCounter1D = 0;
 				this->FillCounter2D = 0;
+
+			
+				ColorList = {
+					{"kBlue",kBlue},
+					{"kAzure",kAzure},
+					{"kCyan",kCyan},
+					{"kTeal",kTeal},
+					{"kGreen",kGreen},
+					{"kSpring",kSpring},
+					{"kYellow",kYellow},
+					{"kOrange",kOrange},
+					{"kRed",kRed},
+					{"kPink",kPink},
+					{"kMagenta",kMagenta},
+					{"kViolet",kViolet}
+				};
+			
+				WedgeRange = {-10,4};
+				WedgeDiff = (WedgeRange.second - WedgeRange.first)+1;
+				LineRange = {-9,0};
+				LineDiff = (LineRange.second - LineRange.first)+1;
+				WedgeNames = {"kCyan","kRed","kGreen","kMagenta","kYellow","kBlue"};
+				LineNames = {"kAzure","kOrange","kTeal","kPink","kSpring","kViolet"};
+			
+				currlineidx = 0;
+				currwedgeidx = 0;
+				currcoloridx = 0;
+
 				fServ = std::make_shared<TServerSocket>(PORT,true);
 				if( not fServ->IsValid() ){
 					std::string mess = "Unable to open Port : "+std::to_string(PORT)+" Bailing out";
@@ -92,6 +121,21 @@ namespace PLOTS{
 
 			~PlotRegistry(){
 				this->console->info("Num 1D Fills : {} | Num 2D Fills : {}",this->FillCounter1D,this->FillCounter2D);
+			}
+
+			int GetCurrLineColor(){
+				return this->ColorList[this->LineNames[this->currlineidx]] + ((this->currlinemult%20) + this->LineRange.first); 
+			}
+
+			void ShiftLineColor(){
+				if( ++this->currlineidx > this->LineNames.size() ){
+					this->currlineidx = 0;
+					this->currlinemult = (++this->currlinemult)%this->LineDiff;
+				}
+				//if( ++this->currlinemult > this->LineRange.second ){
+				//	this->currlineidx = (++this->currlineidx)%this->LineNames.size();
+				//	this->currlinemult = this->LineRange.first;
+				//}	
 			}
 
 			void HandleSocket(TSocket* s){
@@ -186,8 +230,11 @@ namespace PLOTS{
 					this->Plots_1D[name]->GetXaxis()->SetLabelSize(0.04);
 					this->Plots_1D[name]->GetXaxis()->CenterTitle(true);
 					this->Plots_1D[name]->GetYaxis()->SetTitleSize(0.04);
+					this->Plots_1D[name]->GetYaxis()->SetTitleOffset(1.2);
 					this->Plots_1D[name]->GetYaxis()->SetLabelSize(0.04);
 					this->Plots_1D[name]->GetYaxis()->CenterTitle(true);
+					this->Plots_1D[name]->SetLineColor(this->GetCurrLineColor());
+					this->ShiftLineColor();
 					this->PlotIDs.push_back(name);
 				}else{
 					std::string mess = "Unable to register plot "+name+" as it already exists";
@@ -203,8 +250,9 @@ namespace PLOTS{
 					this->Plots_2D[name] = new T(name.c_str(),title.c_str(),nbinsx,xmin,xmax,nbinsy,ymin,ymax);
 					this->Plots_2D[name]->GetXaxis()->SetTitleSize(0.04);
 					this->Plots_2D[name]->GetXaxis()->SetLabelSize(0.04);
-					this->Plots_2D[name]->GetYaxis()->CenterTitle(true);
+					this->Plots_2D[name]->GetXaxis()->CenterTitle(true);
 					this->Plots_2D[name]->GetYaxis()->SetTitleSize(0.04);
+					this->Plots_2D[name]->GetYaxis()->SetTitleOffset(1.2);
 					this->Plots_2D[name]->GetYaxis()->SetLabelSize(0.04);
 					this->Plots_2D[name]->GetYaxis()->CenterTitle(true);
 					this->PlotIDs.push_back(name);
@@ -415,6 +463,19 @@ namespace PLOTS{
 			std::shared_ptr<TList> fSockets;
 		
 			std::shared_ptr<spdlog::logger> console;
+
+			std::map<std::string,EColor> ColorList;
+			std::pair<int,int> WedgeRange;
+			int WedgeDiff;
+			std::pair<int,int> LineRange;
+			int LineDiff;
+			std::vector<std::string> WedgeNames;
+			std::vector<std::string> LineNames;
+			size_t currlineidx;
+			int currlinemult;
+			size_t currwedgeidx;
+			int currwedgemult;
+			size_t currcoloridx;
 	};
 
 }

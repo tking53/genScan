@@ -96,7 +96,7 @@ class BSMProcessor : public Processor{
 
 		std::vector<PhysicsData*> Pairs;
 
-		std::vector<double> UnCorrectedBSM;
+		std::vector<double> RawBSM;
 		std::vector<int> BSMHits;
 		std::vector<int> TotalMult;
 		std::vector<std::unique_ptr<TraceAnalysis>> TraceSettings;

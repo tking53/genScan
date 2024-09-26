@@ -33,6 +33,9 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 				{3600 , {16384,0.0,16384}},
 				{3601 , {16384,0.0,16384}},
 				{3602 , {16384,0.0,16384}},
+				{3603 , {16384,0.0,16384}},
+				{3604 , {16384,0.0,16384}},
+				{3605 , {16384,0.0,16384}},
 				{3610 , {16384,0.0,16384}},
 				{3611 , {16384,0.0,16384}},
 				{3612 , {16384,0.0,16384}}
@@ -55,20 +58,24 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 				{36558 , {2048,0.0,16384.0,2048,0.0,16384.0}},
 				{3656 , {4096,0.0,4096.0,4096,0.0,4096.0}},
 				{36568 , {2048,0.0,16384.0,2048,0.0,16384.0}},
-				{3660 , {4096,0.0,4096.0,4096,0.0,4096.0}},
-				{36608 , {2048,0.0,16384.0,2048,0.0,16384.0}},
+				{3657 , {4096,0.0,4096.0,4096,0.0,4096.0}},
+				{36578 , {2048,0.0,16384.0,2048,0.0,16384.0}},
+				{3658 , {4096,0.0,4096.0,4096,0.0,4096.0}},
+				{36588 , {2048,0.0,16384.0,2048,0.0,16384.0}},
+				{3670 , {4096,0.0,4096.0,4096,0.0,4096.0}},
+				{36708 , {2048,0.0,16384.0,2048,0.0,16384.0}},
 				{3700 , {512,0,512,16384,0.0,16384.0}},
 				{3710 , {16384,0.0,16384.0,1024,0,10.0}},
 				{3720 , {1024,0,32,16384,0.0,16384.0}},
 				{3730 , {1024,0,1024,16384,0.0,16384.0}},
-				{3740 , {1024,0,1024,1024,0,32}},
+				{3740 , {1024,0,1024,8192,0,128}},
 				{3750 , {16384,0,16384.0,1024,0,1024}},
 				{3760 , {512,0,512,16384,-16384.0,16384.0}},
 				{3800 , {512,0,512,16384,0.0,16384.0}},
 				{3810 , {16384,0.0,16384.0,1024,0,10.0}},
 				{3820 , {1024,0,32,16384,0.0,16384.0}},
 				{3830 , {1024,0,1024,16384,0.0,16384.0}},
-				{3840 , {1024,0,1024,1024,0,32}},
+				{3840 , {1024,0,1024,8192,0,128}},
 				{3860 , {512,0,512,16384,-16384.0,16384.0}},
 				{3900 , {512,0,512,16384,0.0,16384.0}},
 				
@@ -257,6 +264,7 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 			this->CurrEvt.UnCorrectedBSM[detectorposition] = evt->GetEnergy();
 			this->HitTimeStamps[detectorposition] = evt->GetTimeStamp();
 			this->TimeStamps.push_back(evt->GetTimeStamp());
+			this->RawBSM[detectorposition] = evt->GetRawEnergyWRandom();
 			++this->BSMHits[detectorposition];
 		}else{
 			++this->BSMHits[detectorposition];
@@ -307,7 +315,7 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 				this->CurrEvt.TDiff[ii] = (this->HitTimeStamps[2*ii] - this->HitTimeStamps[2*ii + 1]);
 				++this->CurrEvt.NumValidSegments;
 				this->CurrEvt.UnCorrectedSumFrontBackEnergy[ii] = (this->CurrEvt.UnCorrectedBSM[2*ii] + this->CurrEvt.UnCorrectedBSM[2*ii + 1])/2.0;
-				this->CurrEvt.Position[ii] = this->CalcPosition(this->CurrEvt.UnCorrectedBSM[2*ii],this->CurrEvt.UnCorrectedBSM[2*ii + 1]);
+				this->CurrEvt.Position[ii] = this->CalcPosition(this->RawBSM[2*ii],this->RawBSM[2*ii + 1]);
 				if( (this->PosCorrectionMap[2*ii] != nullptr) and (this->PosCorrectionMap[2*ii + 1] != nullptr ) ){
 					auto front = this->PosCorrectionMap[2*ii]->Correct(this->CurrEvt.UnCorrectedBSM[2*ii],this->CurrEvt.Position[ii]);
 					auto back = this->PosCorrectionMap[2*ii + 1]->Correct(this->CurrEvt.UnCorrectedBSM[2*ii + 1],this->CurrEvt.Position[ii]);
@@ -323,13 +331,13 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 				std::string id = std::to_string(ii);
 				std::string name = "BSM_362"+id+"_F";
 
-				hismanager->Fill(name,this->CurrEvt.Position[ii],this->CurrEvt.UnCorrectedBSM[2*ii]);
+				hismanager->Fill(name,this->CurrEvt.Position[ii],this->RawBSM[2*ii]);
 
 				name = "BSM_362"+id+"_B";
-				hismanager->Fill(name,this->CurrEvt.Position[ii],this->CurrEvt.UnCorrectedBSM[2*ii + 1]);
+				hismanager->Fill(name,this->CurrEvt.Position[ii],this->RawBSM[2*ii + 1]);
 
 				name = "BSM_362"+id;
-				hismanager->Fill(name,this->CurrEvt.Position[ii],this->CurrEvt.SumFrontBackEnergy[ii]);
+				hismanager->Fill(name,this->CurrEvt.Position[ii],(this->RawBSM[2*ii] + this->RawBSM[2*ii + 1])/2.0);
 
 				name = "BSM_363"+id;
 				hismanager->Fill(name,this->CurrEvt.TDiff[ii],this->CurrEvt.SumFrontBackEnergy[ii]);
@@ -356,11 +364,11 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 
 		for( int ii = 0; ii < this->NumPairs; ++ii ){
 			std::string id = std::to_string(ii);
-			std::string name = "BSM_366"+id;
+			std::string name = "BSM_367"+id;
 
 			hismanager->Fill(name,this->CurrEvt.CorrectedBSM[2*ii+1],this->CurrEvt.CorrectedBSM[2*ii]);
 
-			name = "BSM_366"+id+"8";
+			name = "BSM_367"+id+"8";
 			hismanager->Fill(name,this->CurrEvt.CorrectedBSM[2*ii+1],this->CurrEvt.CorrectedBSM[2*ii]);
 		}
 	}
@@ -374,10 +382,10 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 		int sum = 0;
 		for( int ii = 0; ii < this->NumPMTs; ++ii ){
 			sum += this->TotalMult[ii];
-			this->console->info("channel {} : {}",ii,this->TotalMult[ii]);
+			this->console->error("channel {} : {}",ii,this->TotalMult[ii]);
 		}
 		for( const auto& evt : this->SummaryData ){
-			this->console->info("id : {}, ts : {} erg : {} pileup : {} saturate : {}",evt->GetSpillID(),evt->GetTimeStamp(),evt->GetRawEnergy(),evt->GetPileup(),evt->GetSaturation());
+			this->console->error("id : {}, ts : {} erg : {} pileup : {} saturate : {}",evt->GetSpillID(),evt->GetTimeStamp(),evt->GetRawEnergy(),evt->GetPileup(),evt->GetSaturation());
 		}
 		this->console->info("Total: {}/{}",sum,this->SummaryData.size());
 	}
@@ -415,6 +423,7 @@ void BSMProcessor::Init(const pugi::xml_node& config){
 	this->NumPMTs = 2*this->NumPairs;
 
 	this->BSMHits = std::vector<int>(this->NumPMTs,0);
+	this->RawBSM = std::vector<double>(this->NumPMTs,0.0);
 	this->TotalMult = std::vector<int>(this->NumPMTs,0);
 	this->HitTimeStamps = std::vector<double>(this->NumPMTs,0.0);
 	this->Traces = std::vector<std::vector<uint16_t>>(this->NumPMTs,std::vector<uint16_t>());
@@ -474,33 +483,36 @@ void BSMProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 	hismanager->RegisterPlot<TH1F>("BSM_3600","#betaSM Total; Energy (keV)",this->h1dsettings.at(3600));
 	hismanager->RegisterPlot<TH1F>("BSM_3601","#betaSM Total No MTAS; Energy (keV)",this->h1dsettings.at(3601));
 	hismanager->RegisterPlot<TH1F>("BSM_3602","#betaSM Total + MTAS Total; Energy (keV)",this->h1dsettings.at(3602));
+	hismanager->RegisterPlot<TH1F>("BSM_3603","#betaSM Total + MTAS Total veto M,O; Energy (keV)",this->h1dsettings.at(3603));
+	hismanager->RegisterPlot<TH1F>("BSM_3604","#betaSM Total + MTAS C Sum veto M,O; Energy (keV)",this->h1dsettings.at(3604));
+	hismanager->RegisterPlot<TH1F>("BSM_3605","#betaSM Total + MTAS C Sum veto I,M,O; Energy (keV)",this->h1dsettings.at(3605));
 	hismanager->RegisterPlot<TH1F>("BSM_3610","#betaSM Total; Energy (keV)",this->h1dsettings.at(3610));
 	hismanager->RegisterPlot<TH1F>("BSM_3611","#betaSM Total [MTAS Pileup]; Energy (keV)",this->h1dsettings.at(3611));
 	hismanager->RegisterPlot<TH1F>("BSM_3612","#betaSM Total [MTAS Saturate]; Energy (keV)",this->h1dsettings.at(3612));
 
 	for( size_t ii = 0; ii < this->NumPairs; ++ii ){
 		std::string name = "BSM_362"+std::to_string(ii)+"_F";
-		std::string title = "#betaSM"+std::to_string(ii+1)+"_F Energy vs #betaSM Position; Position (arb.); Energy (keV)";
+		std::string title = "#betaSM"+std::to_string(ii+1)+"_F Energy vs #betaSM Position; Position (arb.); Energy (channel)";
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3620));
 		
 		name = "BSM_362"+std::to_string(ii)+"_B";
-		title = "#betaSM"+std::to_string(ii+1)+"_B Energy vs #betaSM Position; Position (arb.); Energy (keV)";
+		title = "#betaSM"+std::to_string(ii+1)+"_B Energy vs #betaSM Position; Position (arb.); Energy (channel)";
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3620));
 		
 		name = "BSM_362"+std::to_string(ii);
-		title = "#betaSM"+std::to_string(ii+1)+" Energy vs #betaSM Position; Position (arb.); Energy (keV)";
+		title = "#betaSM"+std::to_string(ii+1)+" Energy vs #betaSM Position; Position (arb.); Energy (channel)";
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3620));
 		
 		name = "BSM_362"+std::to_string(ii)+"_F_NOMUON";
-		title = "#betaSM"+std::to_string(ii+1)+"_F Energy vs #betaSM Position; Position (arb.); Energy (keV)";
+		title = "#betaSM"+std::to_string(ii+1)+"_F Energy vs #betaSM Position; Position (arb.); Energy (channel)";
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3620));
 		
 		name = "BSM_362"+std::to_string(ii)+"_B_NOMUON";
-		title = "#betaSM"+std::to_string(ii+1)+"_B Energy vs #betaSM Position; Position (arb.); Energy (keV)";
+		title = "#betaSM"+std::to_string(ii+1)+"_B Energy vs #betaSM Position; Position (arb.); Energy (channel)";
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3620));
 		
 		name = "BSM_362"+std::to_string(ii)+"_NOMUON";
-		title = "#betaSM"+std::to_string(ii+1)+" Energy vs #betaSM Position; Position (arb.); Energy (keV)";
+		title = "#betaSM"+std::to_string(ii+1)+" Energy vs #betaSM Position; Position (arb.); Energy (channel)";
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3620));
 		
 		name = "BSM_363"+std::to_string(ii);
@@ -515,13 +527,22 @@ void BSMProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 		title = "#betaSM"+std::to_string(ii+1)+"_B Energy vs #betaSM TDiff(F-B); TDiff(F-B) (pixie ticks); Energy (keV)";
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3630));
 		
-		name = "BSM_366"+std::to_string(ii);
+		name = "BSM_367"+std::to_string(ii);
 		title = "#betaSM"+std::to_string(ii+1)+"_F Energy vs #betaSM"+std::to_string(ii+1)+"_B; Energy (keV); Energy (keV)";
-		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3660));
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3670));
 
-		name = "BSM_366"+std::to_string(ii)+"8";
+		name = "BSM_367"+std::to_string(ii)+"8";
 		title = "#betaSM"+std::to_string(ii+1)+"_F Energy vs #betaSM"+std::to_string(ii+1)+"_B; Energy (8 keV/bin); Energy (8 keV/bin)";
-		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(36608));
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(36708));
+
+		name = "BSM_367"+std::to_string(ii)+"_NOMUON";
+		title = "#betaSM"+std::to_string(ii+1)+"_F Energy vs #betaSM"+std::to_string(ii+1)+"_B; Energy (keV); Energy (keV)";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3670));
+
+		name = "BSM_367"+std::to_string(ii)+"8_NOMUON";
+		title = "#betaSM"+std::to_string(ii+1)+"_F Energy vs #betaSM"+std::to_string(ii+1)+"_B; Energy (8 keV/bin); Energy (8 keV/bin)";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(36708));
+
 
 		if( this->PlotAllTraces ){
 			name = "BSM_370"+std::to_string(ii)+"_F";
@@ -685,6 +706,14 @@ void BSMProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 
 	hismanager->RegisterPlot<TH2F>("BSM_36568","#betaSM Total vs MTAS C Veto M,O; MTAS C Energy (8 keV/bin); #betaSM Energy (8 keV/bin)",this->h2dsettings.at(36568));
 	
+	hismanager->RegisterPlot<TH2F>("BSM_3657","#betaSM Total vs MTAS Center Sum Veto I,M,O; MTAS Center Sum Energy (keV); #betaSM Energy (keV)",this->h2dsettings.at(3657));
+
+	hismanager->RegisterPlot<TH2F>("BSM_36578","#betaSM Total vs MTAS Center Sum Veto I,M,O; MTAS Center Sum Energy (8 keV/bin); #betaSM Energy (8 keV/bin)",this->h2dsettings.at(36578));
+	
+	hismanager->RegisterPlot<TH2F>("BSM_3658","#betaSM Total vs MTAS C Veto I,M,O; MTAS C Energy (keV); #betaSM Energy (keV)",this->h2dsettings.at(3658));
+
+	hismanager->RegisterPlot<TH2F>("BSM_36588","#betaSM Total vs MTAS C Veto I,M,O; MTAS C Energy (8 keV/bin); #betaSM Energy (8 keV/bin)",this->h2dsettings.at(36588));
+
 	hismanager->RegisterPlot<TH2F>("BSM_4000","Run Time vs #betaSM Total; #betaSM Energy (keV); Run Time (ms)",this->h2dsettings.at(4000));
 	hismanager->RegisterPlot<TH2F>("BSM_4001","Run Time vs #betaSM Total; #betaSM Energy (keV); Run Time (s)",this->h2dsettings.at(4001));
 	hismanager->RegisterPlot<TH2F>("BSM_4002","Run Time vs #betaSM Total; #betaSM Energy (keV); Run Time (min)",this->h2dsettings.at(4002));
@@ -705,6 +734,7 @@ void BSMProcessor::Reset(){
 	this->CurrEvt = this->NewEvt;
 	this->TimeStamps.clear();
 	this->BSMHits = std::vector<int>(this->NumPMTs,0);
+	this->RawBSM = std::vector<double>(this->NumPMTs,0.0);
 	this->HitTimeStamps = std::vector<double>(this->NumPMTs,0.0);
 	this->TotalMult = std::vector<int>(this->NumPMTs,0);
 	this->Pairs = std::vector<PhysicsData*>(this->NumPMTs,nullptr);
@@ -747,13 +777,19 @@ void BSMProcessor::FillPositionPlots(PLOTS::PlotRegistry* hismanager) const{
 				std::string id = std::to_string(ii);
 				std::string name = "BSM_362"+id+"_F_NOMUON";
 
-				hismanager->Fill(name,this->CurrEvt.Position[ii],this->CurrEvt.UnCorrectedBSM[2*ii]);
+				hismanager->Fill(name,this->CurrEvt.Position[ii],this->RawBSM[2*ii]);
 
 				name = "BSM_362"+id+"_B_NOMUON";
-				hismanager->Fill(name,this->CurrEvt.Position[ii],this->CurrEvt.UnCorrectedBSM[2*ii + 1]);
+				hismanager->Fill(name,this->CurrEvt.Position[ii],this->RawBSM[2*ii + 1]);
 
 				name = "BSM_362"+id+"_NOMUON";
-				hismanager->Fill(name,this->CurrEvt.Position[ii],this->CurrEvt.SumFrontBackEnergy[ii]);
+				hismanager->Fill(name,this->CurrEvt.Position[ii],(this->RawBSM[2*ii]+this->RawBSM[2*ii + 1])/2.0);
+
+				name = "BSM_367"+id+"_NOMUON";
+				hismanager->Fill(name,this->CurrEvt.CorrectedBSM[2*ii+1],this->CurrEvt.CorrectedBSM[2*ii]);
+
+				name = "BSM_367"+id+"8_NOMUON";
+				hismanager->Fill(name,this->CurrEvt.CorrectedBSM[2*ii+1],this->CurrEvt.CorrectedBSM[2*ii]);
 			}
 		}
 	}

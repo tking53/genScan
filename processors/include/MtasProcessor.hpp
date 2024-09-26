@@ -32,6 +32,14 @@ class MtasProcessor : public Processor{
 			bool Pileup;
 			bool BetaTriggered;
 			bool RealEvt;
+			bool CenterFire;
+			bool InnerFire;
+			bool MiddleFire;
+			bool OuterFire;
+			int NumCenterFire;
+			int NumInnerFire;
+			int NumMiddleFire;
+			int NumOuterFire;
 
 			EventInfo(){
 				TotalEnergy = std::vector<double>(5,0.0);
@@ -42,6 +50,14 @@ class MtasProcessor : public Processor{
 				Pileup = false;
 				BetaTriggered = false;
 				RealEvt = false;
+				CenterFire = false;
+				InnerFire = false;
+				MiddleFire = false;
+				OuterFire = false;
+				NumCenterFire = 0;
+				NumInnerFire = 0;
+				NumMiddleFire = 0;
+				NumOuterFire = 0;
 			}
 			~EventInfo() = default;
 			EventInfo(const EventInfo&) = default;

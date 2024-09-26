@@ -291,23 +291,31 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 	for( int ii = 0; ii < 6; ++ii ){
 		if( this->CenterHits[2*ii] and this->CenterHits[2*ii + 1] ){
 			this->CurrEvt.SumFrontBackEnergy[ii] = (this->Center[2*ii] + this->Center[2*ii + 1])/2.0;
-			this->Position[ii] = this->CalcPosition(this->Center[2*ii],this->Center[2*ii + 1]);
+			this->Position[ii] = this->CalcPosition(this->RawCenter[2*ii],this->RawCenter[2*ii + 1]);
 			this->CenterFire = true;
+			this->CurrEvt.CenterFire = true;
+			this->CurrEvt.NumCenterFire += 1;
 		}
 		if( this->InnerHits[2*ii] and this->InnerHits[2*ii + 1] ){
 			this->CurrEvt.SumFrontBackEnergy[ii+6] = (this->Inner[2*ii] + this->Inner[2*ii + 1])/2.0;
-			this->Position[ii + 6] = this->CalcPosition(this->Inner[2*ii],this->Inner[2*ii + 1]);
+			this->Position[ii + 6] = this->CalcPosition(this->RawInner[2*ii],this->RawInner[2*ii + 1]);
 			this->InnerFire = true;
+			this->CurrEvt.InnerFire = true;
+			this->CurrEvt.NumInnerFire += 1;
 		}
 		if( this->MiddleHits[2*ii] and this->MiddleHits[2*ii + 1] ){
 			this->CurrEvt.SumFrontBackEnergy[ii+12] = (this->Middle[2*ii] + this->Middle[2*ii + 1])/2.0;
-			this->Position[ii + 12] = this->CalcPosition(this->Middle[2*ii],this->Middle[2*ii + 1]);
+			this->Position[ii + 12] = this->CalcPosition(this->RawMiddle[2*ii],this->RawMiddle[2*ii + 1]);
 			this->MiddleFire = true;
+			this->CurrEvt.MiddleFire = true;
+			this->CurrEvt.NumMiddleFire += 1;
 		}
 		if( this->OuterHits[2*ii] and this->OuterHits[2*ii + 1] ){
 			this->CurrEvt.SumFrontBackEnergy[ii+18] = (this->Outer[2*ii] + this->Outer[2*ii + 1])/2.0;
-			this->Position[ii + 18] = this->CalcPosition(this->Outer[2*ii],this->Outer[2*ii + 1]);
+			this->Position[ii + 18] = this->CalcPosition(this->RawOuter[2*ii],this->RawOuter[2*ii + 1]);
 			this->OuterFire = true;
+			this->CurrEvt.OuterFire = true;
+			this->CurrEvt.NumOuterFire += 1;
 		}
 	}
 
@@ -365,13 +373,13 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 			std::string id = std::to_string(ii);
 
 			std::string name = "MTAS_326"+id+"_F";
-			hismanager->Fill(name,this->Position[ii],this->Center[2*ii]);
+			hismanager->Fill(name,this->Position[ii],this->RawCenter[2*ii]);
 			
 			name = "MTAS_326"+id+"_B";
-			hismanager->Fill(name,this->Position[ii],this->Center[2*ii + 1]);
+			hismanager->Fill(name,this->Position[ii],this->RawCenter[2*ii + 1]);
 			
 			name = "MTAS_326"+id;
-			hismanager->Fill(name,this->Position[ii],this->CurrEvt.SumFrontBackEnergy[ii]);
+			hismanager->Fill(name,this->Position[ii],(this->RawCenter[2*ii] + this->RawCenter[2*ii + 1])/2.0);
 
 			hismanager->Fill("MTAS_3215",this->CurrEvt.SumFrontBackEnergy[ii]);
 			hismanager->Fill("MTAS_3225",this->CurrEvt.SumFrontBackEnergy[ii+6]);
@@ -585,39 +593,39 @@ void MtasProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 	//center position correction plots
 	for( size_t ii = 0; ii < 6; ++ii ){
 		std::string name = "MTAS_316"+std::to_string(ii)+"_F";
-		std::string title = "Center Position vs C"+std::to_string(ii+1)+"F anti #beta-gated; Position (arb.); Energy (keV)";
+		std::string title = "C"+std::to_string(ii+1)+"F vs Center Position anti #beta-gated; Position (arb.); Energy (channel)";
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3160));
 
 		name = "MTAS_316"+std::to_string(ii)+"_B";
-		title = "Center Position vs C"+std::to_string(ii+1)+"B anti #beta-gated; Position (arb.); Energy (keV)";
+		title = "C"+std::to_string(ii+1)+"B vs Center Position anti #beta-gated; Position (arb.); Energy (channel)";
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3160));
 
 		name = "MTAS_316"+std::to_string(ii);
-		title = "Center Position vs C"+std::to_string(ii+1)+" Sum anti #beta-gated; Position (arb.); Energy (keV)";
+		title = "C"+std::to_string(ii+1)+" vs Center Position Sum anti #beta-gated; Position (arb.); Energy (channel)";
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3160));
 		
 		name = "MTAS_326"+std::to_string(ii)+"_F";
-		title = "Center Position vs C"+std::to_string(ii+1)+"F; Position (arb.); Energy (keV)";
+		title = "C"+std::to_string(ii+1)+"F vs Center Position; Position (arb.); Energy (channel)";
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3260));
 
 		name = "MTAS_326"+std::to_string(ii)+"_B";
-		title = "Center Position vs C"+std::to_string(ii+1)+"B; Position (arb.); Energy (keV)";
+		title = "C"+std::to_string(ii+1)+"B vs Center Position; Position (arb.); Energy (channel)";
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3260));
 		
 		name = "MTAS_326"+std::to_string(ii);
-		title = "Center Position vs C"+std::to_string(ii+1)+" Sum; Position (arb.); Energy (keV)";
+		title = "C"+std::to_string(ii+1)+" vs Center Position Sum; Position (arb.); Energy (channel)";
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3260));
 
 		name = "MTAS_336"+std::to_string(ii)+"_F";
-		title = "Center Position vs C"+std::to_string(ii+1)+"F #beta-gated; Position (arb.); Energy (keV)";
+		title = "C"+std::to_string(ii+1)+"F vs Center Position #beta-gated; Position (arb.); Energy (channel)";
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3360));
 
 		name = "MTAS_336"+std::to_string(ii)+"_B";
-		title = "Center Position vs C"+std::to_string(ii+1)+"B #beta-gated; Position (arb.); Energy (keV)";
+		title = "C"+std::to_string(ii+1)+"B vs Center Position #beta-gated; Position (arb.); Energy (channel)";
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3360));
 		
 		name = "MTAS_336"+std::to_string(ii);
-		title = "Center Position vs C"+std::to_string(ii+1)+" Sum #beta-gated; Position (arb.); Energy (keV)";
+		title = "C"+std::to_string(ii+1)+" vs Center Position Sum #beta-gated; Position (arb.); Energy (channel)";
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3360));
 	}
 
@@ -709,13 +717,13 @@ void MtasProcessor::FillBetaPlots(PLOTS::PlotRegistry* hismanager) const{
 			std::string id = std::to_string(ii);
 
 			std::string name = "MTAS_336"+id+"_F";
-			hismanager->Fill(name,this->Position[ii],this->Center[2*ii]);
+			hismanager->Fill(name,this->Position[ii],this->RawCenter[2*ii]);
 			
 			name = "MTAS_336"+id+"_B";
-			hismanager->Fill(name,this->Position[ii],this->Center[2*ii + 1]);
+			hismanager->Fill(name,this->Position[ii],this->RawCenter[2*ii + 1]);
 			
 			name = "MTAS_336"+id;
-			hismanager->Fill(name,this->Position[ii],this->CurrEvt.SumFrontBackEnergy[ii]);
+			hismanager->Fill(name,this->Position[ii],(this->RawCenter[2*ii] + this->RawCenter[2*ii + 1])/2.0);
 
 			hismanager->Fill("MTAS_3315",this->CurrEvt.SumFrontBackEnergy[ii]);
 			hismanager->Fill("MTAS_3325",this->CurrEvt.SumFrontBackEnergy[ii+6]);
@@ -803,13 +811,13 @@ void MtasProcessor::FillNonBetaPlots(PLOTS::PlotRegistry* hismanager) const{
 			std::string id = std::to_string(ii);
 
 			std::string name = "MTAS_316"+id+"_F";
-			hismanager->Fill(name,this->Position[ii],this->Center[2*ii]);
+			hismanager->Fill(name,this->Position[ii],this->RawCenter[2*ii]);
 			
 			name = "MTAS_316"+id+"_B";
-			hismanager->Fill(name,this->Position[ii],this->Center[2*ii + 1]);
+			hismanager->Fill(name,this->Position[ii],this->RawCenter[2*ii + 1]);
 			
 			name = "MTAS_316"+id;
-			hismanager->Fill(name,this->Position[ii],this->CurrEvt.SumFrontBackEnergy[ii]);
+			hismanager->Fill(name,this->Position[ii],(this->RawCenter[2*ii] + this->RawCenter[2*ii + 1])/2.0);
 
 			hismanager->Fill("MTAS_3115",this->CurrEvt.SumFrontBackEnergy[ii]);
 			hismanager->Fill("MTAS_3125",this->CurrEvt.SumFrontBackEnergy[ii+6]);
