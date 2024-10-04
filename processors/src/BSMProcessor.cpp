@@ -62,6 +62,10 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 				{36578 , {2048,0.0,16384.0,2048,0.0,16384.0}},
 				{3658 , {4096,0.0,4096.0,4096,0.0,4096.0}},
 				{36588 , {2048,0.0,16384.0,2048,0.0,16384.0}},
+				{3660 , {4096,0.0,4096.0,4096,0.0,4096.0}},
+				{36608 , {2048,0.0,16384.0,2048,0.0,16384.0}},
+				{3661 , {4096,0.0,4096.0,4096,0.0,4096.0}},
+				{36618 , {2048,0.0,16384.0,2048,0.0,16384.0}},
 				{3670 , {4096,0.0,4096.0,4096,0.0,4096.0}},
 				{36708 , {2048,0.0,16384.0,2048,0.0,16384.0}},
 				{3700 , {512,0,512,16384,0.0,16384.0}},
@@ -679,40 +683,37 @@ void BSMProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 	}
 	
 	hismanager->RegisterPlot<TH2F>("BSM_3650","#betaSM Total vs MTAS Total; MTAS Total Energy (keV); #betaSM Energy (keV)",this->h2dsettings.at(3650));
-
 	hismanager->RegisterPlot<TH2F>("BSM_36508","#betaSM Total vs MTAS Total; MTAS Total Energy (8 keV/bin); #betaSM Energy (8 keV/bin)",this->h2dsettings.at(36508));
 
 	hismanager->RegisterPlot<TH2F>("BSM_3651","#betaSM Total vs MTAS I,M,O; MTAS I,M,O Energy (keV); #betaSM Energy (keV)",this->h2dsettings.at(3651));
-
 	hismanager->RegisterPlot<TH2F>("BSM_36518","#betaSM Total vs MTAS I,M,O; MTAS I,M,O Energy (8 keV/bin); #betaSM Energy (8 keV/bin)",this->h2dsettings.at(36518));
 
 	hismanager->RegisterPlot<TH2F>("BSM_3652","#betaSM Total vs MTAS Center Sum; MTAS Center Sum Energy (keV); #betaSM Energy (keV)",this->h2dsettings.at(3651));
-
 	hismanager->RegisterPlot<TH2F>("BSM_36528","#betaSM Total vs MTAS Center Sum; MTAS Center Sum Energy (8 keV/bin); #betaSM Energy (8 keV/bin)",this->h2dsettings.at(36518));
 
 	hismanager->RegisterPlot<TH2F>("BSM_3653","#betaSM Total vs MTAS C; MTAS C Energy (keV); #betaSM Energy (keV)",this->h2dsettings.at(3653));
-
 	hismanager->RegisterPlot<TH2F>("BSM_36538","#betaSM Total vs MTAS C; MTAS C Energy (8 keV/bin); #betaSM Energy (8 keV/bin)",this->h2dsettings.at(36538));
 
 	hismanager->RegisterPlot<TH2F>("BSM_3654","#betaSM Total vs MTAS Total Veto M,O; MTAS Total Energy (keV); #betaSM Energy (keV)",this->h2dsettings.at(3654));
-
 	hismanager->RegisterPlot<TH2F>("BSM_36548","#betaSM Total vs MTAS Total Veot M,O; MTAS Total Energy (8 keV/bin); #betaSM Energy (8 keV/bin)",this->h2dsettings.at(36548));
 
 	hismanager->RegisterPlot<TH2F>("BSM_3655","#betaSM Total vs MTAS Center Sum Veto M,O; MTAS Center Sum Energy (keV); #betaSM Energy (keV)",this->h2dsettings.at(3655));
-
 	hismanager->RegisterPlot<TH2F>("BSM_36558","#betaSM Total vs MTAS Center Sum Veto M,O; MTAS Center Sum Energy (8 keV/bin); #betaSM Energy (8 keV/bin)",this->h2dsettings.at(36558));
 
 	hismanager->RegisterPlot<TH2F>("BSM_3656","#betaSM Total vs MTAS C Veto M,O; MTAS C Energy (keV); #betaSM Energy (keV)",this->h2dsettings.at(3656));
-
 	hismanager->RegisterPlot<TH2F>("BSM_36568","#betaSM Total vs MTAS C Veto M,O; MTAS C Energy (8 keV/bin); #betaSM Energy (8 keV/bin)",this->h2dsettings.at(36568));
 	
 	hismanager->RegisterPlot<TH2F>("BSM_3657","#betaSM Total vs MTAS Center Sum Veto I,M,O; MTAS Center Sum Energy (keV); #betaSM Energy (keV)",this->h2dsettings.at(3657));
-
 	hismanager->RegisterPlot<TH2F>("BSM_36578","#betaSM Total vs MTAS Center Sum Veto I,M,O; MTAS Center Sum Energy (8 keV/bin); #betaSM Energy (8 keV/bin)",this->h2dsettings.at(36578));
 	
 	hismanager->RegisterPlot<TH2F>("BSM_3658","#betaSM Total vs MTAS C Veto I,M,O; MTAS C Energy (keV); #betaSM Energy (keV)",this->h2dsettings.at(3658));
-
 	hismanager->RegisterPlot<TH2F>("BSM_36588","#betaSM Total vs MTAS C Veto I,M,O; MTAS C Energy (8 keV/bin); #betaSM Energy (8 keV/bin)",this->h2dsettings.at(36588));
+	
+	hismanager->RegisterPlot<TH2F>("BSM_3660","#betaSM Total + MTAS Total vs MTAS Total; MTAS Total Energy (keV); #betaSM Energy + MTAS Total Energy (keV)",this->h2dsettings.at(3660));
+	hismanager->RegisterPlot<TH2F>("BSM_36608","#betaSM Total + MTAS Total vs MTAS Total; MTAS Total Energy (8 keV/bin); #betaSM Energy + MTAS Total Energy (8 keV/bin)",this->h2dsettings.at(36608));
+
+	hismanager->RegisterPlot<TH2F>("BSM_3661","#betaSM Total vs #betaSM Total + MTAS Total; #betaSM Energy + MTAS Total Energy (keV); #betaSM Energy (keV)",this->h2dsettings.at(3661));
+	hismanager->RegisterPlot<TH2F>("BSM_36618","#betaSM Total vs #betaSM Total + MTAS Total; #betaSM Energy + MTAS Total Energy (8 keV/bin); #betaSM Energy (8 keV/bin)",this->h2dsettings.at(36618));
 
 	hismanager->RegisterPlot<TH2F>("BSM_4000","Run Time vs #betaSM Total; #betaSM Energy (keV); Run Time (ms)",this->h2dsettings.at(4000));
 	hismanager->RegisterPlot<TH2F>("BSM_4001","Run Time vs #betaSM Total; #betaSM Energy (keV); Run Time (s)",this->h2dsettings.at(4001));

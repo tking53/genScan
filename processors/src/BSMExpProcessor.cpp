@@ -96,6 +96,12 @@ BSMExpProcessor::BSMExpProcessor(const std::string& log) : Processor(log,"BSMExp
 		hismanager->Fill("BSM_3650",this->CurrMTAS.TotalEnergy[0],this->CurrBSM.TotalEnergy);
 		hismanager->Fill("BSM_36508",this->CurrMTAS.TotalEnergy[0],this->CurrBSM.TotalEnergy);
 
+		hismanager->Fill("BSM_3660",this->CurrMTAS.TotalEnergy[0],this->CurrBSM.TotalEnergy+this->CurrMTAS.TotalEnergy[0]);
+		hismanager->Fill("BSM_36608",this->CurrMTAS.TotalEnergy[0],this->CurrBSM.TotalEnergy+this->CurrMTAS.TotalEnergy[0]);
+
+		hismanager->Fill("BSM_3661",this->CurrMTAS.TotalEnergy[0]+this->CurrBSM.TotalEnergy,this->CurrBSM.TotalEnergy);
+		hismanager->Fill("BSM_36618",this->CurrMTAS.TotalEnergy[0]+this->CurrBSM.TotalEnergy,this->CurrBSM.TotalEnergy);
+
 		hismanager->Fill("BSM_3652",this->CurrMTAS.TotalEnergy[1],this->CurrBSM.TotalEnergy);
 		hismanager->Fill("BSM_36528",this->CurrMTAS.TotalEnergy[1],this->CurrBSM.TotalEnergy);
 
