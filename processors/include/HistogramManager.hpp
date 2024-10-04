@@ -128,7 +128,8 @@ namespace PLOTS{
 			}
 
 			void ShiftLineColor(){
-				if( ++this->currlineidx > this->LineNames.size() ){
+				++this->currlineidx;
+				if( this->currlineidx == this->LineNames.size() ){
 					this->currlineidx = 0;
 					auto temp = (++this->currlinemult)%this->LineDiff;
 					this->currlinemult = temp;
