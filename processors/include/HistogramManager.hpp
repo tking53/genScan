@@ -254,7 +254,7 @@ namespace PLOTS{
 					this->Plots_2D[name]->GetXaxis()->SetLabelSize(0.04);
 					this->Plots_2D[name]->GetXaxis()->CenterTitle(true);
 					this->Plots_2D[name]->GetYaxis()->SetTitleSize(0.04);
-					this->Plots_2D[name]->GetYaxis()->SetTitleOffset(1.2);
+					this->Plots_2D[name]->GetYaxis()->SetTitleOffset(1.375);
 					this->Plots_2D[name]->GetYaxis()->SetLabelSize(0.04);
 					this->Plots_2D[name]->GetYaxis()->CenterTitle(true);
 					this->PlotIDs.push_back(name);
