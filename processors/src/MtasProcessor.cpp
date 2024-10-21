@@ -7,7 +7,6 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
-#include <cmath>
 
 MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProcessor",{"mtas"}){
 	this->NewEvt = EventInfo();
@@ -291,8 +290,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 
 	for( int ii = 0; ii < 6; ++ii ){
 		if( this->CenterHits[2*ii] and this->CenterHits[2*ii + 1] ){
-			this->CurrEvt.SumFrontBackEnergy[ii] = std::sqrt(this->Center[2*ii] * this->Center[2*ii + 1]);
-			//this->CurrEvt.SumFrontBackEnergy[ii] = (this->Center[2*ii] + this->Center[2*ii + 1])/2.0;
+			this->CurrEvt.SumFrontBackEnergy[ii] = (this->Center[2*ii] + this->Center[2*ii + 1])/2.0;
 			this->Position[ii] = this->CalcPosition(this->RawCenter[2*ii],this->RawCenter[2*ii + 1]);
 			this->CenterFire = true;
 			this->CurrEvt.CenterFire = true;
