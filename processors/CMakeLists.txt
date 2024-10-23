@@ -53,7 +53,7 @@ endif()
 
 add_library(PROCESSOR_LIB ${src_files})
 if( USE_SYSTEM_YAMLCPP )
-	target_link_libraries(PROCESSOR_LIB PUBLIC ${ROOT_LIBRARIES} UTILITY_LIB pugixml yaml-cppd jsoncpp)
+	target_link_libraries(PROCESSOR_LIB PUBLIC ${ROOT_LIBRARIES} UTILITY_LIB pugixml yaml-cpp jsoncpp)
 else()
 	target_link_libraries(PROCESSOR_LIB PUBLIC ${ROOT_LIBRARIES} UTILITY_LIB pugixml yaml-cpp jsoncpp)
 endif()

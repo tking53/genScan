@@ -179,7 +179,7 @@ set(_LOG_OPTIONS
 	LOG_OUTPUT_ON_FAILURE TRUE
 	)
 
-option(USE_SYSTEM_PUGIXML "Use the system installed pugixml, if not then we will download one and use that one" OFF)
+option(USE_SYSTEM_PUGIXML "Use the system installed pugixml, if not then we will download one and use that one" ON)
 if( USE_SYSTEM_PUGIXML )
 	find_package(Pugixml REQUIRED)
 else()
@@ -290,7 +290,7 @@ else()
 	list(APPEND EXTERNAL_LOG_DEPS spdlogProject)
 endif()
 
-option(USE_SYSTEM_BOOST "Use either system boost or grab one from github" OFF)
+option(USE_SYSTEM_BOOST "Use either system boost or grab one from github" ON)
 if( USE_SYSTEM_BOOST )
 	find_package(Boost COMPONENTS container program_options REQUIRED)
 	if(Boost_FOUND)
@@ -344,8 +344,8 @@ if( USE_SYSTEM_SPDLOG )
 	target_link_libraries(GenConfig PRIVATE spdlog::spdlog_header_only)
 endif()
 if( USE_SYSTEM_BOOST )
-	target_link_libraries(GenScanor PRIVATE Boost::container Boost::program_options Boost::sort)
-	target_link_libraries(GenConfig PRIVATE Boost::container Boost::program_options Boost::sort)
+	target_link_libraries(GenScanor PRIVATE Boost::container Boost::program_options )
+	target_link_libraries(GenConfig PRIVATE Boost::container Boost::program_options )
 else()
 	target_link_libraries(GenScanor PRIVATE 
 		${BOOST_EXTERNAL_INSTALL_LOCATION}/lib/libboost_container.a
