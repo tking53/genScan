@@ -40,3 +40,5 @@ vscode*
 .vim*
 #ignore clangs
 clangd.log
+
+*.DS_Store
