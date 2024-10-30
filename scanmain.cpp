@@ -287,6 +287,13 @@ int main(int argc, char *argv[]) {
 
 	std::signal(SIGINT, signalHandler);
 
+	//change this to be a two part object, one containing the parts the processors will ask for,
+	//the other being the history of all those objects as well as the common/independet of event things like the mapped uids 
+	//Then we provide accessor function to go through the history of events and when we allocate this object 
+	//we default it to the past 5 events, we should also allow each of the correlated sets can have associated tags with them
+	//this would make life easier for things like previous-gamma previous-beta previous-ion, etc.
+	//we should make each of those tags have a history though? that would require a good bit of everhead but would allow for what we want most
+	//we just have to double check that we invalidate the history properly
 	EventSummary CorrelatedEvents(logname);
 	CorrelatedEvents.InitMappedUIDs(cmap.get(),processorlist.get());
 	Translator::TRANSLATORSTATE CurrState = Translator::TRANSLATORSTATE::UNKNOWN;

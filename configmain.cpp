@@ -16,6 +16,7 @@
 #include <boost/histogram.hpp>
 #include <boost/unordered_map.hpp>
 #include <boost/sort/spreadsort/string_sort.hpp>
+#include <boost/circular_buffer.hpp>
 
 #include <TH1.h>
 #include <TH2.h>
@@ -386,4 +387,13 @@ int main(int argc, char *argv[]) {
 	spdlog::info("NFills : {} | 1D -> Boost : {} | 1D -> Boost (dyn.) : {} | 1D-> Root : {}",MaxNumErg,dur_b1.count(),dur_b1d.count(),dur_r1.count());
 	spdlog::info("NFills : {} | 2D -> Boost : {} | 2D -> Boost (dyn.) : {} | 2D-> Root : {}",MaxNumErg,dur_b2.count(),dur_b2d.count(),dur_r2.count());
 
+	//boost::circular_buffer<int> buff(5,1);
+	//for( const auto& e : buff ){
+	//	spdlog::info("{}",e);
+	//}
+	//for( const auto& e : {5,6,7,8,9,10,11,12,13,14,15} ){
+	//	buff.push_front(e);
+	//	spdlog::info("front -> back : {} -> {}",buff.front(),buff.back());
+	//	spdlog::info("[0] -> [4] : {} -> {}",buff[0],buff[4]);
+	//}
 }
