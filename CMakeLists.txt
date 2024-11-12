@@ -98,7 +98,9 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE BOOL "Generates compile_commands.json
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/Cmake_modules")
 
 #Find ROOT if USE_ROOT was set.
-find_package(ROOT REQUIRED COMPONENTS TreePlayer)
+find_package(ROOT REQUIRED)
+include(${ROOT_USE_FILE})
+#find_package(ROOT REQUIRED COMPONENTS TreePlayer)
 set(ROOTSYS $ENV{ROOTSYS} CACHE STRING "ROOT directory.")
 message(STATUS "FOUND ROOT LOCATED HERE: ${ROOTSYS}")
 find_program(ROOT_CONFIG_EXECUTABLE root-config PATHS ${ROOTSYS}/bin)
@@ -155,8 +157,8 @@ if (${ROOT_VERSION} VERSION_LESS "6.10")
     message(FATAL_ERROR "Minimum ROOT version is 6.10.00.")
 endif (${ROOT_VERSION} VERSION_LESS "6.10")
 mark_as_advanced( GENREFLEX_EXECUTABLE ROOTCINT_EXECUTABLE ROOT_CONFIG_EXECUTABLE)
-include_directories(${ROOT_INCLUDE_DIR})
-link_directories(${ROOT_LIBRARY_DIR})
+#include_directories(${ROOT_INCLUDE_DIR})
+#link_directories(${ROOT_LIBRARY_DIR})
 #------------------------------------------------------------------------------
 
 include(ExternalProject)
@@ -329,7 +331,8 @@ target_include_directories(PROCESSOR_LIB PUBLIC core/include)
 
 add_executable(GenScanor scanmain.cpp)
 add_dependencies(GenScanor ${EXTERNAL_DEPS})
-target_link_libraries(GenScanor PRIVATE MtasStruct RootDevStruct TRANSLATOR_LIB PROCESSOR_LIB CORE_LIB UTILITY_LIB ${ROOT_LIBRARIES})
+target_link_libraries(GenScanor PRIVATE MtasStruct RootDevStruct TRANSLATOR_LIB CORE_LIB )
+#target_link_libraries(GenScanor PRIVATE MtasStruct RootDevStruct TRANSLATOR_LIB PROCESSOR_LIB CORE_LIB UTILITY_LIB ${ROOT_LIBRARIES})
 
 add_executable(GenConfig configmain.cpp)
 add_dependencies(GenConfig ${EXTERNAL_DEPS})
