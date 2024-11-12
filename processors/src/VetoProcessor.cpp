@@ -27,9 +27,9 @@ VetoProcessor::VetoProcessor(const std::string& log) : Processor(log,"VetoProces
 	this->currsubtype = SUBTYPE::UNKNOWN;
 }
 
-[[maybe_unused]] bool VetoProcessor::PreProcess(EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool VetoProcessor::PreProcess(EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	Processor::PreProcess();
-	summary.GetDetectorSummary(this->AllDefaultRegex["veto"],this->SummaryData);
+	eventhistory->GetCurrentEventSummary()->GetDetectorSummary(this->AllDefaultRegex["veto"],this->SummaryData);
 
 	for( const auto& evt : this->SummaryData ){
 		auto subtype = evt->GetSubType();
@@ -109,11 +109,11 @@ VetoProcessor::VetoProcessor(const std::string& log) : Processor(log,"VetoProces
 	return true;
 }
 
-[[maybe_unused]] bool VetoProcessor::Process([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool VetoProcessor::Process([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	return true;
 }
 
-[[maybe_unused]] bool VetoProcessor::PostProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool VetoProcessor::PostProcess([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	this->Reset();
 	return true;
 }

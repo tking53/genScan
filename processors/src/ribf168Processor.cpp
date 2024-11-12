@@ -52,10 +52,10 @@ ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf
 	this->HasVeto = false;
 }
 
-[[maybe_unused]] bool ribf168Processor::PreProcess(EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool ribf168Processor::PreProcess(EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	Processor::PreProcess();
 
-	auto types = summary.GetKnownTypes();
+	auto types = eventhistory->GetCurrentEventSummary()->GetKnownTypes();
 
 	this->HasHagrid = (types.find("hagrid") != types.end());
 	this->HasRIKENIonChamber = (types.find("ionchamber") != types.end());
@@ -64,27 +64,27 @@ ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf
 	this->HasVeto = (types.find("veto") != types.end());
 
 	if( this->HasHagrid ){
-		this->HagridProc->PreProcess(summary,hismanager,cutmanager);
+		this->HagridProc->PreProcess(eventhistory,hismanager,cutmanager);
 		this->CurrHagrid = this->HagridProc->GetCurrEvt();
 	}
 
 	if( this->HasRIKENIonChamber ){
-		this->RIKENIonizationChamberProc->PreProcess(summary,hismanager,cutmanager);
+		this->RIKENIonizationChamberProc->PreProcess(eventhistory,hismanager,cutmanager);
 		this->CurrIonChamber = this->RIKENIonizationChamberProc->GetCurrEvt();
 	}
 
 	if( this->HasRIKENPid ){
-		this->RIKENPidProc->PreProcess(summary,hismanager,cutmanager);
+		this->RIKENPidProc->PreProcess(eventhistory,hismanager,cutmanager);
 		this->CurrPid = this->RIKENPidProc->GetCurrEvt();
 	}
 
 	if( this->HasPSPMT ){
-		this->PSPMTProc->PreProcess(summary,hismanager,cutmanager);
+		this->PSPMTProc->PreProcess(eventhistory,hismanager,cutmanager);
 		this->CurrPSPMT = this->PSPMTProc->GetCurrEvt();
 	}
 
 	if( this->HasVeto ){
-		this->VetoProc->PreProcess(summary,hismanager,cutmanager);
+		this->VetoProc->PreProcess(eventhistory,hismanager,cutmanager);
 		this->CurrVeto = this->VetoProc->GetCurrEvt();
 	}
 
@@ -129,51 +129,51 @@ ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf
 	return true;
 }
 
-[[maybe_unused]] bool ribf168Processor::Process([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool ribf168Processor::Process([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	
 	if( this->HasHagrid ){
-		this->HagridProc->Process(summary,hismanager,cutmanager);
+		this->HagridProc->Process(eventhistory,hismanager,cutmanager);
 	}
 
 	if( this->HasRIKENIonChamber ){
-		this->RIKENIonizationChamberProc->Process(summary,hismanager,cutmanager);
+		this->RIKENIonizationChamberProc->Process(eventhistory,hismanager,cutmanager);
 	}
 
 	if( this->HasRIKENPid ){
-		this->RIKENPidProc->Process(summary,hismanager,cutmanager);
+		this->RIKENPidProc->Process(eventhistory,hismanager,cutmanager);
 	}
 
 	if( this->HasPSPMT ){
-		this->PSPMTProc->Process(summary,hismanager,cutmanager);
+		this->PSPMTProc->Process(eventhistory,hismanager,cutmanager);
 	}
 
 	if( this->HasVeto ){
-		this->VetoProc->Process(summary,hismanager,cutmanager);
+		this->VetoProc->Process(eventhistory,hismanager,cutmanager);
 	}
 
 	return true;
 }
 
-[[maybe_unused]] bool ribf168Processor::PostProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool ribf168Processor::PostProcess([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	
 	if( this->HasHagrid ){
-		this->HagridProc->PostProcess(summary,hismanager,cutmanager);
+		this->HagridProc->PostProcess(eventhistory,hismanager,cutmanager);
 	}
 
 	if( this->HasRIKENIonChamber ){
-		this->RIKENIonizationChamberProc->PostProcess(summary,hismanager,cutmanager);
+		this->RIKENIonizationChamberProc->PostProcess(eventhistory,hismanager,cutmanager);
 	}
 
 	if( this->HasRIKENPid ){
-		this->RIKENPidProc->PostProcess(summary,hismanager,cutmanager);
+		this->RIKENPidProc->PostProcess(eventhistory,hismanager,cutmanager);
 	}
 
 	if( this->HasPSPMT ){
-		this->PSPMTProc->PostProcess(summary,hismanager,cutmanager);
+		this->PSPMTProc->PostProcess(eventhistory,hismanager,cutmanager);
 	}
 
 	if( this->HasVeto ){
-		this->VetoProc->PostProcess(summary,hismanager,cutmanager);
+		this->VetoProc->PostProcess(eventhistory,hismanager,cutmanager);
 	}
 
 	if( this->Ions.size() > 1 ){

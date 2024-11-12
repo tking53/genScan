@@ -18,10 +18,10 @@ MtasTapeProcessor::MtasTapeProcessor(const std::string& log) : Processor(log,"Mt
 	this->CurrState = TapeCycleState::UNKNOWN;
 }
 
-[[maybe_unused]] bool MtasTapeProcessor::PreProcess(EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool MtasTapeProcessor::PreProcess(EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	Processor::PreProcess();
 
-	summary.GetDetectorSummary(this->AllDefaultRegex["tape"],this->SummaryData);
+	eventhistory->GetCurrentEventSummary()->GetDetectorSummary(this->AllDefaultRegex["tape"],this->SummaryData);
 	for( const auto& evt : this->SummaryData ){
 	}
 	
@@ -29,11 +29,11 @@ MtasTapeProcessor::MtasTapeProcessor(const std::string& log) : Processor(log,"Mt
 	return true;
 }
 
-[[maybe_unused]] bool MtasTapeProcessor::Process([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool MtasTapeProcessor::Process([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	return true;
 }
 
-[[maybe_unused]] bool MtasTapeProcessor::PostProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool MtasTapeProcessor::PostProcess([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	this->Reset();
 
 	return true;

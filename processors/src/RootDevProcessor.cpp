@@ -9,10 +9,10 @@
 RootDevProcessor::RootDevProcessor(const std::string& log) : Processor(log,"RootDevProcessor",{"RD"}){
 }
 
-[[maybe_unused]] bool RootDevProcessor::PreProcess(EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool RootDevProcessor::PreProcess(EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	Processor::PreProcess();
 	for( const auto& key : this->Types ){
-		summary.GetDetectorSummary(this->AllDefaultRegex[key],this->SummaryData);
+		eventhistory->GetCurrentEventSummary()->GetDetectorSummary(this->AllDefaultRegex[key],this->SummaryData);
 		//this->console->info("ROOTDEV Size for type {} : {}",key,this->SummaryData.size());
 		for( const auto& evt : this->SummaryData ){
 			this->CurrData.crateNum = evt->GetCrate();
@@ -42,11 +42,11 @@ RootDevProcessor::RootDevProcessor(const std::string& log) : Processor(log,"Root
 	return true;
 }
 
-[[maybe_unused]] bool RootDevProcessor::Process([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool RootDevProcessor::Process([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	return true;
 }
 
-[[maybe_unused]] bool RootDevProcessor::PostProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool RootDevProcessor::PostProcess([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	return true;
 }
 

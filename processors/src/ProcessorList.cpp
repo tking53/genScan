@@ -41,61 +41,56 @@ ProcessorList::ProcessorList(const std::string& log){
 	this->EventStamp = 0;
 }
 
-void ProcessorList::PreAnalyze(EventSummary& Summary,PLOTS::PlotRegistry* HistogramManager,CUTS::CutRegistry* CutManager){
-	auto knowntypes = Summary.GetKnownTypes();
-	#ifdef PROCESSOR_DEBUG
-	for( const auto& t : knowntypes ){
-		this->console->info("Known Type : {} for Event ID : {}",t,this->EventStamp);
-	}
-	#endif
+void ProcessorList::PreAnalyze(EventHistoryManager* History,PLOTS::PlotRegistry* HistogramManager,CUTS::CutRegistry* CutManager){
+	auto knowntypes = History->GetCurrentEventSummary()->GetKnownTypes();
 	for( auto& anal : this->known_analyzers ){
 		if( anal->ContainsAnyType(knowntypes) ){
-			anal->PreProcess(Summary,HistogramManager,CutManager);
+			anal->PreProcess(History,HistogramManager,CutManager);
 		}
 	}
 }
 
-void ProcessorList::Analyze(EventSummary& Summary,PLOTS::PlotRegistry* HistogramManager,CUTS::CutRegistry* CutManager){
-	auto knowntypes = Summary.GetKnownTypes();
+void ProcessorList::Analyze(EventHistoryManager* History,PLOTS::PlotRegistry* HistogramManager,CUTS::CutRegistry* CutManager){
+	auto knowntypes = History->GetCurrentEventSummary()->GetKnownTypes();
 	for( auto& anal : this->known_analyzers ){
 		if( anal->ContainsAnyType(knowntypes) ){
-			anal->Process(Summary,HistogramManager,CutManager);
+			anal->Process(History,HistogramManager,CutManager);
 		}
 	}
 }
 
-void ProcessorList::PostAnalyze(EventSummary& Summary,PLOTS::PlotRegistry* HistogramManager,CUTS::CutRegistry* CutManager){
-	auto knowntypes = Summary.GetKnownTypes();
+void ProcessorList::PostAnalyze(EventHistoryManager* History,PLOTS::PlotRegistry* HistogramManager,CUTS::CutRegistry* CutManager){
+	auto knowntypes = History->GetCurrentEventSummary()->GetKnownTypes();
 	for( auto& anal : this->known_analyzers ){
 		if( anal->ContainsAnyType(knowntypes) ){
-			anal->PostProcess(Summary,HistogramManager,CutManager);
+			anal->PostProcess(History,HistogramManager,CutManager);
 		}
 	}
 }
 
-void ProcessorList::PreProcess(EventSummary& Summary,PLOTS::PlotRegistry* HistogramManager,CUTS::CutRegistry* CutManager){
-	auto knowntypes = Summary.GetKnownTypes();
+void ProcessorList::PreProcess(EventHistoryManager* History,PLOTS::PlotRegistry* HistogramManager,CUTS::CutRegistry* CutManager){
+	auto knowntypes = History->GetCurrentEventSummary()->GetKnownTypes();
 	for( auto& proc : this->known_processors ){
 		if( proc->ContainsAnyType(knowntypes) ){
-			proc->PreProcess(Summary,HistogramManager,CutManager);
+			proc->PreProcess(History,HistogramManager,CutManager);
 		}
 	}
 }
 
-void ProcessorList::Process(EventSummary& Summary,PLOTS::PlotRegistry* HistogramManager,CUTS::CutRegistry* CutManager){
-	auto knowntypes = Summary.GetKnownTypes();
+void ProcessorList::Process(EventHistoryManager* History,PLOTS::PlotRegistry* HistogramManager,CUTS::CutRegistry* CutManager){
+	auto knowntypes = History->GetCurrentEventSummary()->GetKnownTypes();
 	for( auto& proc : this->known_processors ){
 		if( proc->ContainsAnyType(knowntypes) ){
-			proc->Process(Summary,HistogramManager,CutManager);
+			proc->Process(History,HistogramManager,CutManager);
 		}
 	}
 }
 
-void ProcessorList::PostProcess(EventSummary& Summary,PLOTS::PlotRegistry* HistogramManager,CUTS::CutRegistry* CutManager){
-	auto knowntypes = Summary.GetKnownTypes();
+void ProcessorList::PostProcess(EventHistoryManager* History,PLOTS::PlotRegistry* HistogramManager,CUTS::CutRegistry* CutManager){
+	auto knowntypes = History->GetCurrentEventSummary()->GetKnownTypes();
 	for( auto& proc : this->known_processors ){
 		if( proc->ContainsAnyType(knowntypes) ){
-			proc->PostProcess(Summary,HistogramManager,CutManager);
+			proc->PostProcess(History,HistogramManager,CutManager);
 		}
 	}
 	++(this->EventStamp);

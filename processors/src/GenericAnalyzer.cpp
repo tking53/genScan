@@ -3,19 +3,19 @@
 GenericAnalyzer::GenericAnalyzer(const std::string& log) : Analyzer(log,"GenericAnalyzer",{"generic"}){
 }
 
-[[maybe_unused]] bool GenericAnalyzer::PreProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool GenericAnalyzer::PreProcess([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	Analyzer::PreProcess();
 	Analyzer::EndProcess();
 	return true;
 }
 
-[[maybe_unused]] bool GenericAnalyzer::Process([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool GenericAnalyzer::Process([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	Analyzer::Process();
 	Analyzer::EndProcess();
 	return true;
 }
 
-[[maybe_unused]] bool GenericAnalyzer::PostProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool GenericAnalyzer::PostProcess([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	Analyzer::PostProcess();
 	Analyzer::EndProcess();
 	return true;

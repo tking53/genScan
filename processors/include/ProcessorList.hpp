@@ -16,6 +16,7 @@
 
 #include "ChannelMap.hpp"
 #include "CutManager.hpp"
+#include "EventHistoryManager.hpp"
 #include "EventSummary.hpp"
 #include "HistogramManager.hpp"
 #include "PhysicsData.hpp"
@@ -42,14 +43,14 @@ class ProcessorList{
 		void InitializeProcessors(JSONConfigParser*);
 		void InitializeAnalyzers(JSONConfigParser*);
 
-		void PreAnalyze(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
-		void PreProcess(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
+		void PreAnalyze(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
+		void PreProcess(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
 		
-		void Analyze(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
-		void Process(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
+		void Analyze(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
+		void Process(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
 
-		void PostAnalyze(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
-		void PostProcess(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
+		void PostAnalyze(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
+		void PostProcess(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
 
 		void RegisterCuts(CUTS::CutRegistry*);
 		void RegisterOutputTrees(RootFileManager*);

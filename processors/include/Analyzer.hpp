@@ -29,7 +29,7 @@
 
 #include "HistogramManager.hpp"
 #include "CutManager.hpp"
-#include "EventSummary.hpp"
+#include "EventHistoryManager.hpp"
 
 class Analyzer : public std::enable_shared_from_this<Analyzer>{
 	public:
@@ -38,9 +38,9 @@ class Analyzer : public std::enable_shared_from_this<Analyzer>{
 		[[maybe_unused]] virtual bool PreProcess() final;
 		[[maybe_unused]] virtual bool Process() final;
 		[[maybe_unused]] virtual bool PostProcess() final;
-		[[noreturn]] virtual bool PreProcess(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
-		[[noreturn]] virtual bool Process(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
-		[[noreturn]] virtual bool PostProcess(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
+		[[noreturn]] virtual bool PreProcess(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
+		[[noreturn]] virtual bool Process(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
+		[[noreturn]] virtual bool PostProcess(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
 		virtual void EndProcess() final;
 
 		std::shared_ptr<Analyzer> GetPtr();

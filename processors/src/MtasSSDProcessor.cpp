@@ -17,21 +17,21 @@ MtasSSDProcessor::MtasSSDProcessor(const std::string& log) : Processor(log,"Mtas
 	this->MaxEvent = nullptr;
 }
 
-[[maybe_unused]] bool MtasSSDProcessor::PreProcess(EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool MtasSSDProcessor::PreProcess(EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	Processor::PreProcess();
 
-	summary.GetDetectorSummary(this->AllDefaultRegex["silicon"],this->SummaryData);
-	this->MaxEvent = summary.GetDetectorMaxEvent(this->SummaryData);
+	eventhistory->GetCurrentEventSummary()->GetDetectorSummary(this->AllDefaultRegex["silicon"],this->SummaryData);
+	this->MaxEvent = eventhistory->GetCurrentEventSummary()->GetDetectorMaxEvent(this->SummaryData);
 
 	Processor::EndProcess();
 	return true;
 }
 
-[[maybe_unused]] bool MtasSSDProcessor::Process([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool MtasSSDProcessor::Process([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	return true;
 }
 
-[[maybe_unused]] bool MtasSSDProcessor::PostProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool MtasSSDProcessor::PostProcess([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	this->Reset();
 
 	return true;

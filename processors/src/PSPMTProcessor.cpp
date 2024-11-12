@@ -21,10 +21,10 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log) : Processor(log,"PSPMTPro
 	this->Reset();
 }
 
-[[maybe_unused]] bool PSPMTProcessor::PreProcess(EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool PSPMTProcessor::PreProcess(EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	Processor::PreProcess();
 
-	summary.GetDetectorSummary(this->AllDefaultRegex["pspmt"],this->SummaryData);
+	eventhistory->GetCurrentEventSummary()->GetDetectorSummary(this->AllDefaultRegex["pspmt"],this->SummaryData);
 	for( const auto& evt : this->SummaryData ){
 		auto subtype = evt->GetSubType();
 		auto group = evt->GetGroup();
@@ -192,11 +192,11 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log) : Processor(log,"PSPMTPro
 	return true;
 }
 
-[[maybe_unused]] bool PSPMTProcessor::Process([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool PSPMTProcessor::Process([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	return true;
 }
 
-[[maybe_unused]] bool PSPMTProcessor::PostProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool PSPMTProcessor::PostProcess([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	this->Reset();
 	return true;
 }

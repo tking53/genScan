@@ -8,9 +8,9 @@ class WaveformAnalyzer : public Analyzer {
 		WaveformAnalyzer(const std::string&);
 		virtual ~WaveformAnalyzer() = default;
 
-		virtual bool PreProcess(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
-		virtual bool Process(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
-		virtual bool PostProcess(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
+		virtual bool PreProcess(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
+		virtual bool Process(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
+		virtual bool PostProcess(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
 
 
 		virtual void Init([[maybe_unused]] const pugi::xml_node&);

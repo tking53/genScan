@@ -31,7 +31,7 @@
 #include "TTree.h"
 
 #include "CutManager.hpp"
-#include "EventSummary.hpp"
+#include "EventHistoryManager.hpp"
 #include "PhysicsData.hpp"
 #include "HistogramManager.hpp"
 
@@ -41,9 +41,9 @@ class Processor : public std::enable_shared_from_this<Processor> {
 		[[maybe_unused]] virtual bool PreProcess() final;
 		[[maybe_unused]] virtual bool Process() final;
 		[[maybe_unused]] virtual bool PostProcess() final;
-		[[noreturn]] virtual bool PreProcess(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
-		[[noreturn]] virtual bool Process(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
-		[[noreturn]] virtual bool PostProcess(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
+		[[noreturn]] virtual bool PreProcess(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
+		[[noreturn]] virtual bool Process(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
+		[[noreturn]] virtual bool PostProcess(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
 		virtual void EndProcess() final;
 		virtual ~Processor();
 

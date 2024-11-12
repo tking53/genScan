@@ -34,21 +34,28 @@ BSMExpProcessor::BSMExpProcessor(const std::string& log) : Processor(log,"BSMExp
 	this->CurrBSM = BSMProcessor::EventInfo();
 }
 
-[[maybe_unused]] bool BSMExpProcessor::PreProcess(EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool BSMExpProcessor::PreProcess(EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	Processor::PreProcess();
 
-	auto types = summary.GetKnownTypes();
+	auto types = eventhistory->GetCurrentEventSummary()->GetKnownTypes();
 
 	this->HasMTAS = (types.find("mtas") != types.end());
 	this->HasBSM = (types.find("bsm") != types.end());
 
+	//auto currevtcount = eventhistory->GetEventCount();
+	//if( currevtcount > 1 ){
+	//	if( eventhistory->GetPreviousEventSummary(1)->ContainsEventTag("muon") ){
+	//		this->console->info("Previous mtas event registered as muon, current evt count : {}",currevtcount);
+	//	}
+	//}
+
 	if( this->HasMTAS ){
-		this->MtasProc->PreProcess(summary,hismanager,cutmanager);
+		this->MtasProc->PreProcess(eventhistory,hismanager,cutmanager);
 	}
 	this->CurrMTAS = this->MtasProc->GetCurrEvt();
 
 	if( this->HasBSM ){
-		this->BSMProc->PreProcess(summary,hismanager,cutmanager);
+		this->BSMProc->PreProcess(eventhistory,hismanager,cutmanager);
 	}
 	this->CurrBSM = this->BSMProc->GetCurrEvt();
 
@@ -168,14 +175,14 @@ BSMExpProcessor::BSMExpProcessor(const std::string& log) : Processor(log,"BSMExp
 	return true;
 }
 
-[[maybe_unused]] bool BSMExpProcessor::Process([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool BSMExpProcessor::Process([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 
 	return true;
 }
 
-[[maybe_unused]] bool BSMExpProcessor::PostProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
-	this->MtasProc->PostProcess(summary,hismanager,cutmanager);
-	this->BSMProc->PostProcess(summary,hismanager,cutmanager);
+[[maybe_unused]] bool BSMExpProcessor::PostProcess([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+	this->MtasProc->PostProcess(eventhistory,hismanager,cutmanager);
+	this->BSMProc->PostProcess(eventhistory,hismanager,cutmanager);
 
 	return true;
 }

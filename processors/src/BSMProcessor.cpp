@@ -94,10 +94,10 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 	this->NumPMTs = 2*this->NumPairs;
 }
 
-[[maybe_unused]] bool BSMProcessor::PreProcess(EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool BSMProcessor::PreProcess(EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	Processor::PreProcess();
 
-	summary.GetDetectorSummary(this->AllDefaultRegex["bsm"],this->SummaryData);
+	eventhistory->GetCurrentEventSummary()->GetDetectorSummary(this->AllDefaultRegex["bsm"],this->SummaryData);
 
 	//std::vector<std::vector<PhysicsData*>> FrontHits = std::vector<std::vector<PhysicsData*>>(6,std::vector<PhysicsData*>());
 	//std::vector<std::vector<PhysicsData*>> BackHits = std::vector<std::vector<PhysicsData*>>(6,std::vector<PhysicsData*>());
@@ -398,11 +398,11 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 	return true;
 }
 
-[[maybe_unused]] bool BSMProcessor::Process([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool BSMProcessor::Process([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	return true;
 }
 
-[[maybe_unused]] bool BSMProcessor::PostProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool BSMProcessor::PostProcess([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	this->Reset();
 
 	return true;

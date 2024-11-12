@@ -15,11 +15,11 @@ WaveformAnalyzer::WaveformAnalyzer(const std::string& log) : Analyzer(log,"Wavef
 	};
 }
 
-[[maybe_unused]] bool WaveformAnalyzer::PreProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool WaveformAnalyzer::PreProcess([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	Analyzer::PreProcess();
 
 	for( const auto& key : this->Types ){
-		summary.GetDetectorSummary(this->AllDefaultRegex[key],this->SummaryData);
+		eventhistory->GetCurrentEventSummary()->GetDetectorSummary(this->AllDefaultRegex[key],this->SummaryData);
 		//this->console->info("ROOTDEV Size for type {} : {}",key,this->SummaryData.size());
 		for( const auto& evt : this->SummaryData ){
 			for( const auto& s : this->WaveSettings ){
@@ -74,11 +74,11 @@ WaveformAnalyzer::WaveformAnalyzer(const std::string& log) : Analyzer(log,"Wavef
 	return true;
 }
 
-[[maybe_unused]] bool WaveformAnalyzer::Process([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool WaveformAnalyzer::Process([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	return true;
 }
 
-[[maybe_unused]] bool WaveformAnalyzer::PostProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool WaveformAnalyzer::PostProcess([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	return true;
 }
 

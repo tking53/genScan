@@ -15,10 +15,10 @@ HagridProcessor::HagridProcessor(const std::string& log) : Processor(log,"Hagrid
 	this->FirstEvtTime = 0.0;
 }
 
-[[maybe_unused]] bool HagridProcessor::PreProcess(EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool HagridProcessor::PreProcess(EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	Processor::PreProcess();
 
-	summary.GetDetectorSummary(this->AllDefaultRegex["hagrid"],this->SummaryData);
+	eventhistory->GetCurrentEventSummary()->GetDetectorSummary(this->AllDefaultRegex["hagrid"],this->SummaryData);
 	for( const auto& evt : this->SummaryData ){
 		auto currgroup = evt->GetGroup();
 		int groupnum = std::stoi(currgroup);
@@ -120,11 +120,11 @@ HagridProcessor::HagridProcessor(const std::string& log) : Processor(log,"Hagrid
 	return true;
 }
 
-[[maybe_unused]] bool HagridProcessor::Process([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool HagridProcessor::Process([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	return true;
 }
 
-[[maybe_unused]] bool HagridProcessor::PostProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool HagridProcessor::PostProcess([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	this->Reset();
 
 	return true;

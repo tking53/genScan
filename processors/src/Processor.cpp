@@ -4,7 +4,7 @@
 
 #include "Processor.hpp"
 #include "CutManager.hpp"
-#include "EventSummary.hpp"
+#include "EventHistoryManager.hpp"
 #include "HistogramManager.hpp"
 
 #include <spdlog/common.h>
@@ -142,19 +142,19 @@ void Processor::AssociateType(const std::string& t){
 	return true;
 }
 
-[[noreturn]] bool Processor::PreProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]]CUTS::CutRegistry* cutmanager){
-	this->console->error("Called Processor::PreProcess(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*), not the overload");
-	throw std::runtime_error("Called Processor::PreProcess(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*), not the overload");
+[[noreturn]] bool Processor::PreProcess([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]]CUTS::CutRegistry* cutmanager){
+	this->console->error("Called Processor::PreProcess(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*), not the overload");
+	throw std::runtime_error("Called Processor::PreProcess(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*), not the overload");
 }
 
-[[noreturn]] bool Processor::Process([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]]CUTS::CutRegistry* cutmanager){
-	this->console->error("Called Processor::Process(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*), not the overload");
-	throw std::runtime_error("Called Processor::Process(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*), not the overload");
+[[noreturn]] bool Processor::Process([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]]CUTS::CutRegistry* cutmanager){
+	this->console->error("Called Processor::Process(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*), not the overload");
+	throw std::runtime_error("Called Processor::Process(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*), not the overload");
 }
 
-[[noreturn]] bool Processor::PostProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]]CUTS::CutRegistry* cutmanager){
-	this->console->error("Called Processor::PostProcess(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*), not the overload");
-	throw std::runtime_error("Called Processor::PostProcess(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*), not the overload");
+[[noreturn]] bool Processor::PostProcess([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]]CUTS::CutRegistry* cutmanager){
+	this->console->error("Called Processor::PostProcess(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*), not the overload");
+	throw std::runtime_error("Called Processor::PostProcess(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*), not the overload");
 }
 
 void Processor::EndProcess(){

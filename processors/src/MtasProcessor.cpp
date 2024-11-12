@@ -169,10 +169,11 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 	}
 }
 
-[[maybe_unused]] bool MtasProcessor::PreProcess(EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool MtasProcessor::PreProcess(EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	Processor::PreProcess();
 
-	summary.GetDetectorSummary(this->AllDefaultRegex["mtas"],this->SummaryData);
+	auto summary = eventhistory->GetCurrentEventSummary();
+	summary->GetDetectorSummary(this->AllDefaultRegex["mtas"],this->SummaryData);
 	for( const auto& evt : this->SummaryData ){
 		this->CurrEvt.RealEvt = true;
 		auto subtype = evt->GetSubType();
@@ -213,6 +214,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 				this->CurrEvt.Pileup = true;
 			}
 			if( evt->GetSaturation() ){
+				summary->AddEventTag("muon");
 				this->CurrEvt.Saturate = true;
 			}
 			continue;
@@ -409,15 +411,19 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		}
 	}
 
+	if( this->CurrEvt.TotalEnergy[0] > 0.0 ){
+		summary->AddEventTag("gamma");
+	}
+
 	Processor::EndProcess();
 	return true;
 }
 
-[[maybe_unused]] bool MtasProcessor::Process([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool MtasProcessor::Process([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	return true;
 }
 
-[[maybe_unused]] bool MtasProcessor::PostProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool MtasProcessor::PostProcess([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	this->Reset();
 
 	return true;

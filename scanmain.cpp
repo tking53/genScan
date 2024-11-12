@@ -42,7 +42,7 @@
 
 #include "DataParser.hpp"
 
-#include "EventSummary.hpp"
+#include "EventHistoryManager.hpp"
 
 volatile bool ctrlCPressed = false;
 
@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
 		("outputfile,o",boost::program_options::value<std::string>(&outputfile)->default_value("out.txt"),"[filename] filename for output")
 		("enabletree,t",boost::program_options::value<bool>(&enabletree)->default_value(true),"enable root tree output or disable it and only generate histograms")
 		("file,f",boost::program_options::value<std::vector<std::string>>(&FileNames),"[file1 file2 file3 ...] list of files used for input")
-		("limit,l",boost::program_options::value<int>(&limit)->default_value(100000),"limit of coincidence queue")
+		("limit,l",boost::program_options::value<int>(&limit)->default_value(10),"number of events to keep in history [0 -> current, 1 -> prev., ... N-1]")
 		("format,x",boost::program_options::value<std::string>(&dataformat)->default_value("null"),"[file_format] format of the data file (evt,evt-presort,ldf,pld,caen_root,caen_bin)")
 		("port,p",boost::program_options::value<int>(&port)->default_value(9090),"[portid] port to listen/send on for the live histogramming")
 		;
@@ -94,20 +94,15 @@ int main(int argc, char *argv[]) {
 		exit(EXIT_FAILURE);
 	}    
 
-	const int lower_limit = 1000;
+	const int upper_limit = 1000;
 	
-	if( limit < lower_limit ){
-		spdlog::error("limit {} passed in is lower than lower_limit of {}",limit,lower_limit);
-		exit(EXIT_FAILURE);
-	}
-
 	if( FileNames.size() == 0 ){
 		spdlog::error("No input files provided");
 		exit(EXIT_FAILURE);
 	}	
 
-	const int MAX_CRATES = 5;
-	const int MAX_CARDS_PER_CRATE = 13;
+	const int MAX_CRATES = 1;
+	const int MAX_CARDS_PER_CRATE = 6;
 	const int MAX_BOARDS = MAX_CARDS_PER_CRATE*MAX_CRATES;
 	const int MAX_CHANNELS_PER_BOARD = 16;
 	const int MAX_CHANNELS = MAX_CHANNELS_PER_BOARD*MAX_BOARDS;
@@ -135,9 +130,9 @@ int main(int argc, char *argv[]) {
 	spdlog::initialize_logger(console);
 	console->flush_on(spdlog::level::info);
 
-	if( limit < lower_limit ){
-		console->warn("limit of {} is less than lower_limit of {}. Using lower_limit instead",limit,lower_limit);
-		limit = lower_limit;
+	if( limit > upper_limit ){
+		console->warn("limit of {} is greater than upper_limit of {}. Using upper_limit instead",limit,upper_limit);
+		limit = upper_limit;
 	}
 
 	std::unique_ptr<DataParser> dataparser;
@@ -294,38 +289,38 @@ int main(int argc, char *argv[]) {
 	//this would make life easier for things like previous-gamma previous-beta previous-ion, etc.
 	//we should make each of those tags have a history though? that would require a good bit of everhead but would allow for what we want most
 	//we just have to double check that we invalidate the history properly
-	EventSummary CorrelatedEvents(logname);
-	CorrelatedEvents.InitMappedUIDs(cmap.get(),processorlist.get());
+	std::shared_ptr<EventHistoryManager> EvtManager( new EventHistoryManager(logname,limit));
+	EvtManager->InitMappedUIDs(cmap.get(),processorlist.get());
+	//CorrelatedEvents.InitMappedUIDs(cmap.get(),processorlist.get());
 	Translator::TRANSLATORSTATE CurrState = Translator::TRANSLATORSTATE::UNKNOWN;
 	try{
 		do{
-			CurrState = dataparser->Parse(CorrelatedEvents.GetRawEvents());
+			EvtManager->RotateBuffer();
+			CurrState = dataparser->Parse(EvtManager->GetCurrentEventSummary()->GetRawEvents());
 
-			if( not CorrelatedEvents.GetRawEvents().empty() ) [[likely]] {
-				processorlist->ThreshAndCal(CorrelatedEvents.GetRawEvents(),cmap.get());
-				processorlist->ProcessRaw(CorrelatedEvents.GetRawEvents(),HistogramManager.get());
-				StatsManager->IncrementStats(CorrelatedEvents.GetRawEvents());
+			if( not EvtManager->IsCurrentEventSummaryEmpty() ) [[likely]] {
+				processorlist->ThreshAndCal(EvtManager->GetCurrentEventSummary()->GetRawEvents(),cmap.get());
+				processorlist->ProcessRaw(EvtManager->GetCurrentEventSummary()->GetRawEvents(),HistogramManager.get());
+				StatsManager->IncrementStats(EvtManager->GetCurrentEventSummary()->GetRawEvents());
 
-				CorrelatedEvents.BuildDetectorSummary();
+				EvtManager->BuildCurrentEventDetectorSummary();
 
-				processorlist->PreAnalyze(CorrelatedEvents,HistogramManager.get(),CutManager.get());
-				processorlist->PreProcess(CorrelatedEvents,HistogramManager.get(),CutManager.get());
+				processorlist->PreAnalyze(EvtManager.get(),HistogramManager.get(),CutManager.get());
+				processorlist->PreProcess(EvtManager.get(),HistogramManager.get(),CutManager.get());
 
-				processorlist->Analyze(CorrelatedEvents,HistogramManager.get(),CutManager.get());
-				processorlist->Process(CorrelatedEvents,HistogramManager.get(),CutManager.get());
+				processorlist->Analyze(EvtManager.get(),HistogramManager.get(),CutManager.get());
+				processorlist->Process(EvtManager.get(),HistogramManager.get(),CutManager.get());
 
-				processorlist->PostAnalyze(CorrelatedEvents,HistogramManager.get(),CutManager.get());
-				processorlist->PostProcess(CorrelatedEvents,HistogramManager.get(),CutManager.get());
+				processorlist->PostAnalyze(EvtManager.get(),HistogramManager.get(),CutManager.get());
+				processorlist->PostProcess(EvtManager.get(),HistogramManager.get(),CutManager.get());
 
 				if( enabletree ){
 					RootManager->Fill();
 				}
 				processorlist->CleanupTrees();
-
-				CorrelatedEvents.ClearRawEvents();
 			}else [[unlikely]] {
 				if( CurrState != Translator::TRANSLATORSTATE::COMPLETE ){
-					console->critical("CurrState : {} RawEvents : {}",CurrState,CorrelatedEvents.GetRawEvents().size());
+					console->critical("CurrState : {} RawEvents : {}",CurrState,EvtManager->GetCurrentEventSummary()->GetRawEvents().size());
 					throw std::runtime_error("Read data but nothing decoded to allow for correlation");
 				}
 			}

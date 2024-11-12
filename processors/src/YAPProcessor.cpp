@@ -31,16 +31,16 @@ YAPProcessor::YAPProcessor(const std::string& log) : Processor(log,"YAPProcessor
 	this->CurrPuck = PuckProcessor::EventInfo();
 }
 
-[[maybe_unused]] bool YAPProcessor::PreProcess(EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool YAPProcessor::PreProcess(EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	Processor::PreProcess();
 
-	auto types = summary.GetKnownTypes();
+	auto types = eventhistory->GetCurrentEventSummary()->GetKnownTypes();
 
 	this->HasMTAS = (types.find("mtas") != types.end());
 	this->HasPuck = (types.find("puck") != types.end());
 
 	if( this->HasMTAS ){
-		this->MtasProc->PreProcess(summary,hismanager,cutmanager);
+		this->MtasProc->PreProcess(eventhistory,hismanager,cutmanager);
 	}
 	this->CurrMTAS = this->MtasProc->GetCurrEvt();
 	this->MTASTotal = this->CurrMTAS.TotalEnergy[0];
@@ -48,7 +48,7 @@ YAPProcessor::YAPProcessor(const std::string& log) : Processor(log,"YAPProcessor
 	this->MTASPileup = this->CurrMTAS.Pileup;
 
 	if( this->HasPuck ){
-		this->PuckProc->PreProcess(summary,hismanager,cutmanager);
+		this->PuckProc->PreProcess(eventhistory,hismanager,cutmanager);
 	}
 	this->CurrPuck = this->PuckProc->GetCurrEvt();
 	this->YAPFront = this->CurrPuck.Individual[0];
@@ -95,14 +95,14 @@ YAPProcessor::YAPProcessor(const std::string& log) : Processor(log,"YAPProcessor
 	return true;
 }
 
-[[maybe_unused]] bool YAPProcessor::Process([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool YAPProcessor::Process([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 
 	return true;
 }
 
-[[maybe_unused]] bool YAPProcessor::PostProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
-	this->MtasProc->PostProcess(summary,hismanager,cutmanager);
-	this->PuckProc->PostProcess(summary,hismanager,cutmanager);
+[[maybe_unused]] bool YAPProcessor::PostProcess([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+	this->MtasProc->PostProcess(eventhistory,hismanager,cutmanager);
+	this->PuckProc->PostProcess(eventhistory,hismanager,cutmanager);
 
 	return true;
 }

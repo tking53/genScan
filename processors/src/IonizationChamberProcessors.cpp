@@ -11,12 +11,12 @@ IonizationChamberProcessor::IonizationChamberProcessor(const std::string& log) :
 	this->currsubtype = SUBTYPE::UNKNOWN;
 }
 
-[[maybe_unused]] bool IonizationChamberProcessor::PreProcess(EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool IonizationChamberProcessor::PreProcess(EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	Processor::PreProcess();
 
 	this->Reset();
 
-	summary.GetDetectorSummary(this->AllDefaultRegex["ionchamber"],this->SummaryData);
+	eventhistory->GetCurrentEventSummary()->GetDetectorSummary(this->AllDefaultRegex["ionchamber"],this->SummaryData);
 	for( const auto& evt : this->SummaryData ){
 		auto subtype = evt->GetSubType();
 		if( subtype.compare("anode") == 0 ){
@@ -122,11 +122,11 @@ IonizationChamberProcessor::IonizationChamberProcessor(const std::string& log) :
 	return true;
 }
 
-[[maybe_unused]] bool IonizationChamberProcessor::Process([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool IonizationChamberProcessor::Process([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	return true;
 }
 
-[[maybe_unused]] bool IonizationChamberProcessor::PostProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool IonizationChamberProcessor::PostProcess([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	return true;
 }
 
