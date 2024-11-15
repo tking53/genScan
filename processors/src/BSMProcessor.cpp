@@ -166,7 +166,7 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 			//ignore the saturated channel, but keep everything else in this current event
 			if( evt->GetPileup() ){
 				this->AnyPileup = true;
-				this->IndividualPileup[detectorposition] = true;
+				this->IndividualPMTPileup[detectorposition] = true;
 				std::string tracehis = (isfront) ? ("BSM_380"+std::to_string(position)+"_F") :  ("BSM_380"+std::to_string(position)+"_B");
 				size_t idx = 0;
 				for( const auto& tracevalue : evt->GetRawTrace() ){
@@ -203,7 +203,7 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 			}
 			if( evt->GetSaturation() ){
 				this->AnySaturate = true;
-				this->IndividualSaturate[detectorposition] = true;
+				this->IndividualPMTSaturate[detectorposition] = true;
 			}
 			continue;
 		}
@@ -434,9 +434,9 @@ void BSMProcessor::Init(const pugi::xml_node& config){
 	this->Position = std::vector<double>(this->NumPairs,0.0);
 	this->TDiff = std::vector<double>(this->NumPairs,0.0);
 	this->NumValidSegments = 0;
-	this->IndividualPileup = std::vector<bool>(this->NumPMTs,false);
+	this->IndividualPMTPileup = std::vector<bool>(this->NumPMTs,false);
 	this->AnyPileup = false;
-	this->IndividualSaturate = std::vector<bool>(this->NumPMTs,false);
+	this->IndividualPMTSaturate = std::vector<bool>(this->NumPMTs,false);
 	this->AnySaturate = false;
 	this->FirstTime = -1.0;
 	this->LastTime = -1.0;
@@ -752,9 +752,9 @@ void BSMProcessor::Reset(){
 	this->Position = std::vector<double>(this->NumPairs,0.0);
 	this->TDiff = std::vector<double>(this->NumPairs,0.0);
 	this->NumValidSegments = 0;
-	this->IndividualPileup = std::vector<bool>(this->NumPMTs,false);
+	this->IndividualPMTPileup = std::vector<bool>(this->NumPMTs,false);
 	this->AnyPileup = false;
-	this->IndividualSaturate = std::vector<bool>(this->NumPMTs,false);
+	this->IndividualPMTSaturate = std::vector<bool>(this->NumPMTs,false);
 	this->AnySaturate = false;
 	this->FirstTime = -1.0;
 	this->LastTime = -1.0;
@@ -845,16 +845,16 @@ const double& BSMProcessor::GetLastFireTime() const{
 	return this->LastTime;
 }
 
-bool BSMProcessor::DidIndividualSaturate(const int& idx) const{
-	return this->IndividualSaturate[idx];
+bool BSMProcessor::DidIndividualPMTSaturate(const int& idx) const{
+	return this->IndividualPMTSaturate[idx];
 }
 
 const bool& BSMProcessor::DidAnySaturate() const{
 	return this->AnySaturate;
 }
 
-bool BSMProcessor::DidIndividualPileup(const int& idx) const{
-	return this->IndividualPileup[idx];
+bool BSMProcessor::DidIndividualPMTPileup(const int& idx) const{
+	return this->IndividualPMTPileup[idx];
 }
 
 const bool& BSMProcessor::DidAnyPileup() const{

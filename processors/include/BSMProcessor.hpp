@@ -42,10 +42,10 @@ class BSMProcessor : public Processor{
 		const double& GetFirstFireTime() const;
 		const double& GetLastFireTime() const;
 
-		bool DidIndividualSaturate(const int&) const;
+		bool DidIndividualPMTSaturate(const int&) const;
 		const bool& DidAnySaturate() const;
 
-		bool DidIndividualPileup(const int&) const;
+		bool DidIndividualPMTPileup(const int&) const;
 		const bool& DidAnyPileup() const;
 
 		void FillGSPileupTracePlots(PLOTS::PlotRegistry*) const;
@@ -89,10 +89,10 @@ class BSMProcessor : public Processor{
 
 		int NumValidSegments;
 
-		std::vector<bool> IndividualSaturate;
+		std::vector<bool> IndividualPMTSaturate;
 		bool AnySaturate;
 		
-		std::vector<bool> IndividualPileup;
+		std::vector<bool> IndividualPMTPileup;
 		bool AnyPileup;
 
 		std::vector<double> TimeStamps;

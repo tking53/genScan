@@ -50,8 +50,8 @@ class MtasProcessor : public Processor{
 		const bool& DidAnyOuterPileup() const;
 
 		const double& GetSumFrontBackEnergy(const int&) const;
-		bool DidIndividualSaturate(const int&) const;
-		bool DidIndividualPileup(const int&) const;
+		bool DidIndividualPMTSaturate(const int&) const;
+		bool DidIndividualPMTPileup(const int&) const;
 
 		const double& GetFirstFireTime() const;
 		const double& GetLastFireTime() const;
@@ -85,14 +85,14 @@ class MtasProcessor : public Processor{
 		std::vector<int> MiddleHits;
 		std::vector<int> OuterHits;
 
-		std::vector<bool> IndividualSaturate;
+		std::vector<bool> IndividualPMTSaturate;
 		bool CenterSaturate;
 		bool InnerSaturate;
 		bool MiddleSaturate;
 		bool OuterSaturate;
 		bool AnySaturate;
 
-		std::vector<bool> IndividualPileup;
+		std::vector<bool> IndividualPMTPileup;
 		bool CenterPileup;
 		bool InnerPileup;
 		bool MiddlePileup;

@@ -158,14 +158,14 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 	this->SumFrontBackEnergy = std::vector<double>(24,0.0);
 	this->TotalEnergy = std::vector<double>(5,0.0);
 
-	this->IndividualPileup = std::vector<bool>(48,false);
+	this->IndividualPMTPileup = std::vector<bool>(48,false);
 	this->CenterPileup = false;
 	this->InnerPileup = false;
 	this->MiddlePileup = false;
 	this->OuterPileup = false;
 	this->AnyPileup = false;
 
-	this->IndividualSaturate = std::vector<bool>(48,false);
+	this->IndividualPMTSaturate = std::vector<bool>(48,false);
 	this->CenterSaturate = false;
 	this->InnerSaturate = false;
 	this->MiddleSaturate = false;
@@ -236,7 +236,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		if( evt->GetPileup() or evt->GetSaturation() ){
 			//ignore the saturated channel, but keep everything else in this current event
 			if( evt->GetPileup() ){
-				this->IndividualPileup[pmtposition] = true;
+				this->IndividualPMTPileup[pmtposition] = true;
 				this->AnyPileup = true;
 				switch( this->currsubtype ){
 					case SUBTYPE::CENTER:
@@ -257,7 +257,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 			}
 			if( evt->GetSaturation() ){
 				summary->AddEventTag("muon");
-				this->IndividualSaturate[pmtposition] = true;
+				this->IndividualPMTSaturate[pmtposition] = true;
 				this->AnySaturate = true;
 				switch( this->currsubtype ){
 					case SUBTYPE::CENTER:
@@ -583,15 +583,15 @@ void MtasProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 	hismanager->RegisterPlot<TH2F>("MTAS_4304","Run Time vs Mtas Total #beta-gated; Energy (keV); Run Time (day)",this->h2dsettings.at(4304));
 
 	if( this->diagnosticplots ){
-		hismanager->RegisterPlot<TH2F>("MTAS_3431","Raw Individual C PMTs #beta-gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3431));
-		hismanager->RegisterPlot<TH2F>("MTAS_3432","Raw Individual I PMTs #beta-gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3432));
-		hismanager->RegisterPlot<TH2F>("MTAS_3433","Raw Individual M PMTs #beta-gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3433));
-		hismanager->RegisterPlot<TH2F>("MTAS_3434","Raw Individual O PMTs #beta-gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3434));
+		hismanager->RegisterPlot<TH2F>("MTAS_3431","Raw IndividualPMT C PMTs #beta-gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3431));
+		hismanager->RegisterPlot<TH2F>("MTAS_3432","Raw IndividualPMT I PMTs #beta-gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3432));
+		hismanager->RegisterPlot<TH2F>("MTAS_3433","Raw IndividualPMT M PMTs #beta-gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3433));
+		hismanager->RegisterPlot<TH2F>("MTAS_3434","Raw IndividualPMT O PMTs #beta-gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3434));
 
-		hismanager->RegisterPlot<TH2F>("MTAS_3531","Calibrated Individual C PMTs #beta-gated; Energy (keV); PMT (arb.)",this->h2dsettings.at(3531));
-		hismanager->RegisterPlot<TH2F>("MTAS_3532","Calibrated Individual I PMTs #beta-gated; Energy (keV); PMT (arb.)",this->h2dsettings.at(3532));
-		hismanager->RegisterPlot<TH2F>("MTAS_3533","Calibrated Individual M PMTs #beta-gated; Energy (keV); PMT (arb.)",this->h2dsettings.at(3533));
-		hismanager->RegisterPlot<TH2F>("MTAS_3534","Calibrated Individual O PMTs #beta-gated; Energy (keV); PMT (arb.)",this->h2dsettings.at(3534));
+		hismanager->RegisterPlot<TH2F>("MTAS_3531","Calibrated IndividualPMT C PMTs #beta-gated; Energy (keV); PMT (arb.)",this->h2dsettings.at(3531));
+		hismanager->RegisterPlot<TH2F>("MTAS_3532","Calibrated IndividualPMT I PMTs #beta-gated; Energy (keV); PMT (arb.)",this->h2dsettings.at(3532));
+		hismanager->RegisterPlot<TH2F>("MTAS_3533","Calibrated IndividualPMT M PMTs #beta-gated; Energy (keV); PMT (arb.)",this->h2dsettings.at(3533));
+		hismanager->RegisterPlot<TH2F>("MTAS_3534","Calibrated IndividualPMT O PMTs #beta-gated; Energy (keV); PMT (arb.)",this->h2dsettings.at(3534));
 	}
 
 	//not beta event
@@ -629,15 +629,15 @@ void MtasProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 	hismanager->RegisterPlot<TH2F>("MTAS_4104","Run Time vs Mtas Total anti-#beta-gated; Energy (keV); Run Time (day)",this->h2dsettings.at(4104));
 
 	if( this->diagnosticplots ){
-		hismanager->RegisterPlot<TH2F>("MTAS_3411","Raw Individual C PMTs anti-#beta-gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3411));
-		hismanager->RegisterPlot<TH2F>("MTAS_3412","Raw Individual I PMTs anti-#beta-gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3412));
-		hismanager->RegisterPlot<TH2F>("MTAS_3413","Raw Individual M PMTs anti-#beta-gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3413));
-		hismanager->RegisterPlot<TH2F>("MTAS_3414","Raw Individual O PMTs anti-#beta-gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3414));
+		hismanager->RegisterPlot<TH2F>("MTAS_3411","Raw IndividualPMT C PMTs anti-#beta-gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3411));
+		hismanager->RegisterPlot<TH2F>("MTAS_3412","Raw IndividualPMT I PMTs anti-#beta-gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3412));
+		hismanager->RegisterPlot<TH2F>("MTAS_3413","Raw IndividualPMT M PMTs anti-#beta-gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3413));
+		hismanager->RegisterPlot<TH2F>("MTAS_3414","Raw IndividualPMT O PMTs anti-#beta-gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3414));
 
-		hismanager->RegisterPlot<TH2F>("MTAS_3511","Calibrated Individual C PMTs anti-#beta-gated; Energy (keV); PMT (arb.)",this->h2dsettings.at(3511));
-		hismanager->RegisterPlot<TH2F>("MTAS_3512","Calibrated Individual I PMTs anti-#beta-gated; Energy (keV); PMT (arb.)",this->h2dsettings.at(3512));
-		hismanager->RegisterPlot<TH2F>("MTAS_3513","Calibrated Individual M PMTs anti-#beta-gated; Energy (keV); PMT (arb.)",this->h2dsettings.at(3513));
-		hismanager->RegisterPlot<TH2F>("MTAS_3514","Calibrated Individual O PMTs anti-#beta-gated; Energy (keV); PMT (arb.)",this->h2dsettings.at(3514));
+		hismanager->RegisterPlot<TH2F>("MTAS_3511","Calibrated IndividualPMT C PMTs anti-#beta-gated; Energy (keV); PMT (arb.)",this->h2dsettings.at(3511));
+		hismanager->RegisterPlot<TH2F>("MTAS_3512","Calibrated IndividualPMT I PMTs anti-#beta-gated; Energy (keV); PMT (arb.)",this->h2dsettings.at(3512));
+		hismanager->RegisterPlot<TH2F>("MTAS_3513","Calibrated IndividualPMT M PMTs anti-#beta-gated; Energy (keV); PMT (arb.)",this->h2dsettings.at(3513));
+		hismanager->RegisterPlot<TH2F>("MTAS_3514","Calibrated IndividualPMT O PMTs anti-#beta-gated; Energy (keV); PMT (arb.)",this->h2dsettings.at(3514));
 	}
 
 	//center position correction plots
@@ -700,14 +700,14 @@ void MtasProcessor::Reset(){
 	this->SumFrontBackEnergy = std::vector<double>(24,0.0);
 	this->TotalEnergy = std::vector<double>(5,0.0);
 
-	this->IndividualPileup = std::vector<bool>(48,false);
+	this->IndividualPMTPileup = std::vector<bool>(48,false);
 	this->CenterPileup = false;
 	this->InnerPileup = false;
 	this->MiddlePileup = false;
 	this->OuterPileup = false;
 	this->AnyPileup = false;
 
-	this->IndividualSaturate = std::vector<bool>(48,false);
+	this->IndividualPMTSaturate = std::vector<bool>(48,false);
 	this->CenterSaturate = false;
 	this->InnerSaturate = false;
 	this->MiddleSaturate = false;
@@ -1032,12 +1032,12 @@ const double& MtasProcessor::GetSumFrontBackEnergy(const int& idx) const{
 	return this->SumFrontBackEnergy[idx];
 }
 
-bool MtasProcessor::DidIndividualSaturate(const int& idx) const{
-	return this->IndividualSaturate[idx];
+bool MtasProcessor::DidIndividualPMTSaturate(const int& idx) const{
+	return this->IndividualPMTSaturate[idx];
 }
 
-bool MtasProcessor::DidIndividualPileup(const int& idx) const{
-	return this->IndividualPileup[idx];
+bool MtasProcessor::DidIndividualPMTPileup(const int& idx) const{
+	return this->IndividualPMTPileup[idx];
 }
 
 const double& MtasProcessor::GetFirstFireTime() const{
