@@ -23,52 +23,38 @@ class MtasProcessor : public Processor{
 		virtual void RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>&) final;
 		virtual void CleanupTree() final;
 
-		struct EventInfo{
-			std::vector<double> TotalEnergy;
-			std::vector<double> SumFrontBackEnergy;
-			double FirstTime;
-			double LastTime;
-			bool Saturate;
-			bool Pileup;
-			bool BetaTriggered;
-			bool RealEvt;
-			bool CenterFire;
-			bool InnerFire;
-			bool MiddleFire;
-			bool OuterFire;
-			int NumCenterFire;
-			int NumInnerFire;
-			int NumMiddleFire;
-			int NumOuterFire;
+		const double& GetTotalEnergy(const int&) const;
 
-			EventInfo(){
-				TotalEnergy = std::vector<double>(5,0.0);
-				SumFrontBackEnergy = std::vector<double>(24,0.0);
-				FirstTime = -1.0;
-				LastTime = -1.0;
-				Saturate = false;
-				Pileup = false;
-				BetaTriggered = false;
-				RealEvt = false;
-				CenterFire = false;
-				InnerFire = false;
-				MiddleFire = false;
-				OuterFire = false;
-				NumCenterFire = 0;
-				NumInnerFire = 0;
-				NumMiddleFire = 0;
-				NumOuterFire = 0;
-			}
-			~EventInfo() = default;
-			EventInfo(const EventInfo&) = default;
-			EventInfo(EventInfo&&) = default;
-			EventInfo& operator=(const EventInfo&) = default;
-			EventInfo& operator=(EventInfo&&) = default;
-		};
+		const int& GetNumPairsFire() const;
+		const int& GetNumCenterPairsFire() const;
+		const int& GetNumInnerPairsFire() const;
+		const int& GetNumMiddlePairsFire() const;
+		const int& GetNumOuterPairsFire() const;
 
-		void SetIsBeta();
-		EventInfo& GetCurrEvt();
-		EventInfo& GetPrevEvt();
+		const bool& DidAnyFire() const;
+		const bool& DidAnyCenterFire() const;
+		const bool& DidAnyInnerFire() const;
+		const bool& DidAnyMiddleFire() const;
+		const bool& DidAnyOuterFire() const;
+
+		const bool& DidAnySaturate() const;
+		const bool& DidAnyCenterSaturate() const;
+		const bool& DidAnyInnerSaturate() const;
+		const bool& DidAnyMiddleSaturate() const;
+		const bool& DidAnyOuterSaturate() const;
+
+		const bool& DidAnyPileup() const;
+		const bool& DidAnyCenterPileup() const;
+		const bool& DidAnyInnerPileup() const;
+		const bool& DidAnyMiddlePileup() const;
+		const bool& DidAnyOuterPileup() const;
+
+		const double& GetSumFrontBackEnergy(const int&) const;
+		bool DidIndividualSaturate(const int&) const;
+		bool DidIndividualPileup(const int&) const;
+
+		const double& GetFirstFireTime() const;
+		const double& GetLastFireTime() const;
 
 		void FillBetaPlots(PLOTS::PlotRegistry*) const;
 		void FillNonBetaPlots(PLOTS::PlotRegistry*) const;
@@ -76,10 +62,6 @@ class MtasProcessor : public Processor{
 	private:
 		double CalcPosition(double,double);
 		void Reset();
-
-		EventInfo CurrEvt;
-		EventInfo PrevEvt;
-		EventInfo NewEvt;
 
 		std::vector<double> Position;
 
@@ -103,12 +85,34 @@ class MtasProcessor : public Processor{
 		std::vector<int> MiddleHits;
 		std::vector<int> OuterHits;
 
+		std::vector<bool> IndividualSaturate;
+		bool CenterSaturate;
+		bool InnerSaturate;
+		bool MiddleSaturate;
+		bool OuterSaturate;
+		bool AnySaturate;
+
+		std::vector<bool> IndividualPileup;
+		bool CenterPileup;
+		bool InnerPileup;
+		bool MiddlePileup;
+		bool OuterPileup;
+		bool AnyPileup;
+			
+		std::vector<int> NumFire;
 		bool CenterFire;
 		bool InnerFire;
 		bool MiddleFire;
 		bool OuterFire;
+		bool AnyFire;
+			
+		std::vector<double> TotalEnergy;
+		std::vector<double> SumFrontBackEnergy;
 
 		std::vector<double> TimeStamps;
+			
+		double FirstTime;
+		double LastTime;
 		
 		std::vector<ProcessorStruct::MtasSegment> SegmentDataVec;
 		ProcessorStruct::MtasSegment CurrSegmentData;

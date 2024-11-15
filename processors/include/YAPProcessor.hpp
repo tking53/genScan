@@ -24,7 +24,6 @@ class YAPProcessor : public Processor{
 		virtual void CleanupTree() final;
 	private:
 
-		MtasProcessor::EventInfo CurrMTAS;
 		PuckProcessor::EventInfo CurrPuck;
 
 		bool HasMTAS;

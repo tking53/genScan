@@ -27,7 +27,6 @@ YAPProcessor::YAPProcessor(const std::string& log) : Processor(log,"YAPProcessor
 
 	this->BetaThreshold = 0.0;
 
-	this->CurrMTAS = MtasProcessor::EventInfo();
 	this->CurrPuck = PuckProcessor::EventInfo();
 }
 
@@ -42,10 +41,9 @@ YAPProcessor::YAPProcessor(const std::string& log) : Processor(log,"YAPProcessor
 	if( this->HasMTAS ){
 		this->MtasProc->PreProcess(eventhistory,hismanager,cutmanager);
 	}
-	this->CurrMTAS = this->MtasProc->GetCurrEvt();
-	this->MTASTotal = this->CurrMTAS.TotalEnergy[0];
-	this->MTASSaturate = this->CurrMTAS.Saturate;
-	this->MTASPileup = this->CurrMTAS.Pileup;
+	this->MTASTotal = this->MtasProc->GetTotalEnergy(0);
+	this->MTASSaturate = this->MtasProc->DidAnySaturate();
+	this->MTASPileup = this->MtasProc->DidAnyPileup();
 
 	if( this->HasPuck ){
 		this->PuckProc->PreProcess(eventhistory,hismanager,cutmanager);
@@ -57,7 +55,7 @@ YAPProcessor::YAPProcessor(const std::string& log) : Processor(log,"YAPProcessor
 	this->YAPSaturate = this->CurrPuck.Saturate;
 
 	if( this->HasPuck ){
-		hismanager->Fill("YAP_2000",this->CurrMTAS.FirstTime - this->CurrPuck.FirstTime);
+		hismanager->Fill("YAP_2000",this->MtasProc->GetFirstFireTime() - this->CurrPuck.FirstTime);
 		
 		if( (this->CurrPuck.TotalEnergy >= this->BetaThreshold) and (not this->CurrPuck.Saturate) and (not this->CurrPuck.Pileup) ){
 			this->MtasProc->FillBetaPlots(hismanager);
@@ -68,25 +66,25 @@ YAPProcessor::YAPProcessor(const std::string& log) : Processor(log,"YAPProcessor
 		this->MtasProc->FillNonBetaPlots(hismanager);
 	}
 
-	hismanager->Fill("Puck_3650",this->CurrMTAS.TotalEnergy[0],this->CurrPuck.TotalEnergy);
-	hismanager->Fill("Puck_36508",this->CurrMTAS.TotalEnergy[0],this->CurrPuck.TotalEnergy);
-	hismanager->Fill("Puck_3651",this->CurrMTAS.TotalEnergy[0],this->CurrPuck.Individual[0]);
-	hismanager->Fill("Puck_36518",this->CurrMTAS.TotalEnergy[0],this->CurrPuck.Individual[0]);
-	hismanager->Fill("Puck_3652",this->CurrMTAS.TotalEnergy[0],this->CurrPuck.Individual[1]);
-	hismanager->Fill("Puck_36528",this->CurrMTAS.TotalEnergy[0],this->CurrPuck.Individual[1]);
+	hismanager->Fill("Puck_3650",this->MtasProc->GetTotalEnergy(0),this->CurrPuck.TotalEnergy);
+	hismanager->Fill("Puck_36508",this->MtasProc->GetTotalEnergy(0),this->CurrPuck.TotalEnergy);
+	hismanager->Fill("Puck_3651",this->MtasProc->GetTotalEnergy(0),this->CurrPuck.Individual[0]);
+	hismanager->Fill("Puck_36518",this->MtasProc->GetTotalEnergy(0),this->CurrPuck.Individual[0]);
+	hismanager->Fill("Puck_3652",this->MtasProc->GetTotalEnergy(0),this->CurrPuck.Individual[1]);
+	hismanager->Fill("Puck_36528",this->MtasProc->GetTotalEnergy(0),this->CurrPuck.Individual[1]);
 
 	hismanager->Fill("Puck_3610",this->CurrPuck.TotalEnergy);
-	if( (not this->CurrMTAS.Saturate) and (not this->CurrMTAS.Pileup) ){
+	if( (not this->MTASSaturate) and (not this->MTASPileup) ){
 		hismanager->Fill("Puck_3600",this->CurrPuck.TotalEnergy);
-		hismanager->Fill("Puck_3602",this->CurrPuck.TotalEnergy+this->CurrMTAS.TotalEnergy[0]);
-		if( (not this->HasMTAS) or this->CurrMTAS.TotalEnergy[0] < 1.0 ){
+		hismanager->Fill("Puck_3602",this->CurrPuck.TotalEnergy+this->MtasProc->GetTotalEnergy(0));
+		if( (not this->HasMTAS) or this->MtasProc->GetTotalEnergy(0) < 1.0 ){
 			hismanager->Fill("Puck_3601",this->CurrPuck.TotalEnergy);
 		}
 	}else{
-		if( this->CurrMTAS.Pileup ){
+		if( this->MTASPileup ){
 			hismanager->Fill("Puck_3611",this->CurrPuck.TotalEnergy);
 		}
-		if( this->CurrMTAS.Saturate ){
+		if( this->MTASSaturate ){
 			hismanager->Fill("Puck_3612",this->CurrPuck.TotalEnergy);
 		}
 	}
@@ -153,7 +151,6 @@ void YAPProcessor::Finalize(){
 	this->MtasProc->Finalize();
 	this->PuckProc->Finalize();
 
-	this->CurrMTAS = this->MtasProc->GetCurrEvt();
 	this->CurrPuck = this->PuckProc->GetCurrEvt();
 
 	this->console->info("{} has been finalized",this->ProcessorName);

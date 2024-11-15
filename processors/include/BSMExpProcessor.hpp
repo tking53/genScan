@@ -24,7 +24,6 @@ class BSMExpProcessor : public Processor{
 		virtual void CleanupTree() final;
 	private:
 
-		MtasProcessor::EventInfo CurrMTAS;
 		BSMProcessor::EventInfo CurrBSM;
 
 		bool HasMTAS;
