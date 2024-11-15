@@ -20,10 +20,6 @@ namespace PulseFit{
 }
 
 BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor",{"bsm"}){
-	this->NewEvt = EventInfo();
-	this->PrevEvt = this->NewEvt;
-	this->CurrEvt = this->NewEvt;
-
 	this->fronttag = "front";
 	this->backtag = "back";
 	this->foundfirstevt = false;
@@ -169,7 +165,8 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 		if( evt->GetPileup() or evt->GetSaturation() ){
 			//ignore the saturated channel, but keep everything else in this current event
 			if( evt->GetPileup() ){
-				this->CurrEvt.Pileup = true;
+				this->AnyPileup = true;
+				this->IndividualPileup[detectorposition] = true;
 				std::string tracehis = (isfront) ? ("BSM_380"+std::to_string(position)+"_F") :  ("BSM_380"+std::to_string(position)+"_B");
 				size_t idx = 0;
 				for( const auto& tracevalue : evt->GetRawTrace() ){
@@ -205,7 +202,8 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 				hismanager->Fill(pklocbstddevhis,pk.first,baseline.second);
 			}
 			if( evt->GetSaturation() ){
-				this->CurrEvt.Saturate = true;
+				this->AnySaturate = true;
+				this->IndividualSaturate[detectorposition] = true;
 			}
 			continue;
 		}
@@ -265,7 +263,7 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 			hismanager->Fill(pkmaxerghis,evt->GetRawEnergyWRandom(),pk.first);
 			
 			this->Traces[detectorposition] = evt->GetRawTraceData();
-			this->CurrEvt.UnCorrectedBSM[detectorposition] = evt->GetEnergy();
+			this->UnCorrectedBSM[detectorposition] = evt->GetEnergy();
 			this->HitTimeStamps[detectorposition] = evt->GetTimeStamp();
 			this->TimeStamps.push_back(evt->GetTimeStamp());
 			this->RawBSM[detectorposition] = evt->GetRawEnergyWRandom();
@@ -276,10 +274,10 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 	}
 	
 	if( not this->TimeStamps.empty() ){
-		this->CurrEvt.FirstTime = *(std::min_element(this->TimeStamps.begin(),this->TimeStamps.end()));
-		this->CurrEvt.LastTime = *(std::max_element(this->TimeStamps.begin(),this->TimeStamps.end()));
+		this->FirstTime = *(std::min_element(this->TimeStamps.begin(),this->TimeStamps.end()));
+		this->LastTime = *(std::max_element(this->TimeStamps.begin(),this->TimeStamps.end()));
 
-		this->currevttime = (this->CurrEvt.FirstTime - globalfirsttime)*1.0e-9;
+		this->currevttime = (this->FirstTime - globalfirsttime)*1.0e-9;
 
 		if( this->Pairs[0] != nullptr and this->Pairs[1] != nullptr ){
 			auto psdvals = this->Pairs[0]->GetTraceFixedPSD();
@@ -315,65 +313,64 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 
 		for( int ii = 0; ii < this->NumPairs; ++ii ){
 			if( this->BSMHits[2*ii] and this->BSMHits[2*ii + 1] ){
-				this->CurrEvt.RealEvt = true;
-				this->CurrEvt.TDiff[ii] = (this->HitTimeStamps[2*ii] - this->HitTimeStamps[2*ii + 1]);
-				++this->CurrEvt.NumValidSegments;
-				this->CurrEvt.UnCorrectedSumFrontBackEnergy[ii] = (this->CurrEvt.UnCorrectedBSM[2*ii] + this->CurrEvt.UnCorrectedBSM[2*ii + 1])/2.0;
-				this->CurrEvt.Position[ii] = this->CalcPosition(this->RawBSM[2*ii],this->RawBSM[2*ii + 1]);
+				this->TDiff[ii] = (this->HitTimeStamps[2*ii] - this->HitTimeStamps[2*ii + 1]);
+				++this->NumValidSegments;
+				this->Position[ii] = this->CalcPosition(this->RawBSM[2*ii],this->RawBSM[2*ii + 1]);
 				if( (this->PosCorrectionMap[2*ii] != nullptr) and (this->PosCorrectionMap[2*ii + 1] != nullptr ) ){
-					auto front = this->PosCorrectionMap[2*ii]->Correct(this->CurrEvt.UnCorrectedBSM[2*ii],this->CurrEvt.Position[ii]);
-					auto back = this->PosCorrectionMap[2*ii + 1]->Correct(this->CurrEvt.UnCorrectedBSM[2*ii + 1],this->CurrEvt.Position[ii]);
-					this->CurrEvt.CorrectedBSM[2*ii] = front;
-					this->CurrEvt.CorrectedBSM[2*ii + 1] = back;
-					this->CurrEvt.SumFrontBackEnergy[ii] = (front + back)/2.0;
+					auto front = this->PosCorrectionMap[2*ii]->Correct(this->UnCorrectedBSM[2*ii],this->Position[ii]);
+					auto back = this->PosCorrectionMap[2*ii + 1]->Correct(this->UnCorrectedBSM[2*ii + 1],this->Position[ii]);
+					this->CorrectedBSM[2*ii] = front;
+					this->CorrectedBSM[2*ii + 1] = back;
+					this->SumFrontBackEnergy[ii] = (front + back)/2.0;
+					this->GeometricFrontBackEnergy[ii] = std::sqrt(front*back);
 				}else{
-					this->CurrEvt.SumFrontBackEnergy[ii] = (this->CurrEvt.UnCorrectedBSM[2*ii] + this->CurrEvt.UnCorrectedBSM[2*ii + 1])/2.0;
-					this->CurrEvt.CorrectedBSM[2*ii] = this->CurrEvt.UnCorrectedBSM[2*ii];
-					this->CurrEvt.CorrectedBSM[2*ii + 1] = this->CurrEvt.UnCorrectedBSM[2*ii + 1];
+					this->SumFrontBackEnergy[ii] = (this->UnCorrectedBSM[2*ii] + this->UnCorrectedBSM[2*ii + 1])/2.0;
+					this->GeometricFrontBackEnergy[ii] = std::sqrt((this->UnCorrectedBSM[2*ii]) * (this->UnCorrectedBSM[2*ii + 1]));
+					this->CorrectedBSM[2*ii] = this->UnCorrectedBSM[2*ii];
+					this->CorrectedBSM[2*ii + 1] = this->UnCorrectedBSM[2*ii + 1];
 				}
 
 				std::string id = std::to_string(ii);
 				std::string name = "BSM_362"+id+"_F";
 
-				hismanager->Fill(name,this->CurrEvt.Position[ii],this->RawBSM[2*ii]);
+				hismanager->Fill(name,this->Position[ii],this->RawBSM[2*ii]);
 
 				name = "BSM_362"+id+"_B";
-				hismanager->Fill(name,this->CurrEvt.Position[ii],this->RawBSM[2*ii + 1]);
+				hismanager->Fill(name,this->Position[ii],this->RawBSM[2*ii + 1]);
 
 				name = "BSM_362"+id;
-				hismanager->Fill(name,this->CurrEvt.Position[ii],(this->RawBSM[2*ii] + this->RawBSM[2*ii + 1])/2.0);
+				hismanager->Fill(name,this->Position[ii],(this->RawBSM[2*ii] + this->RawBSM[2*ii + 1])/2.0);
 
 				name = "BSM_363"+id;
-				hismanager->Fill(name,this->CurrEvt.TDiff[ii],this->CurrEvt.SumFrontBackEnergy[ii]);
+				hismanager->Fill(name,this->TDiff[ii],this->SumFrontBackEnergy[ii]);
 
 				name = "BSM_363"+id+"_F";
-				hismanager->Fill(name,this->CurrEvt.TDiff[ii],this->CurrEvt.UnCorrectedBSM[2*ii]);
+				hismanager->Fill(name,this->TDiff[ii],this->UnCorrectedBSM[2*ii]);
 
 				name = "BSM_363"+id+"_B";
-				hismanager->Fill(name,this->CurrEvt.TDiff[ii],this->CurrEvt.UnCorrectedBSM[2*ii + 1]);
-			//}else if( this->BSMHits[2*ii] and this->TotalMult[2*ii + 1] ){
+				hismanager->Fill(name,this->TDiff[ii],this->UnCorrectedBSM[2*ii + 1]);
 			}
 		}
 
 		for( int ii = 0; ii < this->NumPairs; ++ii ){
-			this->CurrEvt.TotalEnergy += this->CurrEvt.SumFrontBackEnergy[ii];
-			this->CurrEvt.UnCorrectedTotalEnergy += this->CurrEvt.UnCorrectedSumFrontBackEnergy[ii];
+			this->AverageTotalEnergy += this->SumFrontBackEnergy[ii];
+			this->GeometricTotalEnergy += this->GeometricFrontBackEnergy[ii];
 		}
 
-		hismanager->Fill("BSM_4000",this->CurrEvt.TotalEnergy,this->currevttime*1000.0);
-		hismanager->Fill("BSM_4001",this->CurrEvt.TotalEnergy,this->currevttime);
-		hismanager->Fill("BSM_4002",this->CurrEvt.TotalEnergy,this->currevttime/60.0);
-		hismanager->Fill("BSM_4003",this->CurrEvt.TotalEnergy,this->currevttime/(60.0*60.0));
-		hismanager->Fill("BSM_4004",this->CurrEvt.TotalEnergy,this->currevttime/(60.0*60.0*24.0));
+		hismanager->Fill("BSM_4000",this->AverageTotalEnergy,this->currevttime*1000.0);
+		hismanager->Fill("BSM_4001",this->AverageTotalEnergy,this->currevttime);
+		hismanager->Fill("BSM_4002",this->AverageTotalEnergy,this->currevttime/60.0);
+		hismanager->Fill("BSM_4003",this->AverageTotalEnergy,this->currevttime/(60.0*60.0));
+		hismanager->Fill("BSM_4004",this->AverageTotalEnergy,this->currevttime/(60.0*60.0*24.0));
 
 		for( int ii = 0; ii < this->NumPairs; ++ii ){
 			std::string id = std::to_string(ii);
 			std::string name = "BSM_367"+id;
 
-			hismanager->Fill(name,this->CurrEvt.CorrectedBSM[2*ii+1],this->CurrEvt.CorrectedBSM[2*ii]);
+			hismanager->Fill(name,this->CorrectedBSM[2*ii+1],this->CorrectedBSM[2*ii]);
 
 			name = "BSM_367"+id+"8";
-			hismanager->Fill(name,this->CurrEvt.CorrectedBSM[2*ii+1],this->CurrEvt.CorrectedBSM[2*ii]);
+			hismanager->Fill(name,this->CorrectedBSM[2*ii+1],this->CorrectedBSM[2*ii]);
 		}
 	}
 
@@ -428,6 +425,21 @@ void BSMProcessor::Init(const pugi::xml_node& config){
 
 	this->BSMHits = std::vector<int>(this->NumPMTs,0);
 	this->RawBSM = std::vector<double>(this->NumPMTs,0.0);
+	this->AverageTotalEnergy = 0.0;
+	this->GeometricTotalEnergy = 0.0;
+	this->SumFrontBackEnergy = std::vector<double>(this->NumPairs,0.0);
+	this->GeometricFrontBackEnergy = std::vector<double>(this->NumPairs,0.0);
+	this->UnCorrectedBSM = std::vector<double>(this->NumPMTs,0.0);
+	this->CorrectedBSM = std::vector<double>(this->NumPMTs,0.0);
+	this->Position = std::vector<double>(this->NumPairs,0.0);
+	this->TDiff = std::vector<double>(this->NumPairs,0.0);
+	this->NumValidSegments = 0;
+	this->IndividualPileup = std::vector<bool>(this->NumPMTs,false);
+	this->AnyPileup = false;
+	this->IndividualSaturate = std::vector<bool>(this->NumPMTs,false);
+	this->AnySaturate = false;
+	this->FirstTime = -1.0;
+	this->LastTime = -1.0;
 	this->TotalMult = std::vector<int>(this->NumPMTs,0);
 	this->HitTimeStamps = std::vector<double>(this->NumPMTs,0.0);
 	this->Traces = std::vector<std::vector<uint16_t>>(this->NumPMTs,std::vector<uint16_t>());
@@ -731,8 +743,21 @@ void BSMProcessor::CleanupTree(){
 }
 
 void BSMProcessor::Reset(){
-	this->PrevEvt = this->CurrEvt;
-	this->CurrEvt = this->NewEvt;
+	this->AverageTotalEnergy = 0.0;
+	this->GeometricTotalEnergy = 0.0;
+	this->SumFrontBackEnergy = std::vector<double>(this->NumPairs,0.0);
+	this->GeometricFrontBackEnergy = std::vector<double>(this->NumPairs,0.0);
+	this->UnCorrectedBSM = std::vector<double>(this->NumPMTs,0.0);
+	this->CorrectedBSM = std::vector<double>(this->NumPMTs,0.0);
+	this->Position = std::vector<double>(this->NumPairs,0.0);
+	this->TDiff = std::vector<double>(this->NumPairs,0.0);
+	this->NumValidSegments = 0;
+	this->IndividualPileup = std::vector<bool>(this->NumPMTs,false);
+	this->AnyPileup = false;
+	this->IndividualSaturate = std::vector<bool>(this->NumPMTs,false);
+	this->AnySaturate = false;
+	this->FirstTime = -1.0;
+	this->LastTime = -1.0;
 	this->TimeStamps.clear();
 	this->BSMHits = std::vector<int>(this->NumPMTs,0);
 	this->RawBSM = std::vector<double>(this->NumPMTs,0.0);
@@ -763,14 +788,6 @@ double BSMProcessor::CalcPosition(double front,double back){
 	return (front - back)/(front + back);
 }
 
-BSMProcessor::EventInfo& BSMProcessor::GetCurrEvt(){
-	return this->CurrEvt;
-}
-
-BSMProcessor::EventInfo& BSMProcessor::GetPrevEvt(){
-	return this->PrevEvt;
-}
-
 void BSMProcessor::FillPositionPlots(PLOTS::PlotRegistry* hismanager) const{
 	if( not this->TimeStamps.empty() ){
 		for( int ii = 0; ii < this->NumPairs; ++ii ){
@@ -778,20 +795,68 @@ void BSMProcessor::FillPositionPlots(PLOTS::PlotRegistry* hismanager) const{
 				std::string id = std::to_string(ii);
 				std::string name = "BSM_362"+id+"_F_NOMUON";
 
-				hismanager->Fill(name,this->CurrEvt.Position[ii],this->RawBSM[2*ii]);
+				hismanager->Fill(name,this->Position[ii],this->RawBSM[2*ii]);
 
 				name = "BSM_362"+id+"_B_NOMUON";
-				hismanager->Fill(name,this->CurrEvt.Position[ii],this->RawBSM[2*ii + 1]);
+				hismanager->Fill(name,this->Position[ii],this->RawBSM[2*ii + 1]);
 
 				name = "BSM_362"+id+"_NOMUON";
-				hismanager->Fill(name,this->CurrEvt.Position[ii],(this->RawBSM[2*ii]+this->RawBSM[2*ii + 1])/2.0);
+				hismanager->Fill(name,this->Position[ii],(this->RawBSM[2*ii]+this->RawBSM[2*ii + 1])/2.0);
 
 				name = "BSM_367"+id+"_NOMUON";
-				hismanager->Fill(name,this->CurrEvt.CorrectedBSM[2*ii+1],this->CurrEvt.CorrectedBSM[2*ii]);
+				hismanager->Fill(name,this->CorrectedBSM[2*ii+1],this->CorrectedBSM[2*ii]);
 
 				name = "BSM_367"+id+"8_NOMUON";
-				hismanager->Fill(name,this->CurrEvt.CorrectedBSM[2*ii+1],this->CurrEvt.CorrectedBSM[2*ii]);
+				hismanager->Fill(name,this->CorrectedBSM[2*ii+1],this->CorrectedBSM[2*ii]);
 			}
 		}
 	}
+}
+
+const double& BSMProcessor::GetAverageTotalEnergy() const{
+	return this->AverageTotalEnergy;
+}
+
+const double& BSMProcessor::GetSumFrontBackEnergy(const int& idx) const{
+	return this->SumFrontBackEnergy[idx];
+}
+
+const double& BSMProcessor::GetGeometricTotalEnergy() const{
+	return this->GeometricTotalEnergy;
+}
+
+const double& BSMProcessor::GetGeometricFrontBackEnergy(const int& idx) const{
+	return this->GeometricFrontBackEnergy[idx];
+}
+
+const double& BSMProcessor::GetPosition(const int& idx) const{
+	return this->Position[idx];
+}
+
+const double& BSMProcessor::GetTDiff(const int& idx) const{
+	return this->TDiff[idx];
+}
+
+const double& BSMProcessor::GetFirstFireTime() const{
+	return this->FirstTime;
+}
+
+const double& BSMProcessor::GetLastFireTime() const{
+	return this->LastTime;
+}
+
+bool BSMProcessor::DidIndividualSaturate(const int& idx) const{
+	return this->IndividualSaturate[idx];
+}
+
+const bool& BSMProcessor::DidAnySaturate() const{
+	return this->AnySaturate;
+}
+
+bool BSMProcessor::DidIndividualPileup(const int& idx) const{
+	return this->IndividualPileup[idx];
+}
+
+const bool& BSMProcessor::DidAnyPileup() const{
+	return this->AnyPileup;
 }

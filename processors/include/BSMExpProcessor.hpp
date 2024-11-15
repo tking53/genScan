@@ -23,9 +23,6 @@ class BSMExpProcessor : public Processor{
 		virtual void RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>&) final;
 		virtual void CleanupTree() final;
 	private:
-
-		BSMProcessor::EventInfo CurrBSM;
-
 		bool HasMTAS;
 		bool HasBSM;
 

@@ -29,8 +29,6 @@ BSMExpProcessor::BSMExpProcessor(const std::string& log) : Processor(log,"BSMExp
 	this->BetaThreshold = 0.0;
 	this->QBeta = 8192.0;
 	this->PPCutExists = false;
-
-	this->CurrBSM = BSMProcessor::EventInfo();
 }
 
 [[maybe_unused]] bool BSMExpProcessor::PreProcess(EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
@@ -55,37 +53,31 @@ BSMExpProcessor::BSMExpProcessor(const std::string& log) : Processor(log,"BSMExp
 	if( this->HasBSM ){
 		this->BSMProc->PreProcess(eventhistory,hismanager,cutmanager);
 	}
-	this->CurrBSM = this->BSMProc->GetCurrEvt();
 
-	bool AllWithinTDiff = (std::abs(this->CurrBSM.TDiff[0]) <= 80.0);
-	bool AllWithinPos = ((this->CurrBSM.Position[0] >= this->BSMPosBounds.first) and (this->CurrBSM.Position[0] <= this->BSMPosBounds.second));
-	//for( int ii = 0; ii < 6; ++ii ){
-	//	if( std::abs(this->CurrBSM.TDiff[ii]) > 80.0 ){ 
-	//		AllWithinTDiff = false;
-	//	}
-	//}
+	bool AllWithinTDiff = (std::abs(this->BSMProc->GetTDiff(0)) <= 80.0);
+	bool AllWithinPos = ((this->BSMProc->GetPosition(0) >= this->BSMPosBounds.first) and (this->BSMProc->GetPosition(0) <= this->BSMPosBounds.second));
 
 	if( this->HasBSM and AllWithinTDiff and AllWithinPos ){
-		if( this->MtasProc->GetFirstFireTime() > 0.0 and this->CurrBSM.FirstTime > 0.0 ){
-			hismanager->Fill("BSMEXP_2000",this->MtasProc->GetFirstFireTime() - this->CurrBSM.FirstTime);
+		if( this->MtasProc->GetFirstFireTime() > 0.0 and this->BSMProc->GetFirstFireTime() > 0.0 ){
+			hismanager->Fill("BSMEXP_2000",this->MtasProc->GetFirstFireTime() - this->BSMProc->GetFirstFireTime());
 		}
 		
 		if( this->PPCutExists ){
-			if( this->CurrBSM.Pileup ){
+			if( this->BSMProc->DidAnyPileup() ){
 				hismanager->Fill("BSMEXP_3300_PILEUP",this->MtasProc->GetTotalEnergy(0));
 			}
 			for( size_t ii = 0; ii < 6 ; ++ii ){
 				if( cutmanager->IsWithin("PairProduction",this->MtasProc->GetTotalEnergy(0),this->MtasProc->GetSumFrontBackEnergy(ii)) ){
-					if( this->MtasProc->GetFirstFireTime() > 0.0 and this->CurrBSM.FirstTime > 0.0 ){
-						hismanager->Fill("BSMEXP_2000_PP",this->MtasProc->GetFirstFireTime() - this->CurrBSM.FirstTime);
-						hismanager->Fill("BSM_3600_PP",this->CurrBSM.TotalEnergy);
+					if( this->MtasProc->GetFirstFireTime() > 0.0 and this->BSMProc->GetFirstFireTime() > 0.0 ){
+						hismanager->Fill("BSMEXP_2000_PP",this->MtasProc->GetFirstFireTime() - this->BSMProc->GetFirstFireTime());
+						hismanager->Fill("BSM_3600_PP",this->BSMProc->GetAverageTotalEnergy());
 						break;
 					}
 				}
 			}
 		}
 
-		if( (this->CurrBSM.TotalEnergy >= this->BetaThreshold) and (not this->CurrBSM.Saturate) and (not this->CurrBSM.Pileup) ){
+		if( (this->BSMProc->GetAverageTotalEnergy() >= this->BetaThreshold) and (not this->BSMProc->DidAnySaturate()) and (not this->BSMProc->DidAnyPileup()) ){
 			this->MtasProc->FillBetaPlots(hismanager);
 		}else{
 			this->MtasProc->FillNonBetaPlots(hismanager);
@@ -94,78 +86,78 @@ BSMExpProcessor::BSMExpProcessor(const std::string& log) : Processor(log,"BSMExp
 		this->MtasProc->FillNonBetaPlots(hismanager);
 	}
 
-	hismanager->Fill("BSM_3610",this->CurrBSM.TotalEnergy);
+	hismanager->Fill("BSM_3610",this->BSMProc->GetAverageTotalEnergy());
 	if( (not this->MtasProc->DidAnySaturate()) and (not this->MtasProc->DidAnyPileup()) and AllWithinTDiff and AllWithinPos ){
 		this->BSMProc->FillPositionPlots(hismanager);
 	
-		hismanager->Fill("BSM_3650",this->MtasProc->GetTotalEnergy(0),this->CurrBSM.TotalEnergy);
-		hismanager->Fill("BSM_36508",this->MtasProc->GetTotalEnergy(0),this->CurrBSM.TotalEnergy);
+		hismanager->Fill("BSM_3650",this->MtasProc->GetTotalEnergy(0),this->BSMProc->GetAverageTotalEnergy());
+		hismanager->Fill("BSM_36508",this->MtasProc->GetTotalEnergy(0),this->BSMProc->GetAverageTotalEnergy());
 
-		hismanager->Fill("BSM_3660",this->MtasProc->GetTotalEnergy(0),this->CurrBSM.TotalEnergy+this->MtasProc->GetTotalEnergy(0));
-		hismanager->Fill("BSM_36608",this->MtasProc->GetTotalEnergy(0),this->CurrBSM.TotalEnergy+this->MtasProc->GetTotalEnergy(0));
+		hismanager->Fill("BSM_3660",this->MtasProc->GetTotalEnergy(0),this->BSMProc->GetAverageTotalEnergy()+this->MtasProc->GetTotalEnergy(0));
+		hismanager->Fill("BSM_36608",this->MtasProc->GetTotalEnergy(0),this->BSMProc->GetAverageTotalEnergy()+this->MtasProc->GetTotalEnergy(0));
 
-		hismanager->Fill("BSM_3661",this->MtasProc->GetTotalEnergy(0)+this->CurrBSM.TotalEnergy,this->CurrBSM.TotalEnergy);
-		hismanager->Fill("BSM_36618",this->MtasProc->GetTotalEnergy(0)+this->CurrBSM.TotalEnergy,this->CurrBSM.TotalEnergy);
+		hismanager->Fill("BSM_3661",this->MtasProc->GetTotalEnergy(0)+this->BSMProc->GetAverageTotalEnergy(),this->BSMProc->GetAverageTotalEnergy());
+		hismanager->Fill("BSM_36618",this->MtasProc->GetTotalEnergy(0)+this->BSMProc->GetAverageTotalEnergy(),this->BSMProc->GetAverageTotalEnergy());
 
-		hismanager->Fill("BSM_3652",this->MtasProc->GetTotalEnergy(1),this->CurrBSM.TotalEnergy);
-		hismanager->Fill("BSM_36528",this->MtasProc->GetTotalEnergy(1),this->CurrBSM.TotalEnergy);
+		hismanager->Fill("BSM_3652",this->MtasProc->GetTotalEnergy(1),this->BSMProc->GetAverageTotalEnergy());
+		hismanager->Fill("BSM_36528",this->MtasProc->GetTotalEnergy(1),this->BSMProc->GetAverageTotalEnergy());
 
 		if( not (this->MtasProc->DidAnyMiddleFire() or this->MtasProc->DidAnyOuterFire()) ){
-			hismanager->Fill("BSM_3654",this->MtasProc->GetTotalEnergy(0),this->CurrBSM.TotalEnergy);
-			hismanager->Fill("BSM_36548",this->MtasProc->GetTotalEnergy(0),this->CurrBSM.TotalEnergy);
+			hismanager->Fill("BSM_3654",this->MtasProc->GetTotalEnergy(0),this->BSMProc->GetAverageTotalEnergy());
+			hismanager->Fill("BSM_36548",this->MtasProc->GetTotalEnergy(0),this->BSMProc->GetAverageTotalEnergy());
 
-			hismanager->Fill("BSM_3655",this->MtasProc->GetTotalEnergy(1),this->CurrBSM.TotalEnergy);
-			hismanager->Fill("BSM_36558",this->MtasProc->GetTotalEnergy(1),this->CurrBSM.TotalEnergy);
+			hismanager->Fill("BSM_3655",this->MtasProc->GetTotalEnergy(1),this->BSMProc->GetAverageTotalEnergy());
+			hismanager->Fill("BSM_36558",this->MtasProc->GetTotalEnergy(1),this->BSMProc->GetAverageTotalEnergy());
 
 			if( not this->MtasProc->DidAnyInnerFire() ){
-				hismanager->Fill("BSM_3657",this->MtasProc->GetTotalEnergy(1),this->CurrBSM.TotalEnergy);
-				hismanager->Fill("BSM_36578",this->MtasProc->GetTotalEnergy(1),this->CurrBSM.TotalEnergy);
+				hismanager->Fill("BSM_3657",this->MtasProc->GetTotalEnergy(1),this->BSMProc->GetAverageTotalEnergy());
+				hismanager->Fill("BSM_36578",this->MtasProc->GetTotalEnergy(1),this->BSMProc->GetAverageTotalEnergy());
 			}
 		}
 
 		for( int ii = 0; ii < 6; ++ii ){
-			hismanager->Fill("BSM_3651",this->MtasProc->GetSumFrontBackEnergy(ii+6),this->CurrBSM.TotalEnergy);
-			hismanager->Fill("BSM_3651",this->MtasProc->GetSumFrontBackEnergy(ii+12),this->CurrBSM.TotalEnergy);
-			hismanager->Fill("BSM_3651",this->MtasProc->GetSumFrontBackEnergy(ii+18),this->CurrBSM.TotalEnergy);
-			hismanager->Fill("BSM_36518",this->MtasProc->GetSumFrontBackEnergy(ii+6),this->CurrBSM.TotalEnergy);
-			hismanager->Fill("BSM_36518",this->MtasProc->GetSumFrontBackEnergy(ii+12),this->CurrBSM.TotalEnergy);
-			hismanager->Fill("BSM_36518",this->MtasProc->GetSumFrontBackEnergy(ii+18),this->CurrBSM.TotalEnergy);
+			hismanager->Fill("BSM_3651",this->MtasProc->GetSumFrontBackEnergy(ii+6),this->BSMProc->GetAverageTotalEnergy());
+			hismanager->Fill("BSM_3651",this->MtasProc->GetSumFrontBackEnergy(ii+12),this->BSMProc->GetAverageTotalEnergy());
+			hismanager->Fill("BSM_3651",this->MtasProc->GetSumFrontBackEnergy(ii+18),this->BSMProc->GetAverageTotalEnergy());
+			hismanager->Fill("BSM_36518",this->MtasProc->GetSumFrontBackEnergy(ii+6),this->BSMProc->GetAverageTotalEnergy());
+			hismanager->Fill("BSM_36518",this->MtasProc->GetSumFrontBackEnergy(ii+12),this->BSMProc->GetAverageTotalEnergy());
+			hismanager->Fill("BSM_36518",this->MtasProc->GetSumFrontBackEnergy(ii+18),this->BSMProc->GetAverageTotalEnergy());
 			
-			hismanager->Fill("BSM_3653",this->MtasProc->GetSumFrontBackEnergy(ii),this->CurrBSM.TotalEnergy);
-			hismanager->Fill("BSM_36538",this->MtasProc->GetSumFrontBackEnergy(ii),this->CurrBSM.TotalEnergy);
+			hismanager->Fill("BSM_3653",this->MtasProc->GetSumFrontBackEnergy(ii),this->BSMProc->GetAverageTotalEnergy());
+			hismanager->Fill("BSM_36538",this->MtasProc->GetSumFrontBackEnergy(ii),this->BSMProc->GetAverageTotalEnergy());
 			
 			if( not (this->MtasProc->DidAnyMiddleFire() or this->MtasProc->DidAnyOuterFire()) ){
-				hismanager->Fill("BSM_3656",this->MtasProc->GetSumFrontBackEnergy(ii),this->CurrBSM.TotalEnergy);
-				hismanager->Fill("BSM_36568",this->MtasProc->GetSumFrontBackEnergy(ii),this->CurrBSM.TotalEnergy);
+				hismanager->Fill("BSM_3656",this->MtasProc->GetSumFrontBackEnergy(ii),this->BSMProc->GetAverageTotalEnergy());
+				hismanager->Fill("BSM_36568",this->MtasProc->GetSumFrontBackEnergy(ii),this->BSMProc->GetAverageTotalEnergy());
 				
 				if( not this->MtasProc->DidAnyInnerFire() ){
-					hismanager->Fill("BSM_3658",this->MtasProc->GetSumFrontBackEnergy(ii),this->CurrBSM.TotalEnergy);
-					hismanager->Fill("BSM_36588",this->MtasProc->GetSumFrontBackEnergy(ii),this->CurrBSM.TotalEnergy);
+					hismanager->Fill("BSM_3658",this->MtasProc->GetSumFrontBackEnergy(ii),this->BSMProc->GetAverageTotalEnergy());
+					hismanager->Fill("BSM_36588",this->MtasProc->GetSumFrontBackEnergy(ii),this->BSMProc->GetAverageTotalEnergy());
 				}
 			}
 		}
 
-		hismanager->Fill("BSM_3600",this->CurrBSM.TotalEnergy);
-		hismanager->Fill("BSM_3602",this->CurrBSM.TotalEnergy+this->MtasProc->GetTotalEnergy(0));
+		hismanager->Fill("BSM_3600",this->BSMProc->GetAverageTotalEnergy());
+		hismanager->Fill("BSM_3602",this->BSMProc->GetAverageTotalEnergy()+this->MtasProc->GetTotalEnergy(0));
 		if( not (this->MtasProc->DidAnyMiddleFire() or this->MtasProc->DidAnyOuterFire()) ){
-			hismanager->Fill("BSM_3603",this->CurrBSM.TotalEnergy+this->MtasProc->GetTotalEnergy(0));
-			hismanager->Fill("BSM_3604",this->CurrBSM.TotalEnergy+this->MtasProc->GetTotalEnergy(1));
+			hismanager->Fill("BSM_3603",this->BSMProc->GetAverageTotalEnergy()+this->MtasProc->GetTotalEnergy(0));
+			hismanager->Fill("BSM_3604",this->BSMProc->GetAverageTotalEnergy()+this->MtasProc->GetTotalEnergy(1));
 			if( not this->MtasProc->DidAnyInnerFire() ){
-				hismanager->Fill("BSM_3605",this->CurrBSM.TotalEnergy+this->MtasProc->GetTotalEnergy(1));
+				hismanager->Fill("BSM_3605",this->BSMProc->GetAverageTotalEnergy()+this->MtasProc->GetTotalEnergy(1));
 			}
 		}
 		if( (not this->HasMTAS) or this->MtasProc->GetTotalEnergy(0) < 1.0 ){
-			hismanager->Fill("BSM_3601",this->CurrBSM.TotalEnergy);
-			if( this->CurrBSM.TotalEnergy > this->QBeta ){
+			hismanager->Fill("BSM_3601",this->BSMProc->GetAverageTotalEnergy());
+			if( this->BSMProc->GetAverageTotalEnergy() > this->QBeta ){
 				this->BSMProc->FillGSPileupTracePlots(hismanager);
 			}
 		}
 	}else{
 		if( this->MtasProc->DidAnyPileup() ){
-			hismanager->Fill("BSM_3611",this->CurrBSM.TotalEnergy);
+			hismanager->Fill("BSM_3611",this->BSMProc->GetAverageTotalEnergy());
 		}
 		if( this->MtasProc->DidAnySaturate() ){
-			hismanager->Fill("BSM_3612",this->CurrBSM.TotalEnergy);
+			hismanager->Fill("BSM_3612",this->BSMProc->GetAverageTotalEnergy());
 		}
 	}
 
@@ -234,8 +226,6 @@ void BSMExpProcessor::Init(const pugi::xml_node& config){
 void BSMExpProcessor::Finalize(){
 	this->MtasProc->Finalize();
 	this->BSMProc->Finalize();
-
-	this->CurrBSM = this->BSMProc->GetCurrEvt();
 
 	this->console->info("{} has been finalized",this->ProcessorName);
 }

@@ -29,51 +29,29 @@ class BSMProcessor : public Processor{
 		virtual void RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>&) final;
 		virtual void CleanupTree() final;
 
+		const double& GetAverageTotalEnergy() const;
+		const double& GetSumFrontBackEnergy(const int&) const;
+
+		const double& GetGeometricTotalEnergy() const;
+		const double& GetGeometricFrontBackEnergy(const int&) const;
+
+		const double& GetPosition(const int&) const;
+
+		const double& GetTDiff(const int&) const;
+
+		const double& GetFirstFireTime() const;
+		const double& GetLastFireTime() const;
+
+		bool DidIndividualSaturate(const int&) const;
+		const bool& DidAnySaturate() const;
+
+		bool DidIndividualPileup(const int&) const;
+		const bool& DidAnyPileup() const;
+
 		void FillGSPileupTracePlots(PLOTS::PlotRegistry*) const;
 		void FillPositionPlots(PLOTS::PlotRegistry*) const;
 
-		struct EventInfo{
-			double TotalEnergy;
-			std::vector<double> SumFrontBackEnergy;
-			std::vector<double> Position;
-			std::vector<double> TDiff;
-			std::vector<double> CorrectedBSM;
-			double UnCorrectedTotalEnergy;
-			std::vector<double> UnCorrectedSumFrontBackEnergy;
-			std::vector<double> UnCorrectedBSM;
-			double FirstTime;
-			double LastTime;
-			int NumValidSegments;
-			bool Saturate;
-			bool Pileup;
-			bool RealEvt;
-
-			EventInfo(){
-				TotalEnergy = 0.0;
-				SumFrontBackEnergy = std::vector<double>(6,0.0);
-				Position = std::vector<double>(6,0.0);
-				TDiff = std::vector<double>(6,-1.0e9);
-				CorrectedBSM = std::vector<double>(12,0.0);
-				UnCorrectedTotalEnergy = 0.0;
-				UnCorrectedSumFrontBackEnergy = std::vector<double>(6,0.0);
-				UnCorrectedBSM = std::vector<double>(12,0.0);
-				FirstTime = -1.0;
-				LastTime = -1.0;
-				NumValidSegments = 0;
-				Saturate = false;
-				Pileup = false;
-				RealEvt = false;
-			}
-			~EventInfo() = default;
-			EventInfo(const EventInfo&) = default;
-			EventInfo(EventInfo&&) = default;
-			EventInfo& operator=(const EventInfo&) = default;
-			EventInfo& operator=(EventInfo&&) = default;
-		};
-
-		EventInfo& GetCurrEvt();
-		EventInfo& GetPrevEvt();
-
+	private:
 		struct TraceAnalysis{
 			float integralthreshold;
 			std::string cutid;
@@ -84,22 +62,38 @@ class BSMProcessor : public Processor{
 			}
 		};
 
-	private:
 
 		double CalcPosition(double,double);
 
 		void Reset();
 
-		EventInfo CurrEvt;
-		EventInfo PrevEvt;
-		EventInfo NewEvt;
-
 		std::vector<PhysicsData*> Pairs;
 
 		std::vector<double> RawBSM;
+		std::vector<double> UnCorrectedBSM;
+		std::vector<double> CorrectedBSM;
 		std::vector<int> BSMHits;
 		std::vector<int> TotalMult;
 		std::vector<std::unique_ptr<TraceAnalysis>> TraceSettings;
+
+		double AverageTotalEnergy;
+		double GeometricTotalEnergy;
+		std::vector<double> SumFrontBackEnergy;
+		std::vector<double> GeometricFrontBackEnergy;
+		
+		std::vector<double> Position;
+		std::vector<double> TDiff;
+
+		double FirstTime;
+		double LastTime;
+
+		int NumValidSegments;
+
+		std::vector<bool> IndividualSaturate;
+		bool AnySaturate;
+		
+		std::vector<bool> IndividualPileup;
+		bool AnyPileup;
 
 		std::vector<double> TimeStamps;
 		std::vector<double> HitTimeStamps;
