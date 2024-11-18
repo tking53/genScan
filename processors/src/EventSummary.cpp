@@ -88,3 +88,16 @@ void EventSummary::AddEventTag(const std::string& tag){
 bool EventSummary::ContainsEventTag(const std::string& tag) const{
 	return this->EventTags.find(tag) != this->EventTags.end();
 }
+
+void EventSummary::AddEventObservable(const std::string& name,const double& obs){
+	this->EventObservable[name] = obs;
+}
+
+std::optional<double> EventSummary::GetEventObservable(const std::string& name) const{
+	auto search = this->EventObservable.find(name);
+	if( search == this->EventObservable.end() ){
+		return std::nullopt;
+	}else{
+		return std::optional<double>(search->second);
+	}
+}

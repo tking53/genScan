@@ -3,7 +3,8 @@
 
 #include <set>
 #include <string>
-#include <tuple>
+#include <map>
+#include <optional>
 
 #include <spdlog/common.h>
 #include <spdlog/spdlog.h>
@@ -22,7 +23,6 @@ class EventHistoryManager;
 
 class EventSummary{
 	public:
-		//EventSummary();
 		EventSummary(EventHistoryManager*,const boost::container::flat_map<std::string,std::vector<bool>>&);
 		~EventSummary() = default;
 	
@@ -37,19 +37,20 @@ class EventSummary{
 		void AddEventTag(const std::string&);
 		bool ContainsEventTag(const std::string&) const;
 
+		void AddEventObservable(const std::string&,const double&);
+		std::optional<double> GetEventObservable(const std::string&) const;
+
 		const std::set<std::string>& GetKnownTypes() const;
 
 		PhysicsData* GetDetectorMaxEvent(const std::vector<PhysicsData*>&) const;
 
 	private:
-		//std::string LogName;
-		//std::shared_ptr<spdlog::logger> console;
-		
 		EventHistoryManager* parent;
+		std::set<std::string> EventTags;
+		std::map<std::string,double> EventObservable;
 
 		boost::container::devector<PhysicsData> RawEvents;
 		std::set<std::string> KnownTypes;
-		std::set<std::string> EventTags;
 		boost::container::flat_map<std::string,std::vector<bool>> MappedUIDs;
 		boost::regex ColonParse;
 		unsigned long long UIDCacheHits;
