@@ -139,7 +139,17 @@ void XMLConfigParser::ParseDetectorDriver(){
 			throw std::runtime_error(ss.str());
 		}
 
-		for(; processor; processor = processor.next_sibling("Processor")){
+		std::set<std::string> names;
+		while( processor ){
+			this->RecursiveNameCheck(processor,names);
+			processor = processor.next_sibling("Processor");
+		}
+		while( analyzer ){
+			this->RecursiveNameCheck(analyzer,names);
+			analyzer = analyzer.next_sibling("Analyzer");
+		}
+
+		for(processor = this->DetectorDriver.child("Processor"); processor; processor = processor.next_sibling("Processor")){
 			std::string name = processor.attribute("name").as_string("");
 			if( name.compare("") == 0 ){
 				std::stringstream ss;
@@ -152,7 +162,7 @@ void XMLConfigParser::ParseDetectorDriver(){
 				AddProcessorName(name);
 			}
 		}
-		for(; analyzer; analyzer = analyzer.next_sibling("Analyzer")){
+		for(analyzer = this->DetectorDriver.child("Analyzer"); analyzer; analyzer = analyzer.next_sibling("Analyzer")){
 			std::string name = analyzer.attribute("name").as_string("");
 			if( name.compare("") == 0 ){
 				std::stringstream ss;
@@ -505,5 +515,29 @@ void XMLConfigParser::ParseMap(ChannelMap* cmap){
 		   << *(this->ConfigName) 
 		   << "\" is malformed. Map node is missing.";
 		throw std::runtime_error(ss.str());
+	}
+}
+
+void XMLConfigParser::RecursiveNameCheck(pugi::xml_node& currnode,std::set<std::string>& currset) const{
+	std::string currnodetype(currnode.name());
+	if( currnodetype.compare("Processor") == 0  or currnodetype.compare("Analyzer") == 0 ){
+		auto name = currnode.attribute("name").as_string("");
+		if( currset.find(name) != currset.end() ){
+			std::stringstream ss;
+			ss << "XMLConfigParser::ParseDetectorDriver() : config file named \""
+				<< *(this->ConfigName) 
+				<< "\" is malformed. "
+				<< currnodetype 
+				<< " Named:["
+				<< name
+				<< "] is repeated at some point. Each named object must only exist once within the config file";
+			throw std::runtime_error(ss.str());
+		}else{
+			currset.insert(name);
+		}
+	}
+
+	for(pugi::xml_node child : currnode.children()) {
+		RecursiveNameCheck(child,currset);	
 	}
 }

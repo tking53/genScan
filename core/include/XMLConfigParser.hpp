@@ -1,6 +1,7 @@
 #ifndef __XML_CONFIG_PARSER_HPP__
 #define __XML_CONFIG_PARSER_HPP__
 
+#include <set>
 #include <string>
 #include <vector>
 #include <map>
@@ -26,7 +27,10 @@ class XMLConfigParser : public ConfigParser{
 		virtual void ParseDetectorDriver();
 		virtual void ParseMap(ChannelMap*);
 		virtual void ParseCuts();
+		
+		void RecursiveNameCheck(pugi::xml_node&,std::set<std::string>&) const;
 	private:
+		
 		pugi::xml_document XMLDoc;
 
 		pugi::xml_node Configuration;
