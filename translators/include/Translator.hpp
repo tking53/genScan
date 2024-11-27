@@ -23,6 +23,9 @@
 #include "PhysicsData.hpp"
 
 
+/// @addtogroup Decoding
+/// @{
+/// @class Translator
 class Translator{
 	public:
 		enum TRANSLATORSTATE{
@@ -62,5 +65,6 @@ class Translator{
 
 		uint64_t CurrExtTS;
 };
+/// @}
 
 #endif

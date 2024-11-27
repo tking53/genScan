@@ -1,3 +1,8 @@
+/// @file PhysicsData.hpp
+/// @author T. J. Ruland
+/// @brief Class that holds the raw information from the digitizers 
+///
+
 #ifndef __PHYSICS_DATA_HPP__
 #define __PHYSICS_DATA_HPP__
 
@@ -7,71 +12,183 @@
 
 #include "TraceHelper.hpp"
 
+/// @addtogroup Events
+/// @{
+/// @details Classes associated with constructing Events 
+/// @class PhysicsData
+/// @brief PhysicsData object that all the translators convert their respective data files into
+/// @details This class does all the heavy lifting, so far all the translators interact translate them directly from their data files
+/// and they're loaded into an EventSummary managed by the EventHistoryManager
 class PhysicsData{
 	public:
+		/// @brief Constructs physics data object from the decoded word zero 
+		/// @details Several variables are calculated and defaulted during this process
+		/// 	   -  HeaderLength : headerlength
+		/// 	   -  EventLength : eventlength
+		/// 	   -  CrateNum : cratenum
+		/// 	   -  ModNum : modnum
+		/// 	   -  ChanNum : channum
+		/// 	   -  globalBoardID : gboard
+		/// 	   -  globalChannelID : gchan
+		/// 	   -  RawEnergy : rawerg
+		/// 	   -  RawTimeStamp : rawts
+		///        -  SpillID : 0 
+		///        -  CMapID : "cratenum:modnum:channum"
+		///        -  Location : -1
+		///        -  Energy : 0.0
+		///        -  TimeStamp : -1.0
+		///        -  CFDForcedBit : false
+		///        -  CFDFraction : -1.0
+		///        -  CFDSourceBit : -1
+		///        -  Pileup : false
+		///        -  Saturation : false
+		///        -  Phase : -1.0 
+		///        -  ExternalTimestamp : std::numeric_limits<uint64_t>::max()
+		///        -  Trace : TraceHelper<uint16_t,float>()
+		///        -  QDCSums : {}
+		///        -  Type : ""
+		///        -  SubType : ""
+		///        -  Group : ""
+		///        -  Tags : ""
+		///        -  TagList : {}
+		/// @param[in] headerlength size of the pixie16 header in words (4/8/12/16)
+		/// @param[in] eventlength size of the header + the tracelength in words
+		/// @param[in] cratenum decoded crate number from word zero [0-4]
+		/// @param[in] modnum decoded module number from word zero [0-12]
+		/// @param[in] channum decoded channel number from word zero [0-15] or [0-31] if using Rev. H
+		/// @param[in] gboard linearized global board number calculated from modnum + cratenum*13
+		/// @param[in] gchan linearized global channel number calculated form channum + modnum*16 + cratenum*13*16
+		/// @param[in] rawerg pixie16 filter energy
+		/// @param[in] rawts pixie16 low resolution timestamp
 		PhysicsData(int,int,int,int,int,int,int,uint32_t,uint64_t);
+
+		/// @brief compiler default destructor
 		~PhysicsData() = default;
 
+		/// @brief custom defined copy constructor
+		/// @param other object we are copying data from 
 		PhysicsData(const PhysicsData&);
+
+		/// @brief custom defined move constructor
+		/// @param other object we are moving data from, this leaves other in an unspecified state since we move all the stl objects too with std::move
 		PhysicsData(PhysicsData&&) noexcept;
 
+		/// @brief custom overload copy assignment operator
+		/// @param other object we are copying data from 
 		PhysicsData& operator=(const PhysicsData&);
+		
+		/// @brief custom defined move assignment operator
+		/// @param other object we are moving data from, this leaves other in an unspecified state since we move all the stl objects too with std::move
 		PhysicsData& operator=(PhysicsData&&) noexcept;
 
 		//HeaderLength, this is mostly used for pixie data
+		/// @brief retrieve the HeaderLength
+		/// @return decoded filter header length 
 		int GetHeaderLength() const;
 
 		//EventLength
+		/// @brief retrieve the event length the object was constructed with
+		/// @return decoded filter event length 
 		int GetEventLength() const;
 
 		//RawEnergy
+		/// @brief retrieve the raw energy the object was constructed with
+		/// @return decoded filter energy 
 		uint32_t GetRawEnergy() const;
+		
+		/// @brief retrieve the raw energy the object was constructed with plus the random [0,1) that was added later
+		/// @return decoded filter energy with aliasing
 		double GetRawEnergyWRandom() const;
 
 		//RawTimeStamp
+		/// @brief retrieve the raw timestamp in pixie ticks the object was constructed with
+		/// @return decoded low resolution filter timestamp in pixie ticks (changes with digitizer frequeuncy) 
 		uint64_t GetRawTimeStamp() const;
 
 		//SpillID 
+		/// @brief helper for decoding poll2 data since a spill can be split across 2 actual spills when there is high data rate 
+		/// @param[in] id tracked spill id as we translate from ldf into the PhysicsData object 
 		void SetSpillID(uint64_t);
+		
+		/// @brief retrieve the spill id assigned to this object (only useful when decoding poll2 data) 
+		/// @return return the mapped spill id from tracking the number of spills as poll2 data is translated 
 		uint64_t GetSpillID() const;
 
 		//Energy
+		/// @brief set the energy values that require aliasing  
+		/// @param[in] value1 uncalibrated raw energy with random [0,1.0)
+		/// @param[in] value2 calibrated energy that was been aliased 
 		void SetEnergy(double,double);
+		
+		/// @brief get the calibrated energy value 
+		/// @return calibrated energy derived from aliased raw energy
 		double GetEnergy() const;
 
 		//TimeStamp
+		/// @brief set the low resolution filter timestamp in ns 
+		/// @param[in] value low resolution filter timestamp in ns
 		void SetTimeStamp(double);
+
+		/// @brief get the low resolution filter timestamp in ns 
+		/// @return low resolution filter timestamp in ns
 		double GetTimeStamp() const;
 
 		//CFDTimeStamp
+		/// @brief set the on-board cfd timestamp in ns 
+		/// @param[in] value on-board cfd timestamp in ns
 		void SetCFDTimeStamp(double);
+		
+		/// @brief get the on-board cfd timestamp in ns 
+		/// @return on-board cfd timestamp in ns
 		double GetCFDTimeStamp() const;
 
 		//CFD Forced Bit
+		/// @brief set the on-board cfd forced bit 
+		/// @param[in] value bool of if the on-board cfd was forced 
 		void SetCFDForcedBit(bool);
+		
+		/// @brief get whether the on-board cfd was force-triggered
+		/// @return on-board cfd force triggered
 		bool GetCFDForcedBit() const;
 
 		//CFD Fraction
+		/// @brief set the on-board cfd fraction
+		/// @param[in] value fraction of the on-board cfd (see pixie16 manual for better detail) 
 		void SetCFDFraction(double);
+		
+		/// @brief get the on-board cfd fraction
+		/// @return on-board cfd fraction (see pixie16 manual for better detail)
 		double GetCFDFraction() const;
 
 		//CFD Source Bit
+		/// @brief set which adc triggered the on-board cfd
+		/// @param[in] value adc number (varies with digitizer frequency, see pixie16 manual for better detail) 
 		void SetCFDSourceBit(int);
 		int GetCFDSourceBit() const;
 
 		//Crate
+		/// @brief get the word zero decoded crate number
+		/// @return crate number object constructed with 
 		int GetCrate() const;
 
 		//Module
+		/// @brief get the word zero decoded module number
+		/// @return module number object constructed with 
 		int GetModule() const;
 
 		//Channel
+		/// @brief get the word zero decoded channel number
+		/// @return channel number object constructed with 
 		int GetChannel() const;
 
 		//GlobalChannelID 
+		/// @brief get the global channel id, derived from parsing xml and assigned by ChannelMap
+		/// @return global channel id object constructed with 
 		int GetGlobalChannelID() const;
 
 		//GlobalBoardID 
+		/// @brief get the global board id, derived from parsing xml and assigned by ChannelMap
+		/// @return global board id object constructed with 
 		int GetGlobalBoardID() const;
 
 		//Location, typically this is crateID*(maxModPerCrate*maxChanPerMod) + modID*(maxChanPerMod) + chanID
@@ -215,8 +332,8 @@ class PhysicsData{
 		void CalculateTraceDerivatives();
 	private:
 		//this is info decoded from the data files
-		int HeaderLength;	
-		int EventLength;
+		int HeaderLength; /**< decoded length of event header (4/8/12/16) */	
+		int EventLength; /**< decoded legth of the event HeaderLength+TraceLength */
 		uint32_t RawEnergy;
 		double RawEnergyWRandom;
 		uint64_t RawTimeStamp;
@@ -269,5 +386,6 @@ class PhysicsData{
 
 		TraceHelper<uint16_t,float> GetTraceHelper() const;
 };
+/// @}
 
 #endif

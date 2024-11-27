@@ -21,14 +21,25 @@
 
 class EventHistoryManager;
 
+/// @addtogroup Events
+/// @{
 class EventSummary{
 	public:
 		EventSummary(EventHistoryManager*,const boost::container::flat_map<std::string,std::vector<bool>>&);
 		~EventSummary() = default;
 	
 		void BuildDetectorSummary();
+
+		/// @callgraph
+		/// @callergraph
 		void GetDetectorTypeSummary(const std::string&,std::vector<PhysicsData*>&);
+
+		/// @callgraph
+		/// @callergraph
 		void GetDetectorSummary(const std::string&,std::vector<PhysicsData*>&);
+
+		/// @callgraph
+		/// @callergraph
 		void GetDetectorSummary(const boost::regex&,std::vector<PhysicsData*>&);
 
 		boost::container::devector<PhysicsData>& GetRawEvents();
@@ -59,5 +70,6 @@ class EventSummary{
 		unsigned long long CacheHits;
 		unsigned long long CacheMisses;
 };
+/// @}
 
 #endif
