@@ -28,6 +28,7 @@ class DataParser{
 			CAEN_ROOT,
 			CAEN_BIN,
 			LDF_PIXIE,
+			PACMAN_LDF_PIXIE,
 			PLD,
 			EVT_PRESORT,
 			EVT_BUILT

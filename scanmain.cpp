@@ -73,7 +73,7 @@ int main(int argc, char *argv[]) {
 		("enabletree,t",boost::program_options::value<bool>(&enabletree)->default_value(true),"enable root tree output or disable it and only generate histograms")
 		("file,f",boost::program_options::value<std::vector<std::string>>(&FileNames),"[file1 file2 file3 ...] list of files used for input")
 		("limit,l",boost::program_options::value<int>(&limit)->default_value(10),"number of events to keep in history [0 -> current, 1 -> prev., ... N-1]")
-		("format,x",boost::program_options::value<std::string>(&dataformat)->default_value("null"),"[file_format] format of the data file (evt,evt-presort,ldf,pld,caen_root,caen_bin)")
+		("format,x",boost::program_options::value<std::string>(&dataformat)->default_value("null"),"[file_format] format of the data file (evt,evt-presort,ldf,pacman_ldf,pld,caen_root,caen_bin)")
 		("port,p",boost::program_options::value<int>(&port)->default_value(9090),"[portid] port to listen/send on for the live histogramming")
 		;
 
@@ -143,6 +143,8 @@ int main(int argc, char *argv[]) {
 			dataparser.reset(new DataParser(DataParser::DataFileType::EVT_PRESORT,logname));
 		}else if( dataformat.compare("ldf") == 0 ){
 			dataparser.reset(new DataParser(DataParser::DataFileType::LDF_PIXIE,logname));
+		}else if( dataformat.compare("pacman_ldf") == 0 ){
+			dataparser.reset(new DataParser(DataParser::DataFileType::PACMAN_LDF_PIXIE,logname));
 		}else if( dataformat.compare("pld") == 0 ){
 			dataparser.reset(new DataParser(DataParser::DataFileType::PLD,logname));
 		}else if( dataformat.compare("caen_root") == 0 ){

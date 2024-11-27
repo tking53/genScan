@@ -10,6 +10,7 @@
 #include "EVTTranslator.hpp"
 #include "EVTPresortTranslator.hpp"
 #include "LDFPixieTranslator.hpp"
+#include "PacmanLDFPixieTranslator.hpp"
 
 DataParser::DataParser(DataParser::DataFileType dft,const std::string& log){
 	this->DataType = dft;
@@ -26,6 +27,9 @@ DataParser::DataParser(DataParser::DataFileType dft,const std::string& log){
 			break;
 		case LDF_PIXIE:
 			this->ParserName = "LDF_PIXIE";
+			break;
+		case PACMAN_LDF_PIXIE:
+			this->ParserName = "PACMAN_LDF_PIXIE";
 			break;
 		case PLD:
 			this->ParserName = "PLD";
@@ -47,6 +51,10 @@ DataParser::DataParser(DataParser::DataFileType dft,const std::string& log){
 		case LDF_PIXIE:
 			this->console = spdlog::get(this->LogName)->clone("LDF_PIXIE");
 			this->DataTranslator.reset(new LDFPixieTranslator(this->LogName,this->ParserName));
+			break;
+		case PACMAN_LDF_PIXIE:
+			this->console = spdlog::get(this->LogName)->clone("PACMAN_LDF_PIXIE");
+			this->DataTranslator.reset(new PacmanLDFPixieTranslator(this->LogName,this->ParserName));
 			break;
 		case EVT_PRESORT:
 			this->console = spdlog::get(this->LogName)->clone("EVT_Presort_Parser");
