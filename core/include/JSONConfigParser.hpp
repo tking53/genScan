@@ -1,6 +1,8 @@
 #ifndef __JSON_CONFIG_PARSER_HPP__
 #define __JSON_CONFIG_PARSER_HPP__
 
+#include "json/value.h"
+#include <set>
 #include <string>
 #include <vector>
 #include <map>
@@ -26,6 +28,8 @@ class JSONConfigParser : public ConfigParser{
 		virtual void ParseDetectorDriver();
 		virtual void ParseMap(ChannelMap*);
 		virtual void ParseCuts();
+
+		void RecursiveNameCheck(const Json::Value&,std::set<std::string>&) const;
 	private:
 		std::ifstream finput;
 

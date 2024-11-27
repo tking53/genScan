@@ -1,3 +1,4 @@
+#include <set>
 #include <stdexcept>
 #include <sstream>
 #include <limits>
@@ -138,13 +139,16 @@ void YAMLConfigParser::ParseDetectorDriver(){
 			throw std::runtime_error(ss.str());
 		}
 
+		std::set<std::string> names;
 		for( size_t ii = 0; ii < processor.size(); ++ii ){
+			this->RecursiveNameCheck(processor[ii],names);
 			std::string name = processor[ii]["name"].as<std::string>();
 			this->ProcessorNames[name] = processor[ii];
 			AddProcessorName(name);
 		}
 
 		for( size_t ii = 0; ii < analyzer.size(); ++ii ){
+			this->RecursiveNameCheck(analyzer[ii],names);
 			std::string name = analyzer[ii]["name"].as<std::string>();
 			this->AnalyzerNames[name] = analyzer[ii];
 			AddAnalyzerName(name);
@@ -487,4 +491,35 @@ YAML::Node YAMLConfigParser::GetProcessorYAMLInfo(const std::string& name) const
 
 YAML::Node YAMLConfigParser::GetAnalyzerYAMLInfo(const std::string& name) const{
 	return this->AnalyzerNames.at(name);
+}
+
+void YAMLConfigParser::RecursiveNameCheck(const YAML::Node& currnode,std::set<std::string>& currset) const{
+	if( currnode["name"] ){
+		std::string name = currnode["name"].as<std::string>();
+		if( currset.find(name) != currset.end() ){
+			std::stringstream ss;
+			ss << "YAMLConfigParser::ParseDetectorDriver() : config file named \""
+				<< *(this->ConfigName) 
+				<< "\" is malformed. "
+				<< " Proceessor/Analyzer Named:["
+				<< name
+				<< "] is repeated at some point. Each named object must only exist once within the config file";
+			throw std::runtime_error(ss.str());
+
+		}else{
+			currset.insert(name);
+		}
+	}
+	if( currnode["Processor"] ){
+		YAML::Node child = currnode["Processor"];
+		for( size_t ii = 0; ii < child.size(); ++ii ){
+			this->RecursiveNameCheck(child[ii],currset);
+		}
+	}
+	if( currnode["Analyzer"] ){
+		YAML::Node child = currnode["Analyzer"];
+		for( size_t ii = 0; ii < child.size(); ++ii ){
+			this->RecursiveNameCheck(child[ii],currset);
+		}
+	}
 }

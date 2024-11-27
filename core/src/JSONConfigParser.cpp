@@ -1,4 +1,5 @@
 #include <fstream>
+#include <set>
 #include <stdexcept>
 #include <sstream>
 #include <limits>
@@ -141,13 +142,16 @@ void JSONConfigParser::ParseDetectorDriver(){
 			throw std::runtime_error(ss.str());
 		}
 
+		std::set<std::string> names;
 		for(const auto& proc : processor ){
+			this->RecursiveNameCheck(proc,names);
 			std::string name = proc["name"].asString();
 			this->ProcessorNames[name] = proc;
 			AddProcessorName(name);
 		}
 
 		for(const auto& proc : analyzer ){
+			this->RecursiveNameCheck(proc,names);
 			std::string name = proc["name"].asString();
 			this->AnalyzerNames[name] = proc;
 			AddAnalyzerName(name);
@@ -485,4 +489,36 @@ Json::Value JSONConfigParser::GetProcessorJSONInfo(const std::string& name) cons
 
 Json::Value JSONConfigParser::GetAnalyzerJSONInfo(const std::string& name) const{
 	return this->AnalyzerNames.at(name);
+}
+
+void JSONConfigParser::RecursiveNameCheck(const Json::Value& currnode,std::set<std::string>& currset) const{
+	if( currnode["name"] ){
+		std::string name = currnode["name"].asString();
+		if( currset.find(name) != currset.end() ){
+			std::stringstream ss;
+			ss << "JSONConfigParser::ParseDetectorDriver() : config file named \""
+				<< *(this->ConfigName) 
+				<< "\" is malformed. "
+				<< " Proceessor/Analyzer Named:["
+				<< name
+				<< "] is repeated at some point. Each named object must only exist once within the config file";
+			throw std::runtime_error(ss.str());
+
+		}else{
+			currset.insert(name);
+		}
+	}
+	if( currnode["Processor"] ){
+		Json::Value child = currnode["Processor"];
+		for( const auto& child : currnode["Processor"] ){
+			this->RecursiveNameCheck(child,currset);
+		}
+	}
+	if( currnode["Analyzer"] ){
+		Json::Value child = currnode["Analyzer"];
+		for( const auto& child : currnode["Analyzer"] ){
+			this->RecursiveNameCheck(child,currset);
+		}
+	}
+
 }

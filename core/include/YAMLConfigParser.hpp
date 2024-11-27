@@ -25,6 +25,7 @@ class YAMLConfigParser : public ConfigParser{
 		virtual void ParseDetectorDriver();
 		virtual void ParseMap(ChannelMap*);
 		virtual void ParseCuts();
+		void RecursiveNameCheck(const YAML::Node&,std::set<std::string>&) const;
 	private:
 		YAML::Node YAMLDoc;
 		YAML::Node Configuration;
