@@ -69,7 +69,7 @@ int main(int argc, char *argv[]) {
 	cmdline_options.add_options()
 		("help,h", "produce help message")
 		("configfile,c",boost::program_options::value<std::string>(&configfile)->default_value("config.xml"),"[filename] filename for channel map")
-		("outputfile,o",boost::program_options::value<std::string>(&outputfile)->default_value("out.txt"),"[filename] filename for output")
+		("outputfile,o",boost::program_options::value<std::string>(&outputfile)->default_value("out"),"[filename] filename for output")
 		("enabletree,t",boost::program_options::value<bool>(&enabletree)->default_value(true),"enable root tree output or disable it and only generate histograms")
 		("file,f",boost::program_options::value<std::vector<std::string>>(&FileNames),"[file1 file2 file3 ...] list of files used for input")
 		("limit,l",boost::program_options::value<int>(&limit)->default_value(10),"number of events to keep in history [0 -> current, 1 -> prev., ... N-1]")
