@@ -31,7 +31,9 @@ PuckProcessor::PuckProcessor(const std::string& log) : Processor(log,"PuckProces
 				{3651 , {4096,0.0,4096.0,4096,0.0,4096.0}},
 				{36518 , {2048,0.0,16384.0,2048,0.0,16384.0}},
 				{3652 , {4096,0.0,4096.0,4096,0.0,4096.0}},
-				{36528 , {2048,0.0,16384.0,2048,0.0,16384.0}}
+				{36528 , {2048,0.0,16384.0,2048,0.0,16384.0}},
+				{3660 , {4096,0.0,4096.0,4096,0.0,4096.0}},
+				{36608 , {2048,0.0,16384.0,2048,0.0,16384.0}}
 			    };
 	
 	this->PuckHits = std::vector<int>(2,0);
@@ -84,6 +86,8 @@ PuckProcessor::PuckProcessor(const std::string& log) : Processor(log,"PuckProces
 
 	this->CurrEvt.TotalEnergy = std::accumulate(this->CurrEvt.Individual.begin(),this->CurrEvt.Individual.end(),0.0);
 
+	hismanager->Fill("Puck_3660",this->CurrEvt.Individual[1],this->CurrEvt.Individual[0]);
+
 	Processor::EndProcess();
 	return true;
 }
@@ -135,6 +139,9 @@ void PuckProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 	hismanager->RegisterPlot<TH2F>("Puck_36518","Puck Front vs MTAS Total; MTAS Total Energy (8 keV/bin); Puck Energy (8 keV/bin)",this->h2dsettings.at(36518));
 	hismanager->RegisterPlot<TH2F>("Puck_3652","Puck Back vs MTAS Total; MTAS Total Energy (keV); Puck Energy (keV)",this->h2dsettings.at(3652));
 	hismanager->RegisterPlot<TH2F>("Puck_36528","Puck Back vs MTAS Total; MTAS Total Energy (8 keV/bin); Puck Energy (8 keV/bin)",this->h2dsettings.at(36528));
+	
+	hismanager->RegisterPlot<TH2F>("Puck_3660","Puck Front vs Puck Back; Puck Back Energy (keV); Puck Front Energy (keV)",this->h2dsettings.at(3660));
+	hismanager->RegisterPlot<TH2F>("Puck_36608","Puck Front vs Puck Back; Puck Back Energy (8 keV/bin); Puck Front Energy (8 keV/bin)",this->h2dsettings.at(36608));
 
 	this->console->info("Finished Declaring Plots");
 }
