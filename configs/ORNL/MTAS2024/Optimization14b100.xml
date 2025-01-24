@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Configuration>
+	<Author>
+		<Name>T. Ruland and T. T. King</Name>
+		<Date>March 28, 2022</Date>
+		<Email>rtho139 AT lsu DOT edu</Email>
+	</Author>
+
+	<Description>
+		The HoneyCombDuo xml
+	</Description>
+
+	<Global EventWidth="5.0e-7" EventWidthUnit="s" CorrelationType="rolling-trigger" />
+	<!-- Don't do rolling-window for Mtas, things get weird from the neutrons, IMO tend to trigger twice quite often -->
+	<!-- <Global EventWidth="500.0" EventWidthUnit="ns" CorrelationType="rolling-window" /> -->
+
+	<DetectorDriver >
+		<Processor name="PuckProcessor" />
+		<Processor name="RootDevProcessor" included_types="puck" />
+	</DetectorDriver>
+
+	<Map>
+		<Crate number="0">
+			<!-- <Module number="0" Revision="F" Frequency="100" Firmware="R42950" TraceDelay="120"> -->
+			<Module number="0" Revision="F" Frequency="100" Firmware="R37640" TraceDelay="120">
+				<Channel number="0" type="puck" subtype="puck" group="1" tags="front">
+					<Calibration model="linear" min="0">	
+						0.0 0.1	
+					</Calibration>
+				</Channel>
+				<Channel number="1" type="puck" subtype="puck" group="1" tags="back">
+					<Calibration model="linear" min="0">	
+						0.0 0.1	
+					</Calibration>
+				</Channel>
+			</Module>
+		</Crate>
+	</Map>
+</Configuration>
