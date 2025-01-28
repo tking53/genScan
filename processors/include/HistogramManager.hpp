@@ -16,6 +16,7 @@
 
 #include <boost/sort/spreadsort/string_sort.hpp>
 #include <boost/unordered_map.hpp>
+//#include <boost/unordered/unordered_node_map.hpp>
 
 #include "TH1.h"
 #include "TH2.h"
@@ -236,6 +237,7 @@ namespace PLOTS{
 					this->Plots_1D[name]->GetYaxis()->SetLabelSize(0.04);
 					this->Plots_1D[name]->GetYaxis()->CenterTitle(true);
 					this->Plots_1D[name]->SetLineColor(this->GetCurrLineColor());
+					//this->console->debug("1D plots load factor : {}, bucket counts : {} after adding {}",this->Plots_1D.load_factor(),this->Plots_1D.bucket_count(),name);
 					this->ShiftLineColor();
 					this->PlotIDs.push_back(name);
 				}else{
@@ -257,6 +259,7 @@ namespace PLOTS{
 					this->Plots_2D[name]->GetYaxis()->SetTitleOffset(1.375);
 					this->Plots_2D[name]->GetYaxis()->SetLabelSize(0.04);
 					this->Plots_2D[name]->GetYaxis()->CenterTitle(true);
+					//this->console->debug("2D plots load factor : {}, bucket counts : {} after adding {}",this->Plots_2D.load_factor(),this->Plots_2D.bucket_count(),name);
 					this->PlotIDs.push_back(name);
 				}else{
 					std::string mess = "Unable to register plot "+name+" as it already exists";
@@ -270,9 +273,10 @@ namespace PLOTS{
 			}
 
 			void Fill(const std::string& name,double xval){
-				if( Plot1DExist(name) ){
+				auto test = this->Plots_1D.find(name);
+				if( test != this->Plots_1D.end() ){
 					++(this->FillCounter1D);
-					this->Plots_1D[name]->Fill(xval);
+					test->second->Fill(xval);
 				}else{
 					std::string mess = "Plot : "+name+" does not exist as a 1D plot";
 					this->console->error("{}",mess);
@@ -281,9 +285,10 @@ namespace PLOTS{
 			}
 
 			void WeightedFill(const std::string& name,double xval,double weight){
-				if( Plot1DExist(name) ){
+				auto test = this->Plots_1D.find(name);
+				if( test != this->Plots_1D.end() ){
 					++(this->FillCounter1D);
-					this->Plots_1D[name]->Fill(xval,weight);
+					test->second->Fill(xval,weight);
 				}else{
 					std::string mess = "Plot : "+name+" does not exist as a 1D plot";
 					this->console->error("{}",mess);
@@ -292,9 +297,10 @@ namespace PLOTS{
 			}
 
 			void FillN(const std::string& name,int n,double* xval,double* weight,int stride = 1){
-				if( Plot1DExist(name) ){
+				auto test = this->Plots_1D.find(name);
+				if( test != this->Plots_1D.end() ){
 					++(this->FillCounter1D);
-					this->Plots_1D[name]->FillN(n,xval,weight,stride);
+					test->second->FillN(n,xval,weight,stride);
 				}else{
 					std::string mess = "Plot : "+name+" does not exist as a 1D plot";
 					this->console->error("{}",mess);
@@ -303,13 +309,14 @@ namespace PLOTS{
 			}
 
 			void IncrementBin(const std::string& name,int binx,int count,bool calcerr){
-				if( Plot1DExist(name) ){
-					auto currcount = this->Plots_1D[name]->GetBinContent(binx) + count;
-					this->Plots_1D[name]->SetBinContent(binx,currcount);
+				auto test = this->Plots_1D.find(name);
+				if( test != this->Plots_1D.end() ){
+					auto currcount = test->second->GetBinContent(binx) + count;
+					test->second->SetBinContent(binx,currcount);
 					if( not calcerr ){
-						this->Plots_1D[name]->SetBinError(binx,0.0);
+						test->second->SetBinError(binx,0.0);
 					}else{
-						this->Plots_1D[name]->SetBinError(binx,std::sqrt(currcount));
+						test->second->SetBinError(binx,std::sqrt(currcount));
 					}
 				}else{
 					std::string mess = "Plot : "+name+" does not exist as a 1D plot";
@@ -319,9 +326,10 @@ namespace PLOTS{
 			}
 
 			void Fill(const std::string& name,double xval,double yval){
-				if( Plot2DExist(name) ){
+				auto test = this->Plots_2D.find(name);
+				if( test != this->Plots_2D.end() ){
 					++(this->FillCounter2D);
-					this->Plots_2D[name]->Fill(xval,yval);
+					test->second->Fill(xval,yval);
 				}else{
 					std::string mess = "Plot : "+name+" does not exist as a 2D plot";
 					this->console->error("{}",mess);
@@ -330,9 +338,10 @@ namespace PLOTS{
 			}
 
 			void WeightedFill(const std::string& name,double xval,double yval,double weight){
-				if( Plot2DExist(name) ){
+				auto test = this->Plots_2D.find(name);
+				if( test != this->Plots_2D.end() ){
 					++(this->FillCounter2D);
-					this->Plots_2D[name]->Fill(xval,yval,weight);
+					test->second->Fill(xval,yval,weight);
 				}else{
 					std::string mess = "Plot : "+name+" does not exist as a 2D plot";
 					this->console->error("{}",mess);
@@ -341,9 +350,10 @@ namespace PLOTS{
 			}
 
 			void FillN(const std::string& name,int n,double* xval,double* yval,double* weight,int stride = 1){
-				if( Plot2DExist(name) ){
+				auto test = this->Plots_2D.find(name);
+				if( test != this->Plots_2D.end() ){
 					++(this->FillCounter2D);
-					this->Plots_2D[name]->FillN(n,xval,yval,weight,stride);
+					test->second->FillN(n,xval,yval,weight,stride);
 				}else{
 					std::string mess = "Plot : "+name+" does not exist as a 2D plot";
 					this->console->error("{}",mess);
@@ -352,13 +362,14 @@ namespace PLOTS{
 			}
 
 			void IncrementBin(const std::string& name,int binx,int biny,int count,bool calcerr){
-				if( Plot2DExist(name) ){
-					auto currcount = this->Plots_2D[name]->GetBinContent(binx,biny) + count;
-					this->Plots_2D[name]->SetBinContent(binx,biny,currcount);
+				auto test = this->Plots_2D.find(name);
+				if( test != this->Plots_2D.end() ){
+					auto currcount = test->second->GetBinContent(binx,biny) + count;
+					test->second->SetBinContent(binx,biny,currcount);
 					if( not calcerr ){
-						this->Plots_2D[name]->SetBinError(binx,biny,0.0);
+						test->second->SetBinError(binx,biny,0.0);
 					}else{
-						this->Plots_2D[name]->SetBinError(binx,biny,std::sqrt(currcount));
+						test->second->SetBinError(binx,biny,std::sqrt(currcount));
 					}
 				}else{
 					std::string mess = "Plot : "+name+" does not exist as a 2D plot";
@@ -443,6 +454,8 @@ namespace PLOTS{
 			}
 
 			std::vector<std::string> PlotIDs;
+			//boost::unordered_node_map<std::string,TH1*> Plots_1D;
+			//boost::unordered_node_map<std::string,TH2*> Plots_2D;
 			boost::unordered_map<std::string,TH1*> Plots_1D;
 			boost::unordered_map<std::string,TH2*> Plots_2D;
 			std::string LogName;
