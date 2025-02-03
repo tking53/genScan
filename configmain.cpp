@@ -20,36 +20,71 @@
 #include <boost/program_options.hpp>
 #include <boost/regex.hpp>
 
+//to fix, it broke when doing something like [12,14], should just split on , then split on - and remove regex
 void ParseNumbers(const std::string& currstr,std::set<int>& currset){
-	boost::regex re("(\\d{1,2}\\-\\d{1,2}(?:\\-\\d){0,})|(\\d)");
-
-	std::string::const_iterator start = currstr.begin();
-	std::string::const_iterator end = currstr.end();
-	boost::smatch what;
-	boost::match_flag_type flags = boost::match_default;
-	while(regex_search(start, end, what, re, flags)){
-		auto p = std::string(what[1].first, what[1].second);
-		if( p.size() == 0 ){
-			p = std::string(what[2].first, what[2].second);
-			currset.insert(std::stoi(p));
-		}else{
-			std::istringstream ss(p);
-			std::vector<int> range;
-			std::string val;
-			while( std::getline(ss,val,'-') ){
-				range.push_back(std::stoi(val));
-			}
-			range.push_back(1);
-			for( auto ii = range[0]; ii <= range[1]; ii += range[2] ){
-				currset.insert(ii);
-			}	
+	std::istringstream ss(currstr);
+	std::string val;
+	if( currstr.find(',') != std::string::npos ){
+		std::vector<std::string> refinelist;
+		while( std::getline(ss,val,',') ){
+			refinelist.push_back(val);
 		}
-		// update search position:
-		start = what[0].second;
-		// update flags
-		flags |= boost::match_prev_avail;
-		flags |= boost::match_not_bob;
+		for( const auto& rstr : refinelist ){
+			if( rstr.find('-') != std::string::npos ){
+				std::istringstream rr(rstr);
+				std::vector<int> range;
+				while( std::getline(rr,val,'-') ){
+					range.push_back(std::stoi(val));
+				}
+				range.push_back(1);
+				for( auto ii = range[0]; ii <= range[1]; ii += range[2] ){
+					currset.insert(ii);
+				}
+			}else{
+				currset.insert(std::stoi(rstr));
+			}
+		}
+	}else if( currstr.find('-') != std::string::npos ){
+		std::vector<int> range;
+		while( std::getline(ss,val,'-') ){
+			range.push_back(std::stoi(val));
+		}
+		range.push_back(1);
+		for( auto ii = range[0]; ii <= range[1]; ii += range[2] ){
+			currset.insert(ii);
+		}
+	}else{
+		currset.insert(std::stoi(currstr));
 	}
+	//boost::regex re("(\\d{1,2}\\-\\d{1,2}(?:\\-\\d){0,})|(\\d)");
+
+	//std::string::const_iterator start = currstr.begin();
+	//std::string::const_iterator end = currstr.end();
+	//boost::smatch what;
+	//boost::match_flag_type flags = boost::match_default;
+	//while(regex_search(start, end, what, re, flags)){
+	//	auto p = std::string(what[1].first, what[1].second);
+	//	if( p.size() == 0 ){
+	//		p = std::string(what[2].first, what[2].second);
+	//		currset.insert(std::stoi(p));
+	//	}else{
+	//		std::istringstream ss(p);
+	//		std::vector<int> range;
+	//		std::string val;
+	//		while( std::getline(ss,val,'-') ){
+	//			range.push_back(std::stoi(val));
+	//		}
+	//		range.push_back(1);
+	//		for( auto ii = range[0]; ii <= range[1]; ii += range[2] ){
+	//			currset.insert(ii);
+	//		}	
+	//	}
+	//	// update search position:
+	//	start = what[0].second;
+	//	// update flags
+	//	flags |= boost::match_prev_avail;
+	//	flags |= boost::match_not_bob;
+	//}
 }
 
 
@@ -68,9 +103,19 @@ struct CMap{
 		group = vals.at(2);
 		tags = vals.at(3);
 
-		ParseNumbers(vals.at(4),crateset);
-		ParseNumbers(vals.at(5),boardset);
-		ParseNumbers(vals.at(6),channelset);
+		ParseNumbers(vals.at(4).substr(1,vals.at(4).size()-2),crateset);
+		ParseNumbers(vals.at(5).substr(1,vals.at(5).size()-2),boardset);
+		ParseNumbers(vals.at(6).substr(1,vals.at(6).size()-2),channelset);
+		spdlog::debug("{}:{}:{}:{}",type,subtype,group,tags);
+		for( const auto& c : crateset ){
+			spdlog::debug("crate -> {}",c);
+		}
+		for( const auto& c : boardset ){
+			spdlog::debug("board -> {}",c);
+		}
+		for( const auto& c : channelset ){
+			spdlog::debug("channel -> {}",c);
+		}
 	}
 
 	bool IsValid(int crate,int board, int channel) const{
@@ -92,8 +137,8 @@ struct BMap{
 		firmware = vals.at(2);
 		tracedelay = vals.at(3);
 
-		ParseNumbers(vals.at(4),crateset);
-		ParseNumbers(vals.at(5),boardset);
+		ParseNumbers(vals.at(4).substr(1,vals.at(4).size()-2),crateset);
+		ParseNumbers(vals.at(5).substr(1,vals.at(5).size()-2),boardset);
 	}
 
 	bool IsValid(int crate,int board) const{
@@ -124,8 +169,8 @@ int main(int argc, char *argv[]) {
 		("eventbuild,e",boost::program_options::value<std::string>(&eventbuild)->default_value("EventWidth:500;EventWidthUnit:ns;CorrelationType:rolling-trigger"),"Global info to generate, follow format we split on \";\"")
 		("outputfile,o",boost::program_options::value<std::string>(&outputfile)->default_value("config.xml"),"name of config file to dump to")
 		("numcrate,x",boost::program_options::value<int>(&numcrate)->default_value(1),"number of crates in default xml")
-		("nummodule,y",boost::program_options::value<int>(&nummodule)->default_value(1),"number of modules per crate in default xml")
-		("numchannel,z",boost::program_options::value<int>(&numchannel)->default_value(1),"number of channels per module in default xml")
+		("nummodule,y",boost::program_options::value<int>(&nummodule)->default_value(13),"number of modules per crate in default xml")
+		("numchannel,z",boost::program_options::value<int>(&numchannel)->default_value(16),"number of channels per module in default xml")
 		("processor,p",boost::program_options::value<std::vector<std::string>>(&processorlist),"name of processor to include [Allowed Multiple times]")
 		("analyzer,a",boost::program_options::value<std::vector<std::string>>(&analyzerlist),"name of analyzer to include [Allowed Multiple times]")
 		("cmapregex,r",boost::program_options::value<std::vector<std::string>>(&cmapregexlist),"how to populate the type:subtype:group:tags for each channel format is \"type:subtype:group:tags:[crate]:[module]:[channels]\" [Allowed Multiple times] example regex -> mtas:center:1:front:[1]:[0-4]:[0,2,4,6,8,10] defines MTAS's center front ring")
@@ -273,10 +318,10 @@ int main(int argc, char *argv[]) {
 
 	pugi::xml_node Map = Configuration.append_child("Map");
 	int cnt = 0;
-	for( int ii = 0; ii < 2; ++ii ){
+	for( int ii = 0; ii < numcrate; ++ii ){
 		pugi::xml_node Crate = Map.append_child("Crate");
 		Crate.append_attribute("number") = ii;
-		for( int jj = 0; jj < 13; ++jj ){
+		for( int jj = 0; jj < nummodule; ++jj ){
 			pugi::xml_node Module = Crate.append_child("Module");
 			Module.append_attribute("number") = jj;
 			std::string rev = "F";
@@ -296,7 +341,7 @@ int main(int argc, char *argv[]) {
 			Module.append_attribute("Frequency") = freq.c_str();
 			Module.append_attribute("Firmware") = firm.c_str();
 			Module.append_attribute("TraceDelay") = delay.c_str();
-			for( int kk = 0; kk < 16; ++kk ){
+			for( int kk = 0; kk < numchannel; ++kk ){
 				pugi::xml_node Channel = Module.append_child("Channel");
 				Channel.append_attribute("number") = kk;
 				std::string type = "generic";
