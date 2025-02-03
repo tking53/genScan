@@ -25,7 +25,7 @@ class BSMProcessor : public Processor{
 		virtual void Init(const Json::Value&);
 		virtual void Init(const pugi::xml_node&);
 
-		virtual void DeclarePlots(PLOTS::PlotRegistry*) const;
+		virtual void DeclarePlots(PLOTS::PlotRegistry*);
 		virtual void RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>&) final;
 		virtual void CleanupTree() final;
 
@@ -112,6 +112,15 @@ class BSMProcessor : public Processor{
 		int NumPMTs;
 
 		bool PlotAllTraces;
+
+		TH2* BSM_3500;
+		TH2* BSM_3501;
+
+		TH2* BSM_4000;
+		TH2* BSM_4001;
+		TH2* BSM_4002;
+		TH2* BSM_4003;
+		TH2* BSM_4004;
 };
 
 #endif

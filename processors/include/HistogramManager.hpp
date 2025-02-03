@@ -215,17 +215,17 @@ namespace PLOTS{
 			}
 
 			template<typename T>
-			void RegisterPlot(std::string name,std::string title,const HisHelper1D& h){
-				this->RegisterPlot<T>(name,title,h.nbinsx,h.xlow,h.xhigh);
+			TH1* RegisterPlot(std::string name,std::string title,const HisHelper1D& h){
+				return this->RegisterPlot<T>(name,title,h.nbinsx,h.xlow,h.xhigh);
 			}
 			
 			template<typename T>
-			void RegisterPlot(std::string name,std::string title,const HisHelper2D& h){
-				this->RegisterPlot<T>(name,title,h.nbinsx,h.xlow,h.xhigh,h.nbinsy,h.ylow,h.yhigh);
+			TH2* RegisterPlot(std::string name,std::string title,const HisHelper2D& h){
+				return this->RegisterPlot<T>(name,title,h.nbinsx,h.xlow,h.xhigh,h.nbinsy,h.ylow,h.yhigh);
 			}
 
 			template<typename T>
-			void RegisterPlot(std::string name,std::string title,int nbinsx,double xmin,double xmax){
+			TH1* RegisterPlot(std::string name,std::string title,int nbinsx,double xmin,double xmax){
 				static_assert(std::is_base_of<TH1,T>::value,"T must inherit from TH1");
 				if( not PlotExist(name) ){
 					this->Plots_1D[name] = new T(name.c_str(),title.c_str(),nbinsx,xmin,xmax);
@@ -240,6 +240,7 @@ namespace PLOTS{
 					//this->console->debug("1D plots load factor : {}, bucket counts : {} after adding {}",this->Plots_1D.load_factor(),this->Plots_1D.bucket_count(),name);
 					this->ShiftLineColor();
 					this->PlotIDs.push_back(name);
+					return this->Plots_1D[name];
 				}else{
 					std::string mess = "Unable to register plot "+name+" as it already exists";
 					this->console->error("{}",mess);
@@ -248,7 +249,7 @@ namespace PLOTS{
 			}
 
 			template<typename T>
-			void RegisterPlot(std::string name,std::string title,int nbinsx,double xmin,double xmax,int nbinsy,double ymin,double ymax){
+			TH2* RegisterPlot(std::string name,std::string title,int nbinsx,double xmin,double xmax,int nbinsy,double ymin,double ymax){
 				static_assert(std::is_base_of<TH2,T>::value,"T must inherit from TH2");
 				if( not PlotExist(name) ){
 					this->Plots_2D[name] = new T(name.c_str(),title.c_str(),nbinsx,xmin,xmax,nbinsy,ymin,ymax);
@@ -261,6 +262,7 @@ namespace PLOTS{
 					this->Plots_2D[name]->GetYaxis()->CenterTitle(true);
 					//this->console->debug("2D plots load factor : {}, bucket counts : {} after adding {}",this->Plots_2D.load_factor(),this->Plots_2D.bucket_count(),name);
 					this->PlotIDs.push_back(name);
+					return this->Plots_2D[name];
 				}else{
 					std::string mess = "Unable to register plot "+name+" as it already exists";
 					this->console->error("{}",mess);
@@ -284,6 +286,17 @@ namespace PLOTS{
 				}
 			}
 
+			void Fill(TH1* his,double xval){
+				if( his != nullptr ){
+					++(this->FillCounter1D);
+					his->Fill(xval);
+				}else{
+					std::string mess = "Passed nullptr histogram to 1D Fill()";
+					this->console->error("{}",mess);
+					throw mess;
+				}
+			}
+
 			void WeightedFill(const std::string& name,double xval,double weight){
 				auto test = this->Plots_1D.find(name);
 				if( test != this->Plots_1D.end() ){
@@ -296,6 +309,17 @@ namespace PLOTS{
 				}
 			}
 
+			void WeightedFill(TH1* his,double xval,double weight){
+				if( his != nullptr ){
+					++(this->FillCounter1D);
+					his->Fill(xval,weight);
+				}else{
+					std::string mess = "Passed nullptr histogram to 1D WeightedFill()";
+					this->console->error("{}",mess);
+					throw mess;
+				}
+			}
+
 			void FillN(const std::string& name,int n,double* xval,double* weight,int stride = 1){
 				auto test = this->Plots_1D.find(name);
 				if( test != this->Plots_1D.end() ){
@@ -303,6 +327,17 @@ namespace PLOTS{
 					test->second->FillN(n,xval,weight,stride);
 				}else{
 					std::string mess = "Plot : "+name+" does not exist as a 1D plot";
+					this->console->error("{}",mess);
+					throw mess;
+				}
+			}
+
+			void FillN(TH1* his,int n,double* xval,double* weight,int stride = 1){
+				if( his != nullptr ){
+					++(this->FillCounter1D);
+					his->FillN(n,xval,weight,stride);
+				}else{
+					std::string mess = "Passed nullptr histogram to 1D FillN";
 					this->console->error("{}",mess);
 					throw mess;
 				}
@@ -325,6 +360,22 @@ namespace PLOTS{
 				}
 			}
 
+			void IncrementBin(TH1* his,int binx,int count,bool calcerr){
+				if( his != nullptr ){
+					auto currcount = his->GetBinContent(binx) + count;
+					his->SetBinContent(binx,currcount);
+					if( not calcerr ){
+						his->SetBinError(binx,0.0);
+					}else{
+						his->SetBinError(binx,std::sqrt(currcount));
+					}
+				}else{
+					std::string mess = "Passed nullptr histogram to 1D IncrementBin";
+					this->console->error("{}",mess);
+					throw mess;
+				}
+			}
+
 			void Fill(const std::string& name,double xval,double yval){
 				auto test = this->Plots_2D.find(name);
 				if( test != this->Plots_2D.end() ){
@@ -332,6 +383,17 @@ namespace PLOTS{
 					test->second->Fill(xval,yval);
 				}else{
 					std::string mess = "Plot : "+name+" does not exist as a 2D plot";
+					this->console->error("{}",mess);
+					throw mess;
+				}
+			}
+
+			void Fill(TH2* his,double xval,double yval){
+				if( his != nullptr ){
+					++(this->FillCounter2D);
+					his->Fill(xval,yval);
+				}else{
+					std::string mess = "Passed nullptr histogram to 2D Fill()";
 					this->console->error("{}",mess);
 					throw mess;
 				}
@@ -349,6 +411,17 @@ namespace PLOTS{
 				}
 			}
 
+			void WeightedFill(TH2* his,double xval,double yval,double weight){
+				if( his != nullptr ){
+					++(this->FillCounter2D);
+					his->Fill(xval,yval,weight);
+				}else{
+					std::string mess = "Passed nullptr histogram to 2D WeightedFill()";
+					this->console->error("{}",mess);
+					throw mess;
+				}
+			}
+
 			void FillN(const std::string& name,int n,double* xval,double* yval,double* weight,int stride = 1){
 				auto test = this->Plots_2D.find(name);
 				if( test != this->Plots_2D.end() ){
@@ -360,6 +433,18 @@ namespace PLOTS{
 					throw mess;
 				}
 			}
+
+			void FillN(TH2* his,int n,double* xval,double* yval,double* weight,int stride = 1){
+				if( his != nullptr ){
+					++(this->FillCounter2D);
+					his->FillN(n,xval,yval,weight,stride);
+				}else{
+					std::string mess = "Passed nullptr histogram to 2D FillN";
+					this->console->error("{}",mess);
+					throw mess;
+				}
+			}
+
 
 			void IncrementBin(const std::string& name,int binx,int biny,int count,bool calcerr){
 				auto test = this->Plots_2D.find(name);
@@ -373,6 +458,22 @@ namespace PLOTS{
 					}
 				}else{
 					std::string mess = "Plot : "+name+" does not exist as a 2D plot";
+					this->console->error("{}",mess);
+					throw mess;
+				}
+			}
+
+			void IncrementBin(TH2* his,int binx,int biny,int count,bool calcerr){
+				if( his != nullptr ){
+					auto currcount = his->GetBinContent(binx,biny) + count;
+					his->SetBinContent(binx,biny,currcount);
+					if( not calcerr ){
+						his->SetBinError(binx,biny,0.0);
+					}else{
+						his->SetBinError(binx,biny,std::sqrt(currcount));
+					}
+				}else{
+					std::string mess = "Passed nullptr histogram to 2D IncrementBin()";
 					this->console->error("{}",mess);
 					throw mess;
 				}
