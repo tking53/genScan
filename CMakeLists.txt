@@ -32,12 +32,12 @@ endif()
 set(CMAKE_MACOSX_RPATH TRUE)
 
 if (CMAKE_COMPILER_IS_GNUCXX)
-    #Make compiler messages nice with colored tags.
-    if (${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER "4.9")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fdiagnostics-color=auto")
-    endif ()
+	#Make compiler messages nice with colored tags.
+	if (${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER "4.9")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fdiagnostics-color=auto")
+	endif ()
 
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -fPIC")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -fPIC")
 endif ()
 
 #if user does not specify prefix we assign it to the install directory
@@ -46,47 +46,47 @@ endif ()
 #build. This configuration adds additional junk to my directory that I may
 #not actually want or need.
 if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-    message(STATUS "Install Prefix not specified.")
-    file(MAKE_DIRECTORY install)
-    get_filename_component(INSTALL_DIR ${CMAKE_SOURCE_DIR}/install REALPATH)
-    set(CMAKE_INSTALL_PREFIX ${INSTALL_DIR} CACHE PATH "Install Prefix")
+	message(STATUS "Install Prefix not specified.")
+	file(MAKE_DIRECTORY install)
+	get_filename_component(INSTALL_DIR ${CMAKE_SOURCE_DIR}/install REALPATH)
+	set(CMAKE_INSTALL_PREFIX ${INSTALL_DIR} CACHE PATH "Install Prefix" FORCE)
 endif ()
 message(STATUS "Installing to ${CMAKE_INSTALL_PREFIX}")
 
 option(GS_CORRELATOR_DEBUG "Enable debugging the correlator, output will be very slow" OFF)
 set_property(CACHE GS_CORRELATOR_DEBUG PROPERTY ADVANCED ON)
 if(GS_CORRELATOR_DEBUG)
-    set(GS_CORRELATOR_DEBUG ON CACHE BOOL "Enable debugging the ProcessorList, output will be very slow" FORCE)
-    message(STATUS "ENABLED CORRELATOR DEBUGGING, OUTPUT IS SLOW")
+	set(GS_CORRELATOR_DEBUG ON CACHE BOOL "Enable debugging the ProcessorList, output will be very slow" FORCE)
+	message(STATUS "ENABLED CORRELATOR DEBUGGING, OUTPUT IS SLOW")
 else()
-    set(GS_CORRELATOR_DEBUG OFF CACHE BOOL "Enable debugging the ProcessorList, output will be very slow" FORCE)
+	set(GS_CORRELATOR_DEBUG OFF CACHE BOOL "Enable debugging the ProcessorList, output will be very slow" FORCE)
 endif()
 
 option(GS_PROCESSOR_DEBUG "Enable debugging the ProcessorList, output will be very slow" OFF)
 set_property(CACHE GS_PROCESSOR_DEBUG PROPERTY ADVANCED ON)
 if(GS_PROCESSOR_DEBUG)
-    set(GS_PROCESSOR_DEBUG ON CACHE BOOL "Enable debugging the ProcessorList, output will be very slow" FORCE)
-    message(STATUS "ENABLED PROCESSOR DEBUGGING, OUTPUT IS SLOW")
+	set(GS_PROCESSOR_DEBUG ON CACHE BOOL "Enable debugging the ProcessorList, output will be very slow" FORCE)
+	message(STATUS "ENABLED PROCESSOR DEBUGGING, OUTPUT IS SLOW")
 else()
-    set(GS_PROCESSOR_DEBUG OFF CACHE BOOL "Enable debugging the ProcessorList, output will be very slow" FORCE)
+	set(GS_PROCESSOR_DEBUG OFF CACHE BOOL "Enable debugging the ProcessorList, output will be very slow" FORCE)
 endif()
 
 option(GS_EVENTSUMMARY_DEBUG "Enable debugging the EventSummary, output will be very slow" OFF)
 set_property(CACHE GS_EVENTSUMMARY_DEBUG PROPERTY ADVANCED ON)
 if(GS_EVENTSUMMARY_DEBUG)
-    set(GS_EVENTSUMMARY_DEBUG ON CACHE BOOL "Enable debugging the EventSummary, output will be very slow" FORCE)
-    message(STATUS "ENABLED EVENTSUMMARY DEBUGGING, OUTPUT IS SLOW")
+	set(GS_EVENTSUMMARY_DEBUG ON CACHE BOOL "Enable debugging the EventSummary, output will be very slow" FORCE)
+	message(STATUS "ENABLED EVENTSUMMARY DEBUGGING, OUTPUT IS SLOW")
 else()
-    set(GS_EVENTSUMMARY_DEBUG OFF CACHE BOOL "Enable debugging the EventSummary, output will be very slow" FORCE)
+	set(GS_EVENTSUMMARY_DEBUG OFF CACHE BOOL "Enable debugging the EventSummary, output will be very slow" FORCE)
 endif()
 
 option(GS_TRANSLATOR_DEBUG "Enable debugging the Translators, output will be very slow" OFF)
 set_property(CACHE GS_TRANSLATOR_DEBUG PROPERTY ADVANCED ON)
 if(GS_TRANSLATOR_DEBUG)
-    set(GS_TRANSLATOR_DEBUG ON CACHE BOOL "Enable debugging the ProcessorList, output will be very slow" FORCE)
-    message(STATUS "ENABLED TRANSLATOR DEBUGGING, OUTPUT IS SLOW")
+	set(GS_TRANSLATOR_DEBUG ON CACHE BOOL "Enable debugging the ProcessorList, output will be very slow" FORCE)
+	message(STATUS "ENABLED TRANSLATOR DEBUGGING, OUTPUT IS SLOW")
 else()
-    set(GS_TRANSLATOR_DEBUG OFF CACHE BOOL "Enable debugging the ProcessorList, output will be very slow" FORCE)
+	set(GS_TRANSLATOR_DEBUG OFF CACHE BOOL "Enable debugging the ProcessorList, output will be very slow" FORCE)
 endif()
 
 #Add additional CXX flags if we use the Debug option
@@ -124,54 +124,54 @@ find_program(ROOT_CONFIG_EXECUTABLE root-config PATHS ${ROOTSYS}/bin)
 find_program(ROOTCINT_EXECUTABLE rootcint PATHS $ENV{ROOTSYS}/bin)
 find_program(GENREFLEX_EXECUTABLE genreflex PATHS $ENV{ROOTSYS}/bin)
 if (ROOT_CONFIG_EXECUTABLE)
-    execute_process(
-        COMMAND ${ROOT_CONFIG_EXECUTABLE} --prefix
-        OUTPUT_VARIABLE ROOTSYS
-        OUTPUT_STRIP_TRAILING_WHITESPACE)
+	execute_process(
+	COMMAND ${ROOT_CONFIG_EXECUTABLE} --prefix
+	OUTPUT_VARIABLE ROOTSYS
+	OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-    execute_process(
-        COMMAND ${ROOT_CONFIG_EXECUTABLE} --version
-        OUTPUT_VARIABLE ROOT_VERSION
-        OUTPUT_STRIP_TRAILING_WHITESPACE)
+	execute_process(
+	COMMAND ${ROOT_CONFIG_EXECUTABLE} --version
+	OUTPUT_VARIABLE ROOT_VERSION
+	OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-    execute_process(
-        COMMAND ${ROOT_CONFIG_EXECUTABLE} --incdir
-        OUTPUT_VARIABLE ROOT_INCLUDE_DIR
-        OUTPUT_STRIP_TRAILING_WHITESPACE)
+	execute_process(
+	COMMAND ${ROOT_CONFIG_EXECUTABLE} --incdir
+	OUTPUT_VARIABLE ROOT_INCLUDE_DIR
+	OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-    execute_process(
-        COMMAND ${ROOT_CONFIG_EXECUTABLE} --libs
-        OUTPUT_VARIABLE ROOT_LIBRARIES
-        OUTPUT_STRIP_TRAILING_WHITESPACE)
+	execute_process(
+	COMMAND ${ROOT_CONFIG_EXECUTABLE} --libs
+	OUTPUT_VARIABLE ROOT_LIBRARIES
+	OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-    execute_process(
-        COMMAND ${ROOT_CONFIG_EXECUTABLE} --glibs
-        OUTPUT_VARIABLE ROOT_GUI_LIBRARIES
-        OUTPUT_STRIP_TRAILING_WHITESPACE)
+	execute_process(
+	COMMAND ${ROOT_CONFIG_EXECUTABLE} --glibs
+	OUTPUT_VARIABLE ROOT_GUI_LIBRARIES
+	OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-    set(ROOT_LIBRARY_DIR ${ROOTSYS}/lib)
+	set(ROOT_LIBRARY_DIR ${ROOTSYS}/lib)
 
-    execute_process(
-        COMMAND ${ROOT_CONFIG_EXECUTABLE} --has-minuit2
-        OUTPUT_VARIABLE ROOT_HAS_MINUIT2
-        OUTPUT_STRIP_TRAILING_WHITESPACE)
+	execute_process(
+	COMMAND ${ROOT_CONFIG_EXECUTABLE} --has-minuit2
+	OUTPUT_VARIABLE ROOT_HAS_MINUIT2
+	OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-    execute_process(
-        COMMAND ${ROOT_CONFIG_EXECUTABLE} --has-cxx17
-        OUTPUT_VARIABLE ROOT_HAS_CXX17)
+	execute_process(
+	COMMAND ${ROOT_CONFIG_EXECUTABLE} --has-cxx17
+	OUTPUT_VARIABLE ROOT_HAS_CXX17)
 
-    execute_process(
-        COMMAND ${ROOT_CONFIG_EXECUTABLE} --has-cxx14
-        OUTPUT_VARIABLE ROOT_HAS_CXX14)
+	execute_process(
+	COMMAND ${ROOT_CONFIG_EXECUTABLE} --has-cxx14
+	OUTPUT_VARIABLE ROOT_HAS_CXX14)
 
-    execute_process(
-        COMMAND ${ROOT_CONFIG_EXECUTABLE} --has-cxx11
-        OUTPUT_VARIABLE ROOT_HAS_CXX11)
+	execute_process(
+	COMMAND ${ROOT_CONFIG_EXECUTABLE} --has-cxx11
+	OUTPUT_VARIABLE ROOT_HAS_CXX11)
 
 endif ()
 
 if (${ROOT_VERSION} VERSION_LESS "6.10")
-    message(FATAL_ERROR "Minimum ROOT version is 6.10.00.")
+	message(FATAL_ERROR "Minimum ROOT version is 6.10.00.")
 endif (${ROOT_VERSION} VERSION_LESS "6.10")
 mark_as_advanced( GENREFLEX_EXECUTABLE ROOTCINT_EXECUTABLE ROOT_CONFIG_EXECUTABLE)
 #include_directories(${ROOT_INCLUDE_DIR})
@@ -196,7 +196,7 @@ set(_LOG_OPTIONS
 	LOG_INSTALL TRUE
 	LOG_PATCH TRUE
 	LOG_OUTPUT_ON_FAILURE TRUE
-	)
+)
 
 option(USE_SYSTEM_PUGIXML "Use the system installed pugixml, if not then we will download one and use that one" OFF)
 if( USE_SYSTEM_PUGIXML )
@@ -212,14 +212,14 @@ else()
 		BUILD_COMMAND make -s
 		INSTALL_COMMAND make -s install
 		${_LOG_OPTIONS}
-		)
+	)
 	include_directories(${PUGI_EXTERNAL_INSTALL_LOCATION}/include)
 	link_directories(${PUGI_EXTERNAL_INSTALL_LOCATION}/lib)
 	list(APPEND EXTERNAL_DEPS PugixmlProject)
 	list(APPEND EXTERNAL_CORE_DEPS PugixmlProject)
 	list(APPEND EXTERNAL_PROCESSOR_DEPS PugixmlProject)
 endif()
-	
+
 option(USE_SYSTEM_YAMLCPP "Use the system installed yaml-cpp, if not then we will download one and use that one" OFF)
 if( USE_SYSTEM_YAMLCPP )
 	find_package(yaml-cpp REQUIRED)
@@ -234,14 +234,14 @@ else()
 		BUILD_COMMAND make -s
 		INSTALL_COMMAND make -s install
 		${_LOG_OPTIONS}
-		)
+	)
 	include_directories(${YAML_EXTERNAL_INSTALL_LOCATION}/include)
 	link_directories(${YAML_EXTERNAL_INSTALL_LOCATION}/lib)
 	list(APPEND EXTERNAL_DEPS yaml-cppProject)
 	list(APPEND EXTERNAL_CORE_DEPS yaml-cppProject)
 	list(APPEND EXTERNAL_PROCESSOR_DEPS yaml-cppProject)
 endif()
-	
+
 option(USE_SYSTEM_JSONCPP "Use the system installed jsoncpp, if not then we will download one and use that one" OFF)
 if( USE_SYSTEM_JSONCPP )
 	find_package(jsoncpp REQUIRED)
@@ -256,14 +256,14 @@ else()
 		BUILD_COMMAND make -s
 		INSTALL_COMMAND make -s install
 		${_LOG_OPTIONS}
-		)
+	)
 	include_directories(${JSON_EXTERNAL_INSTALL_LOCATION}/include)
 	link_directories(${JSON_EXTERNAL_INSTALL_LOCATION}/lib)
 	list(APPEND EXTERNAL_DEPS jsoncppProject)
 	list(APPEND EXTERNAL_CORE_DEPS jsoncppProject)
 	list(APPEND EXTERNAL_PROCESSOR_DEPS jsoncppProject)
 endif()
-	
+
 option(USE_SYSTEM_FMT "Use the system fmt library, if not then we will download and use that one" OFF)
 if( USE_SYSTEM_FMT )
 	find_package(fmt REQUIRED)
@@ -280,7 +280,7 @@ else()
 		BUILD_COMMAND make -s
 		INSTALL_COMMAND make -s install
 		${_LOG_OPTIONS}
-		)
+	)
 	include_directories(${FMT_EXTERNAL_INSTALL_LOCATION}/include)
 	link_directories(${FMT_EXTERNAL_INSTALL_LOCATION}/lib)
 	list(APPEND EXTERNAL_DEPS fmtProject)
@@ -302,7 +302,7 @@ else()
 		INSTALL_COMMAND make -s install
 		${_LOG_OPTIONS}
 		DEPENDS ${_FMT_NAME}
-		)
+	)
 	include_directories(${SPDLOG_EXTERNAL_INSTALL_LOCATION}/include)
 	link_directories(${SPDLOG_EXTERNAL_INSTALL_LOCATION}/lib)
 	list(APPEND EXTERNAL_DEPS spdlogProject)
@@ -330,7 +330,7 @@ else()
 		INSTALL_COMMAND make -s install
 		${_LOG_OPTIONS}
 		DEPENDS ${_FMT_NAME}
-		)
+	)
 	include_directories(${BOOST_EXTERNAL_INSTALL_LOCATION}/include)
 	link_directories(${BOOST_EXTERNAL_INSTALL_LOCATION}/lib)
 	list(APPEND EXTERNAL_DEPS boostProject)
@@ -396,11 +396,11 @@ else()
 	target_link_libraries(GenScanor PRIVATE 
 		${BOOST_EXTERNAL_INSTALL_LOCATION}/lib/libboost_container.a
 		${BOOST_EXTERNAL_INSTALL_LOCATION}/lib/libboost_program_options.a
-		)
+	)
 	target_link_libraries(GenConfig PRIVATE 
 		${BOOST_EXTERNAL_INSTALL_LOCATION}/lib/libboost_container.a
 		${BOOST_EXTERNAL_INSTALL_LOCATION}/lib/libboost_program_options.a
-		)
+	)
 	target_link_libraries(GenDev PRIVATE 
 		${BOOST_EXTERNAL_INSTALL_LOCATION}/lib/libboost_container.a
 		${BOOST_EXTERNAL_INSTALL_LOCATION}/lib/libboost_program_options.a
