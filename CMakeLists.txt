@@ -3,6 +3,7 @@
 cmake_minimum_required(VERSION 3.1)
 
 project(GENSCAN C CXX )
+include(CheckCXXCompilerFlag)
 
 #Set the C++ standard to c++20.
 if(NOT CMAKE_CXX_STANDARD)
@@ -10,6 +11,22 @@ if(NOT CMAKE_CXX_STANDARD)
 	set(CMAKE_CXX_STANDARD_REQUIRED ON)
 endif()
 
+check_cxx_compiler_flag("-Wc++20-extensions" COMPILER_SUPPORTS_WCXX20_EXTENSIONS)
+check_cxx_compiler_flag("-Wc++20-attribute-extensions" COMPILER_SUPPORTS_WCXX20_ATTRIBUTE_EXTENSIONS)
+if(COMPILER_SUPPORTS_WCXX20_EXTENSIONS)
+	if(NOT CMAKE_CXX_STANDARD STREQUAL "20")
+		add_compile_options(-Wc++20-extensions)
+	else()
+		add_compile_options(-Wno-c++20-extensions)
+	endif()
+endif()
+if(COMPILER_SUPPORTS_WCXX20_ATTRIBUTE_EXTENSIONS)
+	if(NOT CMAKE_CXX_STANDARD STREQUAL "20")
+		add_compile_options(-Wc++20-attribute-extensions)
+	else()
+		add_compile_options(-Wno-c++20-attribute-extensions)
+	endif()
+endif()
 
 #Use rpath on Mac OS
 set(CMAKE_MACOSX_RPATH TRUE)

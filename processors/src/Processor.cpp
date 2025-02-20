@@ -117,8 +117,8 @@ void Processor::AssociateType(const std::string& t){
 }
 
 [[noreturn]] void Processor::Finalize(){
-	this->console->error("Called Processor::Finalize(), not the overload");
-	throw std::runtime_error("Called Processor::Finalize(), not the overload");
+	this->console->error("Called Processor::Finalize(), not the overload. Likely means function definition doesn't match in your new processor class");
+	throw std::runtime_error("Called Processor::Finalize(), not the overload. Likely means function definition doesn't match in your new processor class");
 }
 
 [[maybe_unused]] bool Processor::PreProcess(){
@@ -143,18 +143,18 @@ void Processor::AssociateType(const std::string& t){
 }
 
 [[noreturn]] bool Processor::PreProcess([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]]CUTS::CutRegistry* cutmanager){
-	this->console->error("Called Processor::PreProcess(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*), not the overload");
-	throw std::runtime_error("Called Processor::PreProcess(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*), not the overload");
+	this->console->error("Called Processor::PreProcess(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*), not the overload. Likely means function definition doesn't match in your new processor class");
+	throw std::runtime_error("Called Processor::PreProcess(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*), not the overload. Likely means function definition doesn't match in your new processor class");
 }
 
 [[noreturn]] bool Processor::Process([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]]CUTS::CutRegistry* cutmanager){
-	this->console->error("Called Processor::Process(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*), not the overload");
-	throw std::runtime_error("Called Processor::Process(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*), not the overload");
+	this->console->error("Called Processor::Process(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*), not the overload. Likely means function definition doesn't match in your new processor class");
+	throw std::runtime_error("Called Processor::Process(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*), not the overload. Likely means function definition doesn't match in your new processor class");
 }
 
 [[noreturn]] bool Processor::PostProcess([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]]CUTS::CutRegistry* cutmanager){
-	this->console->error("Called Processor::PostProcess(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*), not the overload");
-	throw std::runtime_error("Called Processor::PostProcess(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*), not the overload");
+	this->console->error("Called Processor::PostProcess(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*), not the overload. Likely means function definition doesn't match in your new processor class");
+	throw std::runtime_error("Called Processor::PostProcess(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*), not the overload. Likely means function definition doesn't match in your new processor class");
 }
 
 void Processor::EndProcess(){
@@ -184,8 +184,8 @@ void Processor::EndProcess(){
 }
 		
 [[noreturn]] void Processor::DeclarePlots([[maybe_unused]] PLOTS::PlotRegistry* hismanager){
-	this->console->error("Called Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager), not the overload");
-	throw std::runtime_error("Called Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager), not the overload");
+	this->console->error("Called Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager), not the overload. Likely means function definition doesn't match in your new processor class");
+	throw std::runtime_error("Called Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager), not the overload. Likely means function definition doesn't match in your new processor class");
 }
 
 [[nodiscard]] std::set<std::string> Processor::GetKnownTypes() const{
