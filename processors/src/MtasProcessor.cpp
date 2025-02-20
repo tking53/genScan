@@ -196,8 +196,8 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		auto subtype = evt->GetSubType();
 		auto group = evt->GetGroup();
 
-		auto isfront = evt->HasTag(fronttag);
-		auto isback = evt->HasTag(backtag);
+		auto isfront = evt->HasTag(this->fronttag);
+		auto isback = evt->HasTag(this->backtag);
 
 		//this->console->info("{} {} {}",subtype,group,group.size());
 
