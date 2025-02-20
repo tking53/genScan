@@ -17,11 +17,50 @@ class MtasImplantProcessor : public Processor{
 		virtual void Init(const Json::Value&);
 		virtual void Init(const pugi::xml_node&);
 
-		virtual void DeclarePlots(PLOTS::PlotRegistry*) const;
+		virtual void DeclarePlots(PLOTS::PlotRegistry*);
 		virtual void RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>&) final;
 		virtual void CleanupTree() final;
+
+		void Reset();
 	private:
-		
+		std::pair<unsigned int,unsigned int> CalcXY(const unsigned int&) const;
+		void CalcPosition(const std::vector<double>&,std::pair<double,double>&,std::pair<unsigned int,unsigned int>&);
+
+		enum IMPLANTSIPMTYPE{
+			HIGHGAINANODE,
+			HIGHGAINDYNODE,
+			LOWGAINANODE,
+			LOWGAINDYNODE,
+			UNKNOWN
+		};
+
+		IMPLANTSIPMTYPE currsipmtype;
+
+		std::string highgaintag;
+		std::string lowgaintag;
+
+		double YSOHGThreshold;
+		double YSOLGThreshold;
+
+		std::vector<short> HighGainAnodeHitMap;
+		short HighGainDynodeHits;
+		short HighGainAnodeHits;
+		double HighGainDynode;
+		double HighGainDynodeOQDC;
+		std::vector<double> HighGainAnodes;
+		std::vector<double> HighGainAnodesOQDC;
+		std::pair<double,double> HighResHighGainPosition;
+		std::pair<unsigned int,unsigned int> LowResHighGainPosition;
+
+		std::vector<short> LowGainAnodeHitMap;
+		short LowGainDynodeHits;
+		short LowGainAnodeHits;
+		double LowGainDynode;
+		double LowGainDynodeOQDC;
+		std::vector<double> LowGainAnodes;
+		std::vector<double> LowGainAnodesOQDC;
+		std::pair<double,double> HighResLowGainPosition;
+		std::pair<unsigned int,unsigned int> LowResLowGainPosition;
 };
 
 #endif
