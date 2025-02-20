@@ -185,6 +185,8 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 	for( size_t ii = 0; ii < 12; ++ii ){
 		this->PosCorrectionMap.push_back(nullptr);
 	}
+
+	this->GenerateHexagonShapes();
 }
 
 [[maybe_unused]] bool MtasProcessor::PreProcess(EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
@@ -395,6 +397,77 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 	}
 
 	if( (not this->AnySaturate) and (not this->AnyPileup) ){
+		for( int ii = 0; ii < 6; ++ii ){
+			auto currhx = this->HexagonShapes[ii].center;
+			if( this->CenterHits[2*ii] ){
+				for( size_t jj = 0; jj < this->CenterHits[2*ii]; ++jj ){
+					this->MTAS_2501->Fill(currhx.first,currhx.second,1.0);
+					this->MTAS_2503->Fill(currhx.first,currhx.second,1.0);
+				}
+			}
+			if( this->CenterHits[2*ii+1] ){
+				for( size_t jj = 0; jj < this->CenterHits[2*ii]; ++jj ){
+					this->MTAS_2502->Fill(currhx.first,currhx.second,1.0);
+					this->MTAS_2503->Fill(currhx.first,currhx.second,-1.0);
+				}
+			}
+			if( this->CenterHits[2*ii] and this->CenterHits[2*ii+1] ){
+				this->MTAS_2500->Fill(currhx.first,currhx.second,1.0);
+			}
+
+			currhx = this->HexagonShapes[ii+6].center;
+			if( this->InnerHits[2*ii] ){
+				for( size_t jj = 0; jj < this->InnerHits[2*ii]; ++jj ){
+					this->MTAS_2501->Fill(currhx.first,currhx.second,1.0);
+					this->MTAS_2503->Fill(currhx.first,currhx.second,1.0);
+				}
+			}
+			if( this->InnerHits[2*ii+1] ){
+				for( size_t jj = 0; jj < this->InnerHits[2*ii]; ++jj ){
+					this->MTAS_2502->Fill(currhx.first,currhx.second,1.0);
+					this->MTAS_2503->Fill(currhx.first,currhx.second,-1.0);
+				}
+			}
+			if( this->InnerHits[2*ii] and this->InnerHits[2*ii+1] ){
+				this->MTAS_2500->Fill(currhx.first,currhx.second,1.0);
+			}
+
+			currhx = this->HexagonShapes[ii+12].center;
+			if( this->MiddleHits[2*ii] ){
+				for( size_t jj = 0; jj < this->MiddleHits[2*ii]; ++jj ){
+					this->MTAS_2501->Fill(currhx.first,currhx.second,1.0);
+					this->MTAS_2503->Fill(currhx.first,currhx.second,1.0);
+				}
+			}
+			if( this->MiddleHits[2*ii+1] ){
+				for( size_t jj = 0; jj < this->MiddleHits[2*ii]; ++jj ){
+					this->MTAS_2502->Fill(currhx.first,currhx.second,1.0);
+					this->MTAS_2503->Fill(currhx.first,currhx.second,-1.0);
+				}
+			}
+			if( this->MiddleHits[2*ii] and this->MiddleHits[2*ii+1] ){
+				this->MTAS_2500->Fill(currhx.first,currhx.second,1.0);
+			}
+
+			currhx = this->HexagonShapes[ii+18].center;
+			if( this->OuterHits[2*ii] ){
+				for( size_t jj = 0; jj < this->OuterHits[2*ii]; ++jj ){
+					this->MTAS_2501->Fill(currhx.first,currhx.second,1.0);
+					this->MTAS_2503->Fill(currhx.first,currhx.second,1.0);
+				}
+			}
+			if( this->OuterHits[2*ii+1] ){
+				for( size_t jj = 0; jj < this->OuterHits[2*ii]; ++jj ){
+					this->MTAS_2502->Fill(currhx.first,currhx.second,1.0);
+					this->MTAS_2503->Fill(currhx.first,currhx.second,-1.0);
+				}
+			}
+			if( this->OuterHits[2*ii] and this->OuterHits[2*ii+1] ){
+				this->MTAS_2500->Fill(currhx.first,currhx.second,1.0);
+			}
+
+		}
+
 		hismanager->Fill(this->MTAS_4200,this->TotalEnergy[0],this->currevttime*1000.0);
 		hismanager->Fill(this->MTAS_4201,this->TotalEnergy[0],this->currevttime);
 		hismanager->Fill(this->MTAS_4202,this->TotalEnergy[0],this->currevttime/60.0);
@@ -512,6 +585,23 @@ void MtasProcessor::Finalize(){
 }
 
 void MtasProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
+	this->MTAS_2500 = hismanager->RegisterPlot("MTAS_2500","MTAS Segment Hit Map Beam is out of the page");
+	for( const auto& hx : this->HexagonShapes ){
+		this->MTAS_2500->AddBin(6,hx.xcoords,hx.ycoords);
+	}
+	this->MTAS_2501 = hismanager->RegisterPlot("MTAS_2501","MTAS Front Hit Map Beam is out of the page");
+	for( const auto& hx : this->HexagonShapes ){
+		this->MTAS_2501->AddBin(6,hx.xcoords,hx.ycoords);
+	}
+	this->MTAS_2502 = hismanager->RegisterPlot("MTAS_2502","MTAS Back Hit Map Beam is out of the page");
+	for( const auto& hx : this->HexagonShapes ){
+		this->MTAS_2502->AddBin(6,hx.xcoords,hx.ycoords);
+	}
+	this->MTAS_2503 = hismanager->RegisterPlot("MTAS_2503","MTAS Asymmetry Hit Map Beam is out of the page, Front is positive, Back is negative");
+	for( const auto& hx : this->HexagonShapes ){
+		this->MTAS_2503->AddBin(6,hx.xcoords,hx.ycoords);
+	}
+
 	//MTAS diagnostic plots, always want these no matter what
 	this->MTAS_3200 = hismanager->RegisterPlot<TH1F>("MTAS_3200","Mtas Total; Energy (keV)",this->h1dsettings.at(3200));
 	this->MTAS_3201 = hismanager->RegisterPlot<TH2F>("MTAS_3201","Sum F+B; Energy (keV); F+B Pair (arb.)",this->h2dsettings.at(3201));
@@ -750,6 +840,180 @@ void MtasProcessor::Reset(){
 	this->InnerFire = false;
 	this->MiddleFire = false;
 	this->OuterFire = false;
+}
+
+void MtasProcessor::GenerateHexagonShapes(){
+	this->hexagonsize = 1.0;	
+	this->hexagonpad = 0.95;
+
+	double hexwidth = (3.0/2.0)*this->hexagonsize;
+	double hexheight = std::sqrt(3.0)*this->hexagonsize;
+
+	hexagon centercoords(0.0,0.0,this->hexagonsize,this->hexagonpad);
+	hexagon centerholecoords(0.0,0.0,0.5*this->hexagonsize,1.0);
+	this->HexagonShapes.push_back(hexagon(0.0,0.0,this->hexagonsize,this->hexagonpad));
+	//this is C1
+	this->HexagonShapes[0].xcoords[0] = (0.55*centercoords.xcoords[2]+0.45*centercoords.xcoords[1]);
+	this->HexagonShapes[0].ycoords[0] = (0.55*centercoords.ycoords[2]+0.45*centercoords.ycoords[1]);
+
+	this->HexagonShapes[0].xcoords[1] = centercoords.xcoords[2];
+	this->HexagonShapes[0].ycoords[1] = centercoords.ycoords[2];
+
+	this->HexagonShapes[0].xcoords[2] = (0.55*centercoords.xcoords[2]+0.45*centercoords.xcoords[3]);
+	this->HexagonShapes[0].ycoords[2] = (0.55*centercoords.ycoords[2]+0.45*centercoords.ycoords[3]);
+
+	this->HexagonShapes[0].xcoords[3] = (0.55*centerholecoords.xcoords[2]+0.45*centerholecoords.xcoords[3]);
+	this->HexagonShapes[0].ycoords[3] = (0.55*centerholecoords.ycoords[2]+0.45*centerholecoords.ycoords[3]);
+
+	this->HexagonShapes[0].xcoords[4] = centerholecoords.xcoords[2];
+	this->HexagonShapes[0].ycoords[4] = centerholecoords.ycoords[2];
+
+	this->HexagonShapes[0].xcoords[5] = (0.55*centerholecoords.xcoords[2]+0.45*centerholecoords.xcoords[1]);
+	this->HexagonShapes[0].ycoords[5] = (0.55*centerholecoords.ycoords[2]+0.45*centerholecoords.ycoords[1]);
+
+	this->HexagonShapes[0].center.first = (centercoords.xcoords[2]+centerholecoords.xcoords[2])/2.0;
+	this->HexagonShapes[0].center.second = (centercoords.ycoords[2]+centerholecoords.ycoords[2])/2.0;
+
+
+	this->HexagonShapes.push_back(hexagon(0.0,0.0,this->hexagonsize,this->hexagonpad));
+	//this is C2
+	this->HexagonShapes[1].xcoords[0] = (0.55*centercoords.xcoords[3]+0.45*centercoords.xcoords[2]);
+	this->HexagonShapes[1].ycoords[0] = (0.55*centercoords.ycoords[3]+0.45*centercoords.ycoords[2]);
+
+	this->HexagonShapes[1].xcoords[1] = centercoords.xcoords[3];
+	this->HexagonShapes[1].ycoords[1] = centercoords.ycoords[3];
+
+	this->HexagonShapes[1].xcoords[2] = (0.45*centercoords.xcoords[4]+0.55*centercoords.xcoords[3]);
+	this->HexagonShapes[1].ycoords[2] = (0.45*centercoords.ycoords[4]+0.55*centercoords.ycoords[3]);
+
+	this->HexagonShapes[1].xcoords[3] = (0.45*centerholecoords.xcoords[4]+0.55*centerholecoords.xcoords[3]);
+	this->HexagonShapes[1].ycoords[3] = (0.45*centerholecoords.ycoords[4]+0.55*centerholecoords.ycoords[3]);
+
+	this->HexagonShapes[1].xcoords[4] = centerholecoords.xcoords[3];
+	this->HexagonShapes[1].ycoords[4] = centerholecoords.ycoords[3];
+
+	this->HexagonShapes[1].xcoords[5] = (0.45*centerholecoords.xcoords[2]+0.55*centerholecoords.xcoords[3]);
+	this->HexagonShapes[1].ycoords[5] = (0.45*centerholecoords.ycoords[2]+0.55*centerholecoords.ycoords[3]);
+
+	this->HexagonShapes[1].center.first = (centercoords.xcoords[3]+centerholecoords.xcoords[3])/2.0;
+	this->HexagonShapes[1].center.second = (centercoords.ycoords[3]+centerholecoords.ycoords[3])/2.0;
+
+	this->HexagonShapes.push_back(hexagon(0.0,0.0,this->hexagonsize,this->hexagonpad));
+	//this is C3
+	this->HexagonShapes[2].xcoords[0] = (0.45*centercoords.xcoords[3]+0.55*centercoords.xcoords[4]);
+	this->HexagonShapes[2].ycoords[0] = (0.45*centercoords.ycoords[3]+0.55*centercoords.ycoords[4]);
+
+	this->HexagonShapes[2].xcoords[1] = centercoords.xcoords[4];
+	this->HexagonShapes[2].ycoords[1] = centercoords.ycoords[4];
+
+	this->HexagonShapes[2].xcoords[2] = (0.55*centercoords.xcoords[4]+0.45*centercoords.xcoords[5]);
+	this->HexagonShapes[2].ycoords[2] = (0.55*centercoords.ycoords[4]+0.45*centercoords.ycoords[5]);
+
+	this->HexagonShapes[2].xcoords[3] = (0.55*centerholecoords.xcoords[4]+0.45*centerholecoords.xcoords[5]);
+	this->HexagonShapes[2].ycoords[3] = (0.55*centerholecoords.ycoords[4]+0.45*centerholecoords.ycoords[5]);
+
+	this->HexagonShapes[2].xcoords[4] = centerholecoords.xcoords[4];
+	this->HexagonShapes[2].ycoords[4] = centerholecoords.ycoords[4];
+
+	this->HexagonShapes[2].xcoords[5] = (0.55*centerholecoords.xcoords[4]+0.45*centerholecoords.xcoords[3]);
+	this->HexagonShapes[2].ycoords[5] = (0.55*centerholecoords.ycoords[4]+0.45*centerholecoords.ycoords[3]);
+
+	this->HexagonShapes[2].center.first = (centercoords.xcoords[4]+centerholecoords.xcoords[4])/2.0;
+	this->HexagonShapes[2].center.second = (centercoords.ycoords[4]+centerholecoords.ycoords[4])/2.0;
+
+	this->HexagonShapes.push_back(hexagon(0.0,0.0,this->hexagonsize,this->hexagonpad));
+	//this is C4
+	this->HexagonShapes[3].xcoords[0] = (0.55*centercoords.xcoords[5]+0.45*centercoords.xcoords[4]);
+	this->HexagonShapes[3].ycoords[0] = (0.55*centercoords.ycoords[5]+0.45*centercoords.ycoords[4]);
+
+	this->HexagonShapes[3].xcoords[1] = centercoords.xcoords[5];
+	this->HexagonShapes[3].ycoords[1] = centercoords.ycoords[5];
+
+	this->HexagonShapes[3].xcoords[2] = (0.45*centercoords.xcoords[0]+0.55*centercoords.xcoords[5]);
+	this->HexagonShapes[3].ycoords[2] = (0.45*centercoords.ycoords[0]+0.55*centercoords.ycoords[5]);
+
+	this->HexagonShapes[3].xcoords[3] = (0.45*centerholecoords.xcoords[0]+0.55*centerholecoords.xcoords[5]);
+	this->HexagonShapes[3].ycoords[3] = (0.45*centerholecoords.ycoords[0]+0.55*centerholecoords.ycoords[5]);
+
+	this->HexagonShapes[3].xcoords[4] = centerholecoords.xcoords[5];
+	this->HexagonShapes[3].ycoords[4] = centerholecoords.ycoords[5];
+
+	this->HexagonShapes[3].xcoords[5] = (0.45*centerholecoords.xcoords[4]+0.55*centerholecoords.xcoords[5]);
+	this->HexagonShapes[3].ycoords[5] = (0.45*centerholecoords.ycoords[4]+0.55*centerholecoords.ycoords[5]);
+
+	this->HexagonShapes[3].center.first = (centercoords.xcoords[5]+centerholecoords.xcoords[5])/2.0;
+	this->HexagonShapes[3].center.second = (centercoords.ycoords[5]+centerholecoords.ycoords[5])/2.0;
+
+	this->HexagonShapes.push_back(hexagon(0.0,0.0,this->hexagonsize,this->hexagonpad));
+	//this is C5
+	this->HexagonShapes[4].xcoords[0] = (0.45*centercoords.xcoords[5]+0.55*centercoords.xcoords[0]);
+	this->HexagonShapes[4].ycoords[0] = (0.45*centercoords.ycoords[5]+0.55*centercoords.ycoords[0]);
+
+	this->HexagonShapes[4].xcoords[1] = centercoords.xcoords[0];
+	this->HexagonShapes[4].ycoords[1] = centercoords.ycoords[0];
+
+	this->HexagonShapes[4].xcoords[2] = (0.55*centercoords.xcoords[0]+0.45*centercoords.xcoords[1]);
+	this->HexagonShapes[4].ycoords[2] = (0.55*centercoords.ycoords[0]+0.45*centercoords.ycoords[1]);
+
+	this->HexagonShapes[4].xcoords[3] = (0.55*centerholecoords.xcoords[0]+0.45*centerholecoords.xcoords[1]);
+	this->HexagonShapes[4].ycoords[3] = (0.55*centerholecoords.ycoords[0]+0.45*centerholecoords.ycoords[1]);
+
+	this->HexagonShapes[4].xcoords[4] = centerholecoords.xcoords[0];
+	this->HexagonShapes[4].ycoords[4] = centerholecoords.ycoords[0];
+
+	this->HexagonShapes[4].xcoords[5] = (0.55*centerholecoords.xcoords[0]+0.45*centerholecoords.xcoords[5]);
+	this->HexagonShapes[4].ycoords[5] = (0.55*centerholecoords.ycoords[0]+0.45*centerholecoords.ycoords[5]);
+
+	this->HexagonShapes[4].center.first = (centercoords.xcoords[0]+centerholecoords.xcoords[0])/2.0;
+	this->HexagonShapes[4].center.second = (centercoords.ycoords[0]+centerholecoords.ycoords[0])/2.0;
+
+	this->HexagonShapes.push_back(hexagon(0.0,0.0,this->hexagonsize,this->hexagonpad));
+	//this is C6
+	this->HexagonShapes[5].xcoords[0] = (0.45*centercoords.xcoords[0]+0.55*centercoords.xcoords[1]); 
+	this->HexagonShapes[5].ycoords[0] = (0.45*centercoords.ycoords[0]+0.55*centercoords.ycoords[1]); 
+
+	this->HexagonShapes[5].xcoords[1] = centercoords.xcoords[1]; 
+	this->HexagonShapes[5].ycoords[1] = centercoords.ycoords[1]; 
+
+	this->HexagonShapes[5].xcoords[2] = (0.45*centercoords.xcoords[2]+0.55*centercoords.xcoords[1]); 
+	this->HexagonShapes[5].ycoords[2] = (0.45*centercoords.ycoords[2]+0.55*centercoords.ycoords[1]); 
+
+	this->HexagonShapes[5].xcoords[3] = (0.45*centerholecoords.xcoords[2]+0.55*centerholecoords.xcoords[1]);
+	this->HexagonShapes[5].ycoords[3] = (0.45*centerholecoords.ycoords[2]+0.55*centerholecoords.ycoords[1]);
+
+	this->HexagonShapes[5].xcoords[4] = centerholecoords.xcoords[1];
+	this->HexagonShapes[5].ycoords[4] = centerholecoords.ycoords[1];
+
+	this->HexagonShapes[5].xcoords[5] = (0.45*centerholecoords.xcoords[0]+0.55*centerholecoords.xcoords[1]);
+	this->HexagonShapes[5].ycoords[5] = (0.45*centerholecoords.ycoords[0]+0.55*centerholecoords.ycoords[1]);
+
+	this->HexagonShapes[5].center.first = (centercoords.xcoords[1]+centerholecoords.xcoords[1])/2.0;
+	this->HexagonShapes[5].center.second = (centercoords.ycoords[1]+centerholecoords.ycoords[1])/2.0;
+
+
+	//inner
+	this->HexagonShapes.push_back(hexagon(0.0,hexheight,this->hexagonsize,this->hexagonpad));
+	this->HexagonShapes.push_back(hexagon(hexwidth,0.5*hexheight,this->hexagonsize,this->hexagonpad));
+	this->HexagonShapes.push_back(hexagon(hexwidth,-0.5*hexheight,this->hexagonsize,this->hexagonpad));
+	this->HexagonShapes.push_back(hexagon(0.0,-hexheight,this->hexagonsize,this->hexagonpad));
+	this->HexagonShapes.push_back(hexagon(-hexwidth,-0.5*hexheight,this->hexagonsize,this->hexagonpad));
+	this->HexagonShapes.push_back(hexagon(-hexwidth,0.5*hexheight,this->hexagonsize,this->hexagonpad));
+
+	//middle
+	this->HexagonShapes.push_back(hexagon(hexwidth,1.5*hexheight,this->hexagonsize,this->hexagonpad));
+	this->HexagonShapes.push_back(hexagon(2.0*hexwidth,0.0,this->hexagonsize,this->hexagonpad));
+	this->HexagonShapes.push_back(hexagon(hexwidth,-1.5*hexheight,this->hexagonsize,this->hexagonpad));
+	this->HexagonShapes.push_back(hexagon(-hexwidth,-1.5*hexheight,this->hexagonsize,this->hexagonpad));
+	this->HexagonShapes.push_back(hexagon(-2.0*hexwidth,0.0,this->hexagonsize,this->hexagonpad));
+	this->HexagonShapes.push_back(hexagon(-hexwidth,1.5*hexheight,this->hexagonsize,this->hexagonpad));
+	
+	//outer
+	this->HexagonShapes.push_back(hexagon(0.0,2.0*hexheight,this->hexagonsize,this->hexagonpad));
+	this->HexagonShapes.push_back(hexagon(2.0*hexwidth,1.0*hexheight,this->hexagonsize,this->hexagonpad));
+	this->HexagonShapes.push_back(hexagon(2.0*hexwidth,-1.0*hexheight,this->hexagonsize,this->hexagonpad));
+	this->HexagonShapes.push_back(hexagon(0.0,-2.0*hexheight,this->hexagonsize,this->hexagonpad));
+	this->HexagonShapes.push_back(hexagon(-2.0*hexwidth,-1.0*hexheight,this->hexagonsize,this->hexagonpad));
+	this->HexagonShapes.push_back(hexagon(-2.0*hexwidth,1.0*hexheight,this->hexagonsize,this->hexagonpad));
 }
 
 void MtasProcessor::FillBetaPlots(PLOTS::PlotRegistry* hismanager){

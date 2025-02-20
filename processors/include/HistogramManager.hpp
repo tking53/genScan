@@ -20,6 +20,7 @@
 
 #include "TH1.h"
 #include "TH2.h"
+#include "TH2Poly.h"
 #include "TCanvas.h"
 #include "TFrame.h"
 #include "TSocket.h"
@@ -224,6 +225,28 @@ namespace PLOTS{
 				return this->RegisterPlot<T>(name,title,h.nbinsx,h.xlow,h.xhigh,h.nbinsy,h.ylow,h.yhigh);
 			}
 
+			[[nodiscard]] TH2Poly* RegisterPlot(std::string name,std::string title){
+				if( not PlotExist(name) ){
+					this->Plots_2DPoly[name] = new TH2Poly();
+					this->Plots_2DPoly[name]->SetNameTitle(name.c_str(),title.c_str());
+					this->Plots_2DPoly[name]->GetXaxis()->SetTitleSize(0.04);
+					this->Plots_2DPoly[name]->GetXaxis()->SetLabelSize(0.04);
+					this->Plots_2DPoly[name]->GetXaxis()->CenterTitle(true);
+					this->Plots_2DPoly[name]->GetYaxis()->SetTitleSize(0.04);
+					this->Plots_2DPoly[name]->GetYaxis()->SetTitleOffset(1.375);
+					this->Plots_2DPoly[name]->GetYaxis()->SetLabelSize(0.04);
+					this->Plots_2DPoly[name]->GetYaxis()->CenterTitle(true);
+					//this->console->debug("2D plots load factor : {}, bucket counts : {} after adding {}",this->Plots_2D.load_factor(),this->Plots_2D.bucket_count(),name);
+					this->PlotIDs.push_back(name);
+					return this->Plots_2DPoly[name];
+				}else{
+					std::string mess = "Unable to register plot "+name+" as it already exists";
+					this->console->error("{}",mess);
+					throw mess;
+				}
+
+			}
+
 			template<typename T>
 			TH1* RegisterPlot(std::string name,std::string title,int nbinsx,double xmin,double xmax){
 				static_assert(std::is_base_of<TH1,T>::value,"T must inherit from TH1");
@@ -271,7 +294,7 @@ namespace PLOTS{
 			}
 
 			bool PlotExist(std::string name){
-				return Plot1DExist(name) or Plot2DExist(name);
+				return Plot1DExist(name) or Plot2DExist(name) or Plot2DPolyExist(name);
 			}
 
 			void Fill(const std::string& name,double xval){
@@ -496,7 +519,7 @@ namespace PLOTS{
 						       << this->Plots_1D[name]->GetNbinsX() << '\t'
 						       << this->Plots_1D[name]->GetXaxis()->GetXmin() << '\t'
 						       << this->Plots_1D[name]->GetXaxis()->GetXmax() << std::endl;
-					}else{
+					}else if( Plot2DExist(name) ){
 						output << this->Plots_2D[name]->GetTitle() << '\t' 
 						       << this->Plots_2D[name]->GetNbinsX() << '\t'
 						       << this->Plots_2D[name]->GetXaxis()->GetXmin() << '\t'
@@ -504,6 +527,8 @@ namespace PLOTS{
 						       << this->Plots_2D[name]->GetNbinsY() << '\t'
 						       << this->Plots_2D[name]->GetYaxis()->GetXmin() << '\t'
 						       << this->Plots_2D[name]->GetYaxis()->GetXmax() << std::endl;
+					}else{
+						output << this->Plots_2DPoly[name]->GetTitle() << std::endl;
 					}
 				}
 				output.close();
@@ -541,12 +566,18 @@ namespace PLOTS{
 				return this->Plots_2D.find(name) != this->Plots_2D.end();
 			}
 
+			bool Plot2DPolyExist(const std::string& name){
+				return this->Plots_2DPoly.find(name) != this->Plots_2DPoly.end();
+			}
+
 			void Write(std::string name){
 				if( Plot1DExist(name) ){
 					//this->Plots_1D[name]->SetLineColor(GetCurrColor());
 					this->Plots_1D[name]->Write(0,2,0);
 				}else if( Plot2DExist(name) ){
 					this->Plots_2D[name]->Write(0,2,0);
+				}else if( Plot2DPolyExist(name) ){
+					this->Plots_2DPoly[name]->Write(0,2,0);
 				}else{
 					std::string mess = "Unable to write plot "+name+" as it doesn't exist";
 					this->console->error("{}",mess);
@@ -559,6 +590,7 @@ namespace PLOTS{
 			//boost::unordered_node_map<std::string,TH2*> Plots_2D;
 			boost::unordered_map<std::string,TH1*> Plots_1D;
 			boost::unordered_map<std::string,TH2*> Plots_2D;
+			boost::unordered_map<std::string,TH2Poly*> Plots_2DPoly;
 			std::string LogName;
 			std::string outputprefix;
 

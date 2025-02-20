@@ -62,6 +62,7 @@ class MtasProcessor : public Processor{
 	private:
 		double CalcPosition(double,double);
 		void Reset();
+		void GenerateHexagonShapes();
 
 		std::vector<double> Position;
 
@@ -139,6 +140,34 @@ class MtasProcessor : public Processor{
 		bool diagnosticplots;
 
 		std::vector<std::unique_ptr<Correction::ExpoPosCorrection>> PosCorrectionMap;
+
+		struct hexagon{
+			hexagon(double xc,double yc,double sz,double pd){
+				this->center = {xc,yc};
+				this->dim = {sz,pd};
+				for( size_t ii = 0; ii < 6; ++ii ){
+					auto corner = GetFlatHexagonCorner(xc,yc,sz,pd,ii);
+					xcoords[ii] = corner.first;
+				       	ycoords[ii] = corner.second;	
+				}
+			}
+			std::pair<double,double> center;
+			std::pair<double,double> dim;
+			double xcoords[6];
+			double ycoords[6];
+			std::pair<double,double> GetFlatHexagonCorner(double cx,double cy,double sz,double pd,int ii){
+				double angle_rad = (4.0*std::atan(1.0))*(ii*60.0/180.0);
+				return std::pair<double,double>(cx + sz*pd*std::cos(angle_rad),cy + sz*pd*std::sin(angle_rad));
+			}
+		};
+		double hexagonsize;
+		double hexagonpad;
+		std::vector<hexagon> HexagonShapes;
+
+		TH2Poly* MTAS_2500;
+		TH2Poly* MTAS_2501;
+		TH2Poly* MTAS_2502;
+		TH2Poly* MTAS_2503;
 
 		TH1* MTAS_3100;
 		TH2* MTAS_3101;
