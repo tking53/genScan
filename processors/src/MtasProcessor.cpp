@@ -849,9 +849,9 @@ void MtasProcessor::GenerateHexagonShapes(){
 	double hexwidth = (3.0/2.0)*this->hexagonsize;
 	double hexheight = std::sqrt(3.0)*this->hexagonsize;
 
-	hexagon centercoords(0.0,0.0,this->hexagonsize,this->hexagonpad);
-	hexagon centerholecoords(0.0,0.0,0.5*this->hexagonsize,1.0);
-	this->HexagonShapes.push_back(hexagon(0.0,0.0,this->hexagonsize,this->hexagonpad));
+	Geometry::hexagon centercoords(0.0,0.0,this->hexagonsize,this->hexagonpad);
+	Geometry::hexagon centerholecoords(0.0,0.0,0.5*this->hexagonsize,1.0);
+	this->HexagonShapes.push_back(Geometry::hexagon(0.0,0.0,this->hexagonsize,this->hexagonpad));
 	//this is C1
 	this->HexagonShapes[0].xcoords[0] = (0.55*centercoords.xcoords[2]+0.45*centercoords.xcoords[1]);
 	this->HexagonShapes[0].ycoords[0] = (0.55*centercoords.ycoords[2]+0.45*centercoords.ycoords[1]);
@@ -875,7 +875,7 @@ void MtasProcessor::GenerateHexagonShapes(){
 	this->HexagonShapes[0].center.second = (centercoords.ycoords[2]+centerholecoords.ycoords[2])/2.0;
 
 
-	this->HexagonShapes.push_back(hexagon(0.0,0.0,this->hexagonsize,this->hexagonpad));
+	this->HexagonShapes.push_back(Geometry::hexagon(0.0,0.0,this->hexagonsize,this->hexagonpad));
 	//this is C2
 	this->HexagonShapes[1].xcoords[0] = (0.55*centercoords.xcoords[3]+0.45*centercoords.xcoords[2]);
 	this->HexagonShapes[1].ycoords[0] = (0.55*centercoords.ycoords[3]+0.45*centercoords.ycoords[2]);
@@ -898,7 +898,7 @@ void MtasProcessor::GenerateHexagonShapes(){
 	this->HexagonShapes[1].center.first = (centercoords.xcoords[3]+centerholecoords.xcoords[3])/2.0;
 	this->HexagonShapes[1].center.second = (centercoords.ycoords[3]+centerholecoords.ycoords[3])/2.0;
 
-	this->HexagonShapes.push_back(hexagon(0.0,0.0,this->hexagonsize,this->hexagonpad));
+	this->HexagonShapes.push_back(Geometry::hexagon(0.0,0.0,this->hexagonsize,this->hexagonpad));
 	//this is C3
 	this->HexagonShapes[2].xcoords[0] = (0.45*centercoords.xcoords[3]+0.55*centercoords.xcoords[4]);
 	this->HexagonShapes[2].ycoords[0] = (0.45*centercoords.ycoords[3]+0.55*centercoords.ycoords[4]);
@@ -921,7 +921,7 @@ void MtasProcessor::GenerateHexagonShapes(){
 	this->HexagonShapes[2].center.first = (centercoords.xcoords[4]+centerholecoords.xcoords[4])/2.0;
 	this->HexagonShapes[2].center.second = (centercoords.ycoords[4]+centerholecoords.ycoords[4])/2.0;
 
-	this->HexagonShapes.push_back(hexagon(0.0,0.0,this->hexagonsize,this->hexagonpad));
+	this->HexagonShapes.push_back(Geometry::hexagon(0.0,0.0,this->hexagonsize,this->hexagonpad));
 	//this is C4
 	this->HexagonShapes[3].xcoords[0] = (0.55*centercoords.xcoords[5]+0.45*centercoords.xcoords[4]);
 	this->HexagonShapes[3].ycoords[0] = (0.55*centercoords.ycoords[5]+0.45*centercoords.ycoords[4]);
@@ -944,7 +944,7 @@ void MtasProcessor::GenerateHexagonShapes(){
 	this->HexagonShapes[3].center.first = (centercoords.xcoords[5]+centerholecoords.xcoords[5])/2.0;
 	this->HexagonShapes[3].center.second = (centercoords.ycoords[5]+centerholecoords.ycoords[5])/2.0;
 
-	this->HexagonShapes.push_back(hexagon(0.0,0.0,this->hexagonsize,this->hexagonpad));
+	this->HexagonShapes.push_back(Geometry::hexagon(0.0,0.0,this->hexagonsize,this->hexagonpad));
 	//this is C5
 	this->HexagonShapes[4].xcoords[0] = (0.45*centercoords.xcoords[5]+0.55*centercoords.xcoords[0]);
 	this->HexagonShapes[4].ycoords[0] = (0.45*centercoords.ycoords[5]+0.55*centercoords.ycoords[0]);
@@ -967,7 +967,7 @@ void MtasProcessor::GenerateHexagonShapes(){
 	this->HexagonShapes[4].center.first = (centercoords.xcoords[0]+centerholecoords.xcoords[0])/2.0;
 	this->HexagonShapes[4].center.second = (centercoords.ycoords[0]+centerholecoords.ycoords[0])/2.0;
 
-	this->HexagonShapes.push_back(hexagon(0.0,0.0,this->hexagonsize,this->hexagonpad));
+	this->HexagonShapes.push_back(Geometry::hexagon(0.0,0.0,this->hexagonsize,this->hexagonpad));
 	//this is C6
 	this->HexagonShapes[5].xcoords[0] = (0.45*centercoords.xcoords[0]+0.55*centercoords.xcoords[1]); 
 	this->HexagonShapes[5].ycoords[0] = (0.45*centercoords.ycoords[0]+0.55*centercoords.ycoords[1]); 
@@ -992,28 +992,28 @@ void MtasProcessor::GenerateHexagonShapes(){
 
 
 	//inner
-	this->HexagonShapes.push_back(hexagon(0.0,hexheight,this->hexagonsize,this->hexagonpad));
-	this->HexagonShapes.push_back(hexagon(hexwidth,0.5*hexheight,this->hexagonsize,this->hexagonpad));
-	this->HexagonShapes.push_back(hexagon(hexwidth,-0.5*hexheight,this->hexagonsize,this->hexagonpad));
-	this->HexagonShapes.push_back(hexagon(0.0,-hexheight,this->hexagonsize,this->hexagonpad));
-	this->HexagonShapes.push_back(hexagon(-hexwidth,-0.5*hexheight,this->hexagonsize,this->hexagonpad));
-	this->HexagonShapes.push_back(hexagon(-hexwidth,0.5*hexheight,this->hexagonsize,this->hexagonpad));
+	this->HexagonShapes.push_back(Geometry::hexagon(0.0,hexheight,this->hexagonsize,this->hexagonpad));
+	this->HexagonShapes.push_back(Geometry::hexagon(hexwidth,0.5*hexheight,this->hexagonsize,this->hexagonpad));
+	this->HexagonShapes.push_back(Geometry::hexagon(hexwidth,-0.5*hexheight,this->hexagonsize,this->hexagonpad));
+	this->HexagonShapes.push_back(Geometry::hexagon(0.0,-hexheight,this->hexagonsize,this->hexagonpad));
+	this->HexagonShapes.push_back(Geometry::hexagon(-hexwidth,-0.5*hexheight,this->hexagonsize,this->hexagonpad));
+	this->HexagonShapes.push_back(Geometry::hexagon(-hexwidth,0.5*hexheight,this->hexagonsize,this->hexagonpad));
 
 	//middle
-	this->HexagonShapes.push_back(hexagon(hexwidth,1.5*hexheight,this->hexagonsize,this->hexagonpad));
-	this->HexagonShapes.push_back(hexagon(2.0*hexwidth,0.0,this->hexagonsize,this->hexagonpad));
-	this->HexagonShapes.push_back(hexagon(hexwidth,-1.5*hexheight,this->hexagonsize,this->hexagonpad));
-	this->HexagonShapes.push_back(hexagon(-hexwidth,-1.5*hexheight,this->hexagonsize,this->hexagonpad));
-	this->HexagonShapes.push_back(hexagon(-2.0*hexwidth,0.0,this->hexagonsize,this->hexagonpad));
-	this->HexagonShapes.push_back(hexagon(-hexwidth,1.5*hexheight,this->hexagonsize,this->hexagonpad));
+	this->HexagonShapes.push_back(Geometry::hexagon(hexwidth,1.5*hexheight,this->hexagonsize,this->hexagonpad));
+	this->HexagonShapes.push_back(Geometry::hexagon(2.0*hexwidth,0.0,this->hexagonsize,this->hexagonpad));
+	this->HexagonShapes.push_back(Geometry::hexagon(hexwidth,-1.5*hexheight,this->hexagonsize,this->hexagonpad));
+	this->HexagonShapes.push_back(Geometry::hexagon(-hexwidth,-1.5*hexheight,this->hexagonsize,this->hexagonpad));
+	this->HexagonShapes.push_back(Geometry::hexagon(-2.0*hexwidth,0.0,this->hexagonsize,this->hexagonpad));
+	this->HexagonShapes.push_back(Geometry::hexagon(-hexwidth,1.5*hexheight,this->hexagonsize,this->hexagonpad));
 	
 	//outer
-	this->HexagonShapes.push_back(hexagon(0.0,2.0*hexheight,this->hexagonsize,this->hexagonpad));
-	this->HexagonShapes.push_back(hexagon(2.0*hexwidth,1.0*hexheight,this->hexagonsize,this->hexagonpad));
-	this->HexagonShapes.push_back(hexagon(2.0*hexwidth,-1.0*hexheight,this->hexagonsize,this->hexagonpad));
-	this->HexagonShapes.push_back(hexagon(0.0,-2.0*hexheight,this->hexagonsize,this->hexagonpad));
-	this->HexagonShapes.push_back(hexagon(-2.0*hexwidth,-1.0*hexheight,this->hexagonsize,this->hexagonpad));
-	this->HexagonShapes.push_back(hexagon(-2.0*hexwidth,1.0*hexheight,this->hexagonsize,this->hexagonpad));
+	this->HexagonShapes.push_back(Geometry::hexagon(0.0,2.0*hexheight,this->hexagonsize,this->hexagonpad));
+	this->HexagonShapes.push_back(Geometry::hexagon(2.0*hexwidth,1.0*hexheight,this->hexagonsize,this->hexagonpad));
+	this->HexagonShapes.push_back(Geometry::hexagon(2.0*hexwidth,-1.0*hexheight,this->hexagonsize,this->hexagonpad));
+	this->HexagonShapes.push_back(Geometry::hexagon(0.0,-2.0*hexheight,this->hexagonsize,this->hexagonpad));
+	this->HexagonShapes.push_back(Geometry::hexagon(-2.0*hexwidth,-1.0*hexheight,this->hexagonsize,this->hexagonpad));
+	this->HexagonShapes.push_back(Geometry::hexagon(-2.0*hexwidth,1.0*hexheight,this->hexagonsize,this->hexagonpad));
 }
 
 void MtasProcessor::FillBetaPlots(PLOTS::PlotRegistry* hismanager){
