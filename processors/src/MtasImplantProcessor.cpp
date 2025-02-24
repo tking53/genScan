@@ -23,6 +23,9 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 
 	this->lowgaintag = "lowgain";
 	this->highgaintag = "highgain";
+	
+	this->HighGain = ProcessorStruct::DEFAULT_MTAS_IMPLANT_STRUCT;
+	this->LowGain = ProcessorStruct::DEFAULT_MTAS_IMPLANT_STRUCT;
 
 	this->YSOHGThreshold = 0.0;
 	this->YSOLGThreshold = 0.0;
@@ -49,11 +52,13 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 			++(this->HighGainDynodeHits);
 			if( evt->GetEnergy() > this->HighGainDynode ){
 				this->HighGainDynode = evt->GetEnergy();
+				this->HighGainDynodeTS = evt->GetTimeStamp();
 			}
 		}else if(subtype.compare("dynode") == 0 and islowgain ){
 			++(this->LowGainDynodeHits);
 			if( evt->GetEnergy() > this->LowGainDynode ){
 				this->LowGainDynode = evt->GetEnergy();
+				this->LowGainDynodeTS = evt->GetTimeStamp();
 			}
 		}else if(subtype.compare("anode") == 0 and ishighgain ){
 			pixelid = std::stoi(group);
@@ -81,10 +86,22 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 	}
 
 	this->CalcPosition(this->HighGainAnodes,this->HighResHighGainPosition,this->LowResHighGainPosition);
+	this->HighGain.highresx = this->HighResHighGainPosition.first;
+	this->HighGain.highresy = this->HighResHighGainPosition.second;
+	this->HighGain.lowresx = this->LowResHighGainPosition.first;
+	this->HighGain.lowresy = this->LowResHighGainPosition.second;
+	this->HighGain.dynodeerg = this->HighGainDynode;
+	this->HighGain.dynodets = this->HighGainDynodeTS;
 	hismanager->Fill("MTASIMPLANT_7012",this->LowResHighGainPosition.first,this->LowResHighGainPosition.second);
 	hismanager->Fill("MTASIMPLANT_7014",this->HighResHighGainPosition.first,this->HighResHighGainPosition.second);
 
 	this->CalcPosition(this->LowGainAnodes,this->HighResLowGainPosition,this->LowResLowGainPosition);
+	this->LowGain.highresx = this->HighResLowGainPosition.first;
+	this->LowGain.highresy = this->HighResLowGainPosition.second;
+	this->LowGain.lowresx = this->LowResLowGainPosition.first;
+	this->LowGain.lowresy = this->LowResLowGainPosition.second;
+	this->LowGain.dynodeerg = this->LowGainDynode;
+	this->LowGain.dynodets = this->LowGainDynodeTS;
 	hismanager->Fill("MTASIMPLANT_7013",this->LowResLowGainPosition.first,this->LowResLowGainPosition.second);
 	hismanager->Fill("MTASIMPLANT_7015",this->HighResLowGainPosition.first,this->HighResLowGainPosition.second);
 
@@ -155,9 +172,15 @@ void MtasImplantProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 }
 
 void MtasImplantProcessor::RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>& outputtrees){
+	this->OutputTree = new TTree("MtasImplant","MtasImplant Processor output");
+	this->OutputTree->Branch("highgain",&(this->HighGain));
+	this->OutputTree->Branch("lowgain",&(this->LowGain));
+	outputtrees[this->ProcessorName] = this->OutputTree;
 }
 
 void MtasImplantProcessor::CleanupTree(){
+	this->HighGain = ProcessorStruct::DEFAULT_MTAS_IMPLANT_STRUCT;
+	this->LowGain = ProcessorStruct::DEFAULT_MTAS_IMPLANT_STRUCT;
 }
 
 void MtasImplantProcessor::Reset(){
@@ -166,6 +189,7 @@ void MtasImplantProcessor::Reset(){
 	this->HighGainAnodeHits = 0;
 	this->HighGainDynode = 0.0;
 	this->HighGainDynodeOQDC = 0.0;
+	this->HighGainDynodeTS = -1.0;
 	this->HighGainAnodes = std::vector<double>(64,0.0);
 	this->HighGainAnodesOQDC = std::vector<double>(64,0.0);
 	this->HighResHighGainPosition = std::pair<double,double>(-99.0,-99.0);
@@ -176,6 +200,7 @@ void MtasImplantProcessor::Reset(){
 	this->LowGainAnodeHits = 0;
 	this->LowGainDynode = 0.0;
 	this->LowGainDynodeOQDC = 0.0;
+	this->LowGainDynodeTS = -1.0;
 	this->LowGainAnodes = std::vector<double>(64,0.0);
 	this->LowGainAnodesOQDC = std::vector<double>(64,0.0);
 	this->HighResLowGainPosition = std::pair<double,double>(-99.0,-99.0);
@@ -183,7 +208,7 @@ void MtasImplantProcessor::Reset(){
 }
 		
 std::pair<unsigned int,unsigned int> MtasImplantProcessor::CalcXY(const unsigned int& idx) const{
-	return std::make_pair(idx%8,idx/8);
+	return std::make_pair(idx%8,8-idx/8);
 }
 
 void MtasImplantProcessor::CalcPosition(const std::vector<double>& ergs,std::pair<double,double>& highres,std::pair<unsigned int,unsigned int>& lowres){
@@ -203,6 +228,5 @@ void MtasImplantProcessor::CalcPosition(const std::vector<double>& ergs,std::pai
 		ytmp += e*pixel.second;
 		++idx;
 	}
-	highres = std::make_pair(xtmp/esum,8-ytmp/esum);
-	//highres = std::make_pair(xtmp/esum,(8-ytmp)/esum);
+	highres = std::make_pair(xtmp/esum,ytmp/esum);
 }

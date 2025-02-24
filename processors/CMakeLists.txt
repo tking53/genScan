@@ -51,6 +51,31 @@ else()
 		)
 endif()
 
+ROOT_GENERATE_DICTIONARY(MtasImplantStruct_root MtasImplantStruct.hpp LINKDEF include/MtasImplantStructLinkDef.hpp )
+add_library(MtasImplantStruct SHARED MtasImplantStruct_root.cxx MtasImplantStruct_root)
+target_link_libraries(MtasImplantStruct ${ROOT_LIBRARIES})
+add_dependencies(MtasImplantStruct ${EXTERNAL_PROCESSOR_DEPS} ${EXTERNAL_LOG_DEPS})
+if( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
+	add_custom_command(TARGET MtasImplantStruct
+		POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E create_symlink
+		$<TARGET_FILE_NAME:MtasImplantStruct>
+		libMtasImplantStruct_root.dylib
+		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/processors
+		COMMENT "Creating symlink for MtasImplantStruct"
+		)
+else()
+	add_custom_command(TARGET MtasImplantStruct
+		POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E create_symlink
+		$<TARGET_FILE_NAME:MtasImplantStruct>
+		libMtasImplantStruct_root.so
+		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/processors
+		COMMENT "Creating symlink for MtasImplantStruct"
+		)
+endif()
+
+
 add_library(PROCESSOR_LIB ${src_files})
 if( USE_SYSTEM_YAMLCPP )
 	target_link_libraries(PROCESSOR_LIB PUBLIC ${ROOT_LIBRARIES} UTILITY_LIB pugixml yaml-cppd jsoncpp)

@@ -348,8 +348,8 @@ target_include_directories(PROCESSOR_LIB PUBLIC core/include)
 
 add_executable(GenScanor scanmain.cpp)
 add_dependencies(GenScanor ${EXTERNAL_DEPS})
-target_link_libraries(GenScanor PRIVATE MtasStruct RootDevStruct TRANSLATOR_LIB CORE_LIB )
-#target_link_libraries(GenScanor PRIVATE MtasStruct RootDevStruct TRANSLATOR_LIB PROCESSOR_LIB CORE_LIB UTILITY_LIB ${ROOT_LIBRARIES})
+target_link_libraries(GenScanor PRIVATE MtasImplantStruct MtasStruct RootDevStruct TRANSLATOR_LIB CORE_LIB )
+#target_link_libraries(GenScanor PRIVATE MtasImplantStruct MtasStruct RootDevStruct TRANSLATOR_LIB PROCESSOR_LIB CORE_LIB UTILITY_LIB ${ROOT_LIBRARIES})
 
 add_executable(GenConfig configmain.cpp)
 add_dependencies(GenConfig ${EXTERNAL_DEPS})
