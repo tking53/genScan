@@ -187,6 +187,8 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 	}
 
 	this->GenerateHexagonShapes();
+	this->SegmentDataVec = std::vector<ProcessorStruct::MtasSegment>(24,ProcessorStruct::DEFAULT_MTAS_SEGMENT_STRUCT);
+	this->TotalDataVec = std::vector<ProcessorStruct::MtasTotal>(5,ProcessorStruct::DEFAULT_MTAS_TOTAL_STRUCT);
 }
 
 [[maybe_unused]] bool MtasProcessor::PreProcess(EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
@@ -288,6 +290,13 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 				this->CalCenter[detectorposition] = evt->GetEnergy();
 				this->TimeStamps.push_back(evt->GetTimeStamp());
 				++this->CenterHits[detectorposition];
+				if( isfront ){
+					this->SegmentDataVec[detectorposition/2].frontenergy = this->Center[detectorposition];
+					this->SegmentDataVec[detectorposition/2].fronttimestamp = this->TimeStamps.back();
+				}else{
+					this->SegmentDataVec[detectorposition/2].backenergy = this->Center[detectorposition];
+					this->SegmentDataVec[detectorposition/2].backtimestamp = this->TimeStamps.back();
+				}
 			}else{
 				++this->CenterHits[detectorposition];
 			}
@@ -298,6 +307,13 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 				this->CalInner[detectorposition] = evt->GetEnergy();
 				this->TimeStamps.push_back(evt->GetTimeStamp());
 				++this->InnerHits[detectorposition];
+				if( isfront ){
+					this->SegmentDataVec[detectorposition/2 + 6].frontenergy = this->Inner[detectorposition];
+					this->SegmentDataVec[detectorposition/2 + 6].fronttimestamp = this->TimeStamps.back();
+				}else{
+					this->SegmentDataVec[detectorposition/2 + 6].backenergy = this->Inner[detectorposition];
+					this->SegmentDataVec[detectorposition/2 + 6].backtimestamp = this->TimeStamps.back();
+				}
 			}else{
 				++this->InnerHits[detectorposition];
 			}
@@ -308,6 +324,13 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 				this->CalMiddle[detectorposition] = evt->GetEnergy();
 				this->TimeStamps.push_back(evt->GetTimeStamp());
 				++this->MiddleHits[detectorposition];
+				if( isfront ){
+					this->SegmentDataVec[detectorposition/2 + 12].frontenergy = this->Middle[detectorposition];
+					this->SegmentDataVec[detectorposition/2 + 12].fronttimestamp = this->TimeStamps.back();
+				}else{
+					this->SegmentDataVec[detectorposition/2 + 12].backenergy = this->Middle[detectorposition];
+					this->SegmentDataVec[detectorposition/2 + 12].backtimestamp = this->TimeStamps.back();
+				}
 			}else{
 				++this->MiddleHits[detectorposition];
 			}
@@ -318,6 +341,13 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 				this->CalOuter[detectorposition] = evt->GetEnergy();
 				this->TimeStamps.push_back(evt->GetTimeStamp());
 				++this->OuterHits[detectorposition];
+				if( isfront ){
+					this->SegmentDataVec[detectorposition/2 + 18].frontenergy = this->Outer[detectorposition];
+					this->SegmentDataVec[detectorposition/2 + 18].fronttimestamp = this->TimeStamps.back();
+				}else{
+					this->SegmentDataVec[detectorposition/2 + 18].backenergy = this->Outer[detectorposition];
+					this->SegmentDataVec[detectorposition/2 + 18].backtimestamp = this->TimeStamps.back();
+				}
 			}else{
 				++this->OuterHits[detectorposition];
 			}
@@ -335,6 +365,8 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 	for( int ii = 0; ii < 6; ++ii ){
 		if( this->CenterHits[2*ii] and this->CenterHits[2*ii + 1] ){
 			this->SumFrontBackEnergy[ii] = (this->Center[2*ii] + this->Center[2*ii + 1])/2.0;
+			this->SegmentDataVec[ii].sumenergy = this->SumFrontBackEnergy[ii];
+			this->SegmentDataVec[ii].avgtimestamp = (this->SegmentDataVec[ii].fronttimestamp+this->SegmentDataVec[ii].backtimestamp)/2.0;
 			this->Position[ii] = this->CalcPosition(this->RawCenter[2*ii],this->RawCenter[2*ii + 1]);
 			this->CenterFire = true;
 			this->AnyFire = true;
@@ -343,6 +375,8 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		}
 		if( this->InnerHits[2*ii] and this->InnerHits[2*ii + 1] ){
 			this->SumFrontBackEnergy[ii+6] = (this->Inner[2*ii] + this->Inner[2*ii + 1])/2.0;
+			this->SegmentDataVec[ii+6].sumenergy = this->SumFrontBackEnergy[ii+6];
+			this->SegmentDataVec[ii+6].avgtimestamp = (this->SegmentDataVec[ii+6].fronttimestamp+this->SegmentDataVec[ii+6].backtimestamp)/2.0;
 			this->Position[ii + 6] = this->CalcPosition(this->RawInner[2*ii],this->RawInner[2*ii + 1]);
 			this->InnerFire = true;
 			this->AnyFire = true;
@@ -351,6 +385,8 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		}
 		if( this->MiddleHits[2*ii] and this->MiddleHits[2*ii + 1] ){
 			this->SumFrontBackEnergy[ii+12] = (this->Middle[2*ii] + this->Middle[2*ii + 1])/2.0;
+			this->SegmentDataVec[ii+12].sumenergy = this->SumFrontBackEnergy[ii+12];
+			this->SegmentDataVec[ii+12].avgtimestamp = (this->SegmentDataVec[ii+12].fronttimestamp+this->SegmentDataVec[ii+12].backtimestamp)/2.0;
 			this->Position[ii + 12] = this->CalcPosition(this->RawMiddle[2*ii],this->RawMiddle[2*ii + 1]);
 			this->MiddleFire = true;
 			this->AnyFire = true;
@@ -359,6 +395,8 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		}
 		if( this->OuterHits[2*ii] and this->OuterHits[2*ii + 1] ){
 			this->SumFrontBackEnergy[ii+18] = (this->Outer[2*ii] + this->Outer[2*ii + 1])/2.0;
+			this->SegmentDataVec[ii+18].sumenergy = this->SumFrontBackEnergy[ii+18];
+			this->SegmentDataVec[ii+18].avgtimestamp = (this->SegmentDataVec[ii+18].fronttimestamp+this->SegmentDataVec[ii+18].backtimestamp)/2.0;
 			this->Position[ii + 18] = this->CalcPosition(this->RawOuter[2*ii],this->RawOuter[2*ii + 1]);
 			this->OuterFire = true;
 			this->AnyFire = true;
@@ -395,6 +433,35 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		this->TotalEnergy[3] += this->SumFrontBackEnergy[ii+12];
 		this->TotalEnergy[4] += this->SumFrontBackEnergy[ii+18];
 	}
+	this->TotalDataVec[0].sumenergy = this->TotalEnergy[0];
+	this->TotalDataVec[0].numfire = this->NumFire[0];
+	this->TotalDataVec[0].saturate = this->AnySaturate;
+	this->TotalDataVec[0].pileup = this->AnyPileup;
+	this->TotalDataVec[0].timestamp = this->FirstTime;
+
+	this->TotalDataVec[1].sumenergy = this->TotalEnergy[1];
+	this->TotalDataVec[1].numfire = this->NumFire[1];
+	this->TotalDataVec[1].saturate = this->CenterSaturate;
+	this->TotalDataVec[1].pileup = this->CenterPileup;
+	this->TotalDataVec[1].timestamp = this->FirstTime;
+
+	this->TotalDataVec[2].sumenergy = this->TotalEnergy[2];
+	this->TotalDataVec[2].numfire = this->NumFire[2];
+	this->TotalDataVec[2].saturate = this->InnerSaturate;
+	this->TotalDataVec[2].pileup = this->InnerPileup;
+	this->TotalDataVec[2].timestamp = this->FirstTime;
+
+	this->TotalDataVec[3].sumenergy = this->TotalEnergy[3];
+	this->TotalDataVec[3].numfire = this->NumFire[3];
+	this->TotalDataVec[3].saturate = this->MiddleSaturate;
+	this->TotalDataVec[3].pileup = this->MiddlePileup;
+	this->TotalDataVec[3].timestamp = this->FirstTime;
+
+	this->TotalDataVec[4].sumenergy = this->TotalEnergy[4];
+	this->TotalDataVec[4].numfire = this->NumFire[4];
+	this->TotalDataVec[4].saturate = this->OuterSaturate;
+	this->TotalDataVec[4].pileup = this->OuterPileup;
+	this->TotalDataVec[4].timestamp = this->FirstTime;
 
 	if( (not this->AnySaturate) and (not this->AnyPileup) ){
 		for( int ii = 0; ii < 6; ++ii ){
@@ -774,15 +841,50 @@ void MtasProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 
 void MtasProcessor::RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>& outputtrees){
 	this->OutputTree = new TTree("Mtas","Mtas Processor output");
-	this->OutputTree->Branch("segment_vec",&(this->SegmentDataVec));
-	this->OutputTree->Branch("total_vec",&(this->TotalDataVec));
+	this->OutputTree->Branch("Total",&(this->TotalDataVec.at(0)));
 
+	this->OutputTree->Branch("C1",&(this->SegmentDataVec.at(0)));
+	this->OutputTree->Branch("C2",&(this->SegmentDataVec.at(1)));
+	this->OutputTree->Branch("C3",&(this->SegmentDataVec.at(2)));
+	this->OutputTree->Branch("C4",&(this->SegmentDataVec.at(3)));
+	this->OutputTree->Branch("C5",&(this->SegmentDataVec.at(4)));
+	this->OutputTree->Branch("C6",&(this->SegmentDataVec.at(5)));
+	this->OutputTree->Branch("CenterRing",&(this->TotalDataVec.at(1)));
+	
+	this->OutputTree->Branch("I1",&(this->SegmentDataVec.at(6)));
+	this->OutputTree->Branch("I2",&(this->SegmentDataVec.at(7)));
+	this->OutputTree->Branch("I3",&(this->SegmentDataVec.at(8)));
+	this->OutputTree->Branch("I4",&(this->SegmentDataVec.at(9)));
+	this->OutputTree->Branch("I5",&(this->SegmentDataVec.at(10)));
+	this->OutputTree->Branch("I6",&(this->SegmentDataVec.at(11)));
+	this->OutputTree->Branch("InnerRing",&(this->TotalDataVec.at(2)));
+	
+	this->OutputTree->Branch("M1",&(this->SegmentDataVec.at(12)));
+	this->OutputTree->Branch("M2",&(this->SegmentDataVec.at(13)));
+	this->OutputTree->Branch("M3",&(this->SegmentDataVec.at(14)));
+	this->OutputTree->Branch("M4",&(this->SegmentDataVec.at(15)));
+	this->OutputTree->Branch("M5",&(this->SegmentDataVec.at(16)));
+	this->OutputTree->Branch("M6",&(this->SegmentDataVec.at(17)));
+	this->OutputTree->Branch("MiddleRing",&(this->TotalDataVec.at(3)));
+	
+	this->OutputTree->Branch("O1",&(this->SegmentDataVec.at(18)));
+	this->OutputTree->Branch("O2",&(this->SegmentDataVec.at(19)));
+	this->OutputTree->Branch("O3",&(this->SegmentDataVec.at(20)));
+	this->OutputTree->Branch("O4",&(this->SegmentDataVec.at(21)));
+	this->OutputTree->Branch("O5",&(this->SegmentDataVec.at(22)));
+	this->OutputTree->Branch("O6",&(this->SegmentDataVec.at(23)));
+	this->OutputTree->Branch("OuterRing",&(this->TotalDataVec.at(4)));
+	
 	outputtrees[this->ProcessorName] = this->OutputTree;
 }
 
 void MtasProcessor::CleanupTree(){
-	this->SegmentDataVec.clear();
-	this->TotalDataVec.clear();
+	for( auto& e : this->SegmentDataVec ){
+		e = ProcessorStruct::DEFAULT_MTAS_SEGMENT_STRUCT;
+	}
+	for( auto& e : this->TotalDataVec ){
+		e = ProcessorStruct::DEFAULT_MTAS_TOTAL_STRUCT;
+	}
 }
 
 void MtasProcessor::Reset(){

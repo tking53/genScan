@@ -1,5 +1,5 @@
 #include "WaveformAnalyzer.hpp"
-#include "boost/regex/v5/regex_iterator.hpp"
+#include "PulseFitFunctions.hpp"
 
 WaveformAnalyzer::WaveformAnalyzer(const std::string& log) : Analyzer(log,"WaveformAnalyzer",{}){
 	this->h2dsettings = {
@@ -21,7 +21,7 @@ WaveformAnalyzer::WaveformAnalyzer(const std::string& log) : Analyzer(log,"Wavef
 	for( const auto& key : this->Types ){
 		eventhistory->GetCurrentEventSummary()->GetDetectorSummary(this->AllDefaultRegex[key],this->SummaryData);
 		//this->console->info("ROOTDEV Size for type {} : {}",key,this->SummaryData.size());
-		for( const auto& evt : this->SummaryData ){
+		for( auto& evt : this->SummaryData ){
 			for( const auto& s : this->WaveSettings ){
 				boost::smatch cmapmatch;
 				if( boost::regex_match(evt->GetCMapID(),cmapmatch,s.first,boost::regex_constants::match_continuous) ){
@@ -68,6 +68,50 @@ WaveformAnalyzer::WaveformAnalyzer(const std::string& log) : Analyzer(log,"Wavef
 				}
 			}
 			//this->console->info("{} {}",evt->GetType(),this->SummaryData.size());
+			for( auto& s : this->TraceFitSettings ){
+				boost::smatch cmapmatch;
+				if( boost::regex_match(evt->GetCMapID(),cmapmatch,s.first,boost::regex_constants::match_continuous) ){
+					auto trace = evt->GetRawTrace();
+					if( s.second.fithist == nullptr ){
+						s.second.fithist = new TH1F((s.second.FitFuncName+evt->GetCMapID()).c_str(),s.second.FitFuncName.c_str(),trace.size(),0,trace.size());
+					}
+					for( size_t idx = 0; idx < trace.size(); ++idx ){
+						s.second.fithist->SetBinContent(idx+1,trace.at(idx));
+					}
+					for( const auto& parinfo : s.second.ParamInfo ){
+						auto idx = std::get<0>(parinfo);
+						auto isbounded = std::get<1>(parinfo);
+						auto isfixed = std::get<2>(parinfo);
+						auto value = std::get<4>(parinfo);
+						auto lbound = std::get<5>(parinfo);
+						auto ubound = std::get<6>(parinfo);
+						
+						s.second.fitfunc->SetParameter(idx,value);
+						if( isfixed ){
+							s.second.fitfunc->FixParameter(idx,value);
+						}
+						
+						if( isbounded ){
+							s.second.fitfunc->SetParLimits(idx,lbound,ubound);
+						}
+
+					}
+					this->FitResult = s.second.fithist->Fit(s.second.fitfunc,"NSQ","",s.second.FitRange.first,s.second.FitRange.second);
+					//add params to evt
+					//this->console->info("Begin Trace fit : {}",evt->GetCMapID());
+					for( const auto& parinfo : s.second.ParamInfo ){
+						auto idx = std::get<0>(parinfo);
+						auto parname = std::get<3>(parinfo);
+						evt->AddTraceFitInfo(parname,this->FitResult->Parameter(idx),this->FitResult->ParError(idx));
+						//this->console->info("{} : {}+-{}",parname,this->FitResult->Parameter(idx),this->FitResult->ParError(idx));
+					}
+					evt->AddTraceFitInfo("Chi2/NDF",this->FitResult->Chi2(),this->FitResult->Ndf());
+					//this->console->info("Chi2/NDF : {}/{}",this->FitResult->Chi2(),this->FitResult->Ndf());
+					//this->console->info("End Trace fit : {}",evt->GetCMapID());
+					s.second.fithist->GetListOfFunctions()->Clear();
+					break;
+				}
+			}
 		}
 	}
 	Analyzer::EndProcess();
@@ -113,6 +157,61 @@ void WaveformAnalyzer::Init(const pugi::xml_node& config){
 		this->ParsePostTrigger(settings,this->WaveSettings.back().second);
 		this->ParseQDC(settings,this->WaveSettings.back().second);
 		this->ParsePSD(settings,this->WaveSettings.back().second);
+
+		for( pugi::xml_node fitsettings = settings.child("FitSettings"); fitsettings; fitsettings = fitsettings.next_sibling("FitSettings") ){
+			this->console->info("Found trace settings for regex:{}",re.str());
+
+			this->TraceFitSettings.push_back(std::make_pair(re,TraceFitParams()));
+			std::string fitname = fitsettings.attribute("name").as_string("");
+			this->TraceFitSettings.back().second.FitFuncName = fitname;
+
+			double fitlowbound = fitsettings.attribute("min").as_double(0.0);
+			double fithighbound = fitsettings.attribute("max").as_double(0.0);
+			this->TraceFitSettings.back().second.FitRange = {fitlowbound,fithighbound};
+
+			for( pugi::xml_node fitparam = fitsettings.child("FitParam"); fitparam; fitparam = fitparam.next_sibling("FitParam") ){
+				int idx = fitparam.attribute("idx").as_int(-1);
+				double value = fitparam.attribute("value").as_double(0.0);
+				bool isbounded = fitparam.attribute("bounded").as_bool(false);
+				bool isfixed = fitparam.attribute("fixed").as_bool(false);
+				std::string parname = fitparam.attribute("name").as_string("");
+				if( isbounded ){
+					double lowbound = fitparam.attribute("min").as_double(0.0);
+					double highbound = fitparam.attribute("max").as_double(0.0);
+					if( lowbound >= highbound or value < lowbound or value > highbound ){
+						this->console->error("bounded value not between lowbound and highbound {} : [{},{},{}]",parname,lowbound,value,highbound);
+						throw "Bounded value not between lowbound and highbound";
+					}
+					this->TraceFitSettings.back().second.ParamInfo.push_back({idx,isbounded,isfixed,parname,value,lowbound,highbound});
+				}
+				if( isfixed ){
+					this->TraceFitSettings.back().second.ParamInfo.push_back({idx,isbounded,isfixed,parname,value,value,value});
+				}
+				if( idx < 0 ){
+					this->console->error("idx not assigned, need value greater than 0");
+					throw "idx not assigned to fit parameter";
+				}
+
+				if( isfixed and isbounded ){
+					this->console->error("value is set to both bounded and fixed {} : {}",parname,value);
+					throw "Value is set to both bounded and fixed";
+				}
+			}
+			std::sort(this->TraceFitSettings.back().second.ParamInfo.begin(),this->TraceFitSettings.back().second.ParamInfo.end(),[](const std::tuple<int,bool,bool,std::string,double,double,double>& a,const std::tuple<int,bool,bool,std::string,double,double,double>& b){ return std::get<0>(a) < std::get<0>(b); });
+
+			this->TraceFitSettings.back().second.fithist = nullptr;
+			this->TraceFitSettings.back().second.fitfunc = nullptr;
+			if( fitname.compare("BSMSingleTracePulse") == 0 ){
+				this->TraceFitSettings.back().second.fitfunc = new TF1(fitname.c_str(),PulseFit::BSMSingleTraceFit,fitlowbound,fithighbound,8);
+				for( const auto& parinfo : this->TraceFitSettings.back().second.ParamInfo ){
+					this->TraceFitSettings.back().second.fitfunc->SetParName(std::get<0>(parinfo),std::get<3>(parinfo).c_str());
+				}
+				this->TraceFitSettings.back().second.fithist = nullptr;
+			}else{
+				this->console->error("Unknown Trace Fitting Function : {}",fitname);
+				throw "Unknown TraceFitting Function";
+			}
+		}
 
 	}
 

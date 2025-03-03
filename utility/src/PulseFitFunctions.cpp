@@ -22,6 +22,18 @@ namespace PulseFit{
 	double Sin(double* x,double* par){
 		double amp = par[0];
 		double phase = par[1];
-		return amp*TMath::Sin(x[0]+phase);
+		double freq = par[2];
+		return amp*TMath::Sin(freq*(x[0]+phase));
+	}
+
+	double BSMSingleTraceFit(double* x,double* par){
+		double c = PulseFit::Constant(x,par);
+		double sine = PulseFit::Sin(x,par+1);
+		double pulse = PulseFit::Pulse(x,par+4);
+		return c + sine + pulse;
+	}
+
+	double BSMDoubleTraceFit(double* x,double* par){
+		return PulseFit::Constant(x,par)+PulseFit::Sin(x,par+1)+PulseFit::Pulse(x,par+3)+PulseFit::Pulse(x,par+7);
 	}
 }

@@ -7,32 +7,23 @@
 
 namespace ProcessorStruct{
 	struct MtasSegment{
-		double energy = -999;
-		double timestamp = -999;
-		TString Ring = "";
-		TString Segment = "";
-		TString FrontBack = "";
+		double frontenergy = -999.0;
+		double fronttimestamp = -999.0;
+
+		double backenergy = -999.0;
+		double backtimestamp = -999.0;
+
+		double sumenergy = -999.0;
+		double avgtimestamp = -999.0;
 	};
 	static const MtasSegment DEFAULT_MTAS_SEGMENT_STRUCT;
 
 	struct MtasTotal{
-		std::vector<double> CenterEnergy = std::vector<double>(6,-999);
-		std::vector<double> CenterTS = std::vector<double>(6,-999);
-		double CenterSum = -999;
-		
-		std::vector<double> InnerEnergy = std::vector<double>(6,-999);
-		std::vector<double> InnerTS = std::vector<double>(6,-999);
-		double InnerSum = -999;
-
-		std::vector<double> MiddleEnergy = std::vector<double>(6,-999);
-		std::vector<double> MiddleTS = std::vector<double>(6,-999);
-		double MiddleSum = -999;
-
-		std::vector<double> OuterEnergy = std::vector<double>(6,-999);
-		std::vector<double> OuterTS = std::vector<double>(6,-999);
-		double OuterSum = -999;
-
-		double Total = -999;
+		double timestamp = -999.0;
+		double sumenergy = -999.0;
+		int numfire = 0;
+		bool saturate = false;
+		bool pileup = false;
 	};
 	static const MtasTotal DEFAULT_MTAS_TOTAL_STRUCT; 
 }

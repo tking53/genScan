@@ -7,18 +7,6 @@
 #include <string>
 #include <tuple>
 
-namespace PulseFit{
-
-	double BSMSingleTraceFit(double* x,double* par){
-		return PulseFit::Constant(x,par)+PulseFit::Sin(x,par+1)+PulseFit::Pulse(x,par+2);
-	}
-
-	double BSMDoubleTraceFit(double* x,double* par){
-		return PulseFit::Constant(x,par)+PulseFit::Sin(x,par+1)+PulseFit::Pulse(x,par+3)+PulseFit::Pulse(x,par+7);
-	}
-
-}
-
 BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor",{"bsm"}){
 	this->fronttag = "front";
 	this->backtag = "back";
@@ -57,56 +45,15 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 	
 	this->NumPairs = 1;
 	this->NumPMTs = 2*this->NumPairs;
+
+	this->fronttracefitvalues = ProcessorStruct::DEFAULT_BSM_TRACE_FIT_STRUCT;
+	this->backtracefitvalues = ProcessorStruct::DEFAULT_BSM_TRACE_FIT_STRUCT;
 }
 
 [[maybe_unused]] bool BSMProcessor::PreProcess(EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	Processor::PreProcess();
 
 	eventhistory->GetCurrentEventSummary()->GetDetectorSummary(this->AllDefaultRegex["bsm"],this->SummaryData);
-
-	//std::vector<std::vector<PhysicsData*>> FrontHits = std::vector<std::vector<PhysicsData*>>(6,std::vector<PhysicsData*>());
-	//std::vector<std::vector<PhysicsData*>> BackHits = std::vector<std::vector<PhysicsData*>>(6,std::vector<PhysicsData*>());
-
-	//for( auto& evt : this->SummaryData ){
-	//	auto group = evt->GetGroup();
-	//	int segmentid = std::stoi(group);
-	//	int position = segmentid - 1; 	
-	//	if( evt->HasTag(fronttag) ){
-	//		FrontHits[position].push_back(evt);
-	//	}else if( evt->HasTag(backtag) ){
-	//		BackHits[position].push_back(evt);
-	//	}else{
-	//		throw std::runtime_error("evt in BSMProcessor is malformed in xml, and has neither front tag or back tag");
-	//	}
-	//}
-
-	//std::vector<PhysicsData*> GoodHits;
-	//for( size_t ii = 0; ii < this->NumPairs; ++ii ){
-	//	std::vector<std::tuple<size_t,size_t,double>> TDiff;
-	//	for( size_t jj = 0; jj < FrontHits[ii].size(); ++jj ){
-	//		for( size_t kk = 0; kk < BackHits[ii].size(); ++kk ){
-	//			TDiff.push_back(std::make_tuple(jj,kk,std::abs(FrontHits[ii][jj]->GetTimeStamp() - BackHits[ii][kk]->GetTimeStamp())));
-	//		}
-	//	}
-
-	//	for( const auto& e : TDiff ){
-	//		this->console->info("before: {} {} {}",std::get<0>(e),std::get<1>(e),std::get<2>(e));
-	//	}
-
-	//	std::sort(TDiff.begin(),TDiff.end(),[](const std::tuple<size_t,size_t,double>& a,const std::tuple<size_t,size_t,double>& b){
-	//			return std::get<2>(a) < std::get<2>(b);
-	//			} );
-
-	//	for( const auto& e : TDiff ){
-	//		this->console->info("after: {} {} {}",std::get<0>(e),std::get<1>(e),std::get<2>(e));
-	//	}
-	//	//throw "help";
-	//}
-	
-	//if( this->SummaryData.size() > 2 ){
-	//	this->console->info("{}",this->SummaryData.size());
-	//}
-	
 	for( const auto& evt : this->SummaryData ){
 		auto subtype = evt->GetSubType();
 		auto group = evt->GetGroup();
@@ -230,7 +177,31 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 			
 			std::string pkmaxerghis = (isfront) ?  ("BSM_375"+std::to_string(position)+"_F") :  ("BSM_375"+std::to_string(position)+"_B");
 			hismanager->Fill(pkmaxerghis,evt->GetRawEnergyWRandom(),pk.first);
-			
+
+			if( isfront ){
+				this->fronttracefitvalues.constant = evt->GetTraceFitValue("Constant").first;
+				this->fronttracefitvalues.sinamp = evt->GetTraceFitValue("SinAmp").first;
+				this->fronttracefitvalues.sinphase = evt->GetTraceFitValue("SinPhase").first;
+				this->fronttracefitvalues.sinfreq = evt->GetTraceFitValue("SinFreq").first;
+				this->fronttracefitvalues.pulseamp = evt->GetTraceFitValue("PulseAmp").first;
+				this->fronttracefitvalues.pulsedelay = evt->GetTraceFitValue("PulseDelay").first;
+				this->fronttracefitvalues.pulserise = evt->GetTraceFitValue("PulseRise").first;
+				this->fronttracefitvalues.pulsedecay = evt->GetTraceFitValue("PulseDecay").first;
+				this->fronttracefitvalues.energy = evt->GetRawEnergyWRandom();
+				this->fronttracefitvalues.timestamp = evt->GetTimeStamp();
+			}else{
+				this->backtracefitvalues.constant = evt->GetTraceFitValue("Constant").first;
+				this->backtracefitvalues.sinamp = evt->GetTraceFitValue("SinAmp").first;
+				this->backtracefitvalues.sinphase = evt->GetTraceFitValue("SinPhase").first;
+				this->backtracefitvalues.sinfreq = evt->GetTraceFitValue("SinFreq").first;
+				this->backtracefitvalues.pulseamp = evt->GetTraceFitValue("PulseAmp").first;
+				this->backtracefitvalues.pulsedelay = evt->GetTraceFitValue("PulseDelay").first;
+				this->backtracefitvalues.pulserise = evt->GetTraceFitValue("PulseRise").first;
+				this->backtracefitvalues.pulsedecay = evt->GetTraceFitValue("PulseDecay").first;
+				this->backtracefitvalues.energy = evt->GetRawEnergyWRandom();
+				this->backtracefitvalues.timestamp = evt->GetTimeStamp();
+			}
+	
 			this->Traces[detectorposition] = evt->GetRawTraceData();
 			this->UnCorrectedBSM[detectorposition] = evt->GetEnergy();
 			this->HitTimeStamps[detectorposition] = evt->GetTimeStamp();
@@ -662,9 +633,15 @@ void BSMProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 }
 
 void BSMProcessor::RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>& outputtrees){
+	this->OutputTree = new TTree("BSMTraceFit","BSM Processor Trace Fit output");
+	this->OutputTree->Branch("front",&(this->fronttracefitvalues));
+	this->OutputTree->Branch("back",&(this->backtracefitvalues));
+	outputtrees[this->ProcessorName] = this->OutputTree;
 }
 
 void BSMProcessor::CleanupTree(){
+	this->fronttracefitvalues = ProcessorStruct::DEFAULT_BSM_TRACE_FIT_STRUCT;
+	this->backtracefitvalues = ProcessorStruct::DEFAULT_BSM_TRACE_FIT_STRUCT;
 }
 
 void BSMProcessor::Reset(){

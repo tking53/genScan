@@ -602,3 +602,15 @@ const std::vector<float>& PhysicsData::GetTraceDerivative() const{
 const std::vector<uint16_t>& PhysicsData::GetRawTraceDerivative() const{
 	return this->Trace.GetDataDerivative();
 }
+
+bool PhysicsData::DoesTraceFitValueExist(const std::string& name) const{
+	return this->TraceFitInfo.find(name) != this->TraceFitInfo.end();
+}
+
+void PhysicsData::AddTraceFitInfo(const std::string& name,double p,double e){
+	this->TraceFitInfo[name] = {p,e};
+}
+
+std::pair<double,double> PhysicsData::GetTraceFitValue(const std::string& name) const{
+	return this->TraceFitInfo.at(name);
+}

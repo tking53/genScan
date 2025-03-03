@@ -117,9 +117,7 @@ class MtasProcessor : public Processor{
 		double LastTime;
 		
 		std::vector<ProcessorStruct::MtasSegment> SegmentDataVec;
-		ProcessorStruct::MtasSegment CurrSegmentData;
 		std::vector<ProcessorStruct::MtasTotal> TotalDataVec;
-		ProcessorStruct::MtasTotal CurrTotalData;
 
 		enum SUBTYPE{
 			CENTER,

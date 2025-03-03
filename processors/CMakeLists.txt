@@ -75,6 +75,29 @@ else()
 		)
 endif()
 
+ROOT_GENERATE_DICTIONARY(BSMTraceFitStruct_root BSMTraceFitStruct.hpp LINKDEF include/BSMTraceFitStructLinkDef.hpp )
+add_library(BSMTraceFitStruct SHARED BSMTraceFitStruct_root.cxx BSMTraceFitStruct_root)
+target_link_libraries(BSMTraceFitStruct ${ROOT_LIBRARIES})
+add_dependencies(BSMTraceFitStruct ${EXTERNAL_PROCESSOR_DEPS} ${EXTERNAL_LOG_DEPS})
+if( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
+	add_custom_command(TARGET BSMTraceFitStruct
+		POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E create_symlink
+		$<TARGET_FILE_NAME:BSMTraceFitStruct>
+		libBSMTraceFitStruct_root.dylib
+		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/processors
+		COMMENT "Creating symlink for BSMTraceFitStruct"
+		)
+else()
+	add_custom_command(TARGET BSMTraceFitStruct
+		POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E create_symlink
+		$<TARGET_FILE_NAME:BSMTraceFitStruct>
+		libBSMTraceFitStruct_root.so
+		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/processors
+		COMMENT "Creating symlink for BSMTraceFitStruct"
+		)
+endif()
 
 add_library(PROCESSOR_LIB ${src_files})
 if( USE_SYSTEM_YAMLCPP )

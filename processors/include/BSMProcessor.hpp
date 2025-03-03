@@ -2,14 +2,8 @@
 #define __BSM_PROCESSOR_HPP__
 
 #include "Processor.hpp"
-#include "PulseFitFunctions.hpp"
-
+#include "BSMTraceFitStruct.hpp"
 #include "Correction.hpp"
-
-namespace PulseFit{
-	double BSMSingleTraceFit(double*,double*);
-	double BSMDoubleTraceFit(double*,double*);
-}
 
 class BSMProcessor : public Processor{
 	public:
@@ -75,6 +69,9 @@ class BSMProcessor : public Processor{
 		std::vector<int> BSMHits;
 		std::vector<int> TotalMult;
 		std::vector<std::unique_ptr<TraceAnalysis>> TraceSettings;
+
+		ProcessorStruct::BSMTraceFit fronttracefitvalues;
+		ProcessorStruct::BSMTraceFit backtracefitvalues;
 
 		double AverageTotalEnergy;
 		double GeometricTotalEnergy;

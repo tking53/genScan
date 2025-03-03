@@ -1,6 +1,10 @@
 #ifndef __WAVEFORM_ANALYZER_HPP__
 #define __WAVEFORM_ANALYZER_HPP__
 
+#include "TFitResult.h"
+#include "TFitResultPtr.h"
+#include "TF1.h"
+
 #include "Analyzer.hpp"
 
 class WaveformAnalyzer : public Analyzer {
@@ -41,6 +45,9 @@ class WaveformAnalyzer : public Analyzer {
 				FixedPSDBounds = {0,0,0};
 				FractionalPSDBounds = {0,0,2.0};
 				CalcDerivative = false;
+				//need to implement CFAR for determining triggering trace
+				//as well as pierre's trap filter
+				//this is in french though so god help me
 			}
 
 			~WaveFormParams() = default;
@@ -49,6 +56,23 @@ class WaveformAnalyzer : public Analyzer {
 			WaveFormParams(WaveFormParams&&) = default;
 			WaveFormParams& operator=(const WaveFormParams&) = default;
 			WaveFormParams& operator=(WaveFormParams&&) = default;
+		};
+
+		struct TraceFitParams{
+			std::vector<std::tuple<int,bool,bool,std::string,double,double,double>> ParamInfo;
+			std::pair<double,double> FitRange;
+			std::string FitFuncName;
+			TF1* fitfunc;
+			TH1* fithist;
+			TraceFitParams(){
+			}
+
+			~TraceFitParams() = default;
+
+			TraceFitParams(const TraceFitParams&) = default;
+			TraceFitParams(TraceFitParams&&) = default;
+			TraceFitParams& operator=(const TraceFitParams&) = default;
+			TraceFitParams& operator=(TraceFitParams&&) = default;
 		};
 
 		bool ValidateSettingsString(const std::string&) const;
@@ -63,7 +87,11 @@ class WaveformAnalyzer : public Analyzer {
 		void InsertAdditionalTypes(const std::string&);
 
 		std::set<boost::regex> KnownWaveSettings;
+		std::set<boost::regex> KnownTraceSettings;
 		std::vector<std::pair<boost::regex,WaveFormParams>> WaveSettings;
+		std::vector<std::pair<boost::regex,TraceFitParams>> TraceFitSettings;
+
+		TFitResultPtr FitResult;
 
 };
 

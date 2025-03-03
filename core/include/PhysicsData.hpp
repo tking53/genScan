@@ -8,7 +8,9 @@
 
 #include <string>
 #include <vector>
+#include <utility>
 #include <set>
+#include <map>
 
 #include "TraceHelper.hpp"
 
@@ -83,26 +85,26 @@ class PhysicsData{
 
 		//HeaderLength, this is mostly used for pixie data
 		/// @brief retrieve the HeaderLength
-		/// @return decoded filter header length 
+		/// @return HeaderLength 
 		int GetHeaderLength() const;
 
 		//EventLength
 		/// @brief retrieve the event length the object was constructed with
-		/// @return decoded filter event length 
+		/// @return EventLength 
 		int GetEventLength() const;
 
 		//RawEnergy
 		/// @brief retrieve the raw energy the object was constructed with
-		/// @return decoded filter energy 
+		/// @return RawEnergy 
 		uint32_t GetRawEnergy() const;
 		
 		/// @brief retrieve the raw energy the object was constructed with plus the random [0,1) that was added later
-		/// @return decoded filter energy with aliasing
+		/// @return RawEnergyWRandom 
 		double GetRawEnergyWRandom() const;
 
 		//RawTimeStamp
 		/// @brief retrieve the raw timestamp in pixie ticks the object was constructed with
-		/// @return decoded low resolution filter timestamp in pixie ticks (changes with digitizer frequeuncy) 
+		/// @return RawTimeStamp 
 		uint64_t GetRawTimeStamp() const;
 
 		//SpillID 
@@ -111,7 +113,7 @@ class PhysicsData{
 		void SetSpillID(uint64_t);
 		
 		/// @brief retrieve the spill id assigned to this object (only useful when decoding poll2 data) 
-		/// @return return the mapped spill id from tracking the number of spills as poll2 data is translated 
+		/// @return SpillID 
 		uint64_t GetSpillID() const;
 
 		//Energy
@@ -121,7 +123,7 @@ class PhysicsData{
 		void SetEnergy(double,double);
 		
 		/// @brief get the calibrated energy value 
-		/// @return calibrated energy derived from aliased raw energy
+		/// @return Energy 
 		double GetEnergy() const;
 
 		//TimeStamp
@@ -130,7 +132,7 @@ class PhysicsData{
 		void SetTimeStamp(double);
 
 		/// @brief get the low resolution filter timestamp in ns 
-		/// @return low resolution filter timestamp in ns
+		/// @return TimeStamp 
 		double GetTimeStamp() const;
 
 		//CFDTimeStamp
@@ -139,7 +141,7 @@ class PhysicsData{
 		void SetCFDTimeStamp(double);
 		
 		/// @brief get the on-board cfd timestamp in ns 
-		/// @return on-board cfd timestamp in ns
+		/// @return CFDTimeStamp 
 		double GetCFDTimeStamp() const;
 
 		//CFD Forced Bit
@@ -148,7 +150,7 @@ class PhysicsData{
 		void SetCFDForcedBit(bool);
 		
 		/// @brief get whether the on-board cfd was force-triggered
-		/// @return on-board cfd force triggered
+		/// @return CFDForcedBit 
 		bool GetCFDForcedBit() const;
 
 		//CFD Fraction
@@ -157,67 +159,115 @@ class PhysicsData{
 		void SetCFDFraction(double);
 		
 		/// @brief get the on-board cfd fraction
-		/// @return on-board cfd fraction (see pixie16 manual for better detail)
+		/// @return CFDFraction 
 		double GetCFDFraction() const;
 
 		//CFD Source Bit
 		/// @brief set which adc triggered the on-board cfd
 		/// @param[in] value adc number (varies with digitizer frequency, see pixie16 manual for better detail) 
 		void SetCFDSourceBit(int);
+		
+		/// @brief get which adc triggered the on-board cfd
+		/// @return CFDSourceBit 
 		int GetCFDSourceBit() const;
 
 		//Crate
 		/// @brief get the word zero decoded crate number
-		/// @return crate number object constructed with 
+		/// @return CrateNum 
 		int GetCrate() const;
 
 		//Module
 		/// @brief get the word zero decoded module number
-		/// @return module number object constructed with 
+		/// @return ModNum 
 		int GetModule() const;
 
 		//Channel
 		/// @brief get the word zero decoded channel number
-		/// @return channel number object constructed with 
+		/// @return ChanNum 
 		int GetChannel() const;
 
 		//GlobalChannelID 
 		/// @brief get the global channel id, derived from parsing xml and assigned by ChannelMap
-		/// @return global channel id object constructed with 
+		/// @return globalChannelID
 		int GetGlobalChannelID() const;
 
 		//GlobalBoardID 
 		/// @brief get the global board id, derived from parsing xml and assigned by ChannelMap
-		/// @return global board id object constructed with 
+		/// @return globalBoardID 
 		int GetGlobalBoardID() const;
 
 		//Location, typically this is crateID*(maxModPerCrate*maxChanPerMod) + modID*(maxChanPerMod) + chanID
 		//but is overridable within the config file
+		/// @brief set the parsed location within the config file, currently this is the same as globalChannelID 
+		/// @param[in] value config parsed/calculated location value 
 		void SetLocation(int);
+
+		/// @brief get the location of the channel parsed/determined from the input config file 
+		/// @return Location 
 		int GetLocation() const;
 
 		//Pileup
+		/// @brief set the decoded finishcode (i.e. pileup)
+		/// @param[in] value decoded finishcode from translated datastream 
 		void SetPileup(bool);
+		
+		/// @brief get the whether decoded detector hit had pileup 
+		/// @return Pileup 
 		bool GetPileup() const;
 
 		//Saturation/trace out of range
+		/// @brief set the decoded trace out of range information
+		/// @param[in] value trace out of range flag from translated datastream 
 		void SetSaturation(bool);
+		
+		/// @brief get the whether decoded detector hit had the input trace saturate 
+		/// @return Saturation
 		bool GetSaturation() const;
 
+		/// @brief set the external timestamp that is passed along through the frontplane of xia boards
+		/// @param[in] value decoded from special pixie spill
 		void SetExternalTimeStamp(uint64_t);
+
+		/// @brief get the decoded external timestamp as it is changing through the data stream 
+		/// @return ExternalTimestamp
 		uint64_t GetExternalTimeStamp() const;
 
 		//ESums
+		/// @brief set the decoded esum value, this is the leading edge of the trap?
+		/// @param[in] value decoded from translated datastream
 		void SetESumLeading(unsigned int);
+
+		/// @brief get the decoded leading edge esum
+		/// @return ESumLeading
 		unsigned int GetESumLeading() const;
+
+		/// @brief set the decoded esum value, this is the trailing edge of the trap?
+		/// @param[in] value decoded from translated datastream
 		void SetESumTrailing(unsigned int);
+
+		/// @brief get the decoded trailing edge esum
+		/// @return ESumTrailing
 		unsigned int GetESumTrailing() const;
+		
+		/// @brief set the decoded esum value, this is the gap of the trap?
+		/// @param[in] value decoded from translated datastream
 		void SetESumGap(unsigned int);
+
+		/// @brief get the decoded gap esum
+		/// @return ESumGap
 		unsigned int GetESumGap() const;
+		
+		/// @brief set the decoded esum value, this is the baseline of the trap?
+		/// @param[in] value decoded from translated datastream
 		void SetESumBaseline(unsigned int);
+
+		/// @brief get the decoded baseline esum
+		/// @return ESumBaseLine
 		unsigned int GetESumBaseline() const;
 
 		//Phase, need to ask Toby what this means
+		/// @brief what the fuck is this?
+		/// @param[in] decoded phase value from the datastream?
 		void SetPhase(double);
 		double GetPhase() const;
 
@@ -330,11 +380,16 @@ class PhysicsData{
 		void CalcTraceFractionalPSD(const size_t&,const size_t&, const float&);
 		const std::tuple<float,float,float>& GetTraceFractionalPSD() const;
 		void CalculateTraceDerivatives();
+
+		void AddTraceFitInfo(const std::string&,double,double);
+		bool DoesTraceFitValueExist(const std::string&) const;
+		std::pair<double,double> GetTraceFitValue(const std::string&) const;
+
 	private:
 		//this is info decoded from the data files
 		int HeaderLength; /**< decoded length of event header (4/8/12/16) */	
 		int EventLength; /**< decoded legth of the event HeaderLength+TraceLength */
-		uint32_t RawEnergy;
+		uint32_t RawEnergy; 
 		double RawEnergyWRandom;
 		uint64_t RawTimeStamp;
 
@@ -377,6 +432,9 @@ class PhysicsData{
 		std::string UniqueID;
 		std::string CMapID;
 		std::set<std::string> TagList;
+
+		//From trace fitting info
+		std::map<std::string,std::pair<double,double>> TraceFitInfo;
 
 		//Trace Helper, should probably hide this from end user though
 		//and only expose what it can determine
