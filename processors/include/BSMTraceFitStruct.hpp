@@ -11,6 +11,8 @@ namespace ProcessorStruct{
 		double pulsedelay = -999.0; 
 		double pulserise = -999.0; 
 		double pulsedecay = -999.0; 
+		double chi2 = -999.0;
+		double ndf = -999.0;
 		double energy = -999.0;
 		double timestamp = -999.0;
 	};

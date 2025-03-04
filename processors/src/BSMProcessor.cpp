@@ -187,6 +187,8 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 				this->fronttracefitvalues.pulsedelay = evt->GetTraceFitValue("PulseDelay").first;
 				this->fronttracefitvalues.pulserise = evt->GetTraceFitValue("PulseRise").first;
 				this->fronttracefitvalues.pulsedecay = evt->GetTraceFitValue("PulseDecay").first;
+				this->fronttracefitvalues.chi2 = evt->GetTraceFitValue("Chi2/NDF").first;
+				this->fronttracefitvalues.ndf = evt->GetTraceFitValue("Chi2/NDF").second;
 				this->fronttracefitvalues.energy = evt->GetRawEnergyWRandom();
 				this->fronttracefitvalues.timestamp = evt->GetTimeStamp();
 			}else{
@@ -198,6 +200,8 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 				this->backtracefitvalues.pulsedelay = evt->GetTraceFitValue("PulseDelay").first;
 				this->backtracefitvalues.pulserise = evt->GetTraceFitValue("PulseRise").first;
 				this->backtracefitvalues.pulsedecay = evt->GetTraceFitValue("PulseDecay").first;
+				this->backtracefitvalues.chi2 = evt->GetTraceFitValue("Chi2/NDF").first;
+				this->backtracefitvalues.ndf = evt->GetTraceFitValue("Chi2/NDF").second;
 				this->backtracefitvalues.energy = evt->GetRawEnergyWRandom();
 				this->backtracefitvalues.timestamp = evt->GetTimeStamp();
 			}
