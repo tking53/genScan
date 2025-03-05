@@ -20,10 +20,15 @@ class RootFileManager{
 	public:
 		RootFileManager(const std::string& log,const std::string oup,bool enabletrees){
 			this->LogName = log;
+			this->console = spdlog::get(this->LogName)->clone("RootFileManager");
 			this->outputprefix = oup;
 			this->outputfilename = this->outputprefix+".root";
 			this->OutputFile = new TFile(this->outputfilename.c_str(),"RECREATE");
 			this->OutputTreesToFile = enabletrees;
+		}
+
+		~RootFileManager(){
+			this->console->info("Time spent filling trees : {:.3f}s",this->filltime/1000.0);
 		}
 
 		void FinalizeTrees(){
@@ -57,19 +62,20 @@ class RootFileManager{
 					this->KnownProcNames.push_back(name);
 				}
 				if( newnames.size() == 1 ){
-					spdlog::get(this->LogName)->info("Registering Processor [{}] to the root file [{}]",this->KnownProcNames.back(),this->outputfilename);
+					this->console->info("Registering Processor [{}] to the root file [{}]",this->KnownProcNames.back(),this->outputfilename);
 				}else{
 					for( const auto& name : newnames ){
-						spdlog::get(this->LogName)->info("Registering Processor's [{}] Tree to the root file [{}] from [{}]",name,this->outputfilename,procname);
+						this->console->info("Registering Processor's [{}] Tree to the root file [{}] from [{}]",name,this->outputfilename,procname);
 					}
 				}
 			}else{
 				this->NullProcNames.push_back(procname);
-				spdlog::get(this->LogName)->critical("Processor [{}] has no OutputTree(s)",this->NullProcNames.back());
+				this->console->critical("Processor [{}] has no OutputTree(s)",this->NullProcNames.back());
 			}
 		}
 
 		void Fill(){
+			this->start_time = std::chrono::high_resolution_clock::now();
 			if( this->OutputTreesToFile ){
 				for( auto& tree : this->OutputTrees ){
 					if( tree.second != nullptr ){
@@ -77,12 +83,20 @@ class RootFileManager{
 					}
 				}
 			}
+			this->stop_time = std::chrono::high_resolution_clock::now();
+			std::chrono::duration<double,std::milli> dur = this->stop_time - this->start_time;
+			this->filltime += dur.count();
 		}
 
 	private:
 		std::string LogName;
+		std::shared_ptr<spdlog::logger> console;
 		std::string outputprefix;
 		std::string outputfilename;
+		
+		std::chrono::time_point<std::chrono::high_resolution_clock> start_time;
+		std::chrono::time_point<std::chrono::high_resolution_clock> stop_time;
+		double filltime;
 
 		bool OutputTreesToFile;
 
