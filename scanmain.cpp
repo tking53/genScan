@@ -101,7 +101,7 @@ int main(int argc, char *argv[]) {
 		exit(EXIT_FAILURE);
 	}	
 
-	const int MAX_CRATES = 1;
+	const int MAX_CRATES = 2;
 	const int MAX_CARDS_PER_CRATE = 13;
 	const int MAX_BOARDS = MAX_CARDS_PER_CRATE*MAX_CRATES;
 	const int MAX_CHANNELS_PER_BOARD = 16;
