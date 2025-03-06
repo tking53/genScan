@@ -19,7 +19,7 @@ class RIKENIonizationChamberProcessor : public Processor{
 		void Init(const Json::Value&);
 		void Init(const pugi::xml_node&);
 
-		void DeclarePlots(PLOTS::PlotRegistry*) const;
+		void DeclarePlots(PLOTS::PlotRegistry*);
 		virtual void RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>&) final;
 		virtual void CleanupTree() final;
 

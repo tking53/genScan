@@ -43,6 +43,6 @@ void GenericProcessor::Finalize(){
 	this->console->info("{} has been finalized",this->ProcessorName);
 }
 
-void GenericProcessor::DeclarePlots([[maybe_unused]] PLOTS::PlotRegistry* hismanager) const{
+void GenericProcessor::DeclarePlots([[maybe_unused]] PLOTS::PlotRegistry* hismanager){
 	this->console->info("Finished Declaring Plots");
 }

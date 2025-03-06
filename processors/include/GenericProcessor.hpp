@@ -17,7 +17,7 @@ class GenericProcessor : public Processor{
 		virtual void Init(const Json::Value&);
 		virtual void Init(const pugi::xml_node&);
 
-		virtual void DeclarePlots(PLOTS::PlotRegistry*) const;
+		virtual void DeclarePlots(PLOTS::PlotRegistry*);
 };
 
 #endif

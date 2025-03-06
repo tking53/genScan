@@ -61,7 +61,7 @@ void MtasTapeProcessor::Finalize(){
 	this->console->info("{} has been finalized",this->ProcessorName);
 }
 
-void MtasTapeProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
+void MtasTapeProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	//MtasTape diagnostic plots, always want these no matter what
 	this->console->info("Finished Declaring Plots");
 }

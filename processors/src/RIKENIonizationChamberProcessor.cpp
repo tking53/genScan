@@ -157,7 +157,7 @@ void RIKENIonizationChamberProcessor::Finalize(){
 	this->console->info("{} has been finalized, {} Anodes exist",this->ProcessorName,this->NumAnode);
 }
 
-void RIKENIonizationChamberProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
+void RIKENIonizationChamberProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	//First Cathode
 	hismanager->RegisterPlot<TH2F>("IONCHAMBER_7000","Anode Position vs Anode Energy; Energy (arb.); Position (arb.)",8192,0,4,this->NumAnode,0,this->NumAnode);
 	hismanager->RegisterPlot<TH2F>("IONCHAMBER_7010","First PSD (A/C) vs Total Anode",8192,0,32,1024,0,1.0);

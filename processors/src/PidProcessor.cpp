@@ -39,7 +39,7 @@ void PidProcessor::Finalize(){
 	this->console->info("{} has been finalized",this->ProcessorName);
 }
 
-void PidProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
+void PidProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	(void) hismanager;
 	this->console->info("Finished Declaring Plots");
 }

@@ -20,7 +20,7 @@ class PSPMTProcessor : public Processor{
 		virtual void Init(const Json::Value&);
 		virtual void Init(const pugi::xml_node&);
 
-		virtual void DeclarePlots(PLOTS::PlotRegistry*) const;
+		virtual void DeclarePlots(PLOTS::PlotRegistry*);
 		virtual void RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>&) final;
 		virtual void CleanupTree() final;
 

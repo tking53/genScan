@@ -104,7 +104,7 @@ void e21069b_fp2Processor::Finalize(){
 	this->console->info("{} has been finalized",this->ProcessorName);
 }
 
-void e21069b_fp2Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
+void e21069b_fp2Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	this->MtasProc->DeclarePlots(hismanager);
 	this->MtasImplantProc->DeclarePlots(hismanager);
 	this->PidProc->DeclarePlots(hismanager);

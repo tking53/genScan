@@ -59,7 +59,7 @@ void MtasSSDProcessor::Finalize(){
 	this->console->info("{} has been finalized",this->ProcessorName);
 }
 
-void MtasSSDProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
+void MtasSSDProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	//MtasSSD diagnostic plots, always want these no matter what
 	this->console->info("Finished Declaring Plots");
 }

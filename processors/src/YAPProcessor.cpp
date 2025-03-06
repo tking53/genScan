@@ -156,7 +156,7 @@ void YAPProcessor::Finalize(){
 	this->console->info("{} has been finalized",this->ProcessorName);
 }
 
-void YAPProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
+void YAPProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	this->MtasProc->DeclarePlots(hismanager);
 	this->PuckProc->DeclarePlots(hismanager);
 

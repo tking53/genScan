@@ -134,7 +134,7 @@ void VetoProcessor::Finalize(){
 	this->console->info("{} has been finalized",this->ProcessorName);
 }
 
-void VetoProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
+void VetoProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH2F>("VETO_1000","Front Veto Singles; Energy (arb.); Position (arb.)",65536,0,65536,2,0,2);
 	hismanager->RegisterPlot<TH1F>("VETO_1010","Max Front Veto; Energy (arb.);",65536,0,65536);
 	hismanager->RegisterPlot<TH2F>("VETO_2000","Rear Veto Singles; Energy (arb.); Position (arb.)",65536,0,65536,2,0,2);

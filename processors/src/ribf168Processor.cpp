@@ -318,7 +318,7 @@ void ribf168Processor::Finalize(){
 	this->console->info("{} has been finalized",this->ProcessorName);
 }
 
-void ribf168Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
+void ribf168Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	this->HagridProc->DeclarePlots(hismanager);
 	this->RIKENIonizationChamberProc->DeclarePlots(hismanager);
 	this->RIKENPidProc->DeclarePlots(hismanager);

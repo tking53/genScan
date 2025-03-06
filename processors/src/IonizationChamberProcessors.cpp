@@ -153,7 +153,7 @@ void IonizationChamberProcessor::Finalize(){
 	this->console->info("{} has been finalized, {} Anodes exist and {} Cathodes exist",this->ProcessorName,this->NumAnode,this->NumCathode);
 }
 
-void IonizationChamberProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
+void IonizationChamberProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	//First Cathode
 	hismanager->RegisterPlot<TH2F>("IONCHAMBER_7000","First Anode vs First Cathode",8192,0,8192,8192,0,8192);
 	hismanager->RegisterPlot<TH2F>("IONCHAMBER_7010","First PSD (A/C) vs First Cathode",8192,0,8192,1024,0,1.0);

@@ -150,7 +150,7 @@ void HagridProcessor::Finalize(){
 	this->console->info("{} has been finalized, {} Hagrids exist",this->ProcessorName,this->NumHagrid);
 }
 
-void HagridProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
+void HagridProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH2F>("HAGRID_4000","Hagrid Energy; Energy (keV); Hagrid Number (arb.)",16384,0,16384,this->NumHagrid,0,this->NumHagrid);
 	hismanager->RegisterPlot<TH1F>("HAGRID_5000","Hagrid sum; Energy (keV)",16384,0,16384);
 	hismanager->RegisterPlot<TH1F>("HAGRID_5005","Hagrid stack; Energy (keV)",16384,0,16384);

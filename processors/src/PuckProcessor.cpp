@@ -124,7 +124,7 @@ void PuckProcessor::Finalize(){
 	this->console->info("{} has been finalized",this->ProcessorName);
 }
 
-void PuckProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
+void PuckProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	//Puck diagnostic plots, always want these no matter what
 	hismanager->RegisterPlot<TH1F>("Puck_3600","Puck Total; Energy (keV)",this->h1dsettings.at(3600));
 	hismanager->RegisterPlot<TH1F>("Puck_3601","Puck Total No MTAS; Energy (keV)",this->h1dsettings.at(3601));

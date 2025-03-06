@@ -165,7 +165,7 @@ void RIKENPidProcessor::Finalize(){
 	this->console->info("{} has been finalized",this->ProcessorName);
 }
 
-void RIKENPidProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
+void RIKENPidProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH1F>("PID_4000","TDiff F11_Left - F7_Analog; tdiff (ns)",1000,-10000,10000);
 	hismanager->RegisterPlot<TH1F>("PID_4001","TDiff F11_Right - F7_Analog; tdiff (ns)",1000,-10000,10000);
 	hismanager->RegisterPlot<TH1F>("PID_4010","TDiff F11_Left - F7_Logic; tdiff (ns)",1000,-10000,10000);

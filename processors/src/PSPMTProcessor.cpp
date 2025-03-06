@@ -217,7 +217,7 @@ void PSPMTProcessor::Finalize(){
 	this->console->info("{} has been finalized",this->ProcessorName);
 }
 
-void PSPMTProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
+void PSPMTProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH2F>("PSPMT_1901","Low Gain Image; Position (arb.); Position (arb.)",1024,0,1,1024,0,1);
 	hismanager->RegisterPlot<TH2F>("PSPMT_1902","High Gain Image; Position (arb.); Position (arb.)",1024,0,1,1024,0,1);
 
