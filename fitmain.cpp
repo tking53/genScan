@@ -3,6 +3,7 @@
 #include <random>
 #include <vector>
 #include <fstream>
+#include <tuple>
 
 #include <spdlog/common.h>
 #include <spdlog/spdlog.h>
@@ -74,6 +75,17 @@ struct fit_data<C1,C2>{
 	C2 df;
 };
 
+template<typename C1,typename C2,typename C3>
+struct fit_data<C1,C2,C3>{
+	const std::vector<double>& t;
+	const std::vector<double>& y;
+	// the actual function to be fitted
+	C1 f;
+	C2 df;
+	C3 fvv;
+};
+
+
 template<typename FitData, int n_params>
 int internal_f(const gsl_vector* x, void* params, gsl_vector *f){
 	auto* d  = static_cast<FitData*>(params);
@@ -128,6 +140,43 @@ int internal_df(const gsl_vector* x, void* params, gsl_matrix* J){
 	return GSL_SUCCESS;
 }
 
+template<typename FitData, int n_params>
+int internal_fvv(const gsl_vector* x, const gsl_vector* v, void* params, gsl_vector* fvv){
+	auto* d  = static_cast<FitData*>(params);
+	// Convert the parameter values from gsl_vector (in x) into std::tuple
+	auto init_args_x = [x](int index)
+	{
+		return gsl_vector_get(x, index);
+	};
+	auto parameters = gen_tuple<n_params>(init_args_x);
+	for (size_t i = 0; i < d->t.size(); ++i)
+	{
+		double ti = d->t[i];
+		double yi = d->y[i];
+		double sum = 0.0;
+		for( size_t j = 0; j < n_params; ++j )
+		{
+			for( size_t k = j; k < n_params; ++k ){
+				auto func = [ti, &d, j, k](auto ...xs)
+				{
+					// call the actual function to be fitted
+					return d->fvv(j,k,ti, xs...);
+				};
+				auto y = std::apply(func, parameters);
+				if( k == j ){
+					auto vk = gsl_vector_get(v,k);
+					sum += vk*vk*y;
+				}else{
+					auto vk = gsl_vector_get(v,k);
+					auto vj = gsl_vector_get(v,j);
+					sum += 2.0*vk*vj*y;
+				}
+			}
+		}
+		gsl_vector_set(fvv, i, sum);
+	}
+	return GSL_SUCCESS;
+}
 
 using func_f_type   = int (*) (const gsl_vector*, void*, gsl_vector*);
 using func_df_type  = int (*) (const gsl_vector*, void*, gsl_matrix*);
@@ -184,7 +233,24 @@ std::vector<double> internal_solve_system(gsl_vector* initial_params, gsl_multif
 	return result;
 }
 
+template<typename C1,typename C2,typename C3>
+std::vector<double> curve_fit_impl(func_f_type f, func_df_type df, func_fvv_type fvv, gsl_vector* initial_params, fit_data<C1,C2,C3>& fd){
+	assert(fd.t.size() == fd.y.size());
 
+	auto fdf = gsl_multifit_nlinear_fdf();
+	auto fdf_params = gsl_multifit_nlinear_default_parameters();
+
+	fdf.f   = f;
+	fdf.df  = df;
+	fdf.fvv = fvv;
+	fdf.n   = fd.t.size();
+	fdf.p   = initial_params->size;
+	fdf.params = &fd;
+
+	// "This selects the Levenberg-Marquardt algorithm with geodesic acceleration."
+	fdf_params.trs = gsl_multifit_nlinear_trs_lmaccel;
+	return internal_solve_system(initial_params, &fdf, &fdf_params);
+}
 
 template<typename C1,typename C2>
 std::vector<double> curve_fit_impl(func_f_type f, func_df_type df, func_fvv_type fvv, gsl_vector* initial_params, fit_data<C1,C2>& fd){
@@ -237,6 +303,17 @@ std::vector<double> curve_fit_impl(func_f_type f, func_df_type df, func_fvv_type
  * @param y the dependent data, must to have the same size as x.
  * @return std::vector<double> with the computed coefficients
  */
+template<typename CallableFunction,typename CallableDerivative,typename CallableGeodesic>
+std::vector<double> curve_fit(CallableFunction f, CallableDerivative df, CallableGeodesic fvv, const std::vector<double>& initial_params, const std::vector<double>& x, const std::vector<double>& y){
+	// We can't pass lambdas without convert to std::function.
+	constexpr auto n = decltype(n_params(std::function(f)))::n_args - 1;
+	assert(initial_params.size() == n);
+
+	auto params = internal_make_gsl_vector_ptr(initial_params);
+	auto fd = fit_data<CallableFunction,CallableDerivative,CallableGeodesic>{x, y, f,df, fvv};
+	return curve_fit_impl(internal_f<decltype(fd), n>, internal_df<decltype(fd),n>, internal_fvv<decltype(fd),n>, params, fd);
+}
+
 template<typename CallableFunction,typename CallableDerivative>
 std::vector<double> curve_fit(CallableFunction f, CallableDerivative df, const std::vector<double>& initial_params, const std::vector<double>& x, const std::vector<double>& y){
 	// We can't pass lambdas without convert to std::function.
@@ -264,7 +341,7 @@ double gaussian(double x, double a, double b, double c){
     return a * std::exp(-0.5 * z * z);
 }
 
-double gaussian_df(int j,double x, double a, double b, double c){
+double gaussian_d(int j,double x, double a, double b, double c){
 	const double z = (x - b) / c;
 	const double e = std::exp(-0.5 * z * z);
 	switch(j){
@@ -279,9 +356,91 @@ double gaussian_df(int j,double x, double a, double b, double c){
 	}
 }
 
-double gaussian_vv(double x, double a, double b, double c){
-    const double z = (x - b) / c;
-    return a * std::exp(-0.5 * z * z);
+double gaussian_aa(double x,double a,double b, double c){
+	return 0.0;
+}
+
+double gaussian_ab(double x,double a,double b, double c){
+	const double z = (x - b) / c;
+	const double e = std::exp(-0.5 * z * z);
+	return -z * e / c;
+}
+
+double gaussian_ac(double x,double a,double b, double c){
+	const double z = (x - b) / c;
+	const double e = std::exp(-0.5 * z * z);
+	return -z * z * e / c;
+}
+
+double gaussian_ba(double x,double a,double b, double c){
+	return gaussian_ab(x,a,b,c);
+}
+
+double gaussian_bb(double x,double a,double b, double c){
+	const double z = (x - b) / c;
+	const double e = std::exp(-0.5 * z * z);
+	return a * e / (c * c) * (1.0 - z*z);
+}
+
+double gaussian_bc(double x,double a,double b, double c){
+	const double z = (x - b) / c;
+	const double e = std::exp(-0.5 * z * z);
+	return a * z * e / (c * c) * (2.0 - z*z);
+}
+
+double gaussian_ca(double x,double a,double b, double c){
+	return gaussian_ac(x,a,b,c);
+}
+
+double gaussian_cb(double x,double a,double b, double c){
+	return gaussian_bc(x,a,b,c);
+}
+
+double gaussian_cc(double x,double a,double b, double c){
+	const double z = (x - b) / c;
+	const double e = std::exp(-0.5 * z * z);
+	return a * z * z * e / (c * c) * (3.0 - z*z);
+}
+
+double gaussian_vv(int j, int k,double x, double a, double b, double c){
+	if( j == 0 ){
+		switch( k ){
+			case 0:
+				return gaussian_aa(x,a,b,c);
+			case 1:
+				return gaussian_ab(x,a,b,c);
+			case 2:
+				return gaussian_ac(x,a,b,c);
+			default: 
+				return 0.0;
+		}
+	}else if( j == 1 ){
+		switch( k ){
+			case 0:
+				return gaussian_ba(x,a,b,c);
+			case 1:
+				return gaussian_bb(x,a,b,c);
+			case 2:
+				return gaussian_bc(x,a,b,c);
+			default: 
+				return 0.0;
+		}
+	}else if( j == 2 ){
+		const double z = (x - b) / c;
+		const double e = std::exp(-0.5 * z * z);
+		switch( k ){
+			case 0:
+				return gaussian_ca(x,a,b,c);
+			case 1:
+				return gaussian_cb(x,a,b,c);
+			case 2:
+				return gaussian_cc(x,a,b,c);
+			default:
+				return 0.0;
+		}
+	}else{
+		return 0.0;
+	}
 }
 
 
@@ -352,19 +511,25 @@ int main(int argc, char *argv[]) {
 		ys[i] = y + dist(gen);
 	}
 
+	spdlog::info("vals : {} {} {}",a,b,c);
 	auto start_time = std::chrono::high_resolution_clock::now();
 	auto r1 = curve_fit(gaussian, {1.0, 0.0, 1.0}, xs, ys);
 	auto stop_time = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double,std::milli> dur_r1 = (stop_time - start_time);
+	spdlog::info("pure function evale : time {} ms, result : {} {} {}",dur_r1.count(),r1[0],r1[1],r1[2]);
 
 	start_time = std::chrono::high_resolution_clock::now();
-	auto r2 = curve_fit(gaussian, gaussian_df, {1.0, 0.0, 1.0}, xs, ys);
+	auto r2 = curve_fit(gaussian, gaussian_d, {1.0, 0.0, 1.0}, xs, ys);
 	stop_time = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double,std::milli> dur_r2 = (stop_time - start_time);
+	spdlog::info("function with derivative : time {} ms, result : {} {} {}",dur_r2.count(),r2[0],r2[1],r2[2]);
 
-	spdlog::info("vals : {} {} {}",a,b,c);
-	spdlog::info("time {} ms, result : {} {} {}",dur_r1.count(),r1[0],r1[1],r1[2]);
-	spdlog::info("time {} ms, result : {} {} {}",dur_r2.count(),r2[0],r2[1],r2[2]);
+	start_time = std::chrono::high_resolution_clock::now();
+	auto r3 = curve_fit(gaussian, gaussian_d, gaussian_vv, {1.0, 0.0, 1.0}, xs, ys);
+	stop_time = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double,std::milli> dur_r3 = (stop_time - start_time);
+	spdlog::info("function with derivative and geodesic : time {} ms, result : {} {} {}",dur_r3.count(),r3[0],r3[1],r3[2]);
+
 
 	return 0;
 
