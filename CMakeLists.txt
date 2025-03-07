@@ -339,6 +339,10 @@ else()
 	list(APPEND EXTERNAL_CORE_DEPS boostProject)
 endif()
 
+option(USE_SYSTEM_GSL "Use either system gsl or grab from github" ON)
+#TODO: FINISH LATER
+find_package(GSL REQUIRED)
+
 add_subdirectory(utility)
 add_subdirectory(processors)
 add_subdirectory(core)
@@ -359,20 +363,27 @@ add_executable(GenDev devmain.cpp)
 add_dependencies(GenDev ${EXTERNAL_DEPS})
 target_link_libraries(GenDev PRIVATE pugixml UTILITY_LIB ${ROOT_LIBRARIES})
 
+add_executable(GenFit fitmain.cpp)
+add_dependencies(GenFit ${EXTERNAL_DEPS})
+target_link_libraries(GenFit PRIVATE GSL::gsl GSL::gslcblas pugixml UTILITY_LIB ${ROOT_LIBRARIES})
+
 if( USE_SYSTEM_FMT )
 	target_link_libraries(GenScanor PRIVATE fmt::fmt)
 	target_link_libraries(GenConfig PRIVATE fmt::fmt)
 	target_link_libraries(GenDev PRIVATE fmt::fmt)
+	target_link_libraries(GenFit PRIVATE fmt::fmt)
 endif()
 if( USE_SYSTEM_SPDLOG )
 	target_link_libraries(GenScanor PRIVATE spdlog::spdlog_header_only)
 	target_link_libraries(GenConfig PRIVATE spdlog::spdlog_header_only)
 	target_link_libraries(GenDev PRIVATE spdlog::spdlog_header_only)
+	target_link_libraries(GenFit PRIVATE spdlog::spdlog_header_only)
 endif()
 if( USE_SYSTEM_BOOST )
 	target_link_libraries(GenScanor PRIVATE Boost::container Boost::program_options Boost::sort)
 	target_link_libraries(GenConfig PRIVATE Boost::container Boost::program_options Boost::sort)
 	target_link_libraries(GenDev PRIVATE Boost::container Boost::program_options Boost::sort)
+	target_link_libraries(GenFit PRIVATE Boost::container Boost::program_options Boost::sort)
 else()
 	target_link_libraries(GenScanor PRIVATE 
 		${BOOST_EXTERNAL_INSTALL_LOCATION}/lib/libboost_container.a
@@ -386,10 +397,15 @@ else()
 		${BOOST_EXTERNAL_INSTALL_LOCATION}/lib/libboost_container.a
 		${BOOST_EXTERNAL_INSTALL_LOCATION}/lib/libboost_program_options.a
 		)
+	target_link_libraries(GenFit PRIVATE 
+		${BOOST_EXTERNAL_INSTALL_LOCATION}/lib/libboost_container.a
+		${BOOST_EXTERNAL_INSTALL_LOCATION}/lib/libboost_program_options.a
+		)
 endif()
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
 	target_compile_definitions(GenScanor PRIVATE DEBUG_MODE)
 	target_compile_definitions(GenConfig PRIVATE DEBUG_MODE)
 	target_compile_definitions(GenDev PRIVATE DEBUG_MODE)
+	target_compile_definitions(GenFit PRIVATE DEBUG_MODE)
 endif()
 
