@@ -196,18 +196,26 @@ gsl_vector* internal_make_gsl_vector_ptr(const std::vector<double>& vec){
 std::vector<double> internal_solve_system(gsl_vector* initial_params, gsl_multifit_nlinear_fdf *fdf,gsl_multifit_nlinear_parameters *params){
 	// This specifies a trust region method
 	const gsl_multifit_nlinear_type *T = gsl_multifit_nlinear_trust;
-	const size_t max_iter = 200;
-	const double xtol = 1.0e-8;
-	const double gtol = 1.0e-8;
-	const double ftol = 1.0e-8;
+	const size_t max_iter = 1000;
+	const double xtol = 1.0e-6;
+	const double gtol = 1.0e-6;
+	const double ftol = 1.0e-6;
 
 	auto *work = gsl_multifit_nlinear_alloc(T, params, fdf->n, fdf->p);
+	gsl_vector * f = gsl_multifit_nlinear_residual(work);
+	double chisq;
+	double dof = fdf->n - fdf->p;
 	int info;
 
 	// initialize solver
 	gsl_multifit_nlinear_init(initial_params, fdf, work);
 	//iterate until convergence
+	auto start_time = std::chrono::high_resolution_clock::now();
 	gsl_multifit_nlinear_driver(max_iter, xtol, gtol, ftol, nullptr, nullptr, &info, work);
+	auto stop_time = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double,std::milli> dur = (stop_time - start_time);
+	spdlog::info("trace fit : time {} ms",dur.count());
+	gsl_blas_ddot(f, f, &chisq);
 
 	// result will be stored here
 	gsl_vector * y    = gsl_multifit_nlinear_position(work);
@@ -227,6 +235,8 @@ std::vector<double> internal_solve_system(gsl_vector* initial_params, gsl_multif
 	// njev - number of Jacobian evaluations
 	// naev - number of f_vv evaluations
 	//logger::debug("curve fitted after ", niter, " iterations {nfev = ", nfev, "} {njev = ", njev, "} {naev = ", naev, "}");
+	spdlog::info("curve fitted after {} iterations [nfev={},njev={},naev={}]",niter,nfev,njev,naev);
+	spdlog::info("chisq/ndf : {}/{} -> {}",chisq,dof,chisq/dof);
 
 	gsl_multifit_nlinear_free(work);
 	gsl_vector_free(initial_params);
@@ -336,137 +346,40 @@ std::vector<double> curve_fit(CallableFunction f, const std::vector<double>& ini
 	return curve_fit_impl(internal_f<decltype(fd), n>, nullptr, nullptr, params, fd);
 }
 
-double gaussian(double x, double a, double b, double c){
-    const double z = (x - b) / c;
-    return a * std::exp(-0.5 * z * z);
+double Sin(double t,double a,double p,double f){
+	return a*std::sin(f*(t+p));
 }
 
-double gaussian_d(int j,double x, double a, double b, double c){
-	const double z = (x - b) / c;
-	const double e = std::exp(-0.5 * z * z);
-	switch(j){
-		case 0:
-			return -e;
-		case 1:
-			return  -(a / c) * e * z;
-		case 2:
-			return -(a / c) * e * z * z;
-		default:
-			return 0.0;
-	}
+double TraceFunc(double t,double a,double d,double r,double f){
+	return a*((1.0/(std::exp(-(t-d)/r)+1.0))*(1.0/(std::exp((t-d)/f)+1.0)));
 }
 
-double gaussian_aa(double x,double a,double b, double c){
-	return 0.0;
+double sintracefunc(double t,double c,double sa,double sp,double sf,double pa,double pd,double pr,double pf){
+	double SinVal = Sin(t,sa,sp,sf);
+	double PulseVal = TraceFunc(t,pa,pd,pr,pf);
+	return c + SinVal + PulseVal;
 }
 
-double gaussian_ab(double x,double a,double b, double c){
-	const double z = (x - b) / c;
-	const double e = std::exp(-0.5 * z * z);
-	return -z * e / c;
-}
-
-double gaussian_ac(double x,double a,double b, double c){
-	const double z = (x - b) / c;
-	const double e = std::exp(-0.5 * z * z);
-	return -z * z * e / c;
-}
-
-double gaussian_ba(double x,double a,double b, double c){
-	return gaussian_ab(x,a,b,c);
-}
-
-double gaussian_bb(double x,double a,double b, double c){
-	const double z = (x - b) / c;
-	const double e = std::exp(-0.5 * z * z);
-	return a * e / (c * c) * (1.0 - z*z);
-}
-
-double gaussian_bc(double x,double a,double b, double c){
-	const double z = (x - b) / c;
-	const double e = std::exp(-0.5 * z * z);
-	return a * z * e / (c * c) * (2.0 - z*z);
-}
-
-double gaussian_ca(double x,double a,double b, double c){
-	return gaussian_ac(x,a,b,c);
-}
-
-double gaussian_cb(double x,double a,double b, double c){
-	return gaussian_bc(x,a,b,c);
-}
-
-double gaussian_cc(double x,double a,double b, double c){
-	const double z = (x - b) / c;
-	const double e = std::exp(-0.5 * z * z);
-	return a * z * z * e / (c * c) * (3.0 - z*z);
-}
-
-double gaussian_vv(int j, int k,double x, double a, double b, double c){
-	if( j == 0 ){
-		switch( k ){
-			case 0:
-				return gaussian_aa(x,a,b,c);
-			case 1:
-				return gaussian_ab(x,a,b,c);
-			case 2:
-				return gaussian_ac(x,a,b,c);
-			default: 
-				return 0.0;
-		}
-	}else if( j == 1 ){
-		switch( k ){
-			case 0:
-				return gaussian_ba(x,a,b,c);
-			case 1:
-				return gaussian_bb(x,a,b,c);
-			case 2:
-				return gaussian_bc(x,a,b,c);
-			default: 
-				return 0.0;
-		}
-	}else if( j == 2 ){
-		const double z = (x - b) / c;
-		const double e = std::exp(-0.5 * z * z);
-		switch( k ){
-			case 0:
-				return gaussian_ca(x,a,b,c);
-			case 1:
-				return gaussian_cb(x,a,b,c);
-			case 2:
-				return gaussian_cc(x,a,b,c);
-			default:
-				return 0.0;
-		}
-	}else{
-		return 0.0;
-	}
-}
-
-
-template <typename Container>
-auto linspace(typename Container::value_type a, typename Container::value_type b, size_t n){
-    assert(b > a);
-    assert(n > 1);
-
-    Container res(n);
-    const auto step = (b - a) / (n - 1);
-    auto val = a;
-    for(auto& e: res)
-    {
-        e = val;
-        val += step;
-    }
-    return res;
+double tracefunc(double t,double c,double pa,double pd,double pr,double pf){
+	double PulseVal = TraceFunc(t,pa,pd,pr,pf);
+	return c + PulseVal;
 }
 
 int main(int argc, char *argv[]) {
-	std::string inputfile = "test.out";
+	std::string inputfile = "trace.txt";
+	std::string outputfile = "fit.txt";
+	double xmin = 30.0;
+	double xmax = 80.0;
+	std::string fitfunc = "tracefunc";
 
 	boost::program_options::options_description cmdline_options("Generic Options");
 	cmdline_options.add_options()
 		("help,h", "produce help message")
-		("inputfile,i",boost::program_options::value<std::string>(&inputfile)->default_value("trace.txt"),"number of iterations for the fill command")
+		("inputfile,i",boost::program_options::value<std::string>(&inputfile)->default_value("trace.txt"),"file to read the trace data in formatted as x y_i")
+		("outputfile,o",boost::program_options::value<std::string>(&outputfile)->default_value("fit.txt"),"file to write the trace fit in formatted as x y_i y_f")
+		("fitfunc,f",boost::program_options::value<std::string>(&fitfunc)->default_value("tracefunc"),"function to use for trace fitting [tracefunc,sintracefunc]")
+		("xmin,l",boost::program_options::value<double>(&xmin)->default_value(0.0),"lower fit bound")
+		("xmax,u",boost::program_options::value<double>(&xmax)->default_value(0.0),"upper fit bound")
 		;
 
 	boost::program_options::positional_options_description pos;
@@ -479,57 +392,56 @@ int main(int argc, char *argv[]) {
 			spdlog::info(cmdline_options);
 			exit(EXIT_SUCCESS);
 		}
+		if( xmin >= xmax ){
+			throw std::runtime_error("xmin >= xmax");
+		}
 	}catch( std::exception& e){
 		spdlog::error(e.what());
 		exit(EXIT_FAILURE);
 	}    
 
 	double currx,curry;
-	std::vector<std::pair<double,double>> vals;
+	std::vector<double> tracexvals;
+	std::vector<double> traceyvals;
 	std::ifstream input(inputfile);
 	while( input >> currx >> curry ){
-		vals.push_back({currx,curry});
+		if( currx >= xmin && currx <= xmax ){
+			tracexvals.push_back(currx);
+			traceyvals.push_back(curry);
+		}
 	}
 	input.close();
 
-	for( const auto& v : vals ){
-		spdlog::info("read from {} : {} {}",inputfile,v.first,v.second);
+	if( fitfunc.compare("sintracefunc") == 0 ){
+		auto r = curve_fit(sintracefunc, {6580.0,20.0,0.0,0.5,40.0,54.0,1.0,5.0},tracexvals,traceyvals);
+		spdlog::info("constant : {} ",r[0]);
+		spdlog::info("sin -> amp : {} phase : {} freq : {}",r[1],r[2],r[3]);
+		spdlog::info("pulse -> amp : {} delay : {} rise : {} fall : {}",r[4],r[5],r[6],r[7]);
+
+		std::ofstream out(outputfile);
+		for( size_t ii = 0; ii < tracexvals.size(); ++ii ){
+			auto x = tracexvals[ii];
+			auto y = traceyvals[ii];
+			out << x << ' ' << y << ' ' << sintracefunc(x,r[0],r[1],r[2],r[3],r[4],r[5],r[6],r[7]) << std::endl;
+		}
+		out.close();
+	}else if( fitfunc.compare("tracefunc") == 0 ){
+		auto r = curve_fit(tracefunc, {6580.0,40.0,54.0,1.0,5.0},tracexvals,traceyvals);
+		spdlog::info("constant : {} ",r[0]);
+		spdlog::info("pulse -> amp : {} delay : {} rise : {} fall : {}",r[1],r[2],r[3],r[4]);
+
+		std::ofstream out(outputfile);
+		for( size_t ii = 0; ii < tracexvals.size(); ++ii ){
+			auto x = tracexvals[ii];
+			auto y = traceyvals[ii];
+			out << x << ' ' << y << ' ' << tracefunc(x,r[0],r[1],r[2],r[3],r[4]) << std::endl;
+		}
+		out.close();
+	}else{
+		spdlog::error("unknown fit function {}",fitfunc);
+		spdlog::info(cmdline_options);
+		exit(EXIT_FAILURE);
 	}
-
-	auto device = std::random_device();
-	auto gen    = std::mt19937(device());
-
-	auto xs = linspace<std::vector<double>>(0.0, 1.0, 300);
-	auto ys = std::vector<double>(xs.size());
-
-	double a = 5.0, b = 0.4, c = 0.15;
-
-	for(size_t i = 0; i < xs.size(); i++)
-	{
-		auto y =  gaussian(xs[i], a, b, c);
-		auto dist  = std::normal_distribution(0.0, 0.1 * y);
-		ys[i] = y + dist(gen);
-	}
-
-	spdlog::info("vals : {} {} {}",a,b,c);
-	auto start_time = std::chrono::high_resolution_clock::now();
-	auto r1 = curve_fit(gaussian, {1.0, 0.0, 1.0}, xs, ys);
-	auto stop_time = std::chrono::high_resolution_clock::now();
-	std::chrono::duration<double,std::milli> dur_r1 = (stop_time - start_time);
-	spdlog::info("pure function evale : time {} ms, result : {} {} {}",dur_r1.count(),r1[0],r1[1],r1[2]);
-
-	start_time = std::chrono::high_resolution_clock::now();
-	auto r2 = curve_fit(gaussian, gaussian_d, {1.0, 0.0, 1.0}, xs, ys);
-	stop_time = std::chrono::high_resolution_clock::now();
-	std::chrono::duration<double,std::milli> dur_r2 = (stop_time - start_time);
-	spdlog::info("function with derivative : time {} ms, result : {} {} {}",dur_r2.count(),r2[0],r2[1],r2[2]);
-
-	start_time = std::chrono::high_resolution_clock::now();
-	auto r3 = curve_fit(gaussian, gaussian_d, gaussian_vv, {1.0, 0.0, 1.0}, xs, ys);
-	stop_time = std::chrono::high_resolution_clock::now();
-	std::chrono::duration<double,std::milli> dur_r3 = (stop_time - start_time);
-	spdlog::info("function with derivative and geodesic : time {} ms, result : {} {} {}",dur_r3.count(),r3[0],r3[1],r3[2]);
-
 
 	return 0;
 
