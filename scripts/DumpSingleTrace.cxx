@@ -9,7 +9,7 @@
 
 #include "RootDevStruct.hpp"
 
-void DumpSingleTrace(unsigned int entrynum,int crateNum,int chanNum,int modNum,bool ispileup,std::string inputname,std::string outputname){
+void DumpSingleTrace(unsigned int entrynum,int crateNum,int modNum,int chanNum,bool ispileup,std::string inputname,std::string outputname){
 	TFile* file = new TFile(inputname.c_str(),"READ");
 	TTree* tree = dynamic_cast<TTree*>(file->Get("RootDev"));
 	TTreeReader reader(tree);
