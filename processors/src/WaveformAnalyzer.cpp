@@ -16,10 +16,11 @@ WaveformAnalyzer::WaveformAnalyzer(const std::string& log) : Analyzer(log,"Wavef
 
 	this->currsave = 0;
 	this->NumTraceFits = 0;
+	this->fittime = 0.0;
 }
 
 WaveformAnalyzer::~WaveformAnalyzer(){
-	this->console->info("Number of traces fit : {}",this->NumTraceFits);
+	this->console->info("Number of traces fit : {}, total time spent fitting {:.3f}s",this->NumTraceFits,this->fittime/1000.0);
 }
 
 [[maybe_unused]] bool WaveformAnalyzer::PreProcess([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
@@ -108,6 +109,8 @@ WaveformAnalyzer::~WaveformAnalyzer(){
 					this->fit_start_time = std::chrono::high_resolution_clock::now();
 					this->FitResult = s.second.fithist->Fit(s.second.fitfunc,"0SQ","",s.second.FitRange.first,s.second.FitRange.second);
 					this->fit_stop_time = std::chrono::high_resolution_clock::now();
+					std::chrono::duration<double,std::milli> dur = this->fit_stop_time - this->fit_start_time;
+					this->fittime += dur.count();
 					++(this->NumTraceFits);
 					//add params to evt
 					for( const auto& parinfo : s.second.ParamInfo ){
@@ -129,7 +132,6 @@ WaveformAnalyzer::~WaveformAnalyzer(){
 						}
 						TH1* currhist = dynamic_cast<TH1*>(s.second.fithist->Clone(savename.c_str()));
 						currhist->Write(0,2,0);
-						std::chrono::duration<double,std::milli> dur = this->fit_stop_time - this->fit_start_time;
 						this->console->info("===== END TRACE FIT DUMP {}/{} , {} ms====",this->currsave,this->MaxSaveFits,dur.count());
 						++(this->currsave);
 					}	

@@ -95,6 +95,7 @@ class WaveformAnalyzer : public Analyzer {
 		
 		std::chrono::time_point<std::chrono::high_resolution_clock> fit_start_time;
 		std::chrono::time_point<std::chrono::high_resolution_clock> fit_stop_time;
+		double fittime;
 
 		int MaxSaveFits;
 		int currsave;
