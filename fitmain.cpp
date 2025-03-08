@@ -1,6 +1,5 @@
 #include <iostream>
 #include <chrono>
-#include <random>
 #include <vector>
 #include <fstream>
 #include <tuple>
@@ -14,8 +13,6 @@
 
 #include <boost/program_options.hpp>
 
-#include <gsl/gsl_rng.h>
-#include <gsl/gsl_randist.h>
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_blas.h>
