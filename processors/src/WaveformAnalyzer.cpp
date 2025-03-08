@@ -105,7 +105,9 @@ WaveformAnalyzer::~WaveformAnalyzer(){
 						}
 
 					}
+					this->fit_start_time = std::chrono::high_resolution_clock::now();
 					this->FitResult = s.second.fithist->Fit(s.second.fitfunc,"0SQ","",s.second.FitRange.first,s.second.FitRange.second);
+					this->fit_stop_time = std::chrono::high_resolution_clock::now();
 					++(this->NumTraceFits);
 					//add params to evt
 					for( const auto& parinfo : s.second.ParamInfo ){
@@ -127,7 +129,8 @@ WaveformAnalyzer::~WaveformAnalyzer(){
 						}
 						TH1* currhist = dynamic_cast<TH1*>(s.second.fithist->Clone(savename.c_str()));
 						currhist->Write(0,2,0);
-						this->console->info("===== END TRACE FIT DUMP {}/{} ====",this->currsave,this->MaxSaveFits);
+						std::chrono::duration<double,std::milli> dur = this->fit_stop_time - this->fit_start_time;
+						this->console->info("===== END TRACE FIT DUMP {}/{} , {} ms====",this->currsave,this->MaxSaveFits,dur.count());
 						++(this->currsave);
 					}	
 					s.second.fithist->GetListOfFunctions()->Clear();

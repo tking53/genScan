@@ -92,6 +92,9 @@ class WaveformAnalyzer : public Analyzer {
 		std::vector<std::pair<boost::regex,TraceFitParams>> TraceFitSettings;
 
 		TFitResultPtr FitResult;
+		
+		std::chrono::time_point<std::chrono::high_resolution_clock> fit_start_time;
+		std::chrono::time_point<std::chrono::high_resolution_clock> fit_stop_time;
 
 		int MaxSaveFits;
 		int currsave;
