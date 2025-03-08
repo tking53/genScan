@@ -13,6 +13,13 @@ WaveformAnalyzer::WaveformAnalyzer(const std::string& log) : Analyzer(log,"Wavef
 		{1021, {16384,0,16384.0,512,0,512.0}},
 		{1022, {16384,0,16384.0,512,0,512.0}}
 	};
+
+	this->currsave = 0;
+	this->NumTraceFits = 0;
+}
+
+WaveformAnalyzer::~WaveformAnalyzer(){
+	this->console->info("Number of traces fit : {}",this->NumTraceFits);
 }
 
 [[maybe_unused]] bool WaveformAnalyzer::PreProcess([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
@@ -77,6 +84,8 @@ WaveformAnalyzer::WaveformAnalyzer(const std::string& log) : Analyzer(log,"Wavef
 					}
 					for( size_t idx = 0; idx < trace.size(); ++idx ){
 						s.second.fithist->SetBinContent(idx+1,trace.at(idx));
+						//s.second.fithist->SetBinError(idx+1,std::sqrt(trace.at(idx)));
+						s.second.fithist->SetBinError(idx+1,0.5);
 					}
 					for( const auto& parinfo : s.second.ParamInfo ){
 						auto idx = std::get<0>(parinfo);
@@ -96,9 +105,9 @@ WaveformAnalyzer::WaveformAnalyzer(const std::string& log) : Analyzer(log,"Wavef
 						}
 
 					}
-					this->FitResult = s.second.fithist->Fit(s.second.fitfunc,"NSQ","",s.second.FitRange.first,s.second.FitRange.second);
+					this->FitResult = s.second.fithist->Fit(s.second.fitfunc,"0SQ","",s.second.FitRange.first,s.second.FitRange.second);
+					++(this->NumTraceFits);
 					//add params to evt
-					//this->console->info("Begin Trace fit : {}",evt->GetCMapID());
 					for( const auto& parinfo : s.second.ParamInfo ){
 						auto idx = std::get<0>(parinfo);
 						auto parname = std::get<3>(parinfo);
@@ -106,8 +115,21 @@ WaveformAnalyzer::WaveformAnalyzer(const std::string& log) : Analyzer(log,"Wavef
 						//this->console->info("{} : {}+-{}",parname,this->FitResult->Parameter(idx),this->FitResult->ParError(idx));
 					}
 					evt->AddTraceFitInfo("Chi2/NDF",this->FitResult->Chi2(),this->FitResult->Ndf());
-					//this->console->info("Chi2/NDF : {}/{}",this->FitResult->Chi2(),this->FitResult->Ndf());
-					//this->console->info("End Trace fit : {}",evt->GetCMapID());
+					if( this->currsave < this->MaxSaveFits ){
+						this->console->info("===== BEGIN TRACE FIT DUMP {}/{} ====",this->currsave,this->MaxSaveFits);
+						std::string savename = "FitHist_"+std::to_string(this->currsave);
+						this->console->info("saving fit for evt : {} as {}",*evt,savename);
+						this->console->info("fit values : Chi2/NdF : {}/{} : {}",this->FitResult->Chi2(),this->FitResult->Ndf(),this->FitResult->Chi2()/static_cast<double>(this->FitResult->Ndf()));
+						for( const auto& parinfo : s.second.ParamInfo ){
+							auto idx = std::get<0>(parinfo);
+							auto parname = std::get<3>(parinfo);
+							this->console->info("{} : {} +- {}",parname,this->FitResult->Parameter(idx),this->FitResult->ParError(idx));
+						}
+						TH1* currhist = dynamic_cast<TH1*>(s.second.fithist->Clone(savename.c_str()));
+						currhist->Write(0,2,0);
+						this->console->info("===== END TRACE FIT DUMP {}/{} ====",this->currsave,this->MaxSaveFits);
+						++(this->currsave);
+					}	
 					s.second.fithist->GetListOfFunctions()->Clear();
 					break;
 				}
@@ -146,6 +168,7 @@ void WaveformAnalyzer::Init(const pugi::xml_node& config){
 	}else{
 		this->InsertAdditionalTypes(additional_types);
 	}
+	this->MaxSaveFits = config.attribute("max_save").as_int(100);
 
 	for(pugi::xml_node settings = config.child("settings"); settings; settings = settings.next_sibling("settings")){
 		auto re = this->GenerateRegex(settings.attribute("Crate").as_string("[\\d]"),settings.attribute("Module").as_string("[\\d]"),settings.attribute("Channel").as_string("[\\d]"));

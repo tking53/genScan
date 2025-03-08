@@ -10,7 +10,7 @@
 class WaveformAnalyzer : public Analyzer {
 	public:
 		WaveformAnalyzer(const std::string&);
-		virtual ~WaveformAnalyzer() = default;
+		virtual ~WaveformAnalyzer();
 
 		virtual bool PreProcess(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
 		virtual bool Process(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
@@ -93,6 +93,9 @@ class WaveformAnalyzer : public Analyzer {
 
 		TFitResultPtr FitResult;
 
+		int MaxSaveFits;
+		int currsave;
+		int NumTraceFits;
 };
 
 #endif
