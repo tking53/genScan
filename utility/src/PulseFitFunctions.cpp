@@ -26,10 +26,16 @@ namespace PulseFit{
 		return amp*TMath::Sin(freq*(x[0]+phase));
 	}
 
+	double SingleTraceFit(double* x,double* par){
+		double c = PulseFit::Constant(x,par);
+		double pulse = PulseFit::Pulse(x,par+1);
+		return c + pulse;
+	}
+
 	double BSMSingleTraceFit(double* x,double* par){
 		double c = PulseFit::Constant(x,par);
-		double sine = PulseFit::Sin(x,par+1);
-		double pulse = PulseFit::Pulse(x,par+4);
+		double pulse = PulseFit::Pulse(x,par+1);
+		double sine = PulseFit::Sin(x,par+5);
 		return c + sine + pulse;
 	}
 

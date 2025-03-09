@@ -180,9 +180,11 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 
 			if( isfront ){
 				this->fronttracefitvalues.constant = evt->GetTraceFitValue("Constant").first;
-				this->fronttracefitvalues.sinamp = evt->GetTraceFitValue("SinAmp").first;
-				this->fronttracefitvalues.sinphase = evt->GetTraceFitValue("SinPhase").first;
-				this->fronttracefitvalues.sinfreq = evt->GetTraceFitValue("SinFreq").first;
+				if( evt->DoesTraceFitValueExist("SinAmp") ){
+					this->fronttracefitvalues.sinamp = evt->GetTraceFitValue("SinAmp").first;
+					this->fronttracefitvalues.sinphase = evt->GetTraceFitValue("SinPhase").first;
+					this->fronttracefitvalues.sinfreq = evt->GetTraceFitValue("SinFreq").first;
+				}
 				this->fronttracefitvalues.pulseamp = evt->GetTraceFitValue("PulseAmp").first;
 				this->fronttracefitvalues.pulsedelay = evt->GetTraceFitValue("PulseDelay").first;
 				this->fronttracefitvalues.pulserise = evt->GetTraceFitValue("PulseRise").first;
@@ -193,9 +195,11 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 				this->fronttracefitvalues.timestamp = evt->GetTimeStamp();
 			}else{
 				this->backtracefitvalues.constant = evt->GetTraceFitValue("Constant").first;
-				this->backtracefitvalues.sinamp = evt->GetTraceFitValue("SinAmp").first;
-				this->backtracefitvalues.sinphase = evt->GetTraceFitValue("SinPhase").first;
-				this->backtracefitvalues.sinfreq = evt->GetTraceFitValue("SinFreq").first;
+				if( evt->DoesTraceFitValueExist("SinAmp") ){
+					this->backtracefitvalues.sinamp = evt->GetTraceFitValue("SinAmp").first;
+					this->backtracefitvalues.sinphase = evt->GetTraceFitValue("SinPhase").first;
+					this->backtracefitvalues.sinfreq = evt->GetTraceFitValue("SinFreq").first;
+				}
 				this->backtracefitvalues.pulseamp = evt->GetTraceFitValue("PulseAmp").first;
 				this->backtracefitvalues.pulsedelay = evt->GetTraceFitValue("PulseDelay").first;
 				this->backtracefitvalues.pulserise = evt->GetTraceFitValue("PulseRise").first;

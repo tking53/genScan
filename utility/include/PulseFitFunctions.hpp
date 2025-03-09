@@ -8,6 +8,7 @@ namespace PulseFit{
 	double Pulse(double*,double*);
 	double Sin(double*,double*);
 
+	double SingleTraceFit(double*,double*);
 	double BSMSingleTraceFit(double*,double*);
 	double BSMDoubleTraceFit(double*,double*);
 }

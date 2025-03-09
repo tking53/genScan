@@ -231,14 +231,18 @@ void WaveformAnalyzer::Init(const pugi::xml_node& config){
 			this->TraceFitSettings.back().second.fitfunc = nullptr;
 			if( fitname.compare("BSMSingleTracePulse") == 0 ){
 				this->TraceFitSettings.back().second.fitfunc = new TF1(fitname.c_str(),PulseFit::BSMSingleTraceFit,fitlowbound,fithighbound,8);
-				for( const auto& parinfo : this->TraceFitSettings.back().second.ParamInfo ){
-					this->TraceFitSettings.back().second.fitfunc->SetParName(std::get<0>(parinfo),std::get<3>(parinfo).c_str());
-				}
-				this->TraceFitSettings.back().second.fithist = nullptr;
+			}else if( fitname.compare("SingleTracePulse") == 0 ){
+				this->TraceFitSettings.back().second.fitfunc = new TF1(fitname.c_str(),PulseFit::SingleTraceFit,fitlowbound,fithighbound,5);
 			}else{
 				this->console->error("Unknown Trace Fitting Function : {}",fitname);
 				throw "Unknown TraceFitting Function";
 			}
+			for( const auto& parinfo : this->TraceFitSettings.back().second.ParamInfo ){
+				this->TraceFitSettings.back().second.fitfunc->SetParName(std::get<0>(parinfo),std::get<3>(parinfo).c_str());
+			}
+			this->TraceFitSettings.back().second.fithist = nullptr;
+
+
 		}
 
 	}
