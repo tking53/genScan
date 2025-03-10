@@ -342,6 +342,7 @@ endif()
 option(USE_SYSTEM_GSL "Use either system gsl or grab from github" ON)
 #TODO: FINISH LATER
 find_package(GSL REQUIRED)
+find_package(Eigen3 REQUIRED)
 
 add_subdirectory(utility)
 add_subdirectory(processors)
@@ -365,7 +366,7 @@ target_link_libraries(GenDev PRIVATE pugixml UTILITY_LIB ${ROOT_LIBRARIES})
 
 add_executable(GenFit fitmain.cpp)
 add_dependencies(GenFit ${EXTERNAL_DEPS})
-target_link_libraries(GenFit PRIVATE GSL::gsl GSL::gslcblas pugixml UTILITY_LIB ${ROOT_LIBRARIES})
+target_link_libraries(GenFit PRIVATE Eigen3::Eigen GSL::gsl GSL::gslcblas pugixml UTILITY_LIB ${ROOT_LIBRARIES})
 
 add_executable(GenWavelet waveletmain.cpp)
 add_dependencies(GenWavelet ${EXTERNAL_DEPS})

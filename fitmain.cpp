@@ -36,7 +36,7 @@ auto constexpr n_params(std::function<R (ARGS...)> ) {
 /**
  * This function returns the number of parameters of a given function. 
  */
-template <class R, class... ARGS>
+	template <class R, class... ARGS>
 auto constexpr n_params(R (ARGS...) ) 
 {
 	return function_ripper<R, ARGS...>();
@@ -362,6 +362,61 @@ double tracefunc(double t,double c,double pa,double pd,double pr,double pf){
 	return c + PulseVal;
 }
 
+#include <iostream>
+#include <Eigen/Dense>
+
+#include <unsupported/Eigen/NonLinearOptimization>
+#include <unsupported/Eigen/NumericalDiff>
+
+// Generic functor
+template<typename _Scalar, int NX = Eigen::Dynamic, int NY = Eigen::Dynamic>
+struct Functor{
+	typedef _Scalar Scalar;
+	enum {
+		InputsAtCompileTime = NX,
+		ValuesAtCompileTime = NY
+	};
+	typedef Eigen::Matrix<Scalar,InputsAtCompileTime,1> InputType;
+	typedef Eigen::Matrix<Scalar,ValuesAtCompileTime,1> ValueType;
+	typedef Eigen::Matrix<Scalar,ValuesAtCompileTime,InputsAtCompileTime> JacobianType;
+
+	int m_inputs, m_values;
+
+	Functor() : m_inputs(InputsAtCompileTime), m_values(ValuesAtCompileTime) {}
+	Functor(int inputs, int values) : m_inputs(inputs), m_values(values) {}
+
+	int inputs() const { return m_inputs; }
+	int values() const { return m_values; }
+
+};
+
+struct trace_fit_functor : Functor<double>{
+	int operator()(const Eigen::VectorXd &x, Eigen::VectorXd &fvec) const{
+		for( size_t ii = 0; ii < xpoints.size(); ++ii ){
+			fvec(ii) = this->ypoints[ii] - ( tracefunc(this->xpoints[ii],x(0),x(1),x(2),x(3),x(4)) );
+		}
+		return 0;
+	}
+	int inputs() const { return 5;}
+	int values() const { return this->xpoints.size(); }
+	std::vector<double> xpoints;
+	std::vector<double> ypoints;
+};
+
+struct sin_trace_fit_functor : Functor<double>{
+	int operator()(const Eigen::VectorXd &x, Eigen::VectorXd &fvec) const{
+		for( size_t ii = 0; ii < xpoints.size(); ++ii ){
+			fvec(ii) = this->ypoints[ii] - ( sintracefunc(this->xpoints[ii],x(0),x(1),x(2),x(3),x(4),x(5),x(6),x(7)) );
+		}
+		return 0;
+	}
+	int inputs() const { return 8;}
+	int values() const { return this->xpoints.size(); }
+	std::vector<double> xpoints;
+	std::vector<double> ypoints;
+};
+
+
 int main(int argc, char *argv[]) {
 	std::string inputfile = "trace.txt";
 	std::string outputfile = "fit.txt";
@@ -415,11 +470,40 @@ int main(int argc, char *argv[]) {
 		spdlog::info("sin -> amp : {} phase : {} freq : {}",r[1],r[2],r[3]);
 		spdlog::info("pulse -> amp : {} delay : {} rise : {} fall : {}",r[4],r[5],r[6],r[7]);
 
+		Eigen::VectorXd init_guess(8);
+		init_guess(0) = 6580.0;
+		init_guess(1) = 20.0;
+		init_guess(2) = 0.0;
+		init_guess(3) = 0.5;
+		init_guess(4) = 40.0;
+		init_guess(5) = 54.0;
+		init_guess(6) = 1.0;
+		init_guess(7) = 5.0;
+
+		sin_trace_fit_functor tfit;
+		tfit.xpoints = tracexvals;
+		tfit.ypoints = traceyvals;
+		Eigen::NumericalDiff<sin_trace_fit_functor> numDiff(tfit);
+		Eigen::LevenbergMarquardt<Eigen::NumericalDiff<sin_trace_fit_functor>,double> lm(numDiff);
+		lm.parameters.maxfev = 2000;
+		lm.parameters.xtol = 1.0e-10;
+
+		auto start_time = std::chrono::high_resolution_clock::now();
+		int ret = lm.minimize(init_guess);
+		auto stop_time = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<double,std::milli> dur = (stop_time - start_time);
+		spdlog::info("Eigen nfev: {}/{}, time: {} ms  -> {}",lm.nfev,lm.njev,dur.count(),init_guess);
+
+
 		std::ofstream out(outputfile);
 		for( size_t ii = 0; ii < tracexvals.size(); ++ii ){
 			auto x = tracexvals[ii];
 			auto y = traceyvals[ii];
-			out << x << ' ' << y << ' ' << sintracefunc(x,r[0],r[1],r[2],r[3],r[4],r[5],r[6],r[7]) << std::endl;
+			out << x << ' ' 
+			    << y << ' ' 
+			    << sintracefunc(x,r[0],r[1],r[2],r[3],r[4],r[5],r[6],r[7]) << ' '
+			    << sintracefunc(x,init_guess(0),init_guess(1),init_guess(2),init_guess(3),init_guess(4),init_guess(5),init_guess(6),init_guess(7)) 
+			    << std::endl;
 		}
 		out.close();
 	}else if( fitfunc.compare("tracefunc") == 0 ){
@@ -427,11 +511,38 @@ int main(int argc, char *argv[]) {
 		spdlog::info("constant : {} ",r[0]);
 		spdlog::info("pulse -> amp : {} delay : {} rise : {} fall : {}",r[1],r[2],r[3],r[4]);
 
+		Eigen::VectorXd init_guess(5);
+		init_guess(0) = 6580.0;
+		init_guess(1) = 40.0;
+		init_guess(2) = 54.0;
+		init_guess(3) = 1.0;
+		init_guess(4) = 5.0;
+
+		trace_fit_functor tfit;
+		tfit.xpoints = tracexvals;
+		tfit.ypoints = traceyvals;
+		Eigen::NumericalDiff<trace_fit_functor> numDiff(tfit);
+		Eigen::LevenbergMarquardt<Eigen::NumericalDiff<trace_fit_functor>,double> lm(numDiff);
+		lm.parameters.maxfev = 2000;
+		lm.parameters.xtol = 1.0e-10;
+
+		auto start_time = std::chrono::high_resolution_clock::now();
+		//int ret = lm.minimizeInit(init_guess);
+		//ret = lm.minimizeOneStep(init_guess);
+		int ret = lm.minimize(init_guess);
+		auto stop_time = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<double,std::milli> dur = (stop_time - start_time);
+		spdlog::info("Eigen nfev: {}/{}, time: {} ms  -> {}",lm.nfev,lm.njev,dur.count(),init_guess);
+
 		std::ofstream out(outputfile);
 		for( size_t ii = 0; ii < tracexvals.size(); ++ii ){
 			auto x = tracexvals[ii];
 			auto y = traceyvals[ii];
-			out << x << ' ' << y << ' ' << tracefunc(x,r[0],r[1],r[2],r[3],r[4]) << std::endl;
+			out << x << ' ' 
+			    << y << ' ' 
+			    << tracefunc(x,r[0],r[1],r[2],r[3],r[4]) << ' ' 
+			    << tracefunc(x,init_guess(0),init_guess(1),init_guess(2),init_guess(3),init_guess(4)) 
+			    << std::endl;
 		}
 		out.close();
 	}else{
