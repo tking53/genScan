@@ -12,6 +12,10 @@
 #include <set>
 #include <map>
 
+#if defined(__GNUC__) && (__GNUC__ >= 13)
+    #include <cstdint>
+#endif
+
 #include "TraceHelper.hpp"
 
 /// @addtogroup Events
