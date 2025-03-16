@@ -1,8 +1,9 @@
 #include "TGButton.h"
+#include "TGLabel.h"
 #include "TRootEmbeddedCanvas.h"
 #include "TGLayout.h"
 #include "TGTextEntry.h"
-#include "TGTextEntry.h"
+#include "TGNumberEntry.h"
 #include "TH2.h"
 #include "TCanvas.h"
 #include "TSocket.h"
@@ -10,7 +11,10 @@
 #include "RQ_OBJECT.h"
 #include <TGClient.h>
 #include <TGTextBuffer.h>
+#include <exception>
 #include <set>
+#include <string>
+#include <iostream>
 
 class Spy {
 
@@ -32,6 +36,7 @@ class Spy {
 		TGButton            *fQuit;
 		TGButton            *fUpdateLists;
 		TGButton            *fPlotSelected;
+		TGNumberEntry         *fSelectPort;
 		TGTextEntry         *fSelectHistogram;
 		TGTextEntry         *fSelectOptions;
 		TSocket             *fSock;
@@ -91,11 +96,14 @@ void Spy::DoButton()
 void Spy::Connect()
 {
 	// Connect to SpyServ
-	fSock = new TSocket("localhost", 9090);
-	fConnect->SetState(kButtonDisabled);
-	fHpx->SetState(kButtonUp);
-	fHpxpy->SetState(kButtonUp);
-	fHprof->SetState(kButtonUp);
+	auto id = fSelectPort->GetIntNumber();
+	fSock = new TSocket("localhost", id);
+	if( fSock->IsValid() ){
+		fConnect->SetState(kButtonDisabled);
+		fHpx->SetState(kButtonUp);
+		fHpxpy->SetState(kButtonUp);
+		fHprof->SetState(kButtonUp);
+	}
 }
 
 Spy::Spy()
@@ -169,6 +177,11 @@ Spy::Spy()
 	fHorz3 = new TGHorizontalFrame(fMain, 100, 100);
 	fMain->AddFrame(fHorz3, fLhorz);
 
+	fSelectPort = new TGNumberEntry(fHorz3,9090,5,-1,TGNumberFormat::kNESInteger,TGNumberFormat::kNEANonNegative,TGNumberFormat::kNELLimitMinMax,0, 99999);
+	fSelectPort->SetName("fSelectPort");
+	fSelectPort->Resize(102,21);
+	fHorz3->AddFrame(fSelectPort,fLbut);
+	
 	// Create "Connect" and "Quit" buttons
 	// Add to horizontal frame
 	fConnect = new TGTextButton(fHorz3, "Connect");
