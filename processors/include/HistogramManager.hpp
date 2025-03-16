@@ -102,23 +102,27 @@ namespace PLOTS{
 				currwedgeidx = 0;
 				currcoloridx = 0;
 
-				fServ = std::make_shared<TServerSocket>(PORT,true);
-				if( not fServ->IsValid() ){
-					std::string mess = "Unable to open Port : "+std::to_string(PORT)+" Bailing out";
-					throw std::runtime_error(mess);
+				if( PORT > 0 ){
+					fServ = std::make_shared<TServerSocket>(PORT,true);
+					if( not fServ->IsValid() ){
+						std::string mess = "Unable to open Port : "+std::to_string(PORT)+" Bailing out";
+						throw std::runtime_error(mess);
+					}
+					KeepListen = true;
+
+					fMon = std::make_shared<TMonitor>();
+					fMon->Add(fServ.get());
+
+					fSockets = std::make_shared<TList>();
+
+					fCanvas = std::make_shared<TCanvas>(log.c_str(),log.c_str(),600,600);
+					fCanvas->SetFillColor(42);
+					fCanvas->GetFrame()->SetFillColor(21);
+					fCanvas->GetFrame()->SetBorderSize(6);
+					fCanvas->GetFrame()->SetBorderMode(-1);
+				}else{
+					KeepListen = false;
 				}
-				KeepListen = true;
-
-				fMon = std::make_shared<TMonitor>();
-				fMon->Add(fServ.get());
-
-				fSockets = std::make_shared<TList>();
-
-				fCanvas = std::make_shared<TCanvas>(log.c_str(),log.c_str(),600,600);
-				fCanvas->SetFillColor(42);
-				fCanvas->GetFrame()->SetFillColor(21);
-				fCanvas->GetFrame()->SetBorderSize(6);
-				fCanvas->GetFrame()->SetBorderMode(-1);
 			}
 
 			~PlotRegistry(){

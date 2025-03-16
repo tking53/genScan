@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
 		("file,f",boost::program_options::value<std::vector<std::string>>(&FileNames),"[file1 file2 file3 ...] list of files used for input")
 		("limit,l",boost::program_options::value<int>(&limit)->default_value(10),"number of events to keep in history [0 -> current, 1 -> prev., ... N-1]")
 		("format,x",boost::program_options::value<std::string>(&dataformat)->default_value("null"),"[file_format] format of the data file (evt,evt-presort,ldf,pacman_ldf,pld,caen_root,caen_bin)")
-		("port,p",boost::program_options::value<int>(&port)->default_value(9090),"[portid] port to listen/send on for the live histogramming")
+		("port,p",boost::program_options::value<int>(&port)->default_value(9090),"[portid] port to listen/send on for the live histogramming, -1 disables for batch scanning")
 		;
 
 
@@ -281,6 +281,10 @@ int main(int argc, char *argv[]) {
 	console->info("Created Statistics Manager");
 
 	std::thread plotter(&PLOTS::PlotRegistry::HandleSocketHelper,HistogramManager.get());
+	if( port <= 0 ){ 
+		HistogramManager->KillListen();
+		plotter.join();
+	}
 
 	std::signal(SIGINT, signalHandler);
 
@@ -331,10 +335,12 @@ int main(int argc, char *argv[]) {
 		console->error(e.what());
 	}
 	
-	//Write correlated events to disk
-	HistogramManager->KillListen();
-	plotter.join();
+	if( port > 0 ){ 
+		HistogramManager->KillListen();
+		plotter.join();
+	}
 
+	//Write correlated events to disk
 	HistogramManager->WriteAllPlots();
 	RootManager->FinalizeTrees();
 	std::chrono::time_point<std::chrono::high_resolution_clock> global_stop_time = std::chrono::high_resolution_clock::now();
