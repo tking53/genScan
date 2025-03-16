@@ -292,8 +292,18 @@ std::vector<double> curve_fit_impl(func_f_type f, func_df_type df, func_fvv_type
 	fdf.p   = initial_params->size;
 	fdf.params = &fd;
 
+	// "This selects the Levenberg-Marquardt algorithm."
+	fdf_params.trs = gsl_multifit_nlinear_trs_lm;
 	// "This selects the Levenberg-Marquardt algorithm with geodesic acceleration."
-	fdf_params.trs = gsl_multifit_nlinear_trs_lmaccel;
+	//fdf_params.trs = gsl_multifit_nlinear_trs_lmaccel;
+	// "This selects dogleg."
+	//fdf_params.trs = gsl_multifit_nlinear_trs_dogleg;
+	// "This selects double dogleg."
+	//fdf_params.trs = gsl_multifit_nlinear_trs_ddogleg;
+	// "This selects 2D subspace."
+	//fdf_params.trs = gsl_multifit_nlinear_trs_subspace2D;
+	// "This selects steihaug-toint."
+	//fdf_params.trs = gsl_multifit_nlinear_trs_cgst;
 	return internal_solve_system(initial_params, &fdf, &fdf_params);
 }
 
@@ -393,27 +403,45 @@ struct Functor{
 struct trace_fit_functor : Functor<double>{
 	int operator()(const Eigen::VectorXd &x, Eigen::VectorXd &fvec) const{
 		for( size_t ii = 0; ii < xpoints.size(); ++ii ){
-			fvec(ii) = this->ypoints[ii] - ( tracefunc(this->xpoints[ii],x(0),x(1),x(2),x(3),x(4)) );
+			fvec(ii) = this->weights[ii]*(this->ypoints[ii] - ( tracefunc(this->xpoints[ii],x(0),x(1),x(2),x(3),x(4)) ));
+		}
+		int iter = 0;
+		for( const auto& kv : this->constrained ){
+			auto offset = (x(kv.first) - kv.second);
+			fvec(xpoints.size()+iter) = 1.0*offset*offset;
+			++iter;
 		}
 		return 0;
 	}
 	int inputs() const { return 5;}
-	int values() const { return this->xpoints.size(); }
+	int values() const { return this->xpoints.size()+this->constrained.size(); }
+	int constraints() const { return this->constrained.size(); }
 	std::vector<double> xpoints;
 	std::vector<double> ypoints;
+	std::vector<double> weights;
+	std::map<int,double> constrained;
 };
 
 struct sin_trace_fit_functor : Functor<double>{
 	int operator()(const Eigen::VectorXd &x, Eigen::VectorXd &fvec) const{
 		for( size_t ii = 0; ii < xpoints.size(); ++ii ){
-			fvec(ii) = this->ypoints[ii] - ( sintracefunc(this->xpoints[ii],x(0),x(1),x(2),x(3),x(4),x(5),x(6),x(7)) );
+			fvec(ii) = this->weights[ii]*(this->ypoints[ii] - ( sintracefunc(this->xpoints[ii],x(0),x(1),x(2),x(3),x(4),x(5),x(6),x(7)) ));
+		}
+		int iter = 0;
+		for( const auto& kv : this->constrained ){
+			auto offset = (x(kv.first) - kv.second);
+			fvec(xpoints.size()+iter) = 1.0*offset*offset;
+			++iter;
 		}
 		return 0;
 	}
 	int inputs() const { return 8;}
-	int values() const { return this->xpoints.size(); }
+	int values() const { return this->xpoints.size()+this->constrained.size(); }
+	int constraints() const { return this->constrained.size(); }
 	std::vector<double> xpoints;
 	std::vector<double> ypoints;
+	std::vector<double> weights;
+	std::map<int,double> constrained;
 };
 
 
@@ -483,6 +511,7 @@ int main(int argc, char *argv[]) {
 		sin_trace_fit_functor tfit;
 		tfit.xpoints = tracexvals;
 		tfit.ypoints = traceyvals;
+		tfit.weights = std::vector<double>(tracexvals.size(),1.0);
 		Eigen::NumericalDiff<sin_trace_fit_functor> numDiff(tfit);
 		Eigen::LevenbergMarquardt<Eigen::NumericalDiff<sin_trace_fit_functor>,double> lm(numDiff);
 		lm.parameters.maxfev = 2000;
@@ -492,8 +521,14 @@ int main(int argc, char *argv[]) {
 		int ret = lm.minimize(init_guess);
 		auto stop_time = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<double,std::milli> dur = (stop_time - start_time);
-		spdlog::info("Eigen nfev: {}/{}, time: {} ms  -> {}",lm.nfev,lm.njev,dur.count(),init_guess);
-
+		spdlog::info("Eigen niter: {} nfev: {}/{}, time: {} ms \n {}",lm.iter,lm.nfev,lm.njev,dur.count(),init_guess);
+		auto f = lm.fvec;
+		auto chisq = f.dot(f);
+		auto ndf = f.size() - (init_guess.size() + tfit.constrained.size());
+		auto j = lm.fjac;
+		auto cov = (j.transpose()*j).inverse()*(chisq/ndf);
+		spdlog::info("chisq/ndof : {}/{} -> {}",chisq,ndf,chisq/ndf);
+		spdlog::info("cov : \n {}",cov);
 
 		std::ofstream out(outputfile);
 		for( size_t ii = 0; ii < tracexvals.size(); ++ii ){
@@ -521,6 +556,7 @@ int main(int argc, char *argv[]) {
 		trace_fit_functor tfit;
 		tfit.xpoints = tracexvals;
 		tfit.ypoints = traceyvals;
+		tfit.weights = std::vector<double>(tracexvals.size(),1.0);
 		Eigen::NumericalDiff<trace_fit_functor> numDiff(tfit);
 		Eigen::LevenbergMarquardt<Eigen::NumericalDiff<trace_fit_functor>,double> lm(numDiff);
 		lm.parameters.maxfev = 2000;
@@ -532,7 +568,14 @@ int main(int argc, char *argv[]) {
 		int ret = lm.minimize(init_guess);
 		auto stop_time = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<double,std::milli> dur = (stop_time - start_time);
-		spdlog::info("Eigen nfev: {}/{}, time: {} ms  -> {}",lm.nfev,lm.njev,dur.count(),init_guess);
+		spdlog::info("Eigen niter: {} nfev: {}/{}, time: {} ms \n {}",lm.iter,lm.nfev,lm.njev,dur.count(),init_guess);
+		auto f = lm.fvec;
+		auto chisq = f.dot(f);
+		auto ndf = f.size() - (init_guess.size() + tfit.constrained.size());
+		auto j = lm.fjac;
+		auto cov = (j.transpose()*j).inverse()*(chisq/ndf);
+		spdlog::info("chisq/ndof : {}/{} -> {}",chisq,ndf,chisq/ndf);
+		spdlog::info("cov : \n {}",cov);
 
 		std::ofstream out(outputfile);
 		for( size_t ii = 0; ii < tracexvals.size(); ++ii ){
