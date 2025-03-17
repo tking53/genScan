@@ -1,3 +1,5 @@
+#include <gsl/gsl_cblas.h>
+#include <gsl/gsl_matrix_double.h>
 #include <iostream>
 #include <chrono>
 #include <vector>
@@ -18,6 +20,9 @@
 #include <gsl/gsl_blas.h>
 #include <gsl/gsl_multifit_nlinear.h>
 
+#include <Eigen/Dense>
+#include <unsupported/Eigen/NonLinearOptimization>
+#include <unsupported/Eigen/NumericalDiff>
 
 template <class R, class... ARGS>
 struct function_ripper {
@@ -224,6 +229,9 @@ std::vector<double> internal_solve_system(gsl_vector* initial_params, gsl_multif
 	}
 
 	auto niter = gsl_multifit_nlinear_niter(work);
+	auto j = gsl_multifit_nlinear_jac(work);
+	auto cov = gsl_matrix_alloc(fdf->p,fdf->p);
+	gsl_multifit_nlinear_covar (j, 0.0, cov);
 	auto nfev  = fdf->nevalf;
 	auto njev  = fdf->nevaldf;
 	auto naev  = fdf->nevalfvv;
@@ -234,8 +242,15 @@ std::vector<double> internal_solve_system(gsl_vector* initial_params, gsl_multif
 	//logger::debug("curve fitted after ", niter, " iterations {nfev = ", nfev, "} {njev = ", njev, "} {naev = ", naev, "}");
 	spdlog::info("curve fitted after {} iterations [nfev={},njev={},naev={}]",niter,nfev,njev,naev);
 	spdlog::info("chisq/ndf : {}/{} -> {}",chisq,dof,chisq/dof);
+	for( size_t ii = 0; ii < fdf->p; ++ii ){
+		for( size_t jj = 0; jj < fdf->p; ++jj ){
+			std::cout << gsl_matrix_get(cov,ii,jj) << ' ';
+		}
+		std::cout << std::endl;
+	}
 
 	gsl_multifit_nlinear_free(work);
+	gsl_matrix_free(cov);
 	gsl_vector_free(initial_params);
 	return result;
 }
@@ -372,12 +387,6 @@ double tracefunc(double t,double c,double pa,double pd,double pr,double pf){
 	return c + PulseVal;
 }
 
-#include <iostream>
-#include <Eigen/Dense>
-
-#include <unsupported/Eigen/NonLinearOptimization>
-#include <unsupported/Eigen/NumericalDiff>
-
 // Generic functor
 template<typename _Scalar, int NX = Eigen::Dynamic, int NY = Eigen::Dynamic>
 struct Functor{
@@ -401,34 +410,57 @@ struct Functor{
 };
 
 struct trace_fit_functor : Functor<double>{
-	int operator()(const Eigen::VectorXd &x, Eigen::VectorXd &fvec) const{
+	int operator()(Eigen::VectorXd &x, Eigen::VectorXd &fvec) const{
+		for( const auto& kv : this->boundedvalues ){
+			if( x(kv.first) > kv.second.second ){
+				x(kv.first) = kv.second.second;
+			}else if( x(kv.first) < kv.second.first ){
+				x(kv.first) = kv.second.first;
+			}else{
+			}
+		}
 		for( size_t ii = 0; ii < xpoints.size(); ++ii ){
 			fvec(ii) = this->weights[ii]*(this->ypoints[ii] - ( tracefunc(this->xpoints[ii],x(0),x(1),x(2),x(3),x(4)) ));
 		}
 		int iter = 0;
-		for( const auto& kv : this->constrained ){
+		for( const auto& kv : this->fixedvalues ){
 			auto offset = (x(kv.first) - kv.second);
 			fvec(xpoints.size()+iter) = 1.0*offset*offset;
 			++iter;
 		}
 		return 0;
 	}
+	//Jacobian is (values,inputs)
+	//J(i,j) = df_i/dx_j
+	//since x(0) = constant, J(i,0) = 1.0
+	//since x(1) = A_p, J(i,1) = 
+	//since x(2) = t_0, J(i,2) = 
+	//since x(3) = t_r, J(i,3) = 
+	//since x(4) = t_f, J(i,4) = 
+	//int df(const Eigen::VectorXd& x, Eigen::MatrixXd& J) const{
+	//	J(0, 0) = 20 * (x(0) + 3);
+	//	J(0, 1) = 2 * (x(1) - 5);
+	//	J(1, 0) = x(1);
+	//	J(1, 1) = x(0);
+	//	return 0;
+	//}
 	int inputs() const { return 5;}
-	int values() const { return this->xpoints.size()+this->constrained.size(); }
-	int constraints() const { return this->constrained.size(); }
+	int values() const { return this->xpoints.size()+this->fixedvalues.size(); }
+	int constraints() const { return this->fixedvalues.size(); }
 	std::vector<double> xpoints;
 	std::vector<double> ypoints;
 	std::vector<double> weights;
-	std::map<int,double> constrained;
+	std::map<int,double> fixedvalues;
+	std::map<int,std::pair<double,double>> boundedvalues;
 };
 
 struct sin_trace_fit_functor : Functor<double>{
-	int operator()(const Eigen::VectorXd &x, Eigen::VectorXd &fvec) const{
+	int operator()(Eigen::VectorXd &x, Eigen::VectorXd &fvec) const{
 		for( size_t ii = 0; ii < xpoints.size(); ++ii ){
 			fvec(ii) = this->weights[ii]*(this->ypoints[ii] - ( sintracefunc(this->xpoints[ii],x(0),x(1),x(2),x(3),x(4),x(5),x(6),x(7)) ));
 		}
 		int iter = 0;
-		for( const auto& kv : this->constrained ){
+		for( const auto& kv : this->fixedvalues ){
 			auto offset = (x(kv.first) - kv.second);
 			fvec(xpoints.size()+iter) = 1.0*offset*offset;
 			++iter;
@@ -436,12 +468,12 @@ struct sin_trace_fit_functor : Functor<double>{
 		return 0;
 	}
 	int inputs() const { return 8;}
-	int values() const { return this->xpoints.size()+this->constrained.size(); }
-	int constraints() const { return this->constrained.size(); }
+	int values() const { return this->xpoints.size()+this->fixedvalues.size(); }
+	int constraints() const { return this->fixedvalues.size(); }
 	std::vector<double> xpoints;
 	std::vector<double> ypoints;
 	std::vector<double> weights;
-	std::map<int,double> constrained;
+	std::map<int,double> fixedvalues;
 };
 
 
@@ -524,7 +556,7 @@ int main(int argc, char *argv[]) {
 		spdlog::info("Eigen niter: {} nfev: {}/{}, time: {} ms \n {}",lm.iter,lm.nfev,lm.njev,dur.count(),init_guess);
 		auto f = lm.fvec;
 		auto chisq = f.dot(f);
-		auto ndf = f.size() - (init_guess.size() + tfit.constrained.size());
+		auto ndf = f.size() - (init_guess.size() + tfit.fixedvalues.size());
 		auto j = lm.fjac;
 		auto cov = (j.transpose()*j).inverse()*(chisq/ndf);
 		spdlog::info("chisq/ndof : {}/{} -> {}",chisq,ndf,chisq/ndf);
@@ -557,8 +589,10 @@ int main(int argc, char *argv[]) {
 		tfit.xpoints = tracexvals;
 		tfit.ypoints = traceyvals;
 		tfit.weights = std::vector<double>(tracexvals.size(),1.0);
+		//tfit.boundedvalues[0] = {4000.0,5000.0};
 		Eigen::NumericalDiff<trace_fit_functor> numDiff(tfit);
 		Eigen::LevenbergMarquardt<Eigen::NumericalDiff<trace_fit_functor>,double> lm(numDiff);
+		//Eigen::LevenbergMarquardt<trace_fit_functor> lm(tfit);
 		lm.parameters.maxfev = 2000;
 		lm.parameters.xtol = 1.0e-10;
 
@@ -568,14 +602,18 @@ int main(int argc, char *argv[]) {
 		int ret = lm.minimize(init_guess);
 		auto stop_time = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<double,std::milli> dur = (stop_time - start_time);
-		spdlog::info("Eigen niter: {} nfev: {}/{}, time: {} ms \n {}",lm.iter,lm.nfev,lm.njev,dur.count(),init_guess);
+		spdlog::info("Eigen niter: {} nfev: {}/{}, time: {} ms ",lm.iter,lm.nfev,lm.njev,dur.count());
+		spdlog::info("Eigen constant : {} ",init_guess(0));
+		spdlog::info("Eigen pulse -> amp : {} delay : {} rise : {} fall : {}",init_guess(1),init_guess(2),init_guess(3),init_guess(4));
 		auto f = lm.fvec;
 		auto chisq = f.dot(f);
-		auto ndf = f.size() - (init_guess.size() + tfit.constrained.size());
-		auto j = lm.fjac;
-		auto cov = (j.transpose()*j).inverse()*(chisq/ndf);
-		spdlog::info("chisq/ndof : {}/{} -> {}",chisq,ndf,chisq/ndf);
-		spdlog::info("cov : \n {}",cov);
+		auto ndf = f.size() - (init_guess.size() + tfit.fixedvalues.size());
+		Eigen::internal::covar(lm.fjac,lm.permutation.indices());
+		auto cov = lm.fjac.topLeftCorner(init_guess.size(),init_guess.size());
+		auto diag = cov.diagonal().array().inverse().sqrt().matrix().asDiagonal();
+		spdlog::info("Eigen chisq/ndof : {}/{} -> {}",chisq,ndf,chisq/ndf);
+		spdlog::info("Eigen cov : \n {}",cov);
+		spdlog::info("Eigen cor : \n {}",diag*cov*diag);
 
 		std::ofstream out(outputfile);
 		for( size_t ii = 0; ii < tracexvals.size(); ++ii ){
