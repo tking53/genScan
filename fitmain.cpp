@@ -610,7 +610,7 @@ int main(int argc, char *argv[]) {
 		auto ndf = f.size() - (init_guess.size() + tfit.fixedvalues.size());
 		Eigen::internal::covar(lm.fjac,lm.permutation.indices());
 		auto cov = lm.fjac.topLeftCorner(init_guess.size(),init_guess.size());
-		auto diag = cov.diagonal().array().inverse().sqrt().matrix().asDiagonal();
+		auto diag = cov.diagonal().array().sqrt().inverse().matrix().asDiagonal();
 		spdlog::info("Eigen chisq/ndof : {}/{} -> {}",chisq,ndf,chisq/ndf);
 		spdlog::info("Eigen cov : \n {}",cov);
 		spdlog::info("Eigen cor : \n {}",diag*cov*diag);
