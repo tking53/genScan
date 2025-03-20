@@ -2,6 +2,7 @@
 #include "CutManager.hpp"
 #include "EventSummary.hpp"
 #include "HistogramManager.hpp"
+#include "spdlog/spdlog.h"
 #include <TTree.h>
 #include <algorithm>
 #include <stdexcept>
@@ -357,8 +358,10 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 
 	}
 
-	this->FirstTime = *(std::min_element(this->TimeStamps.begin(),this->TimeStamps.end()));
-	this->LastTime = *(std::max_element(this->TimeStamps.begin(),this->TimeStamps.end()));
+	if( this->TimeStamps.size() > 0 ){
+		this->FirstTime = *(std::min_element(this->TimeStamps.begin(),this->TimeStamps.end()));
+		this->LastTime = *(std::max_element(this->TimeStamps.begin(),this->TimeStamps.end()));
+	}
 
 	currevttime = (this->FirstTime - globalfirsttime)*1.0e-9;
 
