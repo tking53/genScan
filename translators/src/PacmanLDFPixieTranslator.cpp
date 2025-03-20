@@ -54,10 +54,14 @@ PacmanLDFPixieTranslator::PacmanLDFPixieTranslator(const std::string& log,const 
 		.buffer2 = std::vector<unsigned int>(8194,0xFFFFFFFF)
 	};
 	this->NTotalWords = 0;
+	this->UnexpectedVSNCount = 0;
+	this->BadSpillCount = 0;
+	this->InvalidHeadersCount = 0;
 }	
 
 PacmanLDFPixieTranslator::~PacmanLDFPixieTranslator(){
-	this->console->info("good chunks : {}, bad chunks : {}, spills : {}",this->CurrDataBuff.goodchunks,this->CurrDataBuff.missingchunks,this->CurrSpillID);
+	this->console->info("good chunks : {}, bad chunks : {}, total spills : {}",this->CurrDataBuff.goodchunks,this->CurrDataBuff.missingchunks,this->CurrSpillID);
+	this->console->info("Found {} UNEXPECTED VSNs in total, Bad Spills : {}, Invalid Headers : {}",this->UnexpectedVSNCount,this->BadSpillCount,this->InvalidHeadersCount);
 	int idx = 0;
 	for( const auto& mod : this->CustomLeftovers ){
 		if( not mod.empty() ){
@@ -453,10 +457,11 @@ int PacmanLDFPixieTranslator::UnpackData(unsigned int& nBytes,bool& full_spill,b
 					try{
 						this->CurrDecoder = CMap->GetXiaDecoder(CrateNumber,ModuleNumber);
 					}catch(const boost::container::out_of_range& e){
-						this->console->error("Ill formed config file, Crate : {} Board : {} does not exist. The next message is what boost reports",CrateNumber,ModuleNumber);
+						this->console->error("Ill formed config file, Crate : {} Board : {} does not exist.",CrateNumber,ModuleNumber);
 						bad_spill = true;
 					}
 					if( bad_spill ){
+						++(this->BadSpillCount);
 						break;
 					}
 					
@@ -516,6 +521,7 @@ int PacmanLDFPixieTranslator::UnpackData(unsigned int& nBytes,bool& full_spill,b
 					++this->EvtSpillCounter[this->CurrSpillID%this->NUMCONCURRENTSPILLS];
 					if( this->CurrHeaderLength < 4 ){
 						this->console->error("FOUND INVALID LENGTH HEADER IN PIXIE DATA, DECODED HEADER LENGTH : {}",this->CurrHeaderLength);
+						++(this->InvalidHeadersCount);
 						bad_spill = true;
 					}
 
@@ -541,7 +547,8 @@ int PacmanLDFPixieTranslator::UnpackData(unsigned int& nBytes,bool& full_spill,b
 		}else{
 			++(this->CurrSpillID);
 			this->databuffer.clear();
-			this->console->critical("UNEXPECTED VSN : {}",vsn);
+			//this->console->critical("UNEXPECTED VSN : {}",vsn);
+			++(this->UnexpectedVSNCount);
 			break;
 		}
 	}

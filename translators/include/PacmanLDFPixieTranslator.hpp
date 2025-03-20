@@ -105,6 +105,9 @@ class PacmanLDFPixieTranslator : public Translator{
 		//std::map<uint64_t,int> EvtSpillCounter;
 		//Increment when we find spill footer
 		uint64_t CurrSpillID;
+		uint64_t BadSpillCount;
+		uint64_t UnexpectedVSNCount;
+		uint64_t InvalidHeadersCount;
 };
 
 #endif
