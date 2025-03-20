@@ -71,6 +71,7 @@ int main(int argc, char *argv[]) {
 	int MAX_CAL_PARAMS_PER_CHANNEL = 4;
 	int nthreads;
 	bool batchmode;
+	bool postmerge;
 
 	boost::program_options::options_description cmdline_options("Generic Options");
 	cmdline_options.add_options()
@@ -85,8 +86,9 @@ int main(int argc, char *argv[]) {
 		("max_crates,i",boost::program_options::value<int>(&MAX_CRATES)->default_value(1),"[MAX_CRATES] Number of crates to expect in data stream")
 		("max_slots,j",boost::program_options::value<int>(&MAX_CARDS_PER_CRATE)->default_value(13),"[MAX_CARDS_PER_CRATE] Number of cards per crate to expect in data stream")
 		("max_channels,k",boost::program_options::value<int>(&MAX_CHANNELS_PER_BOARD)->default_value(16),"[MAX_CHANNELS_PER_BOARD] Number of channels per board to expect in data stream")
-		("numthreads,n",boost::program_options::value<int>(&nthreads)->default_value(std::thread::hardware_concurrency()/2),"[numthreads] Number of threads to use for batch scanning, requires batchmode == true")
-		("batchmode,b",boost::program_options::value<bool>(&batchmode)->default_value(false),"[batchmode] given a list of files, scan them individually across numthreads threads, and merge back into a single file at the end. NOTE: CROSS FILE CORRELATIONS WILL NOT OCCUR, DO NOT USE IF HALF-LIVES ARE ON ORDER OF FILE BOUNDARY")
+		("numthreads,n",boost::program_options::value<int>(&nthreads)->default_value(std::thread::hardware_concurrency()/2),"[numthreads] Number of threads to use for batch scanning, requires batchmode == true, OTHERWISE IS IGNORED AND UNUSED")
+		("batchmode,b",boost::program_options::value<bool>(&batchmode)->default_value(false),"[batchmode] given a list of files, scan them individually across numthreads threads, and merge back into a single file at the end. NOTE: CROSS FILE CORRELATIONS WILL NOT OCCUR, DO NOT USE IF HALF-LIVES ARE ON ORDER OF FILE BOUNDARY. FILE NAMES WILL BE CONSTRUCTED AS file_outputfile.root WHERE file HAS HAD THE FILE EXTENSION STRIPPED.")
+		("merge,m",boost::program_options::value<bool>(&postmerge)->default_value(false),"[postmerge] when in batchmode, merge all files together after the fact, similar to hadd. FILES WILL BE ADDED TOGETHER IN ORDER PROVIDED TO PROGRAM. OUTPUT FILES WILL BE NAMED AFTER outputfile option ")
 		;
 
 
