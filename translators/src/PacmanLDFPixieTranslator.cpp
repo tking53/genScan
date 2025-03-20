@@ -501,7 +501,6 @@ int PacmanLDFPixieTranslator::UnpackData(unsigned int& nBytes,bool& full_spill,b
 					}
 
 					buffpos += this->CurrHeaderLength;
-
 					if( this->CurrTraceLength > 0 ){
 						this->CustomLeftovers[ModuleNumber].back().SetRawTraceLength(this->CurrTraceLength);
 						otherWords = &(this->databuffer[buffpos]);
@@ -515,6 +514,12 @@ int PacmanLDFPixieTranslator::UnpackData(unsigned int& nBytes,bool& full_spill,b
 					}
 					this->CustomLeftovers[ModuleNumber].back().SetSpillID(this->CurrSpillID);
 					++this->EvtSpillCounter[this->CurrSpillID%this->NUMCONCURRENTSPILLS];
+					if( this->CurrHeaderLength < 4 ){
+						this->console->error("FOUND INVALID LENGTH HEADER IN PIXIE DATA, DECODED HEADER LENGTH : {}",this->CurrHeaderLength);
+						bad_spill = true;
+					}
+
+
 				}
 				nWords_read += lenrec;
 			}
