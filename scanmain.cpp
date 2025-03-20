@@ -65,6 +65,13 @@ int main(int argc, char *argv[]) {
 	int limit;
 	std::string dataformat;
 	
+	int MAX_CRATES = 2;
+	int MAX_CARDS_PER_CRATE = 13;
+	int MAX_CHANNELS_PER_BOARD = 16;
+	int MAX_CAL_PARAMS_PER_CHANNEL = 4;
+	int nthreads;
+	bool batchmode;
+
 	boost::program_options::options_description cmdline_options("Generic Options");
 	cmdline_options.add_options()
 		("help,h", "produce help message")
@@ -75,6 +82,11 @@ int main(int argc, char *argv[]) {
 		("limit,l",boost::program_options::value<int>(&limit)->default_value(10),"number of events to keep in history [0 -> current, 1 -> prev., ... N-1]")
 		("format,x",boost::program_options::value<std::string>(&dataformat)->default_value("null"),"[file_format] format of the data file (evt,evt-presort,ldf,pacman_ldf,pld,caen_root,caen_bin)")
 		("port,p",boost::program_options::value<int>(&port)->default_value(9090),"[portid] port to listen/send on for the live histogramming, -1 disables for batch scanning")
+		("max_crates,i",boost::program_options::value<int>(&MAX_CRATES)->default_value(1),"[MAX_CRATES] Number of crates to expect in data stream")
+		("max_slots,j",boost::program_options::value<int>(&MAX_CARDS_PER_CRATE)->default_value(13),"[MAX_CARDS_PER_CRATE] Number of cards per crate to expect in data stream")
+		("max_channels,k",boost::program_options::value<int>(&MAX_CHANNELS_PER_BOARD)->default_value(16),"[MAX_CHANNELS_PER_BOARD] Number of channels per board to expect in data stream")
+		("numthreads,n",boost::program_options::value<int>(&nthreads)->default_value(std::thread::hardware_concurrency()/2),"[numthreads] Number of threads to use for batch scanning, requires batchmode == true")
+		("batchmode,b",boost::program_options::value<bool>(&batchmode)->default_value(false),"[batchmode] given a list of files, scan them individually across numthreads threads, and merge back into a single file at the end. NOTE: CROSS FILE CORRELATIONS WILL NOT OCCUR, DO NOT USE IF HALF-LIVES ARE ON ORDER OF FILE BOUNDARY")
 		;
 
 
@@ -101,12 +113,23 @@ int main(int argc, char *argv[]) {
 		exit(EXIT_FAILURE);
 	}	
 
-	const int MAX_CRATES = 2;
-	const int MAX_CARDS_PER_CRATE = 13;
-	const int MAX_BOARDS = MAX_CARDS_PER_CRATE*MAX_CRATES;
-	const int MAX_CHANNELS_PER_BOARD = 16;
-	const int MAX_CHANNELS = MAX_CHANNELS_PER_BOARD*MAX_BOARDS;
-	const int MAX_CAL_PARAMS_PER_CHANNEL = 4;
+	if( MAX_CRATES < 1 ){
+		spdlog::error("Can't have fewer than 1 crate, supplied with {} max_crates option",MAX_CRATES);
+		exit(EXIT_FAILURE);
+	}
+
+	if( MAX_CARDS_PER_CRATE < 1 or MAX_CARDS_PER_CRATE > 13 ){
+		spdlog::error("Can't have fewer than 1 card per crate or more than 13 cards per crate, supplied with {} max_slots option",MAX_CARDS_PER_CRATE);
+		exit(EXIT_FAILURE);
+	}
+
+	if( MAX_CHANNELS_PER_BOARD != 16 and MAX_CHANNELS_PER_BOARD != 32 and MAX_CHANNELS_PER_BOARD != 8 and MAX_CHANNELS_PER_BOARD != 4 and MAX_CHANNELS_PER_BOARD != 64 ){
+		spdlog::error("Can only have either 4, 8, 16, 32, or 64 channels per board, supplied with {} max_channels option",MAX_CHANNELS_PER_BOARD);
+		exit(EXIT_FAILURE);
+	}
+	
+	int MAX_BOARDS = MAX_CARDS_PER_CRATE*MAX_CRATES;
+	int MAX_CHANNELS = MAX_CHANNELS_PER_BOARD*MAX_BOARDS;
 
 	const std::string logfilename = (outputfile)+".log";
 	const std::string errfilename = (outputfile)+".err";
@@ -281,7 +304,7 @@ int main(int argc, char *argv[]) {
 	console->info("Created Statistics Manager");
 
 	std::thread plotter(&PLOTS::PlotRegistry::HandleSocketHelper,HistogramManager.get());
-	if( port <= 0 ){ 
+	if( port <= 0 or batchmode ){ 
 		HistogramManager->KillListen();
 		plotter.join();
 	}
@@ -335,7 +358,7 @@ int main(int argc, char *argv[]) {
 		console->error(e.what());
 	}
 	
-	if( port > 0 ){ 
+	if( port > 0 and not batchmode){ 
 		HistogramManager->KillListen();
 		plotter.join();
 	}
