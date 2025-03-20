@@ -9,6 +9,7 @@
 	<Global EventWidth="500" EventWidthUnit="ns" CorrelationType="rolling-trigger" />
 	<DetectorDriver>
 		<Processor name="MtasImplantProcessor" yso_thresh_hg="50.0" yso_thresh_lg="50.0"/>
+		<Processor name="MtasProcessor" diagnostic="false" />
 	</DetectorDriver>
 	<Map>
 		<Crate number="0">
