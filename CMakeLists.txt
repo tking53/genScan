@@ -348,6 +348,7 @@ add_subdirectory(utility)
 add_subdirectory(processors)
 add_subdirectory(core)
 add_subdirectory(translators)
+add_subdirectory(fitters)
 
 target_include_directories(PROCESSOR_LIB PUBLIC core/include)
 
@@ -366,7 +367,7 @@ target_link_libraries(GenDev PRIVATE pugixml UTILITY_LIB ${ROOT_LIBRARIES})
 
 add_executable(GenFit fitmain.cpp)
 add_dependencies(GenFit ${EXTERNAL_DEPS})
-target_link_libraries(GenFit PRIVATE Eigen3::Eigen GSL::gsl GSL::gslcblas pugixml UTILITY_LIB ${ROOT_LIBRARIES})
+target_link_libraries(GenFit PRIVATE Eigen3::Eigen GSL::gsl GSL::gslcblas pugixml FITTERS_LIB UTILITY_LIB ${ROOT_LIBRARIES})
 
 add_executable(GenWavelet waveletmain.cpp)
 add_dependencies(GenWavelet ${EXTERNAL_DEPS})
