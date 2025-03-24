@@ -27,7 +27,9 @@ class PidProcessor : public Processor{
 	ProcessorStruct::FP fp1;
 	ProcessorStruct::FP fp2;
 	double currRF;
-	
+
+
+	void FillStruct(PhysicsData* data, ProcessorStruct::PidDet &det);
 
 	enum DETPOSITION{
 		UP,
@@ -51,7 +53,10 @@ class PidProcessor : public Processor{
 		SCINT,
 		PPAC0,
 		PPAC1,
-		PIN,
+		PIN1,
+		PIN2,
+		PIN3,
+		PIN4,
 		RF
 	};
 
