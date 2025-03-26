@@ -11,11 +11,11 @@ proc ModulesHelp {} {
 }
 module-whatis "GenScan provides utilities for a variety of file types and Acquisition systems"
 
-set topdir 	@CMAKE_BINARY_DIR@
+set topdir 	@CMAKE_INSTALL_PREFIX@
 
 setenv GENSCANSYS $topdir
 prepend-path PATH	$topdir/bin
+prepend-path PATH 	$topdir/scripts
 prepend-path LD_LIBRARY_PATH	$topdir/lib
-prepend-path LD_LIBRARY_PATH	$topdir/processors
 prepend-path CPLUS_INCLUDE_PATH	$topdir/include
 prepend-path LIBRARY_PATH	$topdir/lib

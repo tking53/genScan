@@ -1,9 +1,7 @@
 file(GLOB src_files ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 
-add_library(UTILITY_LIB ${src_files})
-target_include_directories(UTILITY_LIB PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+add_library(GenScanUtility ${src_files})
+target_include_directories(GenScanUtility PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-#Configure and install the module file
-configure_file("modulefiles/genScan" genScan @ONLY)
-# install(FILES ${CMAKE_CURRENT_BINARY_DIR}/pixieSuite DESTINATION share/modulefiles/)
-
+install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_PREFIX})
+install(TARGETS GenScanUtility DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)

@@ -1,5 +1,3 @@
-# @authors S.V. Paulauskas, K. Smith, and C. Thronsberry
-
 cmake_minimum_required(VERSION 3.1)
 
 project(GENSCAN C CXX )
@@ -202,7 +200,7 @@ option(USE_SYSTEM_PUGIXML "Use the system installed pugixml, if not then we will
 if( USE_SYSTEM_PUGIXML )
 	find_package(Pugixml REQUIRED)
 else()
-	set(PUGI_EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external/pugi)
+	set(PUGI_EXTERNAL_INSTALL_LOCATION ${CMAKE_INSTALL_PREFIX}/external/pugi)
 	set(PUGI_VERSION v1.13 CACHE STRING "Version of pugixml you want to get from git" )
 	mark_as_advanced(PUGI_VERSION)
 	ExternalProject_Add(PugixmlProject
@@ -224,7 +222,7 @@ option(USE_SYSTEM_YAMLCPP "Use the system installed yaml-cpp, if not then we wil
 if( USE_SYSTEM_YAMLCPP )
 	find_package(yaml-cpp REQUIRED)
 else()
-	set(YAML_EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external/yaml-cpp)
+	set(YAML_EXTERNAL_INSTALL_LOCATION ${CMAKE_INSTALL_PREFIX}/external/yaml-cpp)
 	set(YAML_VERSION 0.8.0 CACHE STRING "Version of yaml-cpp you want to get from git" )
 	mark_as_advanced(YAML_VERSION)
 	ExternalProject_Add(yaml-cppProject
@@ -246,7 +244,7 @@ option(USE_SYSTEM_JSONCPP "Use the system installed jsoncpp, if not then we will
 if( USE_SYSTEM_JSONCPP )
 	find_package(jsoncpp REQUIRED)
 else()
-	set(JSON_EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external/jsoncpp)
+	set(JSON_EXTERNAL_INSTALL_LOCATION ${CMAKE_INSTALL_PREFIX}/external/jsoncpp)
 	set(JSON_VERSION 1.9.5 CACHE STRING "Version of jsoncpp you want to get from git" )
 	mark_as_advanced(JSON_VERSION)
 	ExternalProject_Add(jsoncppProject
@@ -269,7 +267,7 @@ if( USE_SYSTEM_FMT )
 	find_package(fmt REQUIRED)
 	set(_FMT_NAME fmt)
 else()
-	set(FMT_EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external/fmt)
+	set(FMT_EXTERNAL_INSTALL_LOCATION ${CMAKE_INSTALL_PREFIX}/external/fmt)
 	set(FMT_VERSION 8.1.1 CACHE STRING "Version of fmt you want to get from git" )
 	mark_as_advanced(FMT_VERSION)
 	set(_FMT_NAME fmtProject)
@@ -291,7 +289,7 @@ option(USE_SYSTEM_SPDLOG "Use either spdlog or grab it from github" OFF)
 if( USE_SYSTEM_SPDLOG )
 	find_package(spdlog REQUIRED)
 else()
-	set(SPDLOG_EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external/spdlog)
+	set(SPDLOG_EXTERNAL_INSTALL_LOCATION ${CMAKE_INSTALL_PREFIX}/external/spdlog)
 	set(SPDLOG_VERSION v1.9.2 CACHE STRING "Version of spdlog you want to get from git" )
 	mark_as_advanced(SPDLOG_VERSION)
 	ExternalProject_Add(spdlogProject
@@ -319,7 +317,7 @@ if( USE_SYSTEM_BOOST )
 		message(FATAL_ERROR "System Boost not found.")
 	endif()
 else()
-	set(BOOST_EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external/boost)
+	set(BOOST_EXTERNAL_INSTALL_LOCATION ${CMAKE_INSTALL_PREFIX}/external/boost)
 	set(BOOST_VERSION boost-1.84.0 CACHE STRING "Version of boost you want to get from git" )
 	mark_as_advanced(BOOST_VERSION)
 	ExternalProject_Add(boostProject
@@ -339,9 +337,11 @@ else()
 	list(APPEND EXTERNAL_CORE_DEPS boostProject)
 endif()
 
-option(USE_SYSTEM_GSL "Use either system gsl or grab from github" ON)
 #TODO: FINISH LATER
+option(USE_SYSTEM_GSL "Use either system gsl or grab from github" ON)
 find_package(GSL REQUIRED)
+
+option(USE_SYSTEM_EIGEN "Use either system eigen or grab from github" ON)
 find_package(Eigen3 REQUIRED)
 
 add_subdirectory(utility)
@@ -350,28 +350,32 @@ add_subdirectory(core)
 add_subdirectory(translators)
 add_subdirectory(fitters)
 
-target_include_directories(PROCESSOR_LIB PUBLIC core/include)
+target_include_directories(GenScanProcessors PUBLIC core/include)
 
 add_executable(GenScanor scanmain.cpp)
 add_dependencies(GenScanor ${EXTERNAL_DEPS})
-target_link_libraries(GenScanor PRIVATE BSMTraceFitStruct MtasImplantStruct MtasStruct PidStruct RootDevStruct TRANSLATOR_LIB CORE_LIB )
-#target_link_libraries(GenScanor PRIVATE BSMTraceFitStruct MtasImplantStruct MtasStruct PidStruct RootDevStruct TRANSLATOR_LIB PROCESSOR_LIB CORE_LIB UTILITY_LIB ${ROOT_LIBRARIES})
+target_link_libraries(GenScanor PRIVATE BSMTraceFitStruct MtasImplantStruct MtasStruct PidStruct RootDevStruct GenScanFitters GenScanTranslators GenScanCore )
+list(APPEND EXE_LIST GenScanor)
 
 add_executable(GenConfig configmain.cpp)
 add_dependencies(GenConfig ${EXTERNAL_DEPS})
-target_link_libraries(GenConfig PRIVATE pugixml UTILITY_LIB ${ROOT_LIBRARIES})
+target_link_libraries(GenConfig PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES})
+list(APPEND EXE_LIST GenConfig)
 
 add_executable(GenDev devmain.cpp)
 add_dependencies(GenDev ${EXTERNAL_DEPS})
-target_link_libraries(GenDev PRIVATE pugixml UTILITY_LIB ${ROOT_LIBRARIES})
+target_link_libraries(GenDev PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES})
+list(APPEND EXE_LIST GenDev)
 
 add_executable(GenFit fitmain.cpp)
 add_dependencies(GenFit ${EXTERNAL_DEPS})
-target_link_libraries(GenFit PRIVATE Eigen3::Eigen GSL::gsl GSL::gslcblas pugixml FITTERS_LIB UTILITY_LIB ${ROOT_LIBRARIES})
+target_link_libraries(GenFit PRIVATE Eigen3::Eigen GSL::gsl GSL::gslcblas pugixml GenScanFitters GenScanUtility ${ROOT_LIBRARIES})
+list(APPEND EXE_LIST GenFit)
 
 add_executable(GenWavelet waveletmain.cpp)
 add_dependencies(GenWavelet ${EXTERNAL_DEPS})
-target_link_libraries(GenWavelet PRIVATE GSL::gsl GSL::gslcblas pugixml UTILITY_LIB ${ROOT_LIBRARIES})
+target_link_libraries(GenWavelet PRIVATE GSL::gsl GSL::gslcblas pugixml GenScanUtility ${ROOT_LIBRARIES})
+list(APPEND EXE_LIST GenWavelet)
 
 if( USE_SYSTEM_FMT )
 	target_link_libraries(GenScanor PRIVATE fmt::fmt)
@@ -423,3 +427,9 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInf
 	target_compile_definitions(GenWavelet PRIVATE DEBUG_MODE)
 endif()
 
+install(TARGETS ${EXE_LIST} DESTINATION bin)
+install(DIRECTORY scripts DESTINATION ${CMAKE_INSTALL_PREFIX})
+
+#Configure and install the module file
+configure_file("modulefiles/genScan" modulefiles/genScan @ONLY)
+install(DIRECTORY ${CMAKE_BINARY_DIR}/modulefiles  DESTINATION ${CMAKE_INSTALL_PREFIX})
