@@ -179,33 +179,37 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 			hismanager->Fill(pkmaxerghis,evt->GetRawEnergyWRandom(),pk.first);
 
 			if( isfront ){
-				this->fronttracefitvalues.constant = evt->GetTraceFitValue("Constant").first;
-				if( evt->DoesTraceFitValueExist("SinAmp") ){
-					this->fronttracefitvalues.sinamp = evt->GetTraceFitValue("SinAmp").first;
-					this->fronttracefitvalues.sinphase = evt->GetTraceFitValue("SinPhase").first;
-					this->fronttracefitvalues.sinfreq = evt->GetTraceFitValue("SinFreq").first;
+				if( evt->DoesTraceFitValueExist("Constant") ){
+					this->fronttracefitvalues.constant = evt->GetTraceFitValue("Constant").first;
+					if( evt->DoesTraceFitValueExist("SinAmp") ){
+						this->fronttracefitvalues.sinamp = evt->GetTraceFitValue("SinAmp").first;
+						this->fronttracefitvalues.sinphase = evt->GetTraceFitValue("SinPhase").first;
+						this->fronttracefitvalues.sinfreq = evt->GetTraceFitValue("SinFreq").first;
+					}
+					this->fronttracefitvalues.pulseamp = evt->GetTraceFitValue("PulseAmp").first;
+					this->fronttracefitvalues.pulsedelay = evt->GetTraceFitValue("PulseDelay").first;
+					this->fronttracefitvalues.pulserise = evt->GetTraceFitValue("PulseRise").first;
+					this->fronttracefitvalues.pulsedecay = evt->GetTraceFitValue("PulseDecay").first;
+					this->fronttracefitvalues.chi2 = evt->GetTraceFitValue("Chi2/NDF").first;
+					this->fronttracefitvalues.ndf = evt->GetTraceFitValue("Chi2/NDF").second;
 				}
-				this->fronttracefitvalues.pulseamp = evt->GetTraceFitValue("PulseAmp").first;
-				this->fronttracefitvalues.pulsedelay = evt->GetTraceFitValue("PulseDelay").first;
-				this->fronttracefitvalues.pulserise = evt->GetTraceFitValue("PulseRise").first;
-				this->fronttracefitvalues.pulsedecay = evt->GetTraceFitValue("PulseDecay").first;
-				this->fronttracefitvalues.chi2 = evt->GetTraceFitValue("Chi2/NDF").first;
-				this->fronttracefitvalues.ndf = evt->GetTraceFitValue("Chi2/NDF").second;
 				this->fronttracefitvalues.energy = evt->GetRawEnergyWRandom();
 				this->fronttracefitvalues.timestamp = evt->GetTimeStamp();
 			}else{
-				this->backtracefitvalues.constant = evt->GetTraceFitValue("Constant").first;
-				if( evt->DoesTraceFitValueExist("SinAmp") ){
-					this->backtracefitvalues.sinamp = evt->GetTraceFitValue("SinAmp").first;
-					this->backtracefitvalues.sinphase = evt->GetTraceFitValue("SinPhase").first;
-					this->backtracefitvalues.sinfreq = evt->GetTraceFitValue("SinFreq").first;
+				if( evt->DoesTraceFitValueExist("Constant") ){
+					this->backtracefitvalues.constant = evt->GetTraceFitValue("Constant").first;
+					if( evt->DoesTraceFitValueExist("SinAmp") ){
+						this->backtracefitvalues.sinamp = evt->GetTraceFitValue("SinAmp").first;
+						this->backtracefitvalues.sinphase = evt->GetTraceFitValue("SinPhase").first;
+						this->backtracefitvalues.sinfreq = evt->GetTraceFitValue("SinFreq").first;
+					}
+					this->backtracefitvalues.pulseamp = evt->GetTraceFitValue("PulseAmp").first;
+					this->backtracefitvalues.pulsedelay = evt->GetTraceFitValue("PulseDelay").first;
+					this->backtracefitvalues.pulserise = evt->GetTraceFitValue("PulseRise").first;
+					this->backtracefitvalues.pulsedecay = evt->GetTraceFitValue("PulseDecay").first;
+					this->backtracefitvalues.chi2 = evt->GetTraceFitValue("Chi2/NDF").first;
+					this->backtracefitvalues.ndf = evt->GetTraceFitValue("Chi2/NDF").second;
 				}
-				this->backtracefitvalues.pulseamp = evt->GetTraceFitValue("PulseAmp").first;
-				this->backtracefitvalues.pulsedelay = evt->GetTraceFitValue("PulseDelay").first;
-				this->backtracefitvalues.pulserise = evt->GetTraceFitValue("PulseRise").first;
-				this->backtracefitvalues.pulsedecay = evt->GetTraceFitValue("PulseDecay").first;
-				this->backtracefitvalues.chi2 = evt->GetTraceFitValue("Chi2/NDF").first;
-				this->backtracefitvalues.ndf = evt->GetTraceFitValue("Chi2/NDF").second;
 				this->backtracefitvalues.energy = evt->GetRawEnergyWRandom();
 				this->backtracefitvalues.timestamp = evt->GetTimeStamp();
 			}

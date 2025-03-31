@@ -169,14 +169,14 @@ class NonLinearLeastSquaresFitter{
 			return this->ndf;
 		}
 
-		Eigen::LevenbergMarquardt<T,double>::JacobianType Covariance(){
+		typename Eigen::LevenbergMarquardt<T,double>::JacobianType Covariance(){
 			if( not this->CalcCov ){
 				this->InternalCalcCov();
 			}
 			return this->cov;
 		}
 
-		Eigen::LevenbergMarquardt<T,double>::JacobianType Correlation(){
+		typename Eigen::LevenbergMarquardt<T,double>::JacobianType Correlation(){
 			if( not this->CalcCov ){
 				this->InternalCalcCov();
 			}
@@ -200,8 +200,8 @@ class NonLinearLeastSquaresFitter{
 		double ndf;
 		bool CalcCov;
 		bool CalcCor;
-		Eigen::LevenbergMarquardt<T,double>::JacobianType cov;
-		Eigen::LevenbergMarquardt<T,double>::JacobianType cor;
+		typename Eigen::LevenbergMarquardt<T,double>::JacobianType cov;
+		typename Eigen::LevenbergMarquardt<T,double>::JacobianType cor;
 
 		void InternalCalcCov(){
 			Eigen::internal::covar(this->LMFit.fjac,this->LMFit.permutation.indices());
