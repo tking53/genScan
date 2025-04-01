@@ -344,6 +344,8 @@ find_package(GSL REQUIRED)
 option(USE_SYSTEM_EIGEN "Use either system eigen or grab from github" ON)
 find_package(Eigen3 REQUIRED)
 
+find_package(Python3)
+
 add_subdirectory(utility)
 add_subdirectory(processors)
 add_subdirectory(core)
@@ -428,7 +430,10 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInf
 endif()
 
 install(TARGETS ${EXE_LIST} DESTINATION bin)
-install(DIRECTORY scripts DESTINATION ${CMAKE_INSTALL_PREFIX})
+file(GLOB script_files ${CMAKE_CURRENT_SOURCE_DIR}/scripts/*.cxx)
+install(FILES ${script_files} DESTINATION scripts)
+configure_file("scripts/ParScan.py" scripts/ParScan @ONLY)
+install(PROGRAMS ${CMAKE_BINARY_DIR}/scripts/ParScan DESTINATION scripts)
 
 #Configure and install the module file
 configure_file("modulefiles/genScan" modulefiles/genScan @ONLY)

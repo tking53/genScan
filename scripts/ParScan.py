@@ -1,4 +1,4 @@
-#!/opt/homebrew/bin/python3
+#!@Python3_EXECUTABLE@
 import concurrent.futures
 import subprocess
 import threading
