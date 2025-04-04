@@ -1,8 +1,28 @@
-#include <TMath.h>
-
 #include "PulseFitFunctions.hpp"
 
+#include <TMath.h>
+#include <cmath>
+
 namespace PulseFit{
+	double Sin(double t,double a,double p,double f){
+		return a*std::sin(f*(t+p));
+	}
+
+	double TraceFunc(double t,double a,double d,double r,double f){
+		return a*((1.0/(std::exp(-(t-d)/r)+1.0))*(1.0/(std::exp((t-d)/f)+1.0)));
+	}
+
+	double sintracefunc(double t,double c,double sa,double sp,double sf,double pa,double pd,double pr,double pf){
+		double SinVal = Sin(t,sa,sp,sf);
+		double PulseVal = TraceFunc(t,pa,pd,pr,pf);
+		return c + SinVal + PulseVal;
+	}
+
+	double tracefunc(double t,double c,double pa,double pd,double pr,double pf){
+		double PulseVal = TraceFunc(t,pa,pd,pr,pf);
+		return c + PulseVal;
+	}
+
 	double Constant(double* x,double* par){
 		return par[0];
 	}
@@ -26,14 +46,21 @@ namespace PulseFit{
 		return amp*TMath::Sin(freq*(x[0]+phase));
 	}
 
+	double SingleTraceFit(double* x,double* par){
+		double c = PulseFit::Constant(x,par);
+		double pulse = PulseFit::Pulse(x,par+1);
+		return c + pulse;
+	}
+
 	double BSMSingleTraceFit(double* x,double* par){
 		double c = PulseFit::Constant(x,par);
-		double sine = PulseFit::Sin(x,par+1);
-		double pulse = PulseFit::Pulse(x,par+4);
+		double pulse = PulseFit::Pulse(x,par+1);
+		double sine = PulseFit::Sin(x,par+5);
 		return c + sine + pulse;
 	}
 
 	double BSMDoubleTraceFit(double* x,double* par){
 		return PulseFit::Constant(x,par)+PulseFit::Sin(x,par+1)+PulseFit::Pulse(x,par+3)+PulseFit::Pulse(x,par+7);
 	}
+
 }

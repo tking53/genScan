@@ -356,7 +356,7 @@ target_include_directories(GenScanProcessors PUBLIC core/include)
 
 add_executable(GenScanor scanmain.cpp)
 add_dependencies(GenScanor ${EXTERNAL_DEPS})
-target_link_libraries(GenScanor PRIVATE BSMTraceFitStruct MtasImplantStruct MtasStruct PidStruct RootDevStruct GenScanFitters GenScanTranslators GenScanCore )
+target_link_libraries(GenScanor PRIVATE BSMTraceFitStruct MtasImplantStruct MtasStruct PidStruct RootDevStruct GenScanTranslators GenScanCore )
 list(APPEND EXE_LIST GenScanor)
 
 add_executable(GenConfig configmain.cpp)

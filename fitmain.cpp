@@ -15,6 +15,7 @@
 
 #include <boost/program_options.hpp>
 
+#include "TraceFitFunctors.hpp"
 #include "NonLinearLeastSquaresFitter.hpp"
 
 int main(int argc, char *argv[]) {
@@ -118,7 +119,7 @@ int main(int argc, char *argv[]) {
 			auto y = traceyvals[ii];
 			out << x << ' ' 
 			    << y << ' ' 
-			    << sintracefunc(x,init_guess(0),init_guess(1),init_guess(2),init_guess(3),init_guess(4),init_guess(5),init_guess(6),init_guess(7)) 
+			    << PulseFit::sintracefunc(x,init_guess(0),init_guess(1),init_guess(2),init_guess(3),init_guess(4),init_guess(5),init_guess(6),init_guess(7)) 
 			    << std::endl;
 		}
 		out.close();
@@ -166,7 +167,7 @@ int main(int argc, char *argv[]) {
 			auto y = traceyvals[ii];
 			out << x << ' ' 
 			    << y << ' ' 
-			    << tracefunc(x,init_guess(0),init_guess(1),init_guess(2),init_guess(3),init_guess(4)) 
+			    << PulseFit::tracefunc(x,init_guess(0),init_guess(1),init_guess(2),init_guess(3),init_guess(4)) 
 			    << std::endl;
 		}
 		out.close();
