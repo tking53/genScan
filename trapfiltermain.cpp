@@ -1,6 +1,5 @@
 #include <cstdlib>
 #include <iostream>
-#include <numeric>
 #include <vector>
 #include <fstream>
 
@@ -12,25 +11,28 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 #include <boost/program_options.hpp>
-#include <boost/circular_buffer.hpp>
+
+#include "TrapezoidFilter.hpp"
 
 int main(int argc, char *argv[]) {
 	std::string inputfile = "trace.txt";
 	std::string outputfile = "fit.txt";
-	double tau = 0.0;
+	float tau = 0.0;
 	int l = 0;
 	int g = 0;
 	int blen = 0;
+	int nval = 1;
 
 	boost::program_options::options_description cmdline_options("Generic Options");
 	cmdline_options.add_options()
 		("help,h", "produce help message")
 		("inputfile,i",boost::program_options::value<std::string>(&inputfile)->default_value("trace.txt"),"file to read the trace data in formatted as x y_i")
 		("outputfile,o",boost::program_options::value<std::string>(&outputfile)->default_value("trap.txt"),"file to write the trace trapezoid in formatted as x y_i t_i")
-		("tau,t",boost::program_options::value<double>(&tau)->default_value(1.0),"tau value used for pole zero correction if <= 0.0 no pole zero performed")
+		("tau,t",boost::program_options::value<float>(&tau)->default_value(1.0),"tau value used for pole zero correction if <= 0.0 no pole zero performed")
 		("length,l",boost::program_options::value<int>(&l)->default_value(1),"length of filter in samples")
 		("gap,g",boost::program_options::value<int>(&g)->default_value(0),"gap of filter in samples")
 		("baseline,b",boost::program_options::value<int>(&blen)->default_value(0),"length of region in samples to use for baseline")
+		("numeval,n",boost::program_options::value<int>(&nval)->default_value(1),"number of times to run filter for timing purposes")
 		;
 
 	boost::program_options::positional_options_description pos;
@@ -58,9 +60,9 @@ int main(int argc, char *argv[]) {
 		exit(EXIT_FAILURE);
 	}
 
-	double currx,curry;
-	std::vector<double> tracexvals;
-	std::vector<double> traceyvals;
+	float currx,curry;
+	std::vector<float> tracexvals;
+	std::vector<float> traceyvals;
 	std::ifstream input(inputfile);
 	while( input >> currx >> curry ){
 		tracexvals.push_back(currx);
@@ -78,41 +80,21 @@ int main(int argc, char *argv[]) {
 		exit(EXIT_FAILURE);
 	}
 
-	std::vector<double> bltrace(traceyvals);
-	double bline = std::accumulate(traceyvals.begin(),traceyvals.begin()+blen,0.0)/static_cast<double>(blen);
-	for( auto& v : bltrace ){
-		v -= bline;
+	TrapFilter filter(l,g,blen,tau);
+
+	auto start_time = std::chrono::high_resolution_clock::now();
+	for( int ii = 0; ii < nval; ++ii ){
+		auto erg = filter.RunFilter(traceyvals);
 	}
-
-	std::vector<double> pz(bltrace);
-	if( tau > 0.0 ){
-		for( size_t ii = 1; ii < pz.size(); ++ii ){
-			pz[ii] = pz[ii - 1] + bltrace[ii] - bltrace[ii-1] + bltrace[ii-1]/tau;
-		}
-	}
-	std::vector<double> trap(pz.size(),0.0);	
-
-	boost::circular_buffer<double> f(pz.begin()+l+g,pz.begin()+2*l+g);
-	double fsum = std::accumulate(f.begin(),f.end(),0.0);
-
-	boost::circular_buffer<double> b(pz.begin(),pz.begin()+l);
-	double bsum = std::accumulate(b.begin(),b.end(),0.0);
-
-	trap[l] = fsum - bsum;
-	for( size_t ii = 0; ii < pz.size()-(2*l+g); ++ii ){
-		bsum -= b.front();
-		b.push_back(pz[ii+l]);
-		bsum += b.back();
-
-		fsum -= f.front();
-		f.push_back(pz[ii+2*l+g]);
-		fsum += f.back();
-		trap[ii+l+1] = fsum - bsum;
-	}
+	auto stop_time = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double,std::milli> dur = (stop_time - start_time);
+	auto erg = filter.RunFilter(traceyvals);
+	spdlog::info("Time to run filter {} times : {} ms",nval,dur.count());
+	spdlog::info("Energy : {}",erg);
 
 	std::ofstream out(outputfile);
 	for( size_t ii = 0; ii < tracexvals.size(); ++ii ){
-		out << tracexvals[ii] << ' ' << traceyvals[ii] << ' ' << bltrace[ii] << ' ' << pz[ii] << ' ' << trap[ii] << std::endl;
+		out << tracexvals[ii] << ' ' << traceyvals[ii] << ' ' << filter.bltrace[ii] << ' ' << filter.pz[ii] << ' ' << filter.trap[ii] << std::endl;
 	}
 	out.close();
 
