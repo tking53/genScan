@@ -1,10 +1,7 @@
-#include <gsl/gsl_cblas.h>
-#include <gsl/gsl_matrix_double.h>
 #include <iostream>
 #include <chrono>
 #include <vector>
 #include <fstream>
-#include <tuple>
 
 #include <spdlog/common.h>
 #include <spdlog/spdlog.h>

@@ -178,7 +178,7 @@ INLINE_INHERITED_MEMB  = NO
 # shortest path that makes the file name unique will be used
 # The default value is: YES.
 
-FULL_PATH_NAMES        = YES
+FULL_PATH_NAMES        = NO
 
 # The STRIP_FROM_PATH tag can be used to strip a user-defined part of the path.
 # Stripping is only done if one of the specified strings matches the left-hand
@@ -860,7 +860,7 @@ EXTERNAL_TOOL_PATH     =
 # messages are off.
 # The default value is: NO.
 
-QUIET                  = NO
+QUIET                  = @BUILD_DOCS_QUIET@
 
 # The WARNINGS tag can be used to turn on/off the warning messages that are
 # generated to standard error (stderr) by Doxygen. If WARNINGS is set to YES
@@ -967,17 +967,20 @@ WARN_LOGFILE           =
 # spaces. See also FILE_PATTERNS and EXTENSION_MAPPING
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  =  ../core/src \
-                          ../core/include \
-                          ../translators/src \
-                          ../translators/include \
-                          ../processors/src \
-                          ../processors/include \
-                          ../utility/src \
-                          ../utility/include \
-			  ../scanmain.cpp \
-			  ../configmain.cpp \
-			  ../spy.cxx 
+#INPUT                  =  ../core/src \
+#                          ../core/include \
+#                          ../translators/src \
+#                          ../translators/include \
+#                          ../processors/src \
+#                          ../processors/include \
+#                          ../utility/src \
+#                          ../utility/include \
+#                          ../fitters/src \
+#                          ../fitters/include \
+#			  ../scripts/ \
+#			  ../scanmain.cpp \
+#			  ../configmain.cpp 
+INPUT                   =  @ALL_DOC_HEADERS@ @ALL_DOC_SRC@
 
 # This tag can be used to specify the character encoding of the source files
 # that Doxygen parses. Internally Doxygen uses the UTF-8 encoding. Doxygen uses
@@ -1990,7 +1993,7 @@ EXTRA_SEARCH_MAPPINGS  =
 # If the GENERATE_LATEX tag is set to YES, Doxygen will generate LaTeX output.
 # The default value is: YES.
 
-GENERATE_LATEX         = YES
+GENERATE_LATEX         = @BUILD_DOCS_LATEX@
 
 # The LATEX_OUTPUT tag is used to specify where the LaTeX docs will be put. If a
 # relative path is entered the value of OUTPUT_DIRECTORY will be put in front of

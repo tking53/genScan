@@ -338,19 +338,28 @@ else()
 endif()
 
 #TODO: FINISH LATER
-option(USE_SYSTEM_GSL "Use either system gsl or grab from github" ON)
-find_package(GSL REQUIRED)
-
 option(USE_SYSTEM_EIGEN "Use either system eigen or grab from github" ON)
 find_package(Eigen3 REQUIRED)
 
 find_package(Python3)
+find_package(Doxygen)
+
+file(GLOB ALL_DOC_SRC ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 
 add_subdirectory(utility)
 add_subdirectory(processors)
 add_subdirectory(core)
 add_subdirectory(translators)
 add_subdirectory(fitters)
+
+#MUST BE LAST
+if(DOXYGEN_FOUND)
+	add_subdirectory(docs)
+	message(STATUS "Found Doxygen, building documentation")
+else()
+	message(STATUS "Doxygen not found, not creating documentation")
+endif()
+
 
 target_include_directories(GenScanProcessors PUBLIC core/include)
 
@@ -371,7 +380,7 @@ list(APPEND EXE_LIST GenDev)
 
 add_executable(GenFit fitmain.cpp)
 add_dependencies(GenFit ${EXTERNAL_DEPS})
-target_link_libraries(GenFit PRIVATE Eigen3::Eigen GSL::gsl GSL::gslcblas pugixml GenScanFitters GenScanUtility ${ROOT_LIBRARIES})
+target_link_libraries(GenFit PRIVATE Eigen3::Eigen pugixml GenScanFitters GenScanUtility ${ROOT_LIBRARIES})
 list(APPEND EXE_LIST GenFit)
 
 add_executable(GenTrapFilter trapfiltermain.cpp)
