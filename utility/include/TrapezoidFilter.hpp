@@ -6,7 +6,7 @@
 #include <boost/circular_buffer.hpp>
 
 template<class T>
-struct TrapFilter{
+struct TrapezoidFilter{
 	int l;
 	int g;
 	int blen;
@@ -18,13 +18,13 @@ struct TrapFilter{
 	boost::circular_buffer<T> f;
 	boost::circular_buffer<T> b;
 
-	TrapFilter(int ll,int gg,int bb,T tt) : l(ll), g(gg), blen(bb), tau(tt){
+	TrapezoidFilter(int ll,int gg,int bb,T tt) : l(ll), g(gg), blen(bb), tau(tt){
 	}
-	~TrapFilter() = default;
-	TrapFilter(const TrapFilter&) = default;
-	TrapFilter(TrapFilter&&) = default;
-	TrapFilter& operator=(const TrapFilter&) = default;
-	TrapFilter& operator=(TrapFilter&&) = default;
+	~TrapezoidFilter() = default;
+	TrapezoidFilter(const TrapezoidFilter&) = default;
+	TrapezoidFilter(TrapezoidFilter&&) = default;
+	TrapezoidFilter& operator=(const TrapezoidFilter&) = default;
+	TrapezoidFilter& operator=(TrapezoidFilter&&) = default;
 
 	double RunFilter(const std::vector<T>& traceyvals){
 		bltrace = std::vector<T>(traceyvals);

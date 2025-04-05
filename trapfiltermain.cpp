@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
 		exit(EXIT_FAILURE);
 	}
 
-	TrapFilter filter(l,g,blen,tau);
+	TrapezoidFilter filter(l,g,blen,tau);
 
 	auto start_time = std::chrono::high_resolution_clock::now();
 	for( int ii = 0; ii < nval; ++ii ){
