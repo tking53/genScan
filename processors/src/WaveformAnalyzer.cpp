@@ -1,5 +1,5 @@
 #include "WaveformAnalyzer.hpp"
-#include "PulseFitFunctions.hpp"
+#include <stdexcept>
 
 WaveformAnalyzer::WaveformAnalyzer(const std::string& log) : Analyzer(log,"WaveformAnalyzer",{}){
 	this->h2dsettings = {
@@ -44,7 +44,7 @@ WaveformAnalyzer::~WaveformAnalyzer(){
 						//	auto post = std::get<1>(s.second.FractionalPSDBounds);
 						//	evt->CalcTraceFractionalPSD(pre,post,fraction);
 						//}
-						
+
 						auto mid = std::get<1>(s.second.FixedPSDBounds);
 						if( mid > 0 ){
 							auto begin = std::get<0>(s.second.FixedPSDBounds);
@@ -62,7 +62,7 @@ WaveformAnalyzer::~WaveformAnalyzer(){
 					hismanager->Fill("WAVE_1000",s.second.PreTriggerBounds.second,gcid);
 					hismanager->Fill("WAVE_1001",pre.first,gcid);
 					hismanager->Fill("WAVE_1002",pre.second,gcid);
-					
+
 					hismanager->Fill("WAVE_1010",s.second.PostTriggerBounds.first,gcid);
 					hismanager->Fill("WAVE_1010",s.second.PostTriggerBounds.second,gcid);
 					hismanager->Fill("WAVE_1011",post.first,gcid);
@@ -95,12 +95,12 @@ WaveformAnalyzer::~WaveformAnalyzer(){
 						auto value = std::get<4>(parinfo);
 						auto lbound = std::get<5>(parinfo);
 						auto ubound = std::get<6>(parinfo);
-						
+
 						s.second.fitfunc->SetParameter(idx,value);
 						if( isfixed ){
 							s.second.fitfunc->FixParameter(idx,value);
 						}
-						
+
 						if( isbounded ){
 							s.second.fitfunc->SetParLimits(idx,lbound,ubound);
 						}
@@ -165,7 +165,7 @@ void WaveformAnalyzer::Init(const Json::Value& config){
 
 void WaveformAnalyzer::Init(const pugi::xml_node& config){
 	console->info("Init called with pugi::xml_node");
-	
+
 	std::string additional_types = config.attribute("included_types").as_string(""); 
 	if( additional_types.empty() ){
 		this->console->error("Missing included_types tag in xml tag for WaveformAnalyzer");
@@ -179,69 +179,21 @@ void WaveformAnalyzer::Init(const pugi::xml_node& config){
 		auto re = this->GenerateRegex(settings.attribute("Crate").as_string("[\\d]"),settings.attribute("Module").as_string("[\\d]"),settings.attribute("Channel").as_string("[\\d]"));
 		this->console->info("Found settings node regex:{}",re.str());
 
-		this->WaveSettings.push_back(std::make_pair(re,WaveFormParams()));
-		this->WaveSettings.back().second.CalcDerivative = settings.attribute("CalcDerivative").as_bool(false);
-		this->ParsePreTrigger(settings,this->WaveSettings.back().second);
-		this->ParsePostTrigger(settings,this->WaveSettings.back().second);
-		this->ParseQDC(settings,this->WaveSettings.back().second);
-		this->ParsePSD(settings,this->WaveSettings.back().second);
-
+		try{
+			this->WaveSettings.push_back(std::make_pair(re,PSDCalculator(settings)));
+		}catch(std::runtime_error& e){
+			this->console->error("error parsing waveform settings for r:{} {}",re.str(),e.what());
+			throw e;
+		}
 		for( pugi::xml_node fitsettings = settings.child("FitSettings"); fitsettings; fitsettings = fitsettings.next_sibling("FitSettings") ){
 			this->console->info("Found trace settings for regex:{}",re.str());
 
-			this->TraceFitSettings.push_back(std::make_pair(re,TraceFitParams()));
-			std::string fitname = fitsettings.attribute("name").as_string("");
-			this->TraceFitSettings.back().second.FitFuncName = fitname;
-
-			double fitlowbound = fitsettings.attribute("min").as_double(0.0);
-			double fithighbound = fitsettings.attribute("max").as_double(0.0);
-			this->TraceFitSettings.back().second.FitRange = {fitlowbound,fithighbound};
-
-			for( pugi::xml_node fitparam = fitsettings.child("FitParam"); fitparam; fitparam = fitparam.next_sibling("FitParam") ){
-				int idx = fitparam.attribute("idx").as_int(-1);
-				double value = fitparam.attribute("value").as_double(0.0);
-				bool isbounded = fitparam.attribute("bounded").as_bool(false);
-				bool isfixed = fitparam.attribute("fixed").as_bool(false);
-				std::string parname = fitparam.attribute("name").as_string("");
-				if( isbounded ){
-					double lowbound = fitparam.attribute("min").as_double(0.0);
-					double highbound = fitparam.attribute("max").as_double(0.0);
-					if( lowbound >= highbound or value < lowbound or value > highbound ){
-						this->console->error("bounded value not between lowbound and highbound {} : [{},{},{}]",parname,lowbound,value,highbound);
-						throw "Bounded value not between lowbound and highbound";
-					}
-					this->TraceFitSettings.back().second.ParamInfo.push_back({idx,isbounded,isfixed,parname,value,lowbound,highbound});
-				}
-				if( isfixed ){
-					this->TraceFitSettings.back().second.ParamInfo.push_back({idx,isbounded,isfixed,parname,value,value,value});
-				}
-				if( idx < 0 ){
-					this->console->error("idx not assigned, need value greater than 0");
-					throw "idx not assigned to fit parameter";
-				}
-
-				if( isfixed and isbounded ){
-					this->console->error("value is set to both bounded and fixed {} : {}",parname,value);
-					throw "Value is set to both bounded and fixed";
-				}
+			try{
+				this->TraceFitSettings.push_back(std::make_pair(re,RootFitter(fitsettings)));
+			}catch(std::runtime_error& e){
+				this->console->error("error parsing trace fitting settings for r:{} {}",re.str(),e.what());
+				throw e;
 			}
-			std::sort(this->TraceFitSettings.back().second.ParamInfo.begin(),this->TraceFitSettings.back().second.ParamInfo.end(),[](const std::tuple<int,bool,bool,std::string,double,double,double>& a,const std::tuple<int,bool,bool,std::string,double,double,double>& b){ return std::get<0>(a) < std::get<0>(b); });
-
-			this->TraceFitSettings.back().second.fithist = nullptr;
-			this->TraceFitSettings.back().second.fitfunc = nullptr;
-			if( fitname.compare("BSMSingleTracePulse") == 0 ){
-				this->TraceFitSettings.back().second.fitfunc = new TF1(fitname.c_str(),PulseFit::BSMSingleTraceFit,fitlowbound,fithighbound,8);
-			}else if( fitname.compare("SingleTracePulse") == 0 ){
-				this->TraceFitSettings.back().second.fitfunc = new TF1(fitname.c_str(),PulseFit::SingleTraceFit,fitlowbound,fithighbound,5);
-			}else{
-				this->console->error("Unknown Trace Fitting Function : {}",fitname);
-				throw "Unknown TraceFitting Function";
-			}
-			for( const auto& parinfo : this->TraceFitSettings.back().second.ParamInfo ){
-				this->TraceFitSettings.back().second.fitfunc->SetParName(std::get<0>(parinfo),std::get<3>(parinfo).c_str());
-			}
-			this->TraceFitSettings.back().second.fithist = nullptr;
-
 
 		}
 
@@ -269,7 +221,7 @@ void WaveformAnalyzer::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 	hismanager->RegisterPlot<TH2F>("WAVE_1010","PostTriggerRegion Bounds; Trace position (arb.); Linearized Channel Number (arb.)",this->h2dsettings.at(1010));
 	hismanager->RegisterPlot<TH2F>("WAVE_1011","PostTriggerRegion Baseline; Trace baseline (arb.); Linearized Channel Number (arb.)",this->h2dsettings.at(1011));
 	hismanager->RegisterPlot<TH2F>("WAVE_1012","PostTriggerRegion Baseline Std. Dev.; Trace baseline std. dev. (arb.); Linearized Channel Number (arb.)",this->h2dsettings.at(1012));
-	
+
 	hismanager->RegisterPlot<TH2F>("WAVE_1020","Max Trace Location; Trace position (arb.); Linearized Channel Number (arb.)",this->h2dsettings.at(1020));
 	hismanager->RegisterPlot<TH2F>("WAVE_1021","Max Trace Value; adc value (arb.); Linearized Channel Number (arb.)",this->h2dsettings.at(1021));
 	hismanager->RegisterPlot<TH2F>("WAVE_1022","Baseline Subtraced Max Trace Value; adc value (arb.); Linearized Channel Number (arb.)",this->h2dsettings.at(1022));
@@ -306,61 +258,4 @@ boost::regex WaveformAnalyzer::GenerateRegex(const std::string& cratestr,const s
 
 bool WaveformAnalyzer::ValidateSettingsString(const std::string& teststr) const{
 	return teststr.front() == '[' and teststr.back() == ']';
-}
-
-void WaveformAnalyzer::ParsePreTrigger(const pugi::xml_node& settings,WaveFormParams& wav){
-	if( pugi::xml_node curr = settings.child("PreTrigger") ){
-		wav.PreTriggerBounds = std::make_pair<size_t,size_t>(curr.attribute("min").as_int(0),curr.attribute("max").as_int(0));
-		this->console->info("Found PreTrigger node : [min,max) -> [{},{})",wav.PreTriggerBounds.first,wav.PreTriggerBounds.second);
-	}else{
-		this->console->error("missing PreTrigger node in settings node {}",settings);
-		throw "missing PreTrigger node";
-	}
-}
-
-void WaveformAnalyzer::ParsePostTrigger(const pugi::xml_node& settings,WaveFormParams& wav){
-	if( pugi::xml_node curr = settings.child("PostTrigger") ){
-		wav.PostTriggerBounds = std::make_pair<size_t,size_t>(curr.attribute("min").as_int(0),curr.attribute("max").as_int(0));
-		this->console->info("Found PostTrigger node : [min,max) -> [{},{})",wav.PostTriggerBounds.first,wav.PostTriggerBounds.second);
-	}else{
-		this->console->error("missing PostTrigger node in settings node {}",settings);
-		throw "missing PostTrigger node";
-	}
-}
-
-void WaveformAnalyzer::ParseQDC(const pugi::xml_node& settings,WaveFormParams& wav){
-	if( pugi::xml_node curr = settings.child("QDC") ){
-		std::string vals = curr.attribute("bounds").as_string("");
-		if( vals.empty() ){
-			this->console->error("missing bounds attribute in QDC node, should be a list of the bins/entries of the trace to do the trace qdc");
-			this->console->error("e.g. bounds=\"0,10,15,20\" will integrate the trace from [0,10), [10,15), [15,20)");
-			throw "missing bounds attribute in QDC node";
-		}else{
-			boost::regex digit("\\d{1,}");
-			boost::sregex_iterator iter(vals.begin(),vals.end(),digit);
-			boost::sregex_iterator end;
-			for(; iter != end; ++iter){
-				wav.QDCBounds.push_back(static_cast<size_t>(std::stoi(iter->str())));
-			}
-			if( wav.QDCBounds.size() < 2 ){
-				this->console->error("need at least two value for the QDC bounds attribute");
-				throw "need at least two value for the QDC bounds attribute";
-			}
-			this->console->info("Found QDC node : NumSums -> {}, BoundsString -> [{})",wav.QDCBounds.size()-1,vals);
-		}
-	}else{
-		this->console->error("missing QDC node in settings node {}",settings);
-		throw "missing QDC node";
-	}
-}
-
-void WaveformAnalyzer::ParsePSD(const pugi::xml_node& settings,WaveFormParams& wav){
-	if( pugi::xml_node curr = settings.child("PSD") ){
-		wav.HasPSD = true;
-		wav.FixedPSDBounds = std::make_tuple<size_t,size_t,size_t>(curr.attribute("begin").as_int(0),curr.attribute("middle").as_int(0),curr.attribute("end").as_int(0));
-		wav.FractionalPSDBounds = std::make_tuple<size_t,size_t,float>(curr.attribute("pre").as_int(0),curr.attribute("post").as_int(0),curr.attribute("fraction").as_float(2.0));
-		this->console->info("Found PSD node : [begin,middle,end)",std::get<0>(wav.FixedPSDBounds),std::get<1>(wav.FixedPSDBounds),std::get<2>(wav.FixedPSDBounds));
-		this->console->info("Found PSD node : [pre,post) fraction",std::get<0>(wav.FractionalPSDBounds),std::get<1>(wav.FractionalPSDBounds),std::get<2>(wav.FractionalPSDBounds));
-
-	}
 }
