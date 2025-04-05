@@ -7,7 +7,7 @@ option(BUILD_DOCS_LATEX "Build latex documentation YES/NO" NO)
 set_property(CACHE BUILD_DOCS_LATEX PROPERTY STRINGS NO YES)
 mark_as_advanced(BUILD_DOCS_LATEX)
 
-option(BUILD_DOCS_QUIET "Build latex documentation YES/NO" NO)
+option(BUILD_DOCS_QUIET "Build latex documentation YES/NO" YES)
 set_property(CACHE BUILD_DOCS_QUIET PROPERTY STRINGS NO YES)
 mark_as_advanced(BUILD_DOCS_QUIET)
 
@@ -29,4 +29,3 @@ add_custom_target(doc_doxygen
 # Optional: install the generated docs
 install(CODE "execute_process(COMMAND ${CMAKE_COMMAND} --build . --target doc_doxygen WORKING_DIRECTORY ${CMAKE_BINARY_DIR})")
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html DESTINATION share/doc)
-install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/man DESTINATION share/doc)
