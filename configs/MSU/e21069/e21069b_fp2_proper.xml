@@ -7,7 +7,7 @@
 	<DetectorDriver>
 		<Processor name="e21069b_fp2Processor">
 			<Processor name="MtasProcessor"/>
-			<Processor name="MtasImpantProcessor"/>
+			<Processor name="MtasImplantProcessor"/>
 			<Processor name="PidProcessor"/>
 		</Processor>
 	</DetectorDriver>
