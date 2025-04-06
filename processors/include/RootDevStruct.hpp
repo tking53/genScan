@@ -16,6 +16,8 @@ namespace ProcessorStruct{
 		int detNum = -999;   //the instance number of RD in the xml Map
 		int modNum = -999;   // the physical module number
 		int chanNum = -999;  // the physical channel number
+		int gchanid = -999;
+		int gmodid = -999;
 		TString type = "";
 		TString subtype = "";
 		TString group = "";
