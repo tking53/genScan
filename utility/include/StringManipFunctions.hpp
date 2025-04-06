@@ -11,6 +11,7 @@ namespace StringManip{
 	std::string GetFilePath(const std::string&);
 
 	void ParseCalString(const std::string& calstring,std::vector<double>& vals);
+	std::string tolower(std::string);
 }
 
 #endif

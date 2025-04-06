@@ -1,11 +1,6 @@
-#include "boost/histogram/axis/regular.hpp"
 #include <iostream>
-#include <chrono>
-#include <random>
 #include <vector>
-#include <fstream>
 #include <sstream>
-#include <tuple>
 
 #include <spdlog/common.h>
 #include <spdlog/spdlog.h>

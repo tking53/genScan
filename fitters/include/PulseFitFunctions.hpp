@@ -11,6 +11,8 @@ namespace PulseFit{
 	double SingleTraceFit(double*,double*);
 	double BSMSingleTraceFit(double*,double*);
 	double BSMDoubleTraceFit(double*,double*);
+	double GaussN(double*,double*);
+	double GaussNLinBkg(double*,double*);
 
 	//eigen
 	double TraceFunc(double,double,double,double,double);

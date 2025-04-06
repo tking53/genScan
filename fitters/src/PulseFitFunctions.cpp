@@ -31,6 +31,23 @@ namespace PulseFit{
 		return par[0] + par[1]*x[0];
 	}
 
+	double GaussN(double* x,double* par){
+		double norm = par[0];
+		double arg = 0.0;
+		if( par[2] != 0 ){
+			arg = (x[0] - par[1])/par[2];
+			norm = par[0]/(par[2]*TMath::Sqrt(TMath::Pi()));
+		}
+
+		double fitval = norm*TMath::Exp(-0.5*arg*arg);
+		return fitval;
+	}
+
+	double GaussNLinBkg(double* x,double* par){
+		double fitval = GaussN(x,par) + Linear(x,par+3);
+		return fitval;
+	}
+
 	double Pulse(double* x,double* par){
 		double amp = par[0];
 		double t0 = par[1];

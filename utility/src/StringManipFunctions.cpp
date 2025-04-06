@@ -7,7 +7,7 @@ namespace StringManip{
 		auto basefile = GetFileBaseName(File);
 		return GetFilePath(File) + basefile.substr(0,basefile.find_last_of("."));
 	}
-	
+
 	std::string GetFileExtension(const std::string& File){
 		return File.substr(File.find_last_of(".")+1);
 	}
@@ -19,7 +19,7 @@ namespace StringManip{
 	std::string GetFilePath(const std::string& File){
 		return File.substr(0,File.find_last_of("/\\")+1);
 	}
-	
+
 	void ParseCalString(const std::string& calstring,std::vector<double>& vals){
 		double curr;
 		std::stringstream ss;
@@ -30,5 +30,10 @@ namespace StringManip{
 		}while(ss);
 		vals.pop_back();
 
+	}
+
+	std::string tolower(std::string s){
+		std::transform(s.begin(), s.end(), s.begin(),[](unsigned char c){ return std::tolower(c); });
+		return s;
 	}
 }

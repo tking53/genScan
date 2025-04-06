@@ -3,11 +3,11 @@ set(DOXYGEN_OUTPUT_DIR "${CMAKE_INSTALL_PREFIX}/docs")
 set(DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in)
 set(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
 
-option(BUILD_DOCS_LATEX "Build latex documentation YES/NO" NO)
+option(BUILD_DOCS_LATEX "Build latex documentation YES/NO" "NO")
 set_property(CACHE BUILD_DOCS_LATEX PROPERTY STRINGS NO YES)
 mark_as_advanced(BUILD_DOCS_LATEX)
 
-option(BUILD_DOCS_QUIET "Build latex documentation YES/NO" YES)
+option(BUILD_DOCS_QUIET "Build latex documentation YES/NO" "YES")
 set_property(CACHE BUILD_DOCS_QUIET PROPERTY STRINGS NO YES)
 mark_as_advanced(BUILD_DOCS_QUIET)
 
