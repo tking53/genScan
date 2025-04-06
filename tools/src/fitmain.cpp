@@ -76,17 +76,25 @@ int main(int argc, char *argv[]) {
 		}
 		Eigen::VectorXd init_guess(8);
 		init_guess(0) = 6580.0;
-		init_guess(1) = 20.0;
-		init_guess(2) = 0.0;
-		init_guess(3) = 0.5;
-		init_guess(4) = 40.0;
-		init_guess(5) = 54.0;
-		init_guess(6) = 1.0;
-		init_guess(7) = 5.0;
+		init_guess(1) = 40.0;
+		init_guess(2) = 54.0;
+		init_guess(3) = 1.0;
+		init_guess(4) = 5.0;
+		init_guess(5) = 20.0;
+		init_guess(6) = 0.0;
+		init_guess(7) = 0.5;
 
 		sin_trace_fit_functor tfit;
 		tfit.xpoints = tracexvals;
 		tfit.ypoints = traceyvals;
+		tfit.boundedvalues[0] = {6550.0,6610.0};
+		tfit.boundedvalues[1] = {0.0,65536.0};
+		tfit.boundedvalues[2] = {40.0,70.0};
+		tfit.boundedvalues[3] = {1.0e-1,10.0};
+		tfit.boundedvalues[4] = {1.0e-1,10.0};
+		tfit.boundedvalues[5] = {0.0,20.0};
+		tfit.boundedvalues[6] = {-40.0,40.0};
+		tfit.boundedvalues[7] = {0.0,1.0};
 		tfit.weights = std::vector<double>(tracexvals.size(),1.0);
 		Eigen::NumericalDiff<sin_trace_fit_functor> numDiff(tfit);
 		NonLinearLeastSquaresFitter<Eigen::NumericalDiff<sin_trace_fit_functor>> lm(numDiff);
@@ -132,7 +140,11 @@ int main(int argc, char *argv[]) {
 		tfit.xpoints = tracexvals;
 		tfit.ypoints = traceyvals;
 		tfit.weights = std::vector<double>(tracexvals.size(),1.0);
-		//tfit.boundedvalues[0] = {4000.0,5000.0};
+		tfit.boundedvalues[0] = {6550.0,6610.0};
+		tfit.boundedvalues[1] = {0.0,65536.0};
+		tfit.boundedvalues[2] = {40.0,70.0};
+		tfit.boundedvalues[3] = {1.0e-1,10.0};
+		tfit.boundedvalues[4] = {1.0e-1,10.0};
 		Eigen::NumericalDiff<trace_fit_functor> numDiff(tfit);
 		NonLinearLeastSquaresFitter<Eigen::NumericalDiff<trace_fit_functor>> lm(numDiff);
 		lm.MaxEval(2000);

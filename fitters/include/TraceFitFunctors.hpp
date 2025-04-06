@@ -10,21 +10,29 @@
 
 struct trace_fit_functor : BaseFunctor<double>{
 	int operator()(Eigen::VectorXd &x, Eigen::VectorXd &fvec) const{
+		double sum = 0.0;
+		for( size_t ii = 0; ii < xpoints.size(); ++ii ){
+			auto diff = this->weights[ii]*(this->ypoints[ii] - ( PulseFit::tracefunc(this->xpoints[ii],x(0),x(1),x(2),x(3),x(4)) ));
+			fvec(ii) = diff;
+			sum += diff*diff;
+		}
+		sum *= this->xpoints.size();
+		int iter = 0;
 		for( const auto& kv : this->boundedvalues ){
 			if( x(kv.first) > kv.second.second ){
-				x(kv.first) = kv.second.second;
+				auto diff = (x(kv.first) - kv.second.second);
+				fvec(xpoints.size()+iter) = sum*diff*diff;
 			}else if( x(kv.first) < kv.second.first ){
-				x(kv.first) = kv.second.first;
+				auto diff = (x(kv.first) - kv.second.first);
+				fvec(xpoints.size()+iter) = sum*diff*diff;
 			}else{
+				fvec(xpoints.size()+iter) = 0.0;
 			}
+			++iter;
 		}
-		for( size_t ii = 0; ii < xpoints.size(); ++ii ){
-			fvec(ii) = this->weights[ii]*(this->ypoints[ii] - ( PulseFit::tracefunc(this->xpoints[ii],x(0),x(1),x(2),x(3),x(4)) ));
-		}
-		int iter = 0;
 		for( const auto& kv : this->fixedvalues ){
 			auto offset = (x(kv.first) - kv.second);
-			fvec(xpoints.size()+iter) = 1.0*offset*offset;
+			fvec(xpoints.size()+iter) = sum*offset*offset;
 			++iter;
 		}
 		return 0;
@@ -44,16 +52,32 @@ struct trace_fit_functor : BaseFunctor<double>{
 	//	return 0;
 	//}
 	int inputs() const { return 5;}
-	int values() const { return this->xpoints.size()+this->fixedvalues.size(); }
-	int constraints() const { return this->fixedvalues.size(); }
+	int values() const { return this->xpoints.size()+this->fixedvalues.size()+this->boundedvalues.size(); }
+	int constraints() const { return this->fixedvalues.size()+this->boundedvalues.size(); }
 };
 
 struct sin_trace_fit_functor : BaseFunctor<double>{
 	int operator()(Eigen::VectorXd &x, Eigen::VectorXd &fvec) const{
+		double sum = 0.0;
 		for( size_t ii = 0; ii < xpoints.size(); ++ii ){
-			fvec(ii) = this->weights[ii]*(this->ypoints[ii] - ( PulseFit::sintracefunc(this->xpoints[ii],x(0),x(1),x(2),x(3),x(4),x(5),x(6),x(7)) ));
+			auto diff = this->weights[ii]*(this->ypoints[ii] - ( PulseFit::sintracefunc(this->xpoints[ii],x(0),x(1),x(2),x(3),x(4),x(5),x(6),x(7)) ));
+			fvec(ii) = diff;
+			sum += diff*diff;
 		}
+		sum *= this->xpoints.size();
 		int iter = 0;
+		for( const auto& kv : this->boundedvalues ){
+			if( x(kv.first) > kv.second.second ){
+				auto diff = (x(kv.first) - kv.second.second);
+				fvec(xpoints.size()+iter) = sum*diff*diff;
+			}else if( x(kv.first) < kv.second.first ){
+				auto diff = (x(kv.first) - kv.second.first);
+				fvec(xpoints.size()+iter) = sum*diff*diff;
+			}else{
+				fvec(xpoints.size()+iter) = 0.0;
+			}
+			++iter;
+		}
 		for( const auto& kv : this->fixedvalues ){
 			auto offset = (x(kv.first) - kv.second);
 			fvec(xpoints.size()+iter) = 1.0*offset*offset;
@@ -62,8 +86,8 @@ struct sin_trace_fit_functor : BaseFunctor<double>{
 		return 0;
 	}
 	int inputs() const { return 8;}
-	int values() const { return this->xpoints.size()+this->fixedvalues.size(); }
-	int constraints() const { return this->fixedvalues.size(); }
+	int values() const { return this->xpoints.size()+this->fixedvalues.size()+this->boundedvalues.size(); }
+	int constraints() const { return this->fixedvalues.size()+this->boundedvalues.size(); }
 };
 
 

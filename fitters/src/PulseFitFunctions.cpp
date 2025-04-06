@@ -12,7 +12,7 @@ namespace PulseFit{
 		return a*((1.0/(std::exp(-(t-d)/r)+1.0))*(1.0/(std::exp((t-d)/f)+1.0)));
 	}
 
-	double sintracefunc(double t,double c,double sa,double sp,double sf,double pa,double pd,double pr,double pf){
+	double sintracefunc(double t,double c,double pa,double pd,double pr,double pf,double sa,double sp,double sf){
 		double SinVal = Sin(t,sa,sp,sf);
 		double PulseVal = TraceFunc(t,pa,pd,pr,pf);
 		return c + SinVal + PulseVal;
