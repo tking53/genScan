@@ -4,10 +4,11 @@
 #include <stdexcept>
 #include <vector>
 #include <utility>
+#include <map>
+#include <set>
 
 #include "Rtypes.h"
 #include "TF1.h"
-//#include "TRatioPlot.h"
 #include "TH1.h"
 #include "TList.h"
 #include "TFitResult.h"
@@ -22,6 +23,10 @@ struct PeakFitter{
 	TH1* fithist;
 	TF1* fitfunc;
 	std::vector<TF1*> components;
+	std::set<std::string> keys;
+	std::map<std::string,double> Results;
+	std::map<std::string,double> Errors;
+
 
 	PeakFitter(double l,double u,bool chi2,int mode,TH1* hist): FitRange(l,u), loglikelihood(!chi2),fithist(hist){
 		if( mode == 0){
@@ -48,6 +53,8 @@ struct PeakFitter{
 		this->fitfunc->SetParName(2,"Sigma");
 		this->fitfunc->SetParName(3,"BkgOffset");
 		this->fitfunc->SetParName(4,"BkgSlope");
+
+		this->keys = { "Area","Mean","Sigma","BkgSlope","BkgOffset"};
 
 		double bkg_offset = 0;
 		double bkg_slope = 0;
@@ -113,18 +120,17 @@ struct PeakFitter{
 
 	template<typename OStream>
 	friend OStream& operator<<(OStream& os, const PeakFitter& fitinfo) {
-		for( const auto& kv : fitinfo.Results ){
-			os << kv.first << " : " << kv.second << " +- " << fitinfo.Errors.at(kv.first) << " \t ";
+		for( const auto& k : fitinfo.keys ){
+			os << k << " : " << fitinfo.Results.at(k) << " +- " << fitinfo.Errors.at(k) << " \t ";
 		}
+		os << "Chi2/NDF : " << fitinfo.Results.at("Chi2") << "/" << fitinfo.Errors.at("NDF");
 		return os;
 	}
 
 	std::pair<double,double> operator [](const std::string& key) const{
 		return {this->Results.at(key),this->Errors.at(key)};
 	}
-	std::map<std::string,double> Results;
-	std::map<std::string,double> Errors;
-
+	
 	virtual ~PeakFitter() = default;
 
 	PeakFitter(const PeakFitter&) = default;

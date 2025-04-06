@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
 	boost::program_options::options_description cmdline_options("Generic Options");
 	cmdline_options.add_options()
 		("help,h", "produce help message")
-		("projectionindices,p",boost::program_options::value<std::vector<int>>(&indices),"indices to project on if 2d histogram")
+		("projectionindices,p",boost::program_options::value<std::vector<int>>(&indices)->multitoken(),"indices to project on if 2d histogram")
 		("lowerbound,l",boost::program_options::value<double>(&xlow),"lower bound to perform fit")
 		("upperbound,u",boost::program_options::value<double>(&xhigh),"upper bound to perform fit")
 		("inputfile,i",boost::program_options::value<std::string>(&inputfile),"file to get the histogram from")

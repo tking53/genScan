@@ -26,6 +26,11 @@ add_dependencies(GenPeakFit ${EXTERNAL_DEPS})
 target_link_libraries(GenPeakFit PRIVATE Eigen3::Eigen GenScanFitters GenScanUtility ${ROOT_LIBRARIES})
 list(APPEND EXE_LIST GenPeakFit)
 
+add_executable(GenCalRipper src/calibrationrippermain.cpp)
+add_dependencies(GenPeakFit ${EXTERNAL_DEPS})
+target_link_libraries(GenCalRipper PRIVATE GenScanCore)
+list(APPEND EXE_LIST GenCalRipper)
+
 add_executable(GenTrapFilter src/trapfiltermain.cpp)
 add_dependencies(GenTrapFilter ${EXTERNAL_DEPS})
 target_link_libraries(GenTrapFilter PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES})
@@ -33,52 +38,37 @@ list(APPEND EXE_LIST GenTrapFilter)
 
 if( USE_SYSTEM_YAMLCPP )
 	target_link_libraries(GenPeakFit PUBLIC yaml-cppd)
+	target_link_libraries(GenCalRipper PUBLIC yaml-cppd)
 else()
 	target_link_libraries(GenPeakFit PUBLIC yaml-cpp)
+	target_link_libraries(GenCalRipper PUBLIC yaml-cpp)
 endif()
 if( USE_SYSTEM_FMT )
-	target_link_libraries(GenConfig PRIVATE fmt::fmt)
-	target_link_libraries(GenDev PRIVATE fmt::fmt)
-	target_link_libraries(GenTraceFit PRIVATE fmt::fmt)
-	target_link_libraries(GenTrapFilter PRIVATE fmt::fmt)
-	target_link_libraries(GenPeakFit PRIVATE fmt::fmt)
+	foreach( EXE IN LISTS EXE_LIST )
+		target_link_libraries(${EXE} PRIVATE fmt::fmt)
+	endforeach()
 endif()
 if( USE_SYSTEM_SPDLOG )
-	target_link_libraries(GenConfig PRIVATE spdlog::spdlog_header_only)
-	target_link_libraries(GenDev PRIVATE spdlog::spdlog_header_only)
-	target_link_libraries(GenTraceFit PRIVATE spdlog::spdlog_header_only)
-	target_link_libraries(GenTrapFilter PRIVATE spdlog::spdlog_header_only)
-	target_link_libraries(GenPeakFit PRIVATE spdlog::spdlog_header_only)
+	foreach( EXE IN LISTS EXE_LIST )
+		target_link_libraries(${EXE} PRIVATE spdlog::spdlog_header_only)
+	endforeach()
 endif()
 if( USE_SYSTEM_BOOST )
-	target_link_libraries(GenConfig PRIVATE Boost::container Boost::program_options )
-	target_link_libraries(GenDev PRIVATE Boost::container Boost::program_options )
-	target_link_libraries(GenTraceFit PRIVATE Boost::container Boost::program_options )
-	target_link_libraries(GenTrapFilter PRIVATE Boost::container Boost::program_options )
-	target_link_libraries(GenPeakFit PRIVATE Boost::container Boost::program_options )
+	foreach( EXE IN LISTS EXE_LIST )
+		target_link_libraries(${EXE} PRIVATE Boost::container Boost::program_options)
+	endforeach()
 else()
-	target_link_libraries(GenDev PRIVATE 
-		${BOOST_EXTERNAL_INSTALL_LOCATION}/lib/libboost_container.a
-		${BOOST_EXTERNAL_INSTALL_LOCATION}/lib/libboost_program_options.a
-		)
-	target_link_libraries(GenTraceFit PRIVATE 
-		${BOOST_EXTERNAL_INSTALL_LOCATION}/lib/libboost_container.a
-		${BOOST_EXTERNAL_INSTALL_LOCATION}/lib/libboost_program_options.a
-		)
-	target_link_libraries(GenTrapFilter PRIVATE 
-		${BOOST_EXTERNAL_INSTALL_LOCATION}/lib/libboost_container.a
-		${BOOST_EXTERNAL_INSTALL_LOCATION}/lib/libboost_program_options.a
-		)
-	target_link_libraries(GenPeakFit PRIVATE 
-		${BOOST_EXTERNAL_INSTALL_LOCATION}/lib/libboost_container.a
-		${BOOST_EXTERNAL_INSTALL_LOCATION}/lib/libboost_program_options.a
-		)
+	foreach( EXE IN LISTS EXE_LIST )
+		target_link_libraries(${EXE} PRIVATE 
+			${BOOST_EXTERNAL_INSTALL_LOCATION}/lib/libboost_container.a
+			${BOOST_EXTERNAL_INSTALL_LOCATION}/lib/libboost_program_options.a
+			)
+	endforeach()
 endif()
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-	target_compile_definitions(GenConfig PRIVATE DEBUG_MODE)
-	target_compile_definitions(GenDev PRIVATE DEBUG_MODE)
-	target_compile_definitions(GenTraceFit PRIVATE DEBUG_MODE)
-	target_compile_definitions(GenTrapFilter PRIVATE DEBUG_MODE)
+	foreach( EXE IN LISTS EXE_LIST )
+		target_compile_definitions(${EXE} PRIVATE DEBUG_MODE)
+	endforeach()
 endif()
 
 install(TARGETS ${EXE_LIST} DESTINATION bin)
