@@ -1,9 +1,11 @@
 #include "XMLConfigParser.hpp"
+#include <cstdlib>
 #include <fstream>
 #include <iomanip>
 #include <map>
 #include <memory>
 #include <ostream>
+#include <spdlog/fmt/fmt.h>
 #include <sstream>
 #include <utility>
 #include <stdexcept>
@@ -27,13 +29,15 @@
 #include <yaml-cpp/node/parse.h>
 #include <yaml-cpp/yaml.h>
 
+#include <pugixml.hpp>
+
 #include <PolyCalibrator.hpp>
 
 YAML::Emitter& operator << (YAML::Emitter& out, const PolyCalibrator* pf) {
 	out <<  YAML::BeginMap 
-		<< YAML::Key << "HisName" << YAML::Value << pf->gChID
-	        << YAML::Key << "Coefficients" << pf->Results	
-	     << YAML::EndMap;
+		<< YAML::Key << "HisName" << YAML::Value << pf->FitName
+		<< YAML::Key << "Coefficients" << pf->Results	
+		<< YAML::EndMap;
 	return out;
 }
 
@@ -49,7 +53,7 @@ struct calibrationripper{
 		boost::split(strs,s,boost::is_any_of(":"));
 		boost::regex fre(".*\\.((yaml)|(yml)){1}");
 		boost::regex number("^(0|[1-9]\\d*)(\\.\\d+)?(e-?(0|[1-9]\\d*))?");
-	
+
 		if( strs.size() == 2 or strs.size() == 3 ){
 			boost::smatch pmatch;
 			boost::smatch ematch;
@@ -98,19 +102,24 @@ int main(int argc, char *argv[]) {
 	std::vector<std::string> fitfiles;
 	std::vector<calibrationripper> calpoints;
 	std::string configfile;
-	std::string outputfile; 
+	std::string outputfile;
+	std::string logfile; 
 	int order;
 	bool fixcontstant;
 	bool usefiterror;
+	bool apply;
 
 	boost::program_options::options_description cmdline_options("Generic Options");
 	cmdline_options.add_options()
 		("help,h", "produce help message")
 		("fitpoints,f",boost::program_options::value<std::vector<std::string>>(&fitfiles)->multitoken(),"Add file:energy pair (e.g. fit.yaml:661.657:pkerr, pkerr is optional)")
-		("outputfile,o",boost::program_options::value<std::string>(&outputfile)->default_value("GenCalRipper.yaml"),"cal file to output to")
+		("logfile,l",boost::program_options::value<std::string>(&logfile)->default_value("GenCalRipper.yaml"),"log file to output new calibration params to")
+		("configfile,c",boost::program_options::value<std::string>(&configfile),"configfile to read in and adjust")
+		("outputfile,o",boost::program_options::value<std::string>(&outputfile),"configfile to output to")
 		("polyorder,p",boost::program_options::value<int>(&order)->default_value(1),"order to do calibration")
 		("scale,s",boost::program_options::value<bool>(&fixcontstant)->default_value(true),"fix the constant term in the fit")
 		("error,e",boost::program_options::value<bool>(&usefiterror)->default_value(true),"use the fit error from the file")
+		("apply,a",boost::program_options::value<bool>(&apply)->default_value(true),"apply to a configfile")
 		;
 
 
@@ -129,6 +138,10 @@ int main(int argc, char *argv[]) {
 			calpoints.push_back(calibrationripper(f,usefiterror));
 		}
 
+		if( not vm.count("outputfile") and apply ){
+			outputfile = configfile+".calibrated";
+		}
+
 		std::set<std::string> names;
 		for( const auto& c : calpoints ){
 			for( const auto& kv : c.fitvals ){
@@ -136,7 +149,7 @@ int main(int argc, char *argv[]) {
 			}
 		}
 
-		std::unique_ptr<PolyCalibrator> currcal;
+		std::vector<std::unique_ptr<PolyCalibrator>> currcal;
 		YAML::Emitter doc;
 		doc << YAML::BeginMap << YAML::Key << "Calibration" << YAML::BeginSeq;
 		for( const auto& k : names ){
@@ -147,13 +160,69 @@ int main(int argc, char *argv[]) {
 					fitpoints.push_back({.energy=c.peakvalue,.channel=search->second});
 				}
 			}
-			currcal.reset(new PolyCalibrator(fitpoints,fixcontstant,order,k));
-			doc << currcal.get();
+			currcal.push_back(std::make_unique<PolyCalibrator>(fitpoints,fixcontstant,order,k));
+			doc << currcal.back().get();
 		}
 		doc << YAML::EndSeq << YAML::EndMap;
-		std::ofstream yfile(outputfile);
+		std::ofstream yfile(logfile);
 		yfile << doc.c_str() << std::endl;
 		yfile.close();
+
+		if( apply ){
+			pugi::xml_document inputconfig;
+			auto loadres = inputconfig.load_file(configfile.c_str());
+			if( not loadres ){
+				throw std::runtime_error(loadres.description());
+			}
+
+			pugi::xml_node Configuration = inputconfig.child("Configuration");
+			pugi::xml_node Map = Configuration.child("Map");
+			int gchid = 0;
+			for( pugi::xml_node Crate = Map.child("Crate"); Crate; Crate = Crate.next_sibling("Crate") ){
+				for( pugi::xml_node Module = Crate.child("Module"); Module; Module = Module.next_sibling("Module") ){
+					for( pugi::xml_node Channel = Module.child("Channel"); Channel; Channel = Channel.next_sibling("Channel") ){
+						for( const auto& c : currcal ){
+							std::size_t found = c->FitName.find_last_of("_x");
+							auto cgChID = std::stoi(c->FitName.substr(found+1));
+							if( gchid == cgChID ){
+								std::string newvalue = "";
+								for( const auto& kv : c->Results ){
+									if( kv.second == 0.0 ){
+										newvalue += fmt::format("{:.1f} ",kv.second);
+									}else if( std::abs(kv.second) < 1.0e-3 or std::abs(kv.second) > 1.0e3 ){
+										newvalue += fmt::format("{:.6e} ",kv.second);
+									}else{
+										newvalue += fmt::format("{:.6f} ",kv.second);
+									}
+								}
+								pugi::xml_node Calibration = Channel.child("Calibration");
+								if( Calibration ){
+									Calibration.text() = newvalue.c_str();
+									switch(c->Results.size()){
+										case 2:
+											Calibration.attribute("model") = "linear";
+											break;
+										case 3:
+											Calibration.attribute("model") = "quadratic";
+											break;
+										case 4:
+											Calibration.attribute("model") = "cubic";
+											break;
+										default:
+											Calibration.attribute("model") = "unknown";
+											break;
+									}
+								}
+								break;
+							}
+						}
+						++gchid;
+					}
+				}
+			}
+			inputconfig.save_file(outputfile.c_str());
+		}
+
 
 	}catch( std::exception& e){
 		spdlog::error(e.what());

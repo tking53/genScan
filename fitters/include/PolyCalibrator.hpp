@@ -32,13 +32,13 @@ struct PolyCalibrator{
 	std::set<std::string> keys;
 	double chi2;
 	double ndf;
-	std::string gChID;
+	std::string FitName;
 
 	PolyCalibrator(const std::vector<calibrationpoint>& cp,bool fixcontstant,int order,const std::string& gchid){
 		if( cp.size() == 0 ){
 			throw std::runtime_error("Not enough points to calibrate with");
 		}
-		gChID = gchid;
+		FitName = gchid;
 
 		this->fithist = new TGraphErrors(cp.size());
 		int idx = 0;

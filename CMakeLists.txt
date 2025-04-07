@@ -352,6 +352,7 @@ add_subdirectory(core)
 add_subdirectory(translators)
 add_subdirectory(fitters)
 add_subdirectory(tools)
+add_subdirectory(scripts)
 
 #MUST BE LAST
 if(DOXYGEN_FOUND)
@@ -387,11 +388,6 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInf
 endif()
 
 install(TARGETS GenScanor DESTINATION bin)
-file(GLOB script_files ${CMAKE_CURRENT_SOURCE_DIR}/scripts/*.cxx)
-install(FILES ${script_files} DESTINATION scripts)
-configure_file("scripts/ParScan.py" scripts/ParScan @ONLY)
-install(PROGRAMS ${CMAKE_BINARY_DIR}/scripts/ParScan DESTINATION scripts)
-
 #Configure and install the module file
 configure_file("modulefiles/genScan" modulefiles/genScan @ONLY)
 install(DIRECTORY ${CMAKE_BINARY_DIR}/modulefiles  DESTINATION ${CMAKE_INSTALL_PREFIX})
