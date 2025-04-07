@@ -177,7 +177,7 @@ int main(int argc, char *argv[]) {
 
 			pugi::xml_node Configuration = inputconfig.child("Configuration");
 			pugi::xml_node Map = Configuration.child("Map");
-			int gchid = 0;
+			int gchid = 1;
 			for( pugi::xml_node Crate = Map.child("Crate"); Crate; Crate = Crate.next_sibling("Crate") ){
 				for( pugi::xml_node Module = Crate.child("Module"); Module; Module = Module.next_sibling("Module") ){
 					for( pugi::xml_node Channel = Module.child("Channel"); Channel; Channel = Channel.next_sibling("Channel") ){
