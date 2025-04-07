@@ -144,10 +144,9 @@ int main(int argc, char *argv[]) {
 			}else{
 				throw std::runtime_error("not passed a TH1 or TH2 histogram");
 			}
-			auto MaxCrates = rfile->Get("MAX_CRATES")->GetTitle();
-			auto MaxCardsPerCrate = rfile->Get("MAX_CARDS_PER_CRATE")->GetTitle();
-			auto MaxChannelsPerBoard = rfile->Get("MAX_CHANNELS_PER_BOARD")->GetTitle();
-			auto MaxCalParamsPerChannel = rfile->Get("MAX_CAL_PARAMS_PER_CHANNEL")->GetTitle();
+			auto MaxCrates = rfile->Get("MAX_CRATES");
+			auto MaxCardsPerCrate = rfile->Get("MAX_CARDS_PER_CRATE");
+			auto MaxChannelsPerBoard = rfile->Get("MAX_CHANNELS_PER_BOARD");
 			rfile->Close();
 			auto outputfile = outputprefix+".root";
 			auto ofile = new TFile(outputfile.c_str(),"RECREATE");
@@ -159,10 +158,15 @@ int main(int argc, char *argv[]) {
 			doc << YAML::BeginMap;
 			doc << YAML::Key << "InputFile" << YAML::Value << inputfile;
 			doc << YAML::Key << "InputHistogram" << YAML::Value << hisname;
-			doc << YAML::Key << "MAX_CRATES" << YAML::Value << MaxCrates;
-			doc << YAML::Key << "MAX_CARDS_PER_CRATE" << YAML::Value << MaxCardsPerCrate;
-			doc << YAML::Key << "MAX_CHANNELS_PER_BOARD" << YAML::Value << MaxChannelsPerBoard;
-			doc << YAML::Key << "MAX_CAL_PARAMS_PER_CHANNEL" << YAML::Value << MaxCalParamsPerChannel;
+			if( MaxCrates != nullptr ){
+				doc << YAML::Key << "MAX_CRATES" << YAML::Value << MaxCrates->GetTitle();
+			}
+			if( MaxCardsPerCrate != nullptr ){
+				doc << YAML::Key << "MAX_CARDS_PER_CRATE" << YAML::Value << MaxCardsPerCrate->GetTitle();
+			}
+			if( MaxChannelsPerBoard != nullptr ){
+				doc << YAML::Key << "MAX_CHANNELS_PER_BOARD" << YAML::Value << MaxChannelsPerBoard->GetTitle();
+			}
 			doc << YAML::Key << "FitResults";
 			doc << pfs;
 			doc << YAML::EndMap;

@@ -50,7 +50,6 @@ struct calibrationripper{
 	int MaxCrates;
 	int MaxCardsPerCrate;
 	int MaxChannelsPerBoard;
-	int MaxCalParamsPerChannel;
 
 	calibrationripper(std::string s,bool usefiterror) {
 		std::vector<std::string> strs;
@@ -88,7 +87,6 @@ struct calibrationripper{
 		MaxCrates = doc["MAX_CRATES"].as<int>(1);
 		MaxCardsPerCrate = doc["MAX_CARDS_PER_CRATE"].as<int>(13);
 		MaxChannelsPerBoard = doc["MAX_CHANNELS_PER_BOARD"].as<int>(16);
-		MaxCalParamsPerChannel = doc["MAX_CAL_PARAMS_PER_CHANNEL"].as<int>(4);
 		std::set<std::string> names;
 		for( size_t ii = 0; ii < results.size(); ++ii ){
 			auto fitname = results[ii]["HisName"].as<std::string>();
@@ -173,7 +171,6 @@ int main(int argc, char *argv[]) {
 			}
 
 		}
-		auto i = (*CrateMax.begin());
 		auto j = (*BoardMax.begin());
 		auto k = (*ChannelMax.begin());
 
