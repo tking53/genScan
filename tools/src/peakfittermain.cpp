@@ -91,7 +91,7 @@ int main(int argc, char *argv[]) {
 			spdlog::error("missing upperbound");
 			exit(EXIT_FAILURE);
 		}	
-		if( dimensionality == 2 or numproj < 1){
+		if( dimensionality == 2 and numproj < 1){
 			spdlog::error("dimensionality is 2, but no projections given");
 			exit(EXIT_FAILURE);
 		}
