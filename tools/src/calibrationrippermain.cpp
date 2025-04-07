@@ -47,6 +47,10 @@ struct calibrationripper{
 	std::pair<double,double> peakvalue;
 	std::map<std::string,std::pair<double,double>> fitvals;
 	std::string hisname;
+	int MaxCrates;
+	int MaxCardsPerCrate;
+	int MaxChannelsPerBoard;
+	int MaxCalParamsPerChannel;
 
 	calibrationripper(std::string s,bool usefiterror) {
 		std::vector<std::string> strs;
@@ -81,6 +85,10 @@ struct calibrationripper{
 		YAML::Node doc = YAML::LoadFile(filename);
 		auto results = doc["FitResults"];
 		hisname = doc["InputHistogram"].as<std::string>();
+		MaxCrates = doc["MAX_CRATES"].as<int>(1);
+		MaxCardsPerCrate = doc["MAX_CARDS_PER_CRATE"].as<int>(13);
+		MaxChannelsPerBoard = doc["MAX_CHANNELS_PER_BOARD"].as<int>(16);
+		MaxCalParamsPerChannel = doc["MAX_CAL_PARAMS_PER_CHANNEL"].as<int>(4);
 		std::set<std::string> names;
 		for( size_t ii = 0; ii < results.size(); ++ii ){
 			auto fitname = results[ii]["HisName"].as<std::string>();
@@ -134,9 +142,40 @@ int main(int argc, char *argv[]) {
 			exit(EXIT_SUCCESS);
 		}
 
+		std::set<int> CrateMax;
+		std::set<int> BoardMax;
+		std::set<int> ChannelMax;
 		for( const auto& f : fitfiles ){
 			calpoints.push_back(calibrationripper(f,usefiterror));
+			auto i = calpoints.back().MaxCrates;
+			if( CrateMax.empty() ){
+				CrateMax.insert(i);
+			}else{
+				if( CrateMax.find(i) == CrateMax.end() ){
+					throw std::runtime_error("Found multiple crate settings");
+				}
+			}
+			auto j = calpoints.back().MaxCardsPerCrate;
+			if( BoardMax.empty() ){
+				BoardMax.insert(j);
+			}else{
+				if( BoardMax.find(j) == BoardMax.end() ){
+					throw std::runtime_error("Found multiple board settings");
+				}
+			}
+			auto k = calpoints.back().MaxChannelsPerBoard;
+			if( ChannelMax.empty() ){
+				ChannelMax.insert(k);
+			}else{
+				if( ChannelMax.find(k) == ChannelMax.end() ){
+					throw std::runtime_error("Found multiple channel settings");
+				}
+			}
+
 		}
+		auto i = (*CrateMax.begin());
+		auto j = (*BoardMax.begin());
+		auto k = (*ChannelMax.begin());
 
 		if( not vm.count("outputfile") and apply ){
 			outputfile = configfile+".calibrated";
@@ -177,10 +216,16 @@ int main(int argc, char *argv[]) {
 
 			pugi::xml_node Configuration = inputconfig.child("Configuration");
 			pugi::xml_node Map = Configuration.child("Map");
-			int gchid = 1;
+			auto calc_gchid = [&j,&k](const int& a,const int& b, const int& c){
+				return a*j*k + b*k + c + 1;
+			};
 			for( pugi::xml_node Crate = Map.child("Crate"); Crate; Crate = Crate.next_sibling("Crate") ){
+				auto a = Crate.attribute("number").as_int();
 				for( pugi::xml_node Module = Crate.child("Module"); Module; Module = Module.next_sibling("Module") ){
+					auto b = Module.attribute("number").as_int();
 					for( pugi::xml_node Channel = Module.child("Channel"); Channel; Channel = Channel.next_sibling("Channel") ){
+						auto cid = Channel.attribute("number").as_int();
+						auto gchid = calc_gchid(a,b,cid);
 						for( const auto& c : currcal ){
 							std::size_t found = c->FitName.find_last_of("_x");
 							auto cgChID = std::stoi(c->FitName.substr(found+1));
@@ -216,7 +261,6 @@ int main(int argc, char *argv[]) {
 								break;
 							}
 						}
-						++gchid;
 					}
 				}
 			}

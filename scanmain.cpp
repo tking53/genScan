@@ -361,6 +361,10 @@ int main(int argc, char *argv[]) {
 
 	//Write correlated events to disk
 	HistogramManager->WriteAllPlots();
+	RootManager->WriteTNamed("MAX_CRATES",std::to_string(MAX_CRATES));
+	RootManager->WriteTNamed("MAX_CARDS_PER_CRATE",std::to_string(MAX_CARDS_PER_CRATE));
+	RootManager->WriteTNamed("MAX_CHANNELS_PER_BOARD",std::to_string(MAX_CHANNELS_PER_BOARD));
+	RootManager->WriteTNamed("ConfigFile",configfile);
 	RootManager->FinalizeTrees();
 	std::chrono::time_point<std::chrono::high_resolution_clock> global_stop_time = std::chrono::high_resolution_clock::now();
 	auto global_run_time = global_stop_time - global_start_time;

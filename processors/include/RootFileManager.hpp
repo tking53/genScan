@@ -1,6 +1,7 @@
 #ifndef __ROOT_FILE_MANAGER_HPP__
 #define __ROOT_FILE_MANAGER_HPP__
 
+#include <TNamed.h>
 #include <string>
 #include <unordered_map>
 
@@ -29,6 +30,11 @@ class RootFileManager{
 
 		~RootFileManager(){
 			this->console->info("Time spent filling trees : {:.3f}s",this->filltime/1000.0);
+		}
+
+		void WriteTNamed(const std::string& name,const std::string& value){
+			TNamed curr(name.c_str(),value.c_str());
+			curr.Write(0,2,0);
 		}
 
 		void FinalizeTrees(){
