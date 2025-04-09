@@ -35,7 +35,8 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 
 [[maybe_unused]] bool MtasImplantProcessor::PreProcess(EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	Processor::PreProcess();
-	eventhistory->GetCurrentEventSummary()->GetDetectorSummary(this->AllDefaultRegex["mtasimplant"],this->SummaryData);
+	auto summary = 	eventhistory->GetCurrentEventSummary();
+	summary->GetDetectorSummary(this->AllDefaultRegex["mtasimplant"],this->SummaryData);
 	for( const auto& evt : this->SummaryData ){
 		auto subtype = evt->GetSubType();
 		auto group = evt->GetGroup();
@@ -115,6 +116,14 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 		hismanager->Fill("MTASIMPLANT_7043",this->LowGainAnodeHitMap[ii],ii);
 	}
 
+	if( this->LowGainDynode > this->IsIonThresh.first and this->LowGainDynode < this->IsIonThresh.second ){
+		summary->AddEventTag("ion");
+	}
+
+	if( this->HighGainDynode > this->IsBetaThresh.first and this->HighGainDynode < this->IsBetaThresh.second ){
+		summary->AddEventTag("beta");
+	}
+
 	Processor::EndProcess();
 	return true;
 }
@@ -145,6 +154,18 @@ void MtasImplantProcessor::Init(const pugi::xml_node& config){
 
 	this->YSOHGThreshold = config.attribute("yso_thresh_hg").as_double(0.0);
 	this->YSOLGThreshold = config.attribute("yso_thresh_lg").as_double(0.0);
+
+	//high gain dynode must be between these two
+	this->IsBetaThresh = {
+		config.attribute("beta_thresh_low").as_double(50.0),
+		config.attribute("beta_thresh_high").as_double(8192.0)
+	};
+
+	//low gain dynode must be between these two
+	this->IsIonThresh = {
+		config.attribute("ion_thresh_low").as_double(2000.0),
+		config.attribute("ion_thresh_high").as_double(16384.0)
+	};
 
 	this->LoadHistogramSettings(config);
 	this->LoadCustomCuts(config);

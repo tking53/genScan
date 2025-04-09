@@ -65,6 +65,9 @@ class MtasProcessor : public Processor{
 		void Reset();
 		void GenerateHexagonShapes();
 
+		void DeclareBetaPlots(PLOTS::PlotRegistry*);
+		void DeclareAntiBetaPlots(PLOTS::PlotRegistry*);
+
 		std::vector<double> Position;
 
 		std::vector<double> Center;

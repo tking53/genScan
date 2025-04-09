@@ -43,6 +43,9 @@ class MtasImplantProcessor : public Processor{
 		double YSOHGThreshold;
 		double YSOLGThreshold;
 
+		std::pair<double,double> IsBetaThresh;
+		std::pair<double,double> IsIonThresh;
+
 		std::vector<short> HighGainAnodeHitMap;
 		short HighGainDynodeHits;
 		short HighGainAnodeHits;

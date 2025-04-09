@@ -705,8 +705,29 @@ void MtasProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	this->MTAS_4203 = hismanager->RegisterPlot<TH2F>("MTAS_4203","Run Time vs Mtas Total; Energy (keV); Run Time (hr)",this->h2dsettings.at(4203));
 	this->MTAS_4204 = hismanager->RegisterPlot<TH2F>("MTAS_4204","Run Time vs Mtas Total; Energy (keV); Run Time (day)",this->h2dsettings.at(4204));
 
-	//declare the beta gated and not-beta histograms, but we don't fill them until process after parent has told which we are
+	//center position correction plots
+	for( size_t ii = 0; ii < 6; ++ii ){
+		std::string name = "MTAS_326"+std::to_string(ii)+"_F";
+		std::string title = "C"+std::to_string(ii+1)+"F vs Center Position; Position (arb.); Energy (channel)";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3260));
 
+		name = "MTAS_326"+std::to_string(ii)+"_B";
+		title = "C"+std::to_string(ii+1)+"B vs Center Position; Position (arb.); Energy (channel)";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3260));
+
+		name = "MTAS_326"+std::to_string(ii);
+		title = "C"+std::to_string(ii+1)+" vs Center Position Sum; Position (arb.); Energy (channel)";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3260));
+	}
+
+	//declare the beta gated and not-beta histograms, but we don't fill them until parent processor has told which we are
+	this->DeclareBetaPlots(hismanager);
+	this->DeclareAntiBetaPlots(hismanager);
+
+	this->console->info("Finished Declaring Plots");
+}
+
+void MtasProcessor::DeclareBetaPlots(PLOTS::PlotRegistry* hismanager){
 	//beta event
 	this->MTAS_3300 = hismanager->RegisterPlot<TH1F>("MTAS_3300","Mtas Total #beta-gated; Energy (keV)",this->h1dsettings.at(3300));
 	this->MTAS_3301 = hismanager->RegisterPlot<TH2F>("MTAS_3301","Sum F+B; Energy (keV); F+B Pair (arb.)",this->h2dsettings.at(3301));
@@ -753,6 +774,24 @@ void MtasProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 		hismanager->RegisterPlot<TH2F>("MTAS_3534","Calibrated IndividualPMT O PMTs #beta-gated; Energy (keV); PMT (arb.)",this->h2dsettings.at(3534));
 	}
 
+	//center position correction plots
+	for( size_t ii = 0; ii < 6; ++ii ){
+		std::string name  = "MTAS_336"+std::to_string(ii)+"_F";
+		std::string title = "C"+std::to_string(ii+1)+"F vs Center Position #beta-gated; Position (arb.); Energy (channel)";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3360));
+
+		name = "MTAS_336"+std::to_string(ii)+"_B";
+		title = "C"+std::to_string(ii+1)+"B vs Center Position #beta-gated; Position (arb.); Energy (channel)";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3360));
+
+		name = "MTAS_336"+std::to_string(ii);
+		title = "C"+std::to_string(ii+1)+" vs Center Position Sum #beta-gated; Position (arb.); Energy (channel)";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3360));
+	}
+
+}
+
+void MtasProcessor::DeclareAntiBetaPlots(PLOTS::PlotRegistry* hismanager){
 	//not beta event
 	this->MTAS_3100 = hismanager->RegisterPlot<TH1F>("MTAS_3100","Mtas Total anti-#beta-gated; Energy (keV)",this->h1dsettings.at(3100));
 	this->MTAS_3101 = hismanager->RegisterPlot<TH2F>("MTAS_3101","Sum F+B; Energy (keV); F+B Pair (arb.)",this->h2dsettings.at(3101));
@@ -812,34 +851,7 @@ void MtasProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 		name = "MTAS_316"+std::to_string(ii);
 		title = "C"+std::to_string(ii+1)+" vs Center Position Sum anti #beta-gated; Position (arb.); Energy (channel)";
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3160));
-
-		name = "MTAS_326"+std::to_string(ii)+"_F";
-		title = "C"+std::to_string(ii+1)+"F vs Center Position; Position (arb.); Energy (channel)";
-		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3260));
-
-		name = "MTAS_326"+std::to_string(ii)+"_B";
-		title = "C"+std::to_string(ii+1)+"B vs Center Position; Position (arb.); Energy (channel)";
-		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3260));
-
-		name = "MTAS_326"+std::to_string(ii);
-		title = "C"+std::to_string(ii+1)+" vs Center Position Sum; Position (arb.); Energy (channel)";
-		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3260));
-
-		name = "MTAS_336"+std::to_string(ii)+"_F";
-		title = "C"+std::to_string(ii+1)+"F vs Center Position #beta-gated; Position (arb.); Energy (channel)";
-		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3360));
-
-		name = "MTAS_336"+std::to_string(ii)+"_B";
-		title = "C"+std::to_string(ii+1)+"B vs Center Position #beta-gated; Position (arb.); Energy (channel)";
-		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3360));
-
-		name = "MTAS_336"+std::to_string(ii);
-		title = "C"+std::to_string(ii+1)+" vs Center Position Sum #beta-gated; Position (arb.); Energy (channel)";
-		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3360));
 	}
-
-
-	this->console->info("Finished Declaring Plots");
 }
 
 void MtasProcessor::RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>& outputtrees){

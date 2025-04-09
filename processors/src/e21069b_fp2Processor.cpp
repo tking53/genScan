@@ -23,7 +23,8 @@ e21069b_fp2Processor::e21069b_fp2Processor(const std::string& log) : Processor(l
 [[maybe_unused]] bool e21069b_fp2Processor::PreProcess(EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	Processor::PreProcess();
 
-	auto types = eventhistory->GetCurrentEventSummary()->GetKnownTypes();
+	auto summary = eventhistory->GetCurrentEventSummary();
+	auto types = summary->GetKnownTypes();
 
 	this->HasMtas = (types.find("mtas") != types.end());
 	this->HasPid = (types.find("pid") != types.end());
@@ -39,6 +40,17 @@ e21069b_fp2Processor::e21069b_fp2Processor(const std::string& log) : Processor(l
 
 	if( this->HasPid ){
 		this->PidProc->PreProcess(eventhistory,hismanager,cutmanager);
+	}
+
+	//start flow control logic of what to do with ion and others
+	if( this->HasImplant ){
+		if( summary->ContainsEventTag("beta") ){
+			this->MtasProc->FillBetaPlots(hismanager);
+		}else{
+			//need to check for ions and add them, but for now let's just put them in 3100,
+			//therefore bkg = 3200 - 3100 - 3300;
+			this->MtasProc->FillNonBetaPlots(hismanager);
+		}
 	}
 
 	Processor::EndProcess();
