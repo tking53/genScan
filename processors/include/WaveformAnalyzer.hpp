@@ -28,7 +28,7 @@ class WaveformAnalyzer : public Analyzer {
 		virtual void DeclarePlots([[maybe_unused]] PLOTS::PlotRegistry*) const;
 
 	private:
-		bool ValidateSettingsString(const std::string&) const;
+		//bool ValidateSettingsString(const std::string&) const;
 
 		boost::regex GenerateRegex(const std::string&,const std::string&,const std::string&);
 
