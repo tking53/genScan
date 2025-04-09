@@ -28,7 +28,7 @@ list(APPEND EXE_LIST GenPeakFit)
 
 add_executable(GenCalRipper src/calibrationrippermain.cpp)
 add_dependencies(GenPeakFit ${EXTERNAL_DEPS})
-target_link_libraries(GenCalRipper PRIVATE GenScanCore)
+target_link_libraries(GenCalRipper PRIVATE pugixml GenScanFitters GenScanUtility ${ROOT_LIBRARIES})
 list(APPEND EXE_LIST GenCalRipper)
 
 add_executable(GenTrapFilter src/trapfiltermain.cpp)

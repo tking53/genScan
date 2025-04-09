@@ -1,4 +1,3 @@
-#include "XMLConfigParser.hpp"
 #include <cstdlib>
 #include <fstream>
 #include <iomanip>
