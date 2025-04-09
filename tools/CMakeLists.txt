@@ -36,6 +36,16 @@ add_dependencies(GenTrapFilter ${EXTERNAL_DEPS})
 target_link_libraries(GenTrapFilter PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES})
 list(APPEND EXE_LIST GenTrapFilter)
 
+add_executable(GenCMapRegexTest src/channelmapregexchecker.cpp)
+add_dependencies(GenCMapRegexTest ${EXTERNAL_DEPS})
+target_link_libraries(GenCMapRegexTest PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES})
+list(APPEND EXE_LIST GenCMapRegexTest)
+
+#add_executable(GenPeakLocator src/locatepeaksmain.cpp)
+#add_dependencies(GenPeakLocator ${EXTERNAL_DEPS})
+#target_link_libraries(GenPeakLocator PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES})
+#list(APPEND EXE_LIST GenPeakLocator)
+
 if( USE_SYSTEM_YAMLCPP )
 	target_link_libraries(GenPeakFit PUBLIC yaml-cppd)
 	target_link_libraries(GenCalRipper PUBLIC yaml-cppd)

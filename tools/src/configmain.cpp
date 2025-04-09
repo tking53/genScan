@@ -178,194 +178,195 @@ int main(int argc, char *argv[]) {
 	try{
 		boost::program_options::variables_map vm;
 		store(boost::program_options::command_line_parser(argc, argv).options(cmdline_options).positional(p).run(), vm);
-        	notify(vm);
+		notify(vm);
 		if( vm.count("help") or argc <= 2 ){
 			spdlog::info(cmdline_options);
 			exit(EXIT_SUCCESS);
 		}
 
+		pugi::xml_document doc;
+		pugi::xml_node Configuration = doc.append_child("Configuration");
+
+		auto regexaddnodedata = [](pugi::xml_node& curr,const std::string& searchstring,boost::regex& re,const int& idx,const std::string& nextnodename,const std::string& nextnodedefault,const std::string& errmsg){
+			pugi::xml_node next = curr.append_child(nextnodename.c_str());
+
+			boost::smatch match;
+			if( boost::regex_search(searchstring,match,re) ){
+				next.append_child(pugi::node_pcdata).set_value(std::string(match[idx]).c_str());
+			}else{
+				spdlog::warn(errmsg);
+				next.append_child(pugi::node_pcdata).set_value(nextnodedefault.c_str());
+			}
+		};
+
+		pugi::xml_node Author = Configuration.append_child("Author");
+
+		boost::regex Authorregex("(Author:)(.*?)(;|$)");
+		regexaddnodedata(Author,authorinfo,Authorregex,2,"Name","GenConfig","Missing Author information, default to GenConfig");
+
+		boost::regex Dateregex("(Date:)(.*?)(;|$)");
+		regexaddnodedata(Author,authorinfo,Dateregex,2,"Date","Today","Missing Date information, default to Today");
+
+		boost::regex Emailregex("(Email:)(.*?)(;|$)");
+		regexaddnodedata(Author,authorinfo,Emailregex,2,"Email","default AT gmail DOT com","Missing Email information, default to default AT gmail DOT com");
+
+		pugi::xml_node Description = Configuration.append_child("Description");
+		Description.append_child(pugi::node_pcdata).set_value(description.c_str());
+
+		auto regexaddnodeattr = []<class T>(pugi::xml_node& curr,const std::string& searchstring,boost::regex& re,const int& idx,const std::string& attrname,const T& defaultval,const std::string& errmsg){
+
+			boost::smatch match;
+			if( boost::regex_search(searchstring,match,re) ){
+				curr.append_attribute(attrname.c_str()) = std::string(match[idx]).c_str();
+				return true;
+			}else{
+				spdlog::warn(errmsg);
+				curr.append_attribute(attrname.c_str()) = defaultval;
+				return false;
+			}
+		};
+
+		pugi::xml_node Global = Configuration.append_child("Global");
+
+		boost::regex Eventwidthregex("(EventWidth:)(.*?)(;|$)");
+		auto foundevtwidth = regexaddnodeattr(Global,eventbuild,Eventwidthregex,2,"EventWidth",500,"Missing EventWidth, using 500 ns");
+
+		boost::regex Eventwidthunitregex("(EventWidthUnit:)(.*?)(;|$)");
+		if( not foundevtwidth ){
+			Global.append_attribute("EventWidthUnit") = "ns";
+		}else{
+			auto toss = regexaddnodeattr(Global,eventbuild,Eventwidthunitregex,2,"EventWidthUnit","ns","Missing EventWidthUnit using ns"); 
+		}
+
+		boost::regex Correlationtyperegex("(CorrelationType:)(.*?)($|;)");
+		{
+			auto toss = regexaddnodeattr(Global,eventbuild,Correlationtyperegex,2,"CorrelationType","rolling-trigger","Missing CorrelationType using rolling-trigger");
+		}
+
+		pugi::xml_node DetectorDriver = Configuration.append_child("DetectorDriver");
+		for( const auto& a : analyzerlist ){
+			pugi::xml_node processor = DetectorDriver.append_child("Analyzer");
+			processor.append_attribute("name") = a.c_str();
+		}
+		for( const auto& p : processorlist ){
+			pugi::xml_node processor = DetectorDriver.append_child("Processor");
+			processor.append_attribute("name") = p.c_str();
+		}
+
+		//first one is everyone except last so they need to be trimmed of their ":" at the end
+		boost::regex re("(.*?:)|(.+?$)");
+		auto gencurrlist = [](const std::string& currstr, const boost::regex& re){
+			std::string::const_iterator start = currstr.begin();
+			std::string::const_iterator end = currstr.end();
+			boost::smatch what;
+			boost::match_flag_type flags = boost::match_default;
+			std::vector<std::string> vals;
+			while(regex_search(start, end, what, re, flags)){
+				auto p = std::string(what[1].first, what[1].second);
+				if( p.size() == 0 ){
+					p = std::string(what[2].first, what[2].second);
+				}else{
+					p.pop_back();
+				}
+				vals.push_back(p);
+				// update search position:
+				start = what[0].second;
+				// update flags:
+				flags |= boost::match_prev_avail;
+				flags |= boost::match_not_bob;
+			}
+			return vals;
+		};
+
+		std::vector<BMap*> boardinfo;
+		for( const auto& currstr : moduleregexlist ){
+			auto currbmap = gencurrlist(currstr,re);
+			if( currbmap.size() != 6 ){
+				spdlog::error("invalid board map regex, expect revision:frequency:firmware:[cratelist/craterange]:[modulelist/modulerange] for the following regex {}",currstr);
+				spdlog::error("got {} tokens instead of 6 listed below",currbmap.size());
+				for( const auto& p : currbmap ){
+					spdlog::error("{}",p);
+				}
+				exit(EXIT_FAILURE);
+			}
+			boardinfo.push_back(new BMap(currbmap));
+		}	
+
+		std::vector<CMap*> chaninfo;
+		for( const auto& currstr : cmapregexlist ){
+			auto currcmap = gencurrlist(currstr,re);
+			if( currcmap.size() != 7 ){
+				spdlog::error("invalid channel map regex, expect type:subtype:group:tags:[cratelist/craterange]:[modulelist/modulerange]:[channellist/channelrange] for the following regex {}",currstr);
+				spdlog::error("got {} tokens instead of 7 listed below",currcmap.size());
+				for( const auto& p : currcmap ){
+					spdlog::error("{}",p);
+				}
+				exit(EXIT_FAILURE);
+			}
+			chaninfo.push_back(new CMap(currcmap));
+		}
+
+		pugi::xml_node Map = Configuration.append_child("Map");
+		int cnt = 0;
+		for( int ii = 0; ii < numcrate; ++ii ){
+			pugi::xml_node Crate = Map.append_child("Crate");
+			Crate.append_attribute("number") = ii;
+			for( int jj = 0; jj < nummodule; ++jj ){
+				pugi::xml_node Module = Crate.append_child("Module");
+				Module.append_attribute("number") = jj;
+				std::string rev = "F";
+				std::string freq = "250";
+				std::string firm = "R42950";
+				std::string delay = "120";
+				for( const auto& b : boardinfo ){
+					if( b->IsValid(ii,jj) ){
+						rev = b->revision;
+						freq = b->frequency;
+						firm = b->firmware;
+						delay = b->tracedelay;
+						break;
+					}
+				}
+				Module.append_attribute("Revision") = rev.c_str();
+				Module.append_attribute("Frequency") = freq.c_str();
+				Module.append_attribute("Firmware") = firm.c_str();
+				Module.append_attribute("TraceDelay") = delay.c_str();
+				for( int kk = 0; kk < numchannel; ++kk ){
+					pugi::xml_node Channel = Module.append_child("Channel");
+					Channel.append_attribute("number") = kk;
+					std::string type = "generic";
+					std::string subtype = "generic";
+					std::string group = "generic";
+					std::string tags = std::to_string(cnt);
+					for( const auto& c : chaninfo ){
+						if( c->IsValid(ii,jj,kk) ){
+							type = c->type;
+							subtype = c->subtype;
+							group = c->group;
+							tags = c->tags;
+							break;
+						}
+					}
+					Channel.append_attribute("type") = type.c_str();
+					Channel.append_attribute("subtype") = subtype.c_str();
+					Channel.append_attribute("group") = group.c_str();
+					Channel.append_attribute("tags") = tags.c_str();
+
+					pugi::xml_node Calibration = Channel.append_child("Calibration");
+					Calibration.append_attribute("model") = "linear";
+					Calibration.append_attribute("min") = 0.0;
+					Calibration.append_child(pugi::node_pcdata).set_value("0.0 1.0");
+
+					++cnt;
+				}
+			}
+		}
+
+		std::cout << doc.save_file(outputfile.c_str()) << std::endl;
+
 	}catch( std::exception& e){
 		spdlog::error(e.what());
 		exit(EXIT_FAILURE);
 	}    
-	
-	pugi::xml_document doc;
-	pugi::xml_node Configuration = doc.append_child("Configuration");
 
-	auto regexaddnodedata = [](pugi::xml_node& curr,const std::string& searchstring,boost::regex& re,const int& idx,const std::string& nextnodename,const std::string& nextnodedefault,const std::string& errmsg){
-		pugi::xml_node next = curr.append_child(nextnodename.c_str());
-
-		boost::smatch match;
-		if( boost::regex_search(searchstring,match,re) ){
-			next.append_child(pugi::node_pcdata).set_value(std::string(match[idx]).c_str());
-		}else{
-			spdlog::warn(errmsg);
-			next.append_child(pugi::node_pcdata).set_value(nextnodedefault.c_str());
-		}
-	};
-	
-	pugi::xml_node Author = Configuration.append_child("Author");
-
-	boost::regex Authorregex("(Author:)(.*?)(;|$)");
-	regexaddnodedata(Author,authorinfo,Authorregex,2,"Name","GenConfig","Missing Author information, default to GenConfig");
-
-	boost::regex Dateregex("(Date:)(.*?)(;|$)");
-	regexaddnodedata(Author,authorinfo,Dateregex,2,"Date","Today","Missing Date information, default to Today");
-
-	boost::regex Emailregex("(Email:)(.*?)(;|$)");
-	regexaddnodedata(Author,authorinfo,Emailregex,2,"Email","default AT gmail DOT com","Missing Email information, default to default AT gmail DOT com");
-
-	pugi::xml_node Description = Configuration.append_child("Description");
-	Description.append_child(pugi::node_pcdata).set_value(description.c_str());
-
-	auto regexaddnodeattr = []<class T>(pugi::xml_node& curr,const std::string& searchstring,boost::regex& re,const int& idx,const std::string& attrname,const T& defaultval,const std::string& errmsg){
-
-		boost::smatch match;
-		if( boost::regex_search(searchstring,match,re) ){
-			curr.append_attribute(attrname.c_str()) = std::string(match[idx]).c_str();
-			return true;
-		}else{
-			spdlog::warn(errmsg);
-			curr.append_attribute(attrname.c_str()) = defaultval;
-			return false;
-		}
-	};
-
-	pugi::xml_node Global = Configuration.append_child("Global");
-
-	boost::regex Eventwidthregex("(EventWidth:)(.*?)(;|$)");
-	auto foundevtwidth = regexaddnodeattr(Global,eventbuild,Eventwidthregex,2,"EventWidth",500,"Missing EventWidth, using 500 ns");
-
-	boost::regex Eventwidthunitregex("(EventWidthUnit:)(.*?)(;|$)");
-	if( not foundevtwidth ){
-		Global.append_attribute("EventWidthUnit") = "ns";
-	}else{
-		auto toss = regexaddnodeattr(Global,eventbuild,Eventwidthunitregex,2,"EventWidthUnit","ns","Missing EventWidthUnit using ns"); 
-	}
-
-	boost::regex Correlationtyperegex("(CorrelationType:)(.*?)($|;)");
-	{
-		auto toss = regexaddnodeattr(Global,eventbuild,Correlationtyperegex,2,"CorrelationType","rolling-trigger","Missing CorrelationType using rolling-trigger");
-	}
-
-	pugi::xml_node DetectorDriver = Configuration.append_child("DetectorDriver");
-	for( const auto& a : analyzerlist ){
-		pugi::xml_node processor = DetectorDriver.append_child("Analyzer");
-		processor.append_attribute("name") = a.c_str();
-	}
-	for( const auto& p : processorlist ){
-		pugi::xml_node processor = DetectorDriver.append_child("Processor");
-		processor.append_attribute("name") = p.c_str();
-	}
-
-	//first one is everyone except last so they need to be trimmed of their ":" at the end
-	boost::regex re("(.*?:)|(.+?$)");
-	auto gencurrlist = [](const std::string& currstr, const boost::regex& re){
-		std::string::const_iterator start = currstr.begin();
-		std::string::const_iterator end = currstr.end();
-		boost::smatch what;
-		boost::match_flag_type flags = boost::match_default;
-		std::vector<std::string> vals;
-		while(regex_search(start, end, what, re, flags)){
-			auto p = std::string(what[1].first, what[1].second);
-			if( p.size() == 0 ){
-				p = std::string(what[2].first, what[2].second);
-			}else{
-				p.pop_back();
-			}
-			vals.push_back(p);
-			// update search position:
-			start = what[0].second;
-			// update flags:
-			flags |= boost::match_prev_avail;
-			flags |= boost::match_not_bob;
-		}
-		return vals;
-	};
-	
-	std::vector<BMap*> boardinfo;
-	for( const auto& currstr : moduleregexlist ){
-		auto currbmap = gencurrlist(currstr,re);
-		if( currbmap.size() != 6 ){
-			spdlog::error("invalid board map regex, expect revision:frequency:firmware:[cratelist/craterange]:[modulelist/modulerange] for the following regex {}",currstr);
-			spdlog::error("got {} tokens instead of 6 listed below",currbmap.size());
-			for( const auto& p : currbmap ){
-				spdlog::error("{}",p);
-			}
-			exit(EXIT_FAILURE);
-		}
-		boardinfo.push_back(new BMap(currbmap));
-	}	
-
-	std::vector<CMap*> chaninfo;
-	for( const auto& currstr : cmapregexlist ){
-		auto currcmap = gencurrlist(currstr,re);
-		if( currcmap.size() != 7 ){
-			spdlog::error("invalid channel map regex, expect type:subtype:group:tags:[cratelist/craterange]:[modulelist/modulerange]:[channellist/channelrange] for the following regex {}",currstr);
-			spdlog::error("got {} tokens instead of 7 listed below",currcmap.size());
-			for( const auto& p : currcmap ){
-				spdlog::error("{}",p);
-			}
-			exit(EXIT_FAILURE);
-		}
-		chaninfo.push_back(new CMap(currcmap));
-	}
-
-	pugi::xml_node Map = Configuration.append_child("Map");
-	int cnt = 0;
-	for( int ii = 0; ii < numcrate; ++ii ){
-		pugi::xml_node Crate = Map.append_child("Crate");
-		Crate.append_attribute("number") = ii;
-		for( int jj = 0; jj < nummodule; ++jj ){
-			pugi::xml_node Module = Crate.append_child("Module");
-			Module.append_attribute("number") = jj;
-			std::string rev = "F";
-			std::string freq = "250";
-			std::string firm = "R42950";
-			std::string delay = "120";
-			for( const auto& b : boardinfo ){
-				if( b->IsValid(ii,jj) ){
-					rev = b->revision;
-					freq = b->frequency;
-					firm = b->firmware;
-					delay = b->tracedelay;
-					break;
-				}
-			}
-			Module.append_attribute("Revision") = rev.c_str();
-			Module.append_attribute("Frequency") = freq.c_str();
-			Module.append_attribute("Firmware") = firm.c_str();
-			Module.append_attribute("TraceDelay") = delay.c_str();
-			for( int kk = 0; kk < numchannel; ++kk ){
-				pugi::xml_node Channel = Module.append_child("Channel");
-				Channel.append_attribute("number") = kk;
-				std::string type = "generic";
-				std::string subtype = "generic";
-				std::string group = "generic";
-				std::string tags = std::to_string(cnt);
-				for( const auto& c : chaninfo ){
-					if( c->IsValid(ii,jj,kk) ){
-						type = c->type;
-						subtype = c->subtype;
-						group = c->group;
-						tags = c->tags;
-						break;
-					}
-				}
-				Channel.append_attribute("type") = type.c_str();
-				Channel.append_attribute("subtype") = subtype.c_str();
-				Channel.append_attribute("group") = group.c_str();
-				Channel.append_attribute("tags") = tags.c_str();
-				
-				pugi::xml_node Calibration = Channel.append_child("Calibration");
-				Calibration.append_attribute("model") = "linear";
-				Calibration.append_attribute("min") = 0.0;
-				Calibration.append_child(pugi::node_pcdata).set_value("0.0 1.0");
-
-				++cnt;
-			}
-		}
-	}
-
-	std::cout << doc.save_file(outputfile.c_str()) << std::endl;
 }
