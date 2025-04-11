@@ -263,8 +263,8 @@ int main(int argc, char *argv[]) {
 	std::shared_ptr<ProcessorList> processorlist = std::make_shared<ProcessorList>(logname);
 	try{
 		if( config_extension == "xml" ){
-			processorlist->InitializeProcessors(reinterpret_cast<ConfigParser*>(cfgparser.get()));
-			processorlist->InitializeAnalyzers(reinterpret_cast<ConfigParser*>(cfgparser.get()));
+			processorlist->InitializeProcessors(cfgparser.get());
+			processorlist->InitializeAnalyzers(cfgparser.get());
 		}else{
 			console->error("unknown file extension of {}, supported extensions are xml",config_extension);
 			exit(EXIT_FAILURE);
