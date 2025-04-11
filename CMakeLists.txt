@@ -235,31 +235,9 @@ else()
 	)
 	include_directories(${YAML_EXTERNAL_INSTALL_LOCATION}/include)
 	link_directories(${YAML_EXTERNAL_INSTALL_LOCATION}/lib)
+	set(CMAKE_PREFIX_PATH "{YAML_EXTERNAL_INSTALL_LOCATION}" ${CMAKE_PREFIX_PATH})
+	find_package(yaml-cpp REQUIRED)
 	list(APPEND EXTERNAL_DEPS yaml-cppProject)
-	list(APPEND EXTERNAL_CORE_DEPS yaml-cppProject)
-	list(APPEND EXTERNAL_PROCESSOR_DEPS yaml-cppProject)
-endif()
-
-option(USE_SYSTEM_JSONCPP "Use the system installed jsoncpp, if not then we will download one and use that one" OFF)
-if( USE_SYSTEM_JSONCPP )
-	find_package(jsoncpp REQUIRED)
-else()
-	set(JSON_EXTERNAL_INSTALL_LOCATION ${CMAKE_INSTALL_PREFIX}/external)
-	set(JSON_VERSION 1.9.5 CACHE STRING "Version of jsoncpp you want to get from git" )
-	mark_as_advanced(JSON_VERSION)
-	ExternalProject_Add(jsoncppProject
-		GIT_REPOSITORY https://github.com/open-source-parsers/jsoncpp
-		GIT_TAG ${JSON_VERSION}
-		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${JSON_EXTERNAL_INSTALL_LOCATION} -DCMAKE_VERBOSE_MAKEFILE=OFF -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DJSONCPP_WITH_TESTS=OFF -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
-		BUILD_COMMAND make -s
-		INSTALL_COMMAND make -s install
-		${_LOG_OPTIONS}
-	)
-	include_directories(${JSON_EXTERNAL_INSTALL_LOCATION}/include)
-	link_directories(${JSON_EXTERNAL_INSTALL_LOCATION}/lib)
-	list(APPEND EXTERNAL_DEPS jsoncppProject)
-	list(APPEND EXTERNAL_CORE_DEPS jsoncppProject)
-	list(APPEND EXTERNAL_PROCESSOR_DEPS jsoncppProject)
 endif()
 
 option(USE_SYSTEM_FMT "Use the system fmt library, if not then we will download and use that one" OFF)

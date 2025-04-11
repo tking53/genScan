@@ -172,11 +172,7 @@ list(APPEND PROCESSOR_STRUCT_RMAP ${CMAKE_CURRENT_BINARY_DIR}/libPidStruct_root.
 
 
 add_library(GenScanProcessors ${src_files})
-if( USE_SYSTEM_YAMLCPP )
-	target_link_libraries(GenScanProcessors PUBLIC ${ROOT_LIBRARIES} GenScanFitters GenScanUtility pugixml yaml-cppd jsoncpp)
-else()
-	target_link_libraries(GenScanProcessors PUBLIC ${ROOT_LIBRARIES} GenScanFitters GenScanUtility pugixml yaml-cpp jsoncpp)
-endif()
+target_link_libraries(GenScanProcessors PUBLIC ${ROOT_LIBRARIES} GenScanFitters GenScanUtility pugixml)
 target_include_directories(GenScanProcessors PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_dependencies(GenScanProcessors ${EXTERNAL_PROCESSOR_DEPS} ${EXTERNAL_LOG_DEPS})
 
