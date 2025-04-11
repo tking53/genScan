@@ -211,20 +211,6 @@ BSMExpProcessor::BSMExpProcessor(const std::string& log) : Processor(log,"BSMExp
 	return true;
 }
 
-void BSMExpProcessor::Init(const YAML::Node& config){
-	this->MtasProc->Init(config);
-	this->BSMProc->Init(config);
-	this->LoadHistogramSettings(config);
-	this->LoadCustomCuts(config);
-}
-
-void BSMExpProcessor::Init(const Json::Value& config){
-	this->MtasProc->Init(config);
-	this->BSMProc->Init(config);
-	this->LoadHistogramSettings(config);
-	this->LoadCustomCuts(config);
-}
-
 void BSMExpProcessor::Init(const pugi::xml_node& config){
 	for( pugi::xml_node proc = config.child("Processor"); proc; proc = proc.next_sibling("Processor") ){
 		std::string name = proc.attribute("name").as_string();

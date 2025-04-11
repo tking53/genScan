@@ -616,18 +616,6 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 	return true;
 }
 
-void MtasProcessor::Init(const YAML::Node& config){
-	this->console->info("Init called with YAML::Node");
-	this->LoadHistogramSettings(config);
-	this->LoadCustomCuts(config);
-}
-
-void MtasProcessor::Init(const Json::Value& config){
-	this->console->info("Init called with Json::Value");
-	this->LoadHistogramSettings(config);
-	this->LoadCustomCuts(config);
-}
-
 void MtasProcessor::Init(const pugi::xml_node& config){
 	this->console->info("Init called with pugi::xml_node");
 

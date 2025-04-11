@@ -130,16 +130,6 @@ HagridProcessor::HagridProcessor(const std::string& log) : Processor(log,"Hagrid
 	return true;
 }
 
-void HagridProcessor::Init(const YAML::Node& config){
-	this->console->info("Init called with YAML::Node");
-	this->NumHagrid = 16;
-}
-
-void HagridProcessor::Init(const Json::Value& config){
-	this->console->info("Init called with Json::Value");
-	this->NumHagrid = 16;
-}
-
 void HagridProcessor::Init(const pugi::xml_node& config){
 	this->console->info("Init called with pugi::xml_node");
 	this->NumHagrid = 16;

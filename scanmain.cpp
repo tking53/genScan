@@ -25,9 +25,6 @@
 
 #include "ConfigParser.hpp"
 #include "Translator.hpp"
-#include "XMLConfigParser.hpp"
-#include "YAMLConfigParser.hpp"
-#include "JSONConfigParser.hpp"
 #include "ChannelMap.hpp"
 
 #include "Correlator.hpp"
@@ -197,13 +194,9 @@ int main(int argc, char *argv[]) {
 	std::unique_ptr<ConfigParser> cfgparser;
 	auto config_extension = StringManip::GetFileExtension(configfile);
 	if( config_extension == "xml" ){
-		cfgparser.reset(new XMLConfigParser(logname));
-	}else if( config_extension == "yaml" or config_extension == "yml" ){
-		cfgparser.reset(new YAMLConfigParser(logname));
-	}else if( config_extension == "json" ){
-		cfgparser.reset(new JSONConfigParser(logname));
+		cfgparser.reset(new ConfigParser(logname));
 	}else{
-		console->error("unknown file extension of {}, supported extensions are xml, yaml, json",config_extension);
+		console->error("unknown file extension of {}, supported extensions are xml",config_extension);
 		exit(EXIT_FAILURE);
 	}
 
@@ -270,16 +263,10 @@ int main(int argc, char *argv[]) {
 	std::shared_ptr<ProcessorList> processorlist = std::make_shared<ProcessorList>(logname);
 	try{
 		if( config_extension == "xml" ){
-			processorlist->InitializeProcessors(reinterpret_cast<XMLConfigParser*>(cfgparser.get()));
-			processorlist->InitializeAnalyzers(reinterpret_cast<XMLConfigParser*>(cfgparser.get()));
-		}else if( config_extension == "yaml" or config_extension == "yml" ){
-			processorlist->InitializeProcessors(reinterpret_cast<YAMLConfigParser*>(cfgparser.get()));
-			processorlist->InitializeAnalyzers(reinterpret_cast<YAMLConfigParser*>(cfgparser.get()));
-		}else if( config_extension == "json" ){
-			processorlist->InitializeProcessors(reinterpret_cast<JSONConfigParser*>(cfgparser.get()));
-			processorlist->InitializeAnalyzers(reinterpret_cast<JSONConfigParser*>(cfgparser.get()));
+			processorlist->InitializeProcessors(reinterpret_cast<ConfigParser*>(cfgparser.get()));
+			processorlist->InitializeAnalyzers(reinterpret_cast<ConfigParser*>(cfgparser.get()));
 		}else{
-			console->error("unknown file extension of {}, supported extensions are xml, yaml, json",config_extension);
+			console->error("unknown file extension of {}, supported extensions are xml",config_extension);
 			exit(EXIT_FAILURE);
 		}
 		processorlist->DeclarePlots(HistogramManager.get());
@@ -307,16 +294,8 @@ int main(int argc, char *argv[]) {
 
 	std::signal(SIGINT, signalHandler);
 
-	//change this to be a two part object, one containing the parts the processors will ask for,
-	//the other being the history of all those objects as well as the common/independet of event things like the mapped uids 
-	//Then we provide accessor function to go through the history of events and when we allocate this object 
-	//we default it to the past 5 events, we should also allow each of the correlated sets can have associated tags with them
-	//this would make life easier for things like previous-gamma previous-beta previous-ion, etc.
-	//we should make each of those tags have a history though? that would require a good bit of everhead but would allow for what we want most
-	//we just have to double check that we invalidate the history properly
 	std::shared_ptr<EventHistoryManager> EvtManager( new EventHistoryManager(logname,limit));
 	EvtManager->InitMappedUIDs(cmap.get(),processorlist.get());
-	//CorrelatedEvents.InitMappedUIDs(cmap.get(),processorlist.get());
 	Translator::TRANSLATORSTATE CurrState = Translator::TRANSLATORSTATE::UNKNOWN;
 	try{
 		do{

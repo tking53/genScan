@@ -21,9 +21,7 @@
 #include "HistogramManager.hpp"
 #include "PhysicsData.hpp"
 #include "RootFileManager.hpp"
-#include "XMLConfigParser.hpp"
-#include "YAMLConfigParser.hpp"
-#include "JSONConfigParser.hpp"
+#include "ConfigParser.hpp"
 
 #include "Processor.hpp"
 #include "Analyzer.hpp"
@@ -34,15 +32,9 @@ class ProcessorList{
 		ProcessorList(const std::string&);
 		~ProcessorList() = default;
 
-		void InitializeProcessors(XMLConfigParser*);
-		void InitializeAnalyzers(XMLConfigParser*);
+		void InitializeProcessors(ConfigParser*);
+		void InitializeAnalyzers(ConfigParser*);
 		
-		void InitializeProcessors(YAMLConfigParser*);
-		void InitializeAnalyzers(YAMLConfigParser*);
-		
-		void InitializeProcessors(JSONConfigParser*);
-		void InitializeAnalyzers(JSONConfigParser*);
-
 		void PreAnalyze(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
 		void PreProcess(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
 		

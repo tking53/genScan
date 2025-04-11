@@ -118,14 +118,6 @@ VetoProcessor::VetoProcessor(const std::string& log) : Processor(log,"VetoProces
 	return true;
 }
 
-void VetoProcessor::Init(const YAML::Node& config){
-	this->console->info("Init called with YAML::Node");
-}
-
-void VetoProcessor::Init(const Json::Value& config){
-	this->console->info("Init called with Json::Value");
-}
-
 void VetoProcessor::Init(const pugi::xml_node& config){
 	this->console->info("Init called with pugi::xml_node");
 }

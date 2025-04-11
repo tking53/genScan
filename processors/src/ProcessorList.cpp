@@ -159,7 +159,7 @@ void ProcessorList::CreateAnal(const std::string& name){
 	}
 }
 
-void ProcessorList::InitializeProcessors(XMLConfigParser* cmap){
+void ProcessorList::InitializeProcessors(ConfigParser* cmap){
 	auto procnames = cmap->GetProcessorNames();
 	for( auto& name : procnames ){
 		this->CreateProc(name);
@@ -167,43 +167,11 @@ void ProcessorList::InitializeProcessors(XMLConfigParser* cmap){
 	}
 }
 
-void ProcessorList::InitializeAnalyzers(XMLConfigParser* cmap){
+void ProcessorList::InitializeAnalyzers(ConfigParser* cmap){
 	auto analnames = cmap->GetAnalyzerNames();
 	for( auto& name : analnames ){
 		this->CreateAnal(name);
 		known_analyzers.back()->Init(cmap->GetAnalyzerXMLInfo(name));
-	}
-}
-
-void ProcessorList::InitializeProcessors(YAMLConfigParser* cmap){
-	auto procnames = cmap->GetProcessorNames();
-	for( auto& name : procnames ){
-		this->CreateProc(name);
-		known_processors.back()->Init(cmap->GetProcessorYAMLInfo(name));
-	}
-}
-
-void ProcessorList::InitializeAnalyzers(YAMLConfigParser* cmap){
-	auto analnames = cmap->GetAnalyzerNames();
-	for( auto& name : analnames ){
-		this->CreateProc(name);
-		known_analyzers.back()->Init(cmap->GetAnalyzerYAMLInfo(name));
-	}
-}
-
-void ProcessorList::InitializeProcessors(JSONConfigParser* cmap){
-	auto procnames = cmap->GetProcessorNames();
-	for( auto& name : procnames ){
-		this->CreateAnal(name);
-		known_processors.back()->Init(cmap->GetProcessorJSONInfo(name));
-	}
-}
-
-void ProcessorList::InitializeAnalyzers(JSONConfigParser* cmap){
-	auto analnames = cmap->GetAnalyzerNames();
-	for( auto& name : analnames ){
-		this->CreateAnal(name);
-		known_analyzers.back()->Init(cmap->GetAnalyzerJSONInfo(name));
 	}
 }
 

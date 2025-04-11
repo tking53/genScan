@@ -149,14 +149,6 @@ RIKENPidProcessor::RIKENPidProcessor(const std::string& log) : Processor(log,"RI
 	return true;
 }
 
-void RIKENPidProcessor::Init(const YAML::Node& config){
-	this->console->info("Init called with YAML::Node");
-}
-
-void RIKENPidProcessor::Init(const Json::Value& config){
-	this->console->info("Init called with Json::Value");
-}
-
 void RIKENPidProcessor::Init(const pugi::xml_node& config){
 	this->console->info("Init called with pugi::xml_node");
 }

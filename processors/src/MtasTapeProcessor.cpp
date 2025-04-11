@@ -39,18 +39,6 @@ MtasTapeProcessor::MtasTapeProcessor(const std::string& log) : Processor(log,"Mt
 	return true;
 }
 
-void MtasTapeProcessor::Init(const YAML::Node& config){
-	this->console->info("Init called with YAML::Node");
-	this->LoadHistogramSettings(config);
-	this->LoadCustomCuts(config);
-}
-
-void MtasTapeProcessor::Init(const Json::Value& config){
-	this->console->info("Init called with Json::Value");
-	this->LoadHistogramSettings(config);
-	this->LoadCustomCuts(config);
-}
-
 void MtasTapeProcessor::Init(const pugi::xml_node& config){
 	this->console->info("Init called with pugi::xml_node");
 	this->LoadHistogramSettings(config);

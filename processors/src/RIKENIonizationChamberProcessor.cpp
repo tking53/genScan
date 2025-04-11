@@ -137,16 +137,6 @@ RIKENIonizationChamberProcessor::RIKENIonizationChamberProcessor(const std::stri
 	return true;
 }
 
-void RIKENIonizationChamberProcessor::Init(const YAML::Node& config){
-	this->console->info("Init called with YAML::Node");
-	this->NumAnode = 6;
-}
-
-void RIKENIonizationChamberProcessor::Init(const Json::Value& config){
-	this->console->info("Init called with Json::Value");
-	this->NumAnode = 6;
-}
-
 void RIKENIonizationChamberProcessor::Init(const pugi::xml_node& config){
 	this->console->info("Init called with pugi::xml_node");
 	this->NumAnode = 6;

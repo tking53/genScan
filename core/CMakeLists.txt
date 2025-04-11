@@ -7,11 +7,7 @@ set(ALL_DOC_HEADERS ${ALL_DOC_HEADERS} PARENT_SCOPE)
 set(ALL_DOC_SRC ${ALL_DOC_SRC} PARENT_SCOPE)
 
 add_library(GenScanCore ${src_files})
-if( USE_SYSTEM_YAMLCPP )
-	target_link_libraries(GenScanCore PUBLIC ${ROOT_LIBRARIES} GenScanUtility GenScanProcessors pugixml yaml-cppd jsoncpp)
-else()
-	target_link_libraries(GenScanCore PUBLIC ${ROOT_LIBRARIES} GenScanUtility GenScanProcessors pugixml yaml-cpp jsoncpp)
-endif()
+target_link_libraries(GenScanCore PUBLIC ${ROOT_LIBRARIES} GenScanUtility GenScanProcessors pugixml)
 target_include_directories(GenScanCore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_dependencies(GenScanCore ${EXTERNAL_CORE_DEPS} ${EXTERNAL_LOG_DEPS})
 

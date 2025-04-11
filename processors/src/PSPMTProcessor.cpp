@@ -201,14 +201,6 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log) : Processor(log,"PSPMTPro
 	return true;
 }
 
-void PSPMTProcessor::Init(const YAML::Node& config){
-	this->console->info("Init called with YAML::Node");
-}
-
-void PSPMTProcessor::Init(const Json::Value& config){
-	this->console->info("Init called with Json::Value");
-}
-
 void PSPMTProcessor::Init(const pugi::xml_node& config){
 	this->console->info("Init called with pugi::xml_node");
 }

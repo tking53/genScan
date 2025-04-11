@@ -153,16 +153,6 @@ WaveformAnalyzer::~WaveformAnalyzer(){
 	return true;
 }
 
-void WaveformAnalyzer::Init(const YAML::Node& config){
-	console->info("Init called with YAML::Node");
-	this->LoadHistogramSettings(config);
-}
-
-void WaveformAnalyzer::Init(const Json::Value& config){
-	console->info("Init called with Json::Value");
-	this->LoadHistogramSettings(config);
-}
-
 void WaveformAnalyzer::Init(const pugi::xml_node& config){
 	console->info("Init called with pugi::xml_node");
 

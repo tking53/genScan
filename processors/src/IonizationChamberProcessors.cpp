@@ -130,18 +130,6 @@ IonizationChamberProcessor::IonizationChamberProcessor(const std::string& log) :
 	return true;
 }
 
-void IonizationChamberProcessor::Init(const YAML::Node& config){
-	this->console->info("Init called with YAML::Node");
-	this->NumAnode = 5;
-	this->NumCathode = 1;
-}
-
-void IonizationChamberProcessor::Init(const Json::Value& config){
-	this->console->info("Init called with Json::Value");
-	this->NumAnode = 5;
-	this->NumCathode = 1;
-}
-
 void IonizationChamberProcessor::Init(const pugi::xml_node& config){
 	this->console->info("Init called with pugi::xml_node");
 	this->NumAnode = 5;

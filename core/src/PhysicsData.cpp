@@ -80,7 +80,9 @@ PhysicsData::PhysicsData(const PhysicsData& other) :
 	SummaryID(other.SummaryID),
 	UniqueID(other.UniqueID),
 	CMapID(other.CMapID),
-	TagList(other.TagList)
+	TagList(other.TagList),
+	TraceFitInfo(other.TraceFitInfo),
+	InternalTrapFilterEnergy(other.InternalTrapFilterEnergy)
 {
 }
 
@@ -120,7 +122,9 @@ PhysicsData::PhysicsData(PhysicsData&& other) noexcept :
 	SummaryID(std::move(other.SummaryID)),
 	UniqueID(std::move(other.UniqueID)),
 	CMapID(std::move(other.CMapID)),
-	TagList(std::move(other.TagList))
+	TagList(std::move(other.TagList)),
+	TraceFitInfo(std::move(other.TraceFitInfo)),
+	InternalTrapFilterEnergy(other.InternalTrapFilterEnergy)
 {
 }
 
@@ -162,6 +166,8 @@ PhysicsData& PhysicsData::operator=(const PhysicsData& other){
 		UniqueID = other.UniqueID;
 		CMapID = other.CMapID;
 		TagList = other.TagList;
+		TraceFitInfo = other.TraceFitInfo;
+		InternalTrapFilterEnergy = other.InternalTrapFilterEnergy;
 	}
 	return *this;
 }
@@ -204,6 +210,8 @@ PhysicsData& PhysicsData::operator=(PhysicsData&& other) noexcept{
 		UniqueID = std::move(other.UniqueID);
 		CMapID = std::move(other.CMapID);
 		TagList = std::move(other.TagList);
+		TraceFitInfo = std::move(other.TraceFitInfo);
+		InternalTrapFilterEnergy = other.InternalTrapFilterEnergy;
 	}
 	return *this;
 }
@@ -246,6 +254,7 @@ uint64_t PhysicsData::GetSpillID() const{
 void PhysicsData::SetEnergy(double value1,double value2){
 	this->RawEnergyWRandom = value1;
 	this->Energy = value2;
+	this->InternalTrapFilterEnergy = value1;
 }
 
 double PhysicsData::GetEnergy() const{
@@ -613,4 +622,8 @@ void PhysicsData::AddTraceFitInfo(const std::string& name,double p,double e){
 
 std::pair<double,double> PhysicsData::GetTraceFitValue(const std::string& name) const{
 	return this->TraceFitInfo.at(name);
+}
+
+double PhysicsData::GetInternalTrapFilterEnergy() const{
+	return this->InternalTrapFilterEnergy;
 }

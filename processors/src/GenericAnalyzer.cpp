@@ -21,16 +21,6 @@ GenericAnalyzer::GenericAnalyzer(const std::string& log) : Analyzer(log,"Generic
 	return true;
 }
 
-void GenericAnalyzer::Init(const YAML::Node& config){
-	console->info("Init called with YAML::Node");
-	this->LoadHistogramSettings(config);
-}
-
-void GenericAnalyzer::Init(const Json::Value& config){
-	console->info("Init called with Json::Value");
-	this->LoadHistogramSettings(config);
-}
-
 void GenericAnalyzer::Init(const pugi::xml_node& config){
 	console->info("Init called with pugi::xml_node");
 	this->LoadHistogramSettings(config);

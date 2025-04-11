@@ -15,8 +15,6 @@ class RIKENIonizationChamberProcessor : public Processor{
 
 		virtual void Finalize() final;
 
-		void Init(const YAML::Node&);
-		void Init(const Json::Value&);
 		void Init(const pugi::xml_node&);
 
 		void DeclarePlots(PLOTS::PlotRegistry*);

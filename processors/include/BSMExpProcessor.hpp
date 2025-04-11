@@ -15,8 +15,6 @@ class BSMExpProcessor : public Processor{
 
 		virtual void Finalize() final;
 
-		virtual void Init(const YAML::Node&);
-		virtual void Init(const Json::Value&);
 		virtual void Init(const pugi::xml_node&);
 
 		virtual void DeclarePlots(PLOTS::PlotRegistry*);

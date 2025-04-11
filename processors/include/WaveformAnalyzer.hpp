@@ -20,8 +20,6 @@ class WaveformAnalyzer : public Analyzer {
 
 
 		virtual void Init([[maybe_unused]] const pugi::xml_node&);
-		virtual void Init([[maybe_unused]] const YAML::Node&);
-		virtual void Init([[maybe_unused]] const Json::Value&);
 
 		virtual void Finalize();
 

@@ -199,22 +199,6 @@ ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf
 	return true;
 }
 
-void ribf168Processor::Init(const YAML::Node& config){
-	this->HagridProc->Init(config);
-	this->RIKENIonizationChamberProc->Init(config);
-	this->RIKENPidProc->Init(config);
-	this->PSPMTProc->Init(config);
-	this->VetoProc->Init(config);
-}
-
-void ribf168Processor::Init(const Json::Value& config){
-	this->HagridProc->Init(config);
-	this->RIKENIonizationChamberProc->Init(config);
-	this->RIKENPidProc->Init(config);
-	this->PSPMTProc->Init(config);
-	this->VetoProc->Init(config);
-}
-
 void ribf168Processor::Init(const pugi::xml_node& config){
 	for( pugi::xml_node proc = config.child("Processor"); proc; proc = proc.next_sibling("Processor") ){
 		std::string name = proc.attribute("name").as_string();

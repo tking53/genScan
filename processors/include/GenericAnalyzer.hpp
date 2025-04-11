@@ -11,8 +11,6 @@ class GenericAnalyzer : public Analyzer{
 		[[maybe_unused]] virtual bool Process([[maybe_unused]] EventHistoryManager*,[[maybe_unused]] PLOTS::PlotRegistry*,[[maybe_unused]] CUTS::CutRegistry*) final;
 		[[maybe_unused]] virtual bool PostProcess([[maybe_unused]] EventHistoryManager*,[[maybe_unused]] PLOTS::PlotRegistry*,[[maybe_unused]] CUTS::CutRegistry*) final;
 
-		virtual void Init(const YAML::Node&);
-		virtual void Init(const Json::Value&);
 		virtual void Init(const pugi::xml_node&);
 
 		virtual void Finalize() final;

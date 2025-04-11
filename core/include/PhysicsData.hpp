@@ -388,6 +388,7 @@ class PhysicsData{
 		void AddTraceFitInfo(const std::string&,double,double);
 		bool DoesTraceFitValueExist(const std::string&) const;
 		std::pair<double,double> GetTraceFitValue(const std::string&) const;
+		double GetInternalTrapFilterEnergy() const;
 
 	private:
 		//this is info decoded from the data files
@@ -439,6 +440,9 @@ class PhysicsData{
 
 		//From trace fitting info
 		std::map<std::string,std::pair<double,double>> TraceFitInfo;
+
+		//From internal trap filter by default is just the FilterEnergy
+		double InternalTrapFilterEnergy;
 
 		//Trace Helper, should probably hide this from end user though
 		//and only expose what it can determine

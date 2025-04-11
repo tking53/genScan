@@ -22,10 +22,6 @@
 #include <pugixml.hpp>
 #include <pugiconfig.hpp>
 
-#include <yaml-cpp/yaml.h>
-
-#include <json/json.h>
-
 #include <boost/regex.hpp>
 
 #include "TTree.h"
@@ -55,8 +51,6 @@ class Processor : public std::enable_shared_from_this<Processor> {
 		[[nodiscard]] virtual bool ContainsAnyType(const std::set<std::string>&) const final;
 
 		[[noreturn]] virtual void Init([[maybe_unused]] const pugi::xml_node&);
-		[[noreturn]] virtual void Init([[maybe_unused]] const YAML::Node&);
-		[[noreturn]] virtual void Init([[maybe_unused]] const Json::Value&);
 
 		virtual void AssociateType(const std::string&) final;
 		[[noreturn]] virtual void Finalize();
@@ -73,12 +67,8 @@ class Processor : public std::enable_shared_from_this<Processor> {
 		
 	protected:
 		virtual void LoadHistogramSettings(const pugi::xml_node&) final;
-		virtual void LoadHistogramSettings(const YAML::Node&) final;
-		virtual void LoadHistogramSettings(const Json::Value&) final;
 		
 		virtual void LoadCustomCuts(const pugi::xml_node&) final;
-		virtual void LoadCustomCuts(const YAML::Node&) final;
-		virtual void LoadCustomCuts(const Json::Value&) final;
 
 		enum STEP{
 			PREPROCESS,

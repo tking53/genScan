@@ -137,18 +137,6 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 	return true;
 }
 
-void MtasImplantProcessor::Init(const YAML::Node& config){
-	this->console->info("Init called with YAML::Node");
-	this->LoadHistogramSettings(config);
-	this->LoadCustomCuts(config);
-}
-
-void MtasImplantProcessor::Init(const Json::Value& config){
-	this->console->info("Init called with Json::Value");
-	this->LoadHistogramSettings(config);
-	this->LoadCustomCuts(config);
-}
-
 void MtasImplantProcessor::Init(const pugi::xml_node& config){
 	this->console->info("Init called with pugi::xml_node");
 

@@ -91,18 +91,6 @@ e21069b_fp2Processor::e21069b_fp2Processor(const std::string& log) : Processor(l
 	return true;
 }
 
-void e21069b_fp2Processor::Init(const YAML::Node& config){
-	this->MtasProc->Init(config);
-	this->MtasImplantProc->Init(config);
-	this->PidProc->Init(config);
-}
-
-void e21069b_fp2Processor::Init(const Json::Value& config){
-	this->MtasProc->Init(config);
-	this->MtasImplantProc->Init(config);
-	this->PidProc->Init(config);
-}
-
 void e21069b_fp2Processor::Init(const pugi::xml_node& config){
 	this->MtasProc->Init(config);
 	this->MtasImplantProc->Init(config);

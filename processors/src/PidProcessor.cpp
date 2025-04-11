@@ -196,14 +196,6 @@ PidProcessor::PidProcessor(const std::string& log) : Processor(log,"PidProcessor
 	return true;
 }
 
-void PidProcessor::Init(const YAML::Node& config){
-	this->console->info("Init called with YAML::Node");
-}
-
-void PidProcessor::Init(const Json::Value& config){
-	this->console->info("Init called with Json::Value");
-}
-
 void PidProcessor::Init(const pugi::xml_node& config){
 	this->console->info("Init called with pugi::xml_node");
 }

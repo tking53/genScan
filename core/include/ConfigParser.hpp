@@ -4,57 +4,59 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <set>
+#include <map>
 
 #include <boost/container/flat_set.hpp>
 
 #include <pugiconfig.hpp>
 #include <pugixml.hpp>
 
-#include <yaml-cpp/yaml.h>
-
-#include <json/json.h>
-
 #include "ChannelMap.hpp"
 
 class ConfigParser{
 	public:
 		ConfigParser(const std::string&);
-		[[noreturn]] virtual void Parse([[maybe_unused]] ChannelMap*);
-		virtual ~ConfigParser();
+		void Parse(ChannelMap*);
+		~ConfigParser();
+		
+		pugi::xml_node GetAnalyzerXMLInfo(const std::string&) const;
+		pugi::xml_node GetProcessorXMLInfo(const std::string&) const;
 
-		virtual void SetConfigFile(std::string&);
-		virtual void SetDescriptionText(std::string*);
-		virtual void SetAuthorNameText(std::string*);
-		virtual void SetAuthorDateText(std::string*);
-		virtual void SetAuthorEmailText(std::string*);
+		void SetConfigFile(std::string&);
+		void SetDescriptionText(std::string*);
+		void SetAuthorNameText(std::string*);
+		void SetAuthorDateText(std::string*);
+		void SetAuthorEmailText(std::string*);
 
-		virtual double GetGlobalEventWidth() const;
-		virtual double GetGlobalEventWidthInNS() const;
-		virtual void SetGlobalEventWidthInS(double);
+		double GetGlobalEventWidth() const;
+		double GetGlobalEventWidthInNS() const;
+		void SetGlobalEventWidthInS(double);
 
-		virtual std::string* GetConfigName() const;
-		virtual std::string* GetDescriptionText() const;
-		virtual std::string* GetAuthorNameText() const;
-		virtual std::string* GetAuthorDateText() const;
-		virtual std::string* GetAuthorEmailText() const;
+		std::string* GetConfigName() const;
+		std::string* GetDescriptionText() const;
+		std::string* GetAuthorNameText() const;
+		std::string* GetAuthorDateText() const;
+		std::string* GetAuthorEmailText() const;
 
-		virtual std::vector<std::string> GetProcessorNames() const;
-		virtual std::vector<std::string> GetAnalyzerNames() const;
+		std::vector<std::string> GetProcessorNames() const;
+		std::vector<std::string> GetAnalyzerNames() const;
 
-		virtual void AddProcessorName(const std::string&);
-		virtual void AddAnalyzerName(const std::string&);
+		void AddProcessorName(const std::string&);
+		void AddAnalyzerName(const std::string&);
 
-		virtual std::string* GetCorrelationType() const;
-		virtual void SetCorrelationType(std::string*);
+		std::string* GetCorrelationType() const;
+		void SetCorrelationType(std::string*);
 
-		virtual std::vector<std::pair<std::string,std::string>> GetCutDetails() const final;
+		std::vector<std::pair<std::string,std::string>> GetCutDetails() const;
 	protected:
-		[[noreturn]] virtual void ParseDescription();
-		[[noreturn]] virtual void ParseAuthor();
-		[[noreturn]] virtual void ParseGlobal();
-		[[noreturn]] virtual void ParseDetectorDriver();
-		[[noreturn]] virtual void ParseCuts();
-		[[noreturn]] virtual void ParseMap([[maybe_unused]] ChannelMap*);
+		void ParseDescription();
+		void ParseAuthor();
+		void ParseGlobal();
+		void ParseDetectorDriver();
+		void ParseCuts();
+		void ParseMap(ChannelMap*);
+		void RecursiveNameCheck(pugi::xml_node&,std::set<std::string>&) const;
 
 		std::vector<std::string> ProcessorNames;
 		std::vector<std::string> AnalyzerNames;
@@ -78,6 +80,20 @@ class ConfigParser{
 		boost::container::flat_set<int> KnownCrates;
 		boost::container::flat_set<int> KnownBoardsInCrate;
 		boost::container::flat_set<int> KnownChannelsInBoard;
+	
+		pugi::xml_document XMLDoc;
+
+		pugi::xml_node Configuration;
+		pugi::xml_node Description;
+		pugi::xml_node Author;
+		pugi::xml_node Global;
+		pugi::xml_node DetectorDriver;
+		pugi::xml_node Cuts;
+		pugi::xml_node Map;
+
+		std::map<std::string,pugi::xml_node> ProcessorNodes;
+		std::map<std::string,pugi::xml_node> AnalyzerNodes;
+
 };
 
 #endif

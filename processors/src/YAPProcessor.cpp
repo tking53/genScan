@@ -105,20 +105,6 @@ YAPProcessor::YAPProcessor(const std::string& log) : Processor(log,"YAPProcessor
 	return true;
 }
 
-void YAPProcessor::Init(const YAML::Node& config){
-	this->MtasProc->Init(config);
-	this->PuckProc->Init(config);
-	this->LoadHistogramSettings(config);
-	this->LoadCustomCuts(config);
-}
-
-void YAPProcessor::Init(const Json::Value& config){
-	this->MtasProc->Init(config);
-	this->PuckProc->Init(config);
-	this->LoadHistogramSettings(config);
-	this->LoadCustomCuts(config);
-}
-
 void YAPProcessor::Init(const pugi::xml_node& config){
 	for( pugi::xml_node proc = config.child("Processor"); proc; proc = proc.next_sibling("Processor") ){
 		std::string name = proc.attribute("name").as_string();
