@@ -1,8 +1,10 @@
 #include <TNamed.h>
 #include <fstream>
+#include <map>
 #include <ostream>
 #include <stdexcept>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <spdlog/common.h>
@@ -14,6 +16,7 @@
 
 #include <boost/program_options.hpp>
 #include <boost/regex.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include <yaml-cpp/emitter.h>
 #include <yaml-cpp/emittermanip.h>
@@ -39,6 +42,59 @@ YAML::Emitter& operator << (YAML::Emitter& out, const PeakFitter* pf) {
 	return out;
 }
 
+std::map<std::string,double> ParseFixedValues(const std::vector<std::string>& values){
+	std::map<std::string,double> retvals;
+	for( const auto& s : values ){
+		std::vector<std::string> strs;
+		boost::split(strs,s,boost::is_any_of(":"));
+		boost::regex number("^(0|[1-9]\\d*)(\\.\\d+)?(e-?(0|[1-9]\\d*))?");
+
+		if( strs.size() == 2 ){
+			boost::smatch pmatch;
+			std::string valname = strs[0];
+			if( retvals.find(valname) != retvals.end() ){
+				throw std::runtime_error("Given Fixed Parameter multiple times");
+			}else{
+				if( boost::regex_match(strs[1],pmatch,number) ){
+					retvals[valname] = std::stod(strs[1]);
+				}else{
+					throw std::runtime_error("Invalid fixed value, not a number");
+				}
+			}
+		}else{
+			throw std::runtime_error("Unable to parse input");
+		}
+	}
+	return retvals;
+}
+
+std::map<std::string,std::pair<double,double>> ParseBoundedValues(const std::vector<std::string>& values){
+	std::map<std::string,std::pair<double,double>> retvals;
+	for( const auto& s : values ){
+		std::vector<std::string> strs;
+		boost::split(strs,s,boost::is_any_of(":"));
+		boost::regex number("^(0|[1-9]\\d*)(\\.\\d+)?(e-?(0|[1-9]\\d*))?");
+
+		if( strs.size() == 3 ){
+			boost::smatch lmatch;
+			boost::smatch umatch;
+			std::string valname = strs[0];
+			if( retvals.find(valname) != retvals.end() ){
+				throw std::runtime_error("Given Bounded Parameter multiple times");
+			}else{
+				if( boost::regex_match(strs[1],lmatch,number) and boost::regex_match(strs[2],lmatch,number) ){
+					retvals[valname] = {std::stod(strs[1]),std::stod(strs[2])};
+				}else{
+					throw std::runtime_error("Invalid bounded pair, not two numbers");
+				}
+			}
+		}else{
+			throw std::runtime_error("Unable to parse input");
+		}
+	}
+	return retvals;
+}
+
 int main(int argc, char *argv[]) {
 
 	std::string outputprefix;
@@ -47,16 +103,22 @@ int main(int argc, char *argv[]) {
 	int dimensionality;
 	std::string axis;
 	std::vector<int> indices;
+	std::vector<std::string> boundedparams;
+	std::vector<std::string> fixedparams;
 	double xlow;
 	double xhigh;
 	bool quiet;
 	bool chi2;
 	int mode;
+	std::map<std::string,double> fixedvalues; 
+	std::map<std::string,std::pair<double,double>> boundedvalues; 
 
 	boost::program_options::options_description cmdline_options("Generic Options");
 	cmdline_options.add_options()
 		("help,h", "produce help message")
 		("projectionindices,p",boost::program_options::value<std::vector<int>>(&indices)->multitoken(),"indices to project on if 2d histogram")
+		("boundparameter,b",boost::program_options::value<std::vector<std::string>>(&boundedparams)->multitoken(),"parameter to bound name:low:high")
+		("fixparameter,f",boost::program_options::value<std::vector<std::string>>(&fixedparams)->multitoken(),"parameter to bound name:value")
 		("lowerbound,l",boost::program_options::value<double>(&xlow),"lower bound to perform fit")
 		("upperbound,u",boost::program_options::value<double>(&xhigh),"upper bound to perform fit")
 		("inputfile,i",boost::program_options::value<std::string>(&inputfile),"file to get the histogram from")
@@ -112,6 +174,8 @@ int main(int argc, char *argv[]) {
 			exit(EXIT_FAILURE);
 		}
 
+		fixedvalues = ParseFixedValues(fixedparams);
+		boundedvalues = ParseBoundedValues(boundedparams);
 	}catch( std::exception& e){
 		spdlog::error(e.what());
 		exit(EXIT_FAILURE);
@@ -135,12 +199,12 @@ int main(int argc, char *argv[]) {
 						histofit = dynamic_cast<TH2*>(mainhis)->ProjectionY(name.c_str(),idx,idx);
 					}	
 					histofit->SetDirectory(0);
-					pfs.push_back(new PeakFitter(xlow,xhigh,chi2,mode,histofit));
+					pfs.push_back(new PeakFitter(xlow,xhigh,chi2,mode,histofit,fixedvalues,boundedvalues));
 				}
 			}else if( boost::regex_search(histype,re1d) ){
 				histofit = dynamic_cast<TH1*>(mainhis);
 				histofit->SetDirectory(0);
-				pfs.push_back(new PeakFitter(xlow,xhigh,chi2,mode,histofit));
+				pfs.push_back(new PeakFitter(xlow,xhigh,chi2,mode,histofit,fixedvalues,boundedvalues));
 			}else{
 				throw std::runtime_error("not passed a TH1 or TH2 histogram");
 			}

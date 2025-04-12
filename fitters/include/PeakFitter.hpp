@@ -21,14 +21,23 @@ struct PeakFitter{
 	std::pair<double,double> FitRange;
 	bool loglikelihood;
 	TH1* fithist;
+	std::map<std::string,double> fvalues;
+	std::map<std::string,std::pair<double,double>> bvalues;
 	TF1* fitfunc;
 	std::vector<TF1*> components;
-	std::set<std::string> keys;
+	std::map<std::string,int> keys;
 	std::map<std::string,double> Results;
 	std::map<std::string,double> Errors;
 
 
-	PeakFitter(double l,double u,bool chi2,int mode,TH1* hist): FitRange(l,u), loglikelihood(!chi2),fithist(hist){
+	PeakFitter(double l,double u,bool chi2,int mode,TH1* hist,
+			const std::map<std::string,double>& fixedvalues,const std::map<std::string,std::pair<double,double>>& boundedvalues) 
+		: FitRange(l,u), loglikelihood(!chi2),fithist(hist),fvalues(fixedvalues),bvalues(boundedvalues){
+		for( const auto& kv : fvalues ){
+			if( bvalues.find(kv.first) != bvalues.end() ){
+				throw std::runtime_error("Parameter is both fixed and bounded");
+			}
+		}
 		if( mode == 0){
 			this->InitGaussNLinBkgFit();
 		}else if( mode == 1 ){
@@ -50,13 +59,13 @@ struct PeakFitter{
 		this->components.at(0)->SetLineColor(kMagenta);
 		this->components.at(1)->SetLineColor(kGreen);
 
-		this->fitfunc->SetParName(0,"Area");
-		this->fitfunc->SetParName(1,"Mean");
-		this->fitfunc->SetParName(2,"Sigma");
-		this->fitfunc->SetParName(3,"BkgOffset");
-		this->fitfunc->SetParName(4,"BkgSlope");
-
-		this->keys = { "Area","Mean","Sigma","BkgSlope","BkgOffset"};
+		this->keys = { {"Area",0},{"Mean",1},{"Sigma",2},{"BkgOffset",3},{"BkgSlope",4}};
+		AssignFitParNames();
+		VerifyFixedValues();
+		VerifyBoundedValues();
+		if( this->fvalues.find("Mean") == this->fvalues.end() and this->bvalues.find("Mean") == this->bvalues.end() ){
+			this->bvalues["Mean"] = this->FitRange; 
+		}
 
 		double bkg_offset = 0;
 		double bkg_slope = 0;
@@ -69,7 +78,7 @@ struct PeakFitter{
 		auto integral = this->fithist->Integral(minbin,maxbin);
 
 		this->fitfunc->SetParameters(area,offset,width,bkg_offset,bkg_slope);
-		this->fitfunc->SetParLimits(1,this->FitRange.first,this->FitRange.second);
+		FixAndBoundParameters();
 
 		if( integral > 0.0 ){
 			std::string option = "0SQ";
@@ -79,19 +88,7 @@ struct PeakFitter{
 			TFitResultPtr fitresult = this->fithist->Fit(this->fitfunc,option.c_str(),"",FitRange.first,FitRange.second);
 
 			if( not fitresult->IsEmpty() ){
-				this->Results["Area"] = fitresult->Parameter(0);
-				this->Results["Mean"] = fitresult->Parameter(1);
-				this->Results["Sigma"] = fitresult->Parameter(2);
-				this->Results["BkgOffset"] = fitresult->Parameter(3);
-				this->Results["BkgSlope"] = fitresult->Parameter(4);
-				this->Results["Chi2"] = fitresult->Chi2();
-				
-				this->Errors["Area"] = fitresult->ParError(0);
-				this->Errors["Mean"] = fitresult->ParError(1);
-				this->Errors["Sigma"] = fitresult->ParError(2);
-				this->Errors["BkgOffset"] = fitresult->ParError(3);
-				this->Errors["BkgSlope"] = fitresult->ParError(4);
-				this->Errors["NDF"] = fitresult->Ndf();
+				AssignFitValuesErrors(fitresult);
 
 				this->fitfunc->SetParameters(this->Results["Area"],this->Results["Mean"],this->Results["Sigma"]
 						,this->Results["BkgOffset"],this->Results["BkgSlope"]);
@@ -124,14 +121,13 @@ struct PeakFitter{
 		this->components.at(1)->SetLineColor(kGreen);
 		this->components.at(2)->SetLineColor(kViolet);
 
-		this->fitfunc->SetParName(0,"Area");
-		this->fitfunc->SetParName(1,"Mean");
-		this->fitfunc->SetParName(2,"Sigma");
-		this->fitfunc->SetParName(3,"ComptonArea");
-		this->fitfunc->SetParName(4,"BkgOffset");
-		this->fitfunc->SetParName(5,"BkgSlope");
-
-		this->keys = { "Area","Mean","Sigma","ComptonArea","BkgOffset","BkgSlope"};
+		this->keys = { {"Area",0},{"Mean",1},{"Sigma",2},{"ComptonArea",3},{"BkgOffset",4},{"BkgSlope",5}};
+		AssignFitParNames();
+		VerifyFixedValues();
+		VerifyBoundedValues();
+		if( this->fvalues.find("Mean") == this->fvalues.end() and this->bvalues.find("Mean") == this->bvalues.end() ){
+			this->bvalues["Mean"] = this->FitRange; 
+		}
 
 		double ca = 0;
 		double cbkg = 0;
@@ -146,7 +142,7 @@ struct PeakFitter{
 		auto integral = this->fithist->Integral(minbin,maxbin);
 
 		this->fitfunc->SetParameters(area,offset,width,ca,cbkg,sbkg,qbkg);
-		this->fitfunc->SetParLimits(1,this->FitRange.first,this->FitRange.second);
+		FixAndBoundParameters();
 
 		if( integral > 0.0 ){
 			std::string option = "0SQ";
@@ -156,22 +152,8 @@ struct PeakFitter{
 			TFitResultPtr fitresult = this->fithist->Fit(this->fitfunc,option.c_str(),"",FitRange.first,FitRange.second);
 
 			if( not fitresult->IsEmpty() ){
-				this->Results["Area"] = fitresult->Parameter(0);
-				this->Results["Mean"] = fitresult->Parameter(1);
-				this->Results["Sigma"] = fitresult->Parameter(2);
-				this->Results["ComptonArea"] = fitresult->Parameter(3);
-				this->Results["BkgOffset"] = fitresult->Parameter(4);
-				this->Results["BkgSlope"] = fitresult->Parameter(5);
-				this->Results["Chi2"] = fitresult->Chi2();
-				
-				this->Errors["Area"] = fitresult->ParError(0);
-				this->Errors["Mean"] = fitresult->ParError(1);
-				this->Errors["Sigma"] = fitresult->ParError(2);
-				this->Errors["ComptonArea"] = fitresult->ParError(3);
-				this->Errors["BkgOffset"] = fitresult->ParError(4);
-				this->Errors["BkgSlope"] = fitresult->ParError(5);
-				this->Errors["NDF"] = fitresult->Ndf();
-
+				AssignFitValuesErrors(fitresult);
+		
 				this->fitfunc->SetParameters(this->Results["Area"],this->Results["Mean"],this->Results["Sigma"]
 						,this->Results["ComptonArea"]
 						,this->Results["BkgOffset"],this->Results["BkgSlope"]);
@@ -192,6 +174,48 @@ struct PeakFitter{
 		}
 	}
 
+	void FixAndBoundParameters(){
+		for( const auto& kv : this->fvalues ){
+			this->fitfunc->FixParameter(this->keys[kv.first],kv.second);
+		}
+		for( const auto& kv : this->bvalues ){
+			this->fitfunc->SetParLimits(this->keys[kv.first],kv.second.first,kv.second.second);
+		}
+	}
+
+	void VerifyFixedValues(){
+		for( const auto& kv : this->fvalues ){
+			if( this->keys.find(kv.first) == this->keys.end() ){
+				throw std::runtime_error("Unknown parameter name "+kv.first);
+			}
+		}
+	}
+
+	void VerifyBoundedValues(){
+		for( const auto& kv : this->bvalues ){
+			if( this->keys.find(kv.first) == this->keys.end() ){
+				throw std::runtime_error("Unknown parameter name "+kv.first);
+			}
+			if( kv.second.second < kv.second.first ){
+				throw std::runtime_error("Bounded parameter has lowerbound higher than upperbound");
+			}
+		}
+	}
+
+	void AssignFitValuesErrors(const TFitResultPtr& fitresult){
+		for( const auto& kv :this->keys ){
+			this->Results[kv.first] = fitresult->Parameter(kv.second);
+			this->Errors[kv.first] = fitresult->ParError(kv.second);
+		}
+		this->Results["Chi2"] = fitresult->Chi2();
+		this->Errors["NDF"] = fitresult->Ndf();
+	}
+
+	void AssignFitParNames(){
+		for( const auto& kv :this->keys ){
+			this->fitfunc->SetParName(kv.second,kv.first.c_str());
+		}
+	}
 
 	void WriteHistogram(){
 		this->fithist->Write(0,2,0);
@@ -205,8 +229,8 @@ struct PeakFitter{
 
 	template<typename OStream>
 	friend OStream& operator<<(OStream& os, const PeakFitter& fitinfo) {
-		for( const auto& k : fitinfo.keys ){
-			os << k << " : " << fitinfo.Results.at(k) << " +- " << fitinfo.Errors.at(k) << " \t ";
+		for( const auto& kv : fitinfo.keys ){
+			os << kv.first << " : " << fitinfo.Results.at(kv.first) << " +- " << fitinfo.Errors.at(kv.first) << " \t ";
 		}
 		os << "Chi2/NDF : " << fitinfo.Results.at("Chi2") << "/" << fitinfo.Errors.at("NDF");
 		return os;
