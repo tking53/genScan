@@ -1,5 +1,6 @@
 #include <exception>
 #include <cmath>
+#include <limits>
 #include <stdexcept>
 #include <string>
 #include <tuple>
@@ -226,8 +227,8 @@ std::tuple<double,double,double> ChannelMap::GetCalibratedEnergy(int crid,int bi
 			}
 			break;
 	}
-	double InternalRaw = -1.0;
-	double InternalCal = -1.0;
+	double InternalRaw = std::numeric_limits<float>::max();
+	double InternalCal = std::numeric_limits<float>::max();
 	if( c.InternalParams.size() > 0 ){
 		InternalRaw = c.InternalFilter.RunFilter(trace);
 		InternalCal = 0.0;
