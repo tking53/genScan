@@ -4,31 +4,17 @@
 #include <cmath>
 
 namespace PulseFit{
-	double Sin(double t,double a,double p,double f){
-		return a*std::sin(f*(t+p));
-	}
-
-	double TraceFunc(double t,double a,double d,double r,double f){
-		return a*((1.0/(std::exp(-(t-d)/r)+1.0))*(1.0/(std::exp((t-d)/f)+1.0)));
-	}
-
-	double sintracefunc(double t,double c,double pa,double pd,double pr,double pf,double sa,double sp,double sf){
-		double SinVal = Sin(t,sa,sp,sf);
-		double PulseVal = TraceFunc(t,pa,pd,pr,pf);
-		return c + SinVal + PulseVal;
-	}
-
-	double tracefunc(double t,double c,double pa,double pd,double pr,double pf){
-		double PulseVal = TraceFunc(t,pa,pd,pr,pf);
-		return c + PulseVal;
-	}
-
+	//root
 	double Constant(double* x,double* par){
 		return par[0];
 	}
 
 	double Linear(double* x,double* par){
 		return par[0] + par[1]*x[0];
+	}
+
+	double Quad(double* x,double* par){
+		return par[0] + par[1]*x[0] + par[2]*x[0]*x[0];
 	}
 
 	double GaussN(double* x,double* par){
@@ -46,6 +32,32 @@ namespace PulseFit{
 	double GaussNLinBkg(double* x,double* par){
 		double fitval = GaussN(x,par) + Linear(x,par+3);
 		return fitval;
+	}
+
+	double GaussErf(double* x, double* par){
+		double arg = 0.0;
+		double norm = par[0];
+		if( par[2] != 0 ){
+			arg = (x[0] - par[1])/par[2];
+			norm = par[0]/(par[2]*TMath::Sqrt(TMath::Pi()));
+		}
+		double fitval = norm*(TMath::Erfc(arg));
+		return fitval;
+	}
+
+	double GaussNErfBkg(double* x,double* par){
+		//have to calc by hand because we can't transform the params to work without causing memory issues
+		double arg = 0.0;
+		double norm = par[3];
+		if( par[2] != 0 ){
+			arg = (x[0] - par[1])/par[2];
+			norm = par[3]/(par[2]*TMath::Sqrt(TMath::Pi()));
+		}
+		double ce = norm*(TMath::Erfc(arg));
+		
+		auto gaussn = GaussN(x,par);
+		auto bkg = Linear(x,par+4);
+		return gaussn + ce + bkg;
 	}
 
 	double Pulse(double* x,double* par){
@@ -79,5 +91,26 @@ namespace PulseFit{
 	double BSMDoubleTraceFit(double* x,double* par){
 		return PulseFit::Constant(x,par)+PulseFit::Sin(x,par+1)+PulseFit::Pulse(x,par+3)+PulseFit::Pulse(x,par+7);
 	}
+
+	//eigen
+	double Sin(double t,double a,double p,double f){
+		return a*std::sin(f*(t+p));
+	}
+
+	double TraceFunc(double t,double a,double d,double r,double f){
+		return a*((1.0/(std::exp(-(t-d)/r)+1.0))*(1.0/(std::exp((t-d)/f)+1.0)));
+	}
+
+	double sintracefunc(double t,double c,double pa,double pd,double pr,double pf,double sa,double sp,double sf){
+		double SinVal = Sin(t,sa,sp,sf);
+		double PulseVal = TraceFunc(t,pa,pd,pr,pf);
+		return c + SinVal + PulseVal;
+	}
+
+	double tracefunc(double t,double c,double pa,double pd,double pr,double pf){
+		double PulseVal = TraceFunc(t,pa,pd,pr,pf);
+		return c + PulseVal;
+	}
+
 
 }

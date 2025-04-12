@@ -6,6 +6,7 @@ namespace PulseFit{
 	//root
 	double Constant(double*,double*);
 	double Linear(double*,double*);
+	double Quad(double*,double*);
 	double Pulse(double*,double*);
 	double Sin(double*,double*);
 	double SingleTraceFit(double*,double*);
@@ -13,6 +14,8 @@ namespace PulseFit{
 	double BSMDoubleTraceFit(double*,double*);
 	double GaussN(double*,double*);
 	double GaussNLinBkg(double*,double*);
+	double GaussErf(double*,double*);
+	double GaussNErfBkg(double*,double*);
 
 	//eigen
 	double TraceFunc(double,double,double,double,double);

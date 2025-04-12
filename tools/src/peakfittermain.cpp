@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
 		("inputfile,i",boost::program_options::value<std::string>(&inputfile),"file to get the histogram from")
 		("outputprefix,o",boost::program_options::value<std::string>(&outputprefix)->default_value("GenPeakFitterResults"),"file to output to fit info to")
 		("numdimension,n",boost::program_options::value<int>(&dimensionality)->default_value(1),"dimensionality of histogram (1,2)")
-		("mode,m",boost::program_options::value<int>(&mode)->default_value(0),"peak fitting mode 0->GaussNLinBkg")
+		("mode,m",boost::program_options::value<int>(&mode)->default_value(0),"peak fitting mode 0->GaussNLinBkg 1->MtasLikePeaks")
 		("axis,a",boost::program_options::value<std::string>(&axis)->default_value("x"),"axis to project onto (x,y,X,Y) if 2D")
 		("data,d",boost::program_options::value<std::string>(&hisname),"histogram to manipulate")
 		("quiet,q",boost::program_options::value<bool>(&quiet)->default_value(false),"quiet output")

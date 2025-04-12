@@ -31,6 +31,8 @@ struct PeakFitter{
 	PeakFitter(double l,double u,bool chi2,int mode,TH1* hist): FitRange(l,u), loglikelihood(!chi2),fithist(hist){
 		if( mode == 0){
 			this->InitGaussNLinBkgFit();
+		}else if( mode == 1 ){
+			this->InitGaussNErfBkgFit();
 		}else{
 			throw std::runtime_error("Unknown peak fitting mode");
 		}
@@ -107,6 +109,89 @@ struct PeakFitter{
 			}
 		}
 	}
+	
+	void InitGaussNErfBkgFit(){
+		this->fithist->SetLineColor(kBlack);
+
+		this->fitfunc = new TF1("GaussNErfBkg",&PulseFit::GaussNErfBkg,FitRange.first,FitRange.second,6);
+		this->fitfunc->SetLineColor(kRed);
+		this->components = {
+			new TF1("GaussN",&PulseFit::GaussN,FitRange.first,FitRange.second,3),
+			new TF1("ErfBkg",&PulseFit::GaussErf,FitRange.first,FitRange.second,3),
+			new TF1("LinBkg",&PulseFit::Quad,FitRange.first,FitRange.second,3)
+		};
+		this->components.at(0)->SetLineColor(kMagenta);
+		this->components.at(1)->SetLineColor(kGreen);
+		this->components.at(2)->SetLineColor(kViolet);
+
+		this->fitfunc->SetParName(0,"Area");
+		this->fitfunc->SetParName(1,"Mean");
+		this->fitfunc->SetParName(2,"Sigma");
+		this->fitfunc->SetParName(3,"ComptonArea");
+		this->fitfunc->SetParName(4,"BkgOffset");
+		this->fitfunc->SetParName(5,"BkgSlope");
+
+		this->keys = { "Area","Mean","Sigma","ComptonArea","BkgOffset","BkgSlope"};
+
+		double ca = 0;
+		double cbkg = 0;
+		double sbkg = 0;
+		double qbkg = 0;
+		double width = this->FitRange.second - this->FitRange.first;
+		double offset = (this->FitRange.second + this->FitRange.first)/2.0;
+		double area = this->fithist->GetBinContent(this->fithist->FindBin(offset));
+
+		auto minbin = this->fithist->FindBin(this->FitRange.first);
+		auto maxbin = this->fithist->FindBin(this->FitRange.second);
+		auto integral = this->fithist->Integral(minbin,maxbin);
+
+		this->fitfunc->SetParameters(area,offset,width,ca,cbkg,sbkg,qbkg);
+		this->fitfunc->SetParLimits(1,this->FitRange.first,this->FitRange.second);
+
+		if( integral > 0.0 ){
+			std::string option = "0SQ";
+			if( this->loglikelihood ){
+				option+="L";
+			}
+			TFitResultPtr fitresult = this->fithist->Fit(this->fitfunc,option.c_str(),"",FitRange.first,FitRange.second);
+
+			if( not fitresult->IsEmpty() ){
+				this->Results["Area"] = fitresult->Parameter(0);
+				this->Results["Mean"] = fitresult->Parameter(1);
+				this->Results["Sigma"] = fitresult->Parameter(2);
+				this->Results["ComptonArea"] = fitresult->Parameter(3);
+				this->Results["BkgOffset"] = fitresult->Parameter(4);
+				this->Results["BkgSlope"] = fitresult->Parameter(5);
+				this->Results["Chi2"] = fitresult->Chi2();
+				
+				this->Errors["Area"] = fitresult->ParError(0);
+				this->Errors["Mean"] = fitresult->ParError(1);
+				this->Errors["Sigma"] = fitresult->ParError(2);
+				this->Errors["ComptonArea"] = fitresult->ParError(3);
+				this->Errors["BkgOffset"] = fitresult->ParError(4);
+				this->Errors["BkgSlope"] = fitresult->ParError(5);
+				this->Errors["NDF"] = fitresult->Ndf();
+
+				this->fitfunc->SetParameters(this->Results["Area"],this->Results["Mean"],this->Results["Sigma"]
+						,this->Results["ComptonArea"]
+						,this->Results["BkgOffset"],this->Results["BkgSlope"]);
+
+				this->fithist->GetListOfFunctions()->Add(this->fitfunc);
+				this->components.at(0)->SetParameters(this->Results["Area"],this->Results["Mean"],this->Results["Sigma"]);
+				this->fithist->GetListOfFunctions()->Add(this->components.at(0));
+				this->components.at(1)->SetParameters(this->Results["ComptonArea"],this->Results["Mean"],this->Results["Sigma"]);
+				this->fithist->GetListOfFunctions()->Add(this->components.at(1));
+				this->components.at(2)->SetParameters(this->Results["BkgOffset"],this->Results["BkgSlope"]);
+				this->fithist->GetListOfFunctions()->Add(this->components.at(2));
+
+				TLine* gauss_centroid = new TLine(this->Results["Mean"],0,
+						this->Results["Mean"],0.75*(this->fithist->GetBinContent(this->fithist->FindBin(this->Results["Mean"]))));
+				gauss_centroid->SetLineColor(kAzure);
+				this->fithist->GetListOfFunctions()->Add(gauss_centroid);
+			}
+		}
+	}
+
 
 	void WriteHistogram(){
 		this->fithist->Write(0,2,0);
