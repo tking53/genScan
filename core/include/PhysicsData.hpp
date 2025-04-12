@@ -124,7 +124,7 @@ class PhysicsData{
 		/// @brief set the energy values that require aliasing  
 		/// @param[in] value1 uncalibrated raw energy with random [0,1.0)
 		/// @param[in] value2 calibrated energy that was been aliased 
-		void SetEnergy(double,double);
+		void SetEnergy(double,double,double,double);
 		
 		/// @brief get the calibrated energy value 
 		/// @return Energy 
@@ -388,7 +388,8 @@ class PhysicsData{
 		void AddTraceFitInfo(const std::string&,double,double);
 		bool DoesTraceFitValueExist(const std::string&) const;
 		std::pair<double,double> GetTraceFitValue(const std::string&) const;
-		double GetInternalTrapFilterEnergy() const;
+		double GetInternalFilterRaw() const;
+		double GetInternalFilterEnergy() const;
 
 	private:
 		//this is info decoded from the data files
@@ -442,7 +443,8 @@ class PhysicsData{
 		std::map<std::string,std::pair<double,double>> TraceFitInfo;
 
 		//From internal trap filter by default is just the FilterEnergy
-		double InternalTrapFilterEnergy;
+		double InternalFilterRaw;
+		double InternalFilterEnergy;
 
 		//Trace Helper, should probably hide this from end user though
 		//and only expose what it can determine

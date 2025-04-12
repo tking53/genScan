@@ -2,6 +2,7 @@
 #include <cmath>
 #include <stdexcept>
 #include <string>
+#include <tuple>
 
 #include "ChannelMap.hpp"
 
@@ -19,8 +20,6 @@ ChannelMap::ChannelMap(int mc,int mbpc,int mcpb,int mcppc){
 	if( mcppc < 4 ){
 		throw std::runtime_error("ChannelMap::ChannelMap() supplied with less than 4 calibration parameters per channel");
 	}
-	MAX_CAL_PARAMS_PER_CHANNEL = mcppc;
-	MAX_CAL_PARAMS = MAX_CAL_PARAMS_PER_CHANNEL*MAX_CHANNELS;
 }
 
 ChannelMap::FirmwareVersion ChannelMap::CalcFirmwareEnum(const std::string& type) const{
@@ -127,50 +126,82 @@ ChannelMap::FirmwareVersion ChannelMap::CalcFirmwareEnum(const std::string& type
 	return this->ModuleFilterClockTickToNS.at(this->GetGlobalBoardID(CrateNum,ModNum));
 }
 
-[[nodiscard]] bool ChannelMap::SetParams(int crid,int bid,int cid,const std::string& t,const std::string& st,const std::string& g,const std::string& tt,const std::set<std::string>& tg,CalType c,const std::vector<double>& p,int tdelay,const std::pair<double,double>& thresh){
-	if( static_cast<int>(p.size()) > MAX_CAL_PARAMS_PER_CHANNEL ){
-		throw std::runtime_error("Trying to assign more calibration parameters than allowed");
-	}else{
-		auto gcid = this->GetGlobalChanID(crid,bid,cid);
-		auto gbid = this->GetGlobalBoardID(crid,bid);
-		if( (gcid >= MAX_FID) or (gbid >= MAX_BOARDS) or (cid >= MAX_CHANNELS_PER_BOARD) ){
-			std::string mess = "Invalid config file, Crate : "+std::to_string(crid)+"Board : "+std::to_string(bid)+" Channel : "+std::to_string(cid)+" Is Invalid";
-			throw std::runtime_error(mess);
-		}
-		std::string currunique_id = t + ":" + st + ":" + g;
-		for( auto& currtag : tg )
-			currunique_id += ":" + currtag;
-		auto result = this->KnownUID.insert_unique(currunique_id);
-		if( not result.second ){
-			throw std::runtime_error("Channel : "+std::to_string(cid)+
-					         " Board : "+std::to_string(bid)+
-						 " Crate : "+std::to_string(crid)+
-						 " type:subtype:group:(tags) : "+currunique_id+
-						 " has duplicate type:subtype:group:(tags) as another");
-		}
-
-		ChannelInfo CurrChannelInfo = {
-			.cal = c,
-			.ChannelIDInBoard = cid,
-			.BoardIDInCrate = bid,
-			.CrateID = crid,
-			.GlobalChannelID = gcid,
-			.TraceDelay = tdelay, 
-			.type = t,
-			.subtype = st,
-			.group = g,
-			.tags = tt,
-			.taglist = tg,
-			.unique_id = currunique_id,
-		        .Params = p,
-			.Thresh = thresh	
-		};
-		auto retval = this->ChannelConfigMap.insert_or_assign(gcid,CurrChannelInfo);
-		return !retval.second; 
+[[nodiscard]] bool ChannelMap::SetParams(int crid,int bid,int cid,const std::string& t,const std::string& st,const std::string& g,const std::string& tt,const std::set<std::string>& tg,const std::vector<double>& p){
+	auto gcid = this->GetGlobalChanID(crid,bid,cid);
+	auto gbid = this->GetGlobalBoardID(crid,bid);
+	if( (gcid >= MAX_FID) or (gbid >= MAX_BOARDS) or (cid >= MAX_CHANNELS_PER_BOARD) ){
+		std::string mess = "Invalid config file, Crate : "+std::to_string(crid)+"Board : "+std::to_string(bid)+" Channel : "+std::to_string(cid)+" Is Invalid";
+		throw std::runtime_error(mess);
 	}
+	std::string currunique_id = t + ":" + st + ":" + g;
+	for( auto& currtag : tg )
+		currunique_id += ":" + currtag;
+	auto result = this->KnownUID.insert_unique(currunique_id);
+	if( not result.second ){
+		throw std::runtime_error("Channel : "+std::to_string(cid)+
+				" Board : "+std::to_string(bid)+
+				" Crate : "+std::to_string(crid)+
+				" type:subtype:group:(tags) : "+currunique_id+
+				" has duplicate type:subtype:group:(tags) as another");
+	}
+
+	ChannelInfo CurrChannelInfo = {
+		.ChannelIDInBoard = cid,
+		.BoardIDInCrate = bid,
+		.CrateID = crid,
+		.GlobalChannelID = gcid,
+		.type = t,
+		.subtype = st,
+		.group = g,
+		.tags = tt,
+		.taglist = tg,
+		.unique_id = currunique_id,
+		.Params = p,
+		.InternalFilter = TrapezoidFilter<float,uint16_t>(1,1,1,1.0),
+		.InternalParams = {}
+	};
+	auto retval = this->ChannelConfigMap.insert_or_assign(gcid,CurrChannelInfo);
+	return !retval.second; 
 }
 
-double ChannelMap::GetCalibratedEnergy(int crid,int bid,int cid,double erg){
+[[nodiscard]] bool ChannelMap::SetParams(int crid,int bid,int cid,const std::string& t,const std::string& st,const std::string& g,const std::string& tt,const std::set<std::string>& tg,const std::vector<double>& p,int fl,int fg,int fb,float ftau,const std::vector<double>& ip){
+	auto gcid = this->GetGlobalChanID(crid,bid,cid);
+	auto gbid = this->GetGlobalBoardID(crid,bid);
+	if( (gcid >= MAX_FID) or (gbid >= MAX_BOARDS) or (cid >= MAX_CHANNELS_PER_BOARD) ){
+		std::string mess = "Invalid config file, Crate : "+std::to_string(crid)+"Board : "+std::to_string(bid)+" Channel : "+std::to_string(cid)+" Is Invalid";
+		throw std::runtime_error(mess);
+	}
+	std::string currunique_id = t + ":" + st + ":" + g;
+	for( auto& currtag : tg )
+		currunique_id += ":" + currtag;
+	auto result = this->KnownUID.insert_unique(currunique_id);
+	if( not result.second ){
+		throw std::runtime_error("Channel : "+std::to_string(cid)+
+				" Board : "+std::to_string(bid)+
+				" Crate : "+std::to_string(crid)+
+				" type:subtype:group:(tags) : "+currunique_id+
+				" has duplicate type:subtype:group:(tags) as another");
+	}
+
+	ChannelInfo CurrChannelInfo = {
+		.ChannelIDInBoard = cid,
+		.BoardIDInCrate = bid,
+		.CrateID = crid,
+		.GlobalChannelID = gcid,
+		.type = t,
+		.subtype = st,
+		.group = g,
+		.tags = tt,
+		.taglist = tg,
+		.unique_id = currunique_id,
+		.Params = p,
+		.InternalFilter = TrapezoidFilter<float,uint16_t>(fl,fg,fb,ftau),
+		.InternalParams = ip
+	};
+	auto retval = this->ChannelConfigMap.insert_or_assign(gcid,CurrChannelInfo);
+	return !retval.second; 
+}
+std::tuple<double,double,double> ChannelMap::GetCalibratedEnergy(int crid,int bid,int cid,double erg,const std::vector<uint16_t>& trace){
 	auto gcid = this->GetGlobalChanID(crid,bid,cid);
 	auto gbid = this->GetGlobalBoardID(crid,bid);
 	if( (gcid >= MAX_FID) or (gbid >= MAX_BOARDS) or (cid >= MAX_CHANNELS_PER_BOARD) ){
@@ -178,36 +209,49 @@ double ChannelMap::GetCalibratedEnergy(int crid,int bid,int cid,double erg){
 		throw std::runtime_error(mess);
 	}
 	auto c = ChannelConfigMap.at(gcid);
-	//if( erg < c.Thresh.first or erg > c.Thresh.second ){
-	//	return 0.0;
-	//}
-	switch(c.cal){
-		case Linear:
-			return c.Params.at(0) + c.Params.at(1)*erg; 
+	double BoardErg = 0.0;
+	switch(c.Params.size()){
+		case 1:
+			BoardErg = c.Params[0];
 			break;
-		case Quadratic:
-			return c.Params.at(0) + c.Params.at(1)*erg + c.Params.at(2)*erg*erg; 
+		case 2:
+			BoardErg = c.Params[0] + c.Params[1]*erg;
 			break;
-		case Cubic:
-			return c.Params.at(0) + c.Params.at(1)*erg + c.Params.at(2)*erg*erg + c.Params.at(3)*erg*erg*erg; 
+		case 3:
+			BoardErg = c.Params[0] + c.Params[1]*erg + c.Params[2]*erg*erg;
 			break;
-		case LinearExpo:
-			return std::exp(c.Params.at(0) + c.Params.at(1)*erg); 
-			break;
-		case QuadraticExpo:
-			return std::exp(c.Params.at(0) + c.Params.at(1)*erg + c.Params.at(2)*erg*erg); 
-			break;
-		case CubicExpo:
-			return std::exp(c.Params.at(0) + c.Params.at(1)*erg + c.Params.at(2)*erg*erg + c.Params.at(3)*erg*erg*erg); 
-			break;
-		case Unknown:
 		default:
-			throw std::runtime_error("Unused channel");
+			for( size_t ii = 0; ii < c.Params.size(); ++ii ){
+				BoardErg += c.Params[ii]*std::pow(erg,ii);
+			}
 			break;
 	}
+	double InternalRaw = -1.0;
+	double InternalCal = -1.0;
+	if( c.InternalParams.size() > 0 ){
+		InternalRaw = c.InternalFilter.RunFilter(trace);
+		InternalCal = 0.0;
+		switch(c.InternalParams.size()){
+			case 1:
+				InternalCal = c.InternalParams[0];
+				break;
+			case 2:
+				InternalCal = c.InternalParams[0] + c.InternalParams[1]*InternalRaw;
+				break;
+			case 3:
+				InternalCal = c.InternalParams[0] + c.InternalParams[1]*InternalRaw + c.InternalParams[2]*InternalRaw*InternalRaw;
+				break;
+			default:
+				for( size_t ii = 0; ii < c.InternalParams.size(); ++ii ){
+					InternalCal += c.InternalParams[ii]*std::pow(InternalRaw,ii);
+				}
+				break;
+		}
+	}
+	return std::make_tuple(BoardErg,InternalRaw,InternalCal);
 }
 
-bool ChannelMap::SetBoardInfo(int crid,int bid,const char& rev,const std::string& firm,int freq,int tdelay){
+bool ChannelMap::SetBoardInfo(int crid,int bid,const char& rev,const std::string& firm,int freq){
 	if( bid >= MAX_BOARDS ){
 		std::string mess = "Board ID : "+std::to_string(bid)+" exceeds the maximum number of boards : "+std::to_string(MAX_BOARDS);
 		throw std::runtime_error(mess);
@@ -218,7 +262,6 @@ bool ChannelMap::SetBoardInfo(int crid,int bid,const char& rev,const std::string
 			.BoardIDInCrate = bid,
 			.CrateID = crid,
 			.GlobalBoardID = this->GetGlobalBoardID(crid,bid),
-			.TraceDelay = tdelay,
 			.Version = this->CalcFirmwareEnum(firm),
 			.xiadecoder = new XiaDecoder(this->CalcFirmwareEnum(firm),freq)
 		};
@@ -239,16 +282,6 @@ int ChannelMap::GetNumCrates() const{
 	return MAX_CRATES;
 }
 
-[[nodiscard]] ChannelMap::CalType ChannelMap::GetCalType(int crid,int bid,int cid) const{
-	auto gcid = this->GetGlobalChanID(crid,bid,cid);
-	auto gbid = this->GetGlobalBoardID(crid,bid);
-	if( (gcid >= MAX_FID) or (gbid >= MAX_BOARDS) or (cid >= MAX_CHANNELS_PER_BOARD) ){
-		std::string mess = "Invalid config file, Crate : "+std::to_string(crid)+"Board : "+std::to_string(bid)+" Channel : "+std::to_string(cid)+" Is Invalid";
-		throw std::runtime_error(mess);
-	}
-	return ChannelConfigMap.at(gcid).cal;
-}
-		
 [[nodiscard]] int ChannelMap::GetBoardFrequency(int crid,int bid) const{
 	auto gbid = this->GetGlobalBoardID(crid,bid);
 	if( gbid >= MAX_BOARDS ){
@@ -256,15 +289,6 @@ int ChannelMap::GetNumCrates() const{
 		throw std::runtime_error(mess);
 	}
 	return BoardConfigMap.at(gbid).Frequency;
-}
-
-[[nodiscard]] int ChannelMap::GetBoardTraceDelay(int crid,int bid) const{
-	auto gbid = this->GetGlobalBoardID(crid,bid);
-	if( gbid >= MAX_BOARDS ){
-		std::string mess = "Board ID : "+std::to_string(gbid)+" exceeds the maximum number of boards : "+std::to_string(MAX_BOARDS);
-		throw std::runtime_error(mess);
-	}
-	return BoardConfigMap.at(gbid).TraceDelay;
 }
 
 [[nodiscard]] ChannelMap::FirmwareVersion ChannelMap::GetBoardFirmware(int crid,int bid) const{

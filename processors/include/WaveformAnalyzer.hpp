@@ -18,7 +18,6 @@ class WaveformAnalyzer : public Analyzer {
 		virtual bool Process(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
 		virtual bool PostProcess(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
 
-
 		virtual void Init([[maybe_unused]] const pugi::xml_node&);
 
 		virtual void Finalize();
@@ -26,8 +25,6 @@ class WaveformAnalyzer : public Analyzer {
 		virtual void DeclarePlots([[maybe_unused]] PLOTS::PlotRegistry*) const;
 
 	private:
-		//bool ValidateSettingsString(const std::string&) const;
-
 		boost::regex GenerateRegex(const std::string&,const std::string&,const std::string&);
 
 		void InsertAdditionalTypes(const std::string&);

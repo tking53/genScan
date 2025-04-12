@@ -5,7 +5,7 @@
 #include <numeric>
 #include <boost/circular_buffer.hpp>
 
-template<class T>
+template<class T,class U>
 struct TrapezoidFilter{
 	int l;
 	int g;
@@ -26,9 +26,9 @@ struct TrapezoidFilter{
 	TrapezoidFilter& operator=(const TrapezoidFilter&) = default;
 	TrapezoidFilter& operator=(TrapezoidFilter&&) = default;
 
-	double RunFilter(const std::vector<T>& traceyvals){
-		bltrace = std::vector<T>(traceyvals);
-		T bline = std::accumulate(traceyvals.begin(),traceyvals.begin()+blen,0.0)/static_cast<T>(blen);
+	double RunFilter(const std::vector<U>& traceyvals){
+		bltrace = std::vector<T>(traceyvals.begin(),traceyvals.end());
+		T bline = std::accumulate(bltrace.begin(),bltrace.begin()+blen,0.0)/static_cast<T>(blen);
 		for( auto& v : bltrace ){
 			v -= bline;
 		}

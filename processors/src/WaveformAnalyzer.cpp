@@ -232,20 +232,11 @@ void WaveformAnalyzer::InsertAdditionalTypes(const std::string& typestring){
 }
 
 boost::regex WaveformAnalyzer::GenerateRegex(const std::string& cratestr,const std::string& modstr,const std::string& channelstr){
-	//if( this->ValidateSettingsString(cratestr) and this->ValidateSettingsString(modstr) and this->ValidateSettingsString(channelstr) ){
-		boost::regex re("^"+cratestr+":"+modstr+":"+channelstr+"$");
-		auto result = this->KnownWaveSettings.insert(re);
-		if( result.first == this->KnownWaveSettings.end() ){
-			this->console->error("duplicate settings tag found for Crate=\"{}\" Module=\"{}\" Channel=\"{}\"",cratestr,modstr,channelstr);
-			throw "duplicate settings found in WaveformAnalyzer settings tag";
-		}
-		return re;
-	//}else{
-	//	this->console->error("invalid string in either Crate, Module, or Channel attribute. Expect [first-last] or [a,b,c] where first, last, a, b, and c are all numbers");
-	//	throw "invalid string in either Crate, Module, or Channel attribute. Expect [first-last] or [a,b,c] where first, last, a, b, and c are all numbers";
-	//}
+	boost::regex re("^"+cratestr+":"+modstr+":"+channelstr+"$");
+	auto result = this->KnownWaveSettings.insert(re);
+	if( result.first == this->KnownWaveSettings.end() ){
+		this->console->error("duplicate settings tag found for Crate=\"{}\" Module=\"{}\" Channel=\"{}\"",cratestr,modstr,channelstr);
+		throw "duplicate settings found in WaveformAnalyzer settings tag";
+	}
+	return re;
 }
-
-//bool WaveformAnalyzer::ValidateSettingsString(const std::string& teststr) const{
-//	return teststr.front() == '[' and teststr.back() == ']';
-//}

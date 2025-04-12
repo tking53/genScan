@@ -2,6 +2,7 @@
 #define __CHANNEL_MAP_HPP__
 
 #include <string>
+#include <tuple>
 #include <vector>
 #include <set>
 
@@ -9,21 +10,12 @@
 #include <boost/container/flat_set.hpp>
 
 #include "PhysicsData.hpp"
+#include "TrapezoidFilter.hpp"
 
 class XiaDecoder;
 
 class ChannelMap{
 	public:
-		enum CalType{
-			Unknown,
-			Linear,
-			Quadratic,
-			Cubic,
-			LinearExpo,
-			QuadraticExpo,
-			CubicExpo
-		};
-
 		enum FirmwareVersion{
 			R17562,
 			R20466,
@@ -45,7 +37,6 @@ class ChannelMap{
 			int BoardIDInCrate;
 			int CrateID;
 			int GlobalBoardID;
-			int TraceDelay;
 			FirmwareVersion Version;
 			XiaDecoder* xiadecoder;
 
@@ -55,8 +46,7 @@ class ChannelMap{
 				   << " Board: " << b.BoardIDInCrate
 				   << " gBoard: " << b.GlobalBoardID
 				   << " Revision: " << b.Revision
-				   << " Frequency: " << b.Frequency
-				   << " TraceDelay: " << b.TraceDelay;
+				   << " Frequency: " << b.Frequency;
 				switch( b.Version ){
 					case R17562:
 						os << " Version: R17562";
@@ -100,12 +90,10 @@ class ChannelMap{
 		};
 
 		struct ChannelInfo{
-			CalType cal;
 			int ChannelIDInBoard;
 			int BoardIDInCrate;
 			int CrateID;
 			int GlobalChannelID;
-			int TraceDelay;
 			std::string type;
 			std::string subtype;
 			std::string group;
@@ -113,7 +101,8 @@ class ChannelMap{
 			std::set<std::string> taglist;
 			std::string unique_id;
 			std::vector<double> Params;
-			std::pair<double,double> Thresh;
+			TrapezoidFilter<float,uint16_t> InternalFilter;
+			std::vector<double> InternalParams;
 
 			template<typename OStream>
 			friend OStream& operator<<(OStream& os, const ChannelMap::ChannelInfo& c) {
@@ -121,7 +110,6 @@ class ChannelMap{
 				   << " Board: " << c.BoardIDInCrate
 				   << " Channel: " << c.ChannelIDInBoard
 				   << " gChannel: " << c.GlobalChannelID
-				   << " TraceDelay: " << c.TraceDelay
 				   << " Type: " << c.type
 				   << " Subtype: " << c.subtype
 				   << " Group: " << c.group
@@ -130,31 +118,19 @@ class ChannelMap{
 				   << " ParsedTags: ";
 				for( const auto& t : c.taglist )
 					os << t << ",";
-				os << " CalType: ";
-				switch(c.cal){
-					case Linear:
-						os << "Linear";
-						break;
-					case Quadratic:
-						os << "Quadratic";
-						break;
-					case Cubic:
-						os << "Cubic";
-						break;
-					case LinearExpo:
-						os << "LinearExpo";
-						break;
-					case QuadraticExpo:
-						os << "QuadraticExpo";
-						break;
-					default:
-						os << "UNKNOWN";
-						break;
-				}
 				os << " CalParams: ";
 				for( const auto& p : c.Params )
 					os << p << ",";
-				os << " Threshold: [" << c.Thresh.first << "," << c.Thresh.second << "]";
+				if( c.InternalParams.size() > 0 ){
+					os << " InternalTrapFilter(len,gap,baseline,tau): (" 
+					   << c.InternalFilter.l << "," 
+					   << c.InternalFilter.g << "," 
+					   << c.InternalFilter.blen << "," 
+					   << c.InternalFilter.tau << ")" ;
+					os << " InternalCalParams: ";
+					for( const auto& p : c.InternalParams )
+						os << p << ",";
+				}
 				return os;
 			}
 
@@ -166,18 +142,15 @@ class ChannelMap{
 		int GetNumCrates() const;
 		int GetNumChannelsPerBoard() const;
 
-
-		[[nodiscard]] double GetCalibratedEnergy(int,int,int,double);
+		[[nodiscard]] std::tuple<double,double,double> GetCalibratedEnergy(int,int,int,double,const std::vector<uint16_t>&);
 		
-		[[nodiscard]] bool SetParams(int,int,int,const std::string&,const std::string&,const std::string&,const std::string&,const std::set<std::string>&,CalType,const std::vector<double>&,int,const std::pair<double,double>&);
-
-		[[nodiscard]] CalType GetCalType(int,int,int) const;
+		[[nodiscard]] bool SetParams(int,int,int,const std::string&,const std::string&,const std::string&,const std::string&,const std::set<std::string>&,const std::vector<double>&);
+		[[nodiscard]] bool SetParams(int,int,int,const std::string&,const std::string&,const std::string&,const std::string&,const std::set<std::string>&,const std::vector<double>&,int,int,int,float,const std::vector<double>&);
 
 		[[nodiscard]] int GetBoardFrequency(int,int) const;
-		[[nodiscard]] int GetBoardTraceDelay(int,int) const;
 		[[nodiscard]] ChannelMap::FirmwareVersion GetBoardFirmware(int,int) const;
 
-		[[nodiscard]] bool SetBoardInfo(int,int,const char&,const std::string&,int,int);
+		[[nodiscard]] bool SetBoardInfo(int,int,const char&,const std::string&,int);
 		[[nodiscard]] bool SetModuleClockTickMap(const char&,int,int,int);
 		[[nodiscard]] int GetModuleClockTicksToNS(int,int) const;
 		[[nodiscard]] int GetModuleADCClockTicksToNS(int,int) const;
@@ -205,8 +178,6 @@ class ChannelMap{
 		int MAX_BOARDS;
 		int MAX_CHANNELS_PER_BOARD;
 		int MAX_CHANNELS;
-		int MAX_CAL_PARAMS_PER_CHANNEL;
-		int MAX_CAL_PARAMS;
 		int MAX_FID;
 		
 		boost::container::flat_set<std::string> KnownUID;

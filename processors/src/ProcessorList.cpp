@@ -201,8 +201,8 @@ void ProcessorList::ThreshAndCal(boost::container::devector<PhysicsData>& RawEve
 		auto raw = evt.GetRawEnergy();
 		auto erg = raw+this->randNum(this->randGen);
 		try{
-			auto cal = cmap->GetCalibratedEnergy(evt.GetCrate(),evt.GetModule(),evt.GetChannel(),erg);
-			evt.SetEnergy(erg,cal);
+			const auto [cal,iraw,ical] = cmap->GetCalibratedEnergy(evt.GetCrate(),evt.GetModule(),evt.GetChannel(),erg,evt.GetRawTrace());
+			evt.SetEnergy(erg,cal,iraw,ical);
 		}catch(const boost::container::out_of_range& e){
 			this->console->error("Invalid channel map for event {}. Next message is description from boost",evt);
 			throw std::runtime_error(e.what());
@@ -242,8 +242,10 @@ void ProcessorList::ProcessRaw(boost::container::devector<PhysicsData>& RawEvent
 		int rate_y = scalartime/scalarsize;
 		int rate_x = static_cast<int>(scalartime)%scalarsize;
 		HistogramManager->Fill("Raw",evt.GetRawEnergyWRandom(),gChanID);
+		HistogramManager->Fill("InternalRaw",evt.GetInternalFilterRaw(),gChanID);
 		HistogramManager->Fill("Scalar",scalartime,gChanID);
 		HistogramManager->Fill("Cal",evt.GetEnergy(),gChanID);
+		HistogramManager->Fill("InternalCal",evt.GetInternalFilterEnergy(),gChanID);
 		HistogramManager->Fill("Event_Mult",gChanID,evtsize);
 		HistogramManager->Fill("Total_Rate",rate_x,rate_y);
 		if( evt.GetPileup() ){

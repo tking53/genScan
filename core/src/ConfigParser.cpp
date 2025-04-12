@@ -274,16 +274,7 @@ void ConfigParser::ParseMap(ChannelMap* cmap){
 						<< bid << "\" is either missing Frequency attribute or is negative";
 					throw std::runtime_error(ss.str());
 				}
-				int TraceDelay = board.attribute("TraceDelay").as_int(-1);
-				if( TraceDelay < 0 ){
-					std::stringstream ss;
-					ss << "ConfigParser::ParseMap() : config file named \""
-						<< *(this->ConfigName) 
-						<< "\" is most likely malformed, because module with number \""
-						<< bid << "\" is either missing TraceDelay attribute or is negative";
-					throw std::runtime_error(ss.str());
-				}
-				auto duplicate = cmap->SetBoardInfo(crid,bid,revision[0],firmware,frequency,TraceDelay);
+				auto duplicate = cmap->SetBoardInfo(crid,bid,revision[0],firmware,frequency);
 				if( duplicate ){
 					std::stringstream ss;
 					ss << "ConfigParser::ParseMap() : config file named \""
@@ -350,19 +341,8 @@ void ConfigParser::ParseMap(ChannelMap* cmap){
 							taglist.insert(match.str());
 						}
 
-						int LocalTraceDelay = channel.attribute("TraceDelay").as_int(TraceDelay);
-						if( LocalTraceDelay < 0 ){
-							std::stringstream ss;
-							ss << "ConfigParser::ParseMap() : config file named \""
-								<< *(this->ConfigName) 
-								<< "\" is malformed. Because no TraceDelay for channel with number=\""
-								<< cid << "\" in module with number=\""
-								<< bid << "\" is negative";
-							throw std::runtime_error(ss.str());
-						}
-
-
 						pugi::xml_node calibration = channel.child("Calibration");
+						std::vector<double> params;
 						if( !calibration ){
 							std::stringstream ss;
 							ss << "ConfigParser::ParseMap() : config file named \""
@@ -372,24 +352,7 @@ void ConfigParser::ParseMap(ChannelMap* cmap){
 								<< bid << "\"";
 							throw std::runtime_error(ss.str());
 						}else{
-							std::string cal_type = calibration.attribute("model").as_string("");
-							if( cal_type.compare("") == 0 ){
-								std::stringstream ss;
-								ss << "ConfigParser::ParseMap() : config file named \""
-									<< *(this->ConfigName) 
-									<< "\" is malformed. Because Calibration tag for channel with number=\""
-									<< cid << "\" in module with number=\""
-									<< bid << "\" is missing the \"model\" attribute";
-								throw std::runtime_error(ss.str());
-							}
-
-							double threshmin = calibration.attribute("thresh_min").as_double(0);
-							double threshmax = calibration.attribute("thresh_max").as_double(65536);
-							std::pair<double,double> ThreshVals = {threshmin,threshmax};
-
-							std::vector<double> params;
 							std::string calstring = calibration.text().get();
-							ChannelMap::CalType ct = ChannelMap::CalType::Unknown;
 							StringManip::ParseCalString(calstring,params);
 							if( params.size() == 0 ){
 								std::stringstream ss;
@@ -400,90 +363,11 @@ void ConfigParser::ParseMap(ChannelMap* cmap){
 									<< bid << "\" is missing the \"text\" containing the calibration parameters";
 								throw std::runtime_error(ss.str());
 							}
+						}
 
-							if (cal_type.compare("linear") == 0 ){
-								if( params.size() != 2 ){
-									std::stringstream ss;
-									ss << "ConfigParser::ParseMap() : config file named \""
-										<< *(this->ConfigName) 
-										<< "\" is malformed. Because Calibration tag for channel with number=\""
-										<< cid << "\" in module with number=\""
-										<< bid << "\" is model=\"linear\" which expects 2 parameters but has "
-										<< params.size() << " listed.";
-									throw std::runtime_error(ss.str());
-								}
-								ct = ChannelMap::CalType::Linear;
-							}else if (cal_type.compare("quadratic") == 0 ){
-								if( params.size() != 3 ){
-									std::stringstream ss;
-									ss << "ConfigParser::ParseMap() : config file named \""
-										<< *(this->ConfigName) 
-										<< "\" is malformed. Because Calibration tag for channel with number=\""
-										<< cid << "\" in module with number=\""
-										<< bid << "\" is model=\"quadratic\" which expects 3 parameters but has "
-										<< params.size() << " listed.";
-									throw std::runtime_error(ss.str());
-								}
-								ct = ChannelMap::CalType::Quadratic;
-							}else if (cal_type.compare("cubic") == 0 ){
-								if( params.size() != 4 ){
-									std::stringstream ss;
-									ss << "ConfigParser::ParseMap() : config file named \""
-										<< *(this->ConfigName) 
-										<< "\" is malformed. Because Calibration tag for channel with number=\""
-										<< cid << "\" in module with number=\""
-										<< bid << "\" is model=\"cubic\" which expects 4 parameters but has "
-										<< params.size() << " listed.";
-									throw std::runtime_error(ss.str());
-								}
-								ct = ChannelMap::CalType::Cubic;
-							}else if (cal_type.compare("linear_expo") == 0 ){
-								if( params.size() != 2 ){
-									std::stringstream ss;
-									ss << "ConfigParser::ParseMap() : config file named \""
-										<< *(this->ConfigName) 
-										<< "\" is malformed. Because Calibration tag for channel with number=\""
-										<< cid << "\" in module with number=\""
-										<< bid << "\" is model=\"linear_expo\" which expects 2 parameters but has "
-										<< params.size() << " listed.";
-									throw std::runtime_error(ss.str());
-								}
-								ct = ChannelMap::CalType::LinearExpo;
-							}else if (cal_type.compare("quadratic_expo") == 0 ){
-								if( params.size() != 3 ){
-									std::stringstream ss;
-									ss << "ConfigParser::ParseMap() : config file named \""
-										<< *(this->ConfigName) 
-										<< "\" is malformed. Because Calibration tag for channel with number=\""
-										<< cid << "\" in module with number=\""
-										<< bid << "\" is model=\"quadratic_expo\" which expects 3 parameters but has "
-										<< params.size() << " listed.";
-									throw std::runtime_error(ss.str());
-								}
-								ct = ChannelMap::CalType::QuadraticExpo;
-							}else if (cal_type.compare("cubic_expo") == 0 ){
-								if( params.size() != 4 ){
-									std::stringstream ss;
-									ss << "ConfigParser::ParseMap() : config file named \""
-										<< *(this->ConfigName) 
-										<< "\" is malformed. Because Calibration tag for channel with number=\""
-										<< cid << "\" in module with number=\""
-										<< bid << "\" is model=\"cubic_expo\" which expects 4 parameters but has "
-										<< params.size() << " listed.";
-									throw std::runtime_error(ss.str());
-								}
-								ct = ChannelMap::CalType::CubicExpo;
-							}else{
-								std::stringstream ss;
-								ss << "ConfigParser::ParseMap() : config file named \""
-									<< *(this->ConfigName) 
-									<< "\" is malformed. Because Calibration tag for channel with number=\""
-									<< cid << "\" in module with number=\""
-									<< bid << "\" has calibration type of model=\""
-									<< cal_type << "\"";
-								throw std::runtime_error(ss.str());
-							}
-							auto duplicate = cmap->SetParams(crid,bid,cid,type,subtype,group,tags,taglist,ct,params,LocalTraceDelay,ThreshVals); 
+						pugi::xml_node trapfilter = channel.child("TrapFilter");
+						if( !trapfilter ){
+							auto duplicate = cmap->SetParams(crid,bid,cid,type,subtype,group,tags,taglist,params); 
 							if( duplicate ){
 								std::stringstream ss;
 								ss << "ConfigParser::ParseMap() : config file named \""
@@ -493,7 +377,45 @@ void ConfigParser::ParseMap(ChannelMap* cmap){
 									<< bid << "\" in crate with number=\""
 									<< crid << "\" is duplicated";
 								throw std::runtime_error(ss.str());
-
+							}
+						}else{
+							pugi::xml_node trapfiltercalibration = trapfilter.child("Calibration");
+							std::vector<double> tfparams;
+							if( !trapfiltercalibration ){
+								std::stringstream ss;
+								ss << "ConfigParser::ParseMap() : config file named \""
+									<< *(this->ConfigName) 
+									<< "\" is malformed. Because no Calibration tag exists for TrapFilter on channel with number=\""
+									<< cid << "\" in module with number=\""
+									<< bid << "\"";
+								throw std::runtime_error(ss.str());
+							}else{
+								int len = trapfilter.attribute("len").as_int(1);
+								int gap = trapfilter.attribute("gap").as_int(0);
+								int bline = trapfilter.attribute("bline").as_int(1);
+								float tau = trapfilter.attribute("tau").as_float(1.0);
+								std::string calstring = trapfiltercalibration.text().get();
+								StringManip::ParseCalString(calstring,tfparams);
+								if( params.size() == 0 ){
+									std::stringstream ss;
+									ss << "ConfigParser::ParseMap() : config file named \""
+										<< *(this->ConfigName) 
+										<< "\" is malformed. Because TrapFilter Calibration tag for channel with number=\""
+										<< cid << "\" in module with number=\""
+										<< bid << "\" is missing the \"text\" containing the calibration parameters";
+									throw std::runtime_error(ss.str());
+								}
+								auto duplicate = cmap->SetParams(crid,bid,cid,type,subtype,group,tags,taglist,params,len,gap,bline,tau,tfparams); 
+								if( duplicate ){
+									std::stringstream ss;
+									ss << "ConfigParser::ParseMap() : config file named \""
+										<< *(this->ConfigName) 
+										<< "\" is malformed. Because Parameters for channel with number=\""
+										<< cid << "\" in module with number=\""
+										<< bid << "\" in crate with number=\""
+										<< crid << "\" is duplicated";
+									throw std::runtime_error(ss.str());
+								}
 							}
 						}
 					}

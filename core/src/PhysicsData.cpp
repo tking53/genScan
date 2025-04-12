@@ -82,7 +82,8 @@ PhysicsData::PhysicsData(const PhysicsData& other) :
 	CMapID(other.CMapID),
 	TagList(other.TagList),
 	TraceFitInfo(other.TraceFitInfo),
-	InternalTrapFilterEnergy(other.InternalTrapFilterEnergy)
+	InternalFilterRaw(other.InternalFilterRaw),
+	InternalFilterEnergy(other.InternalFilterEnergy)
 {
 }
 
@@ -124,7 +125,8 @@ PhysicsData::PhysicsData(PhysicsData&& other) noexcept :
 	CMapID(std::move(other.CMapID)),
 	TagList(std::move(other.TagList)),
 	TraceFitInfo(std::move(other.TraceFitInfo)),
-	InternalTrapFilterEnergy(other.InternalTrapFilterEnergy)
+	InternalFilterRaw(other.InternalFilterRaw),
+	InternalFilterEnergy(other.InternalFilterEnergy)
 {
 }
 
@@ -167,7 +169,8 @@ PhysicsData& PhysicsData::operator=(const PhysicsData& other){
 		CMapID = other.CMapID;
 		TagList = other.TagList;
 		TraceFitInfo = other.TraceFitInfo;
-		InternalTrapFilterEnergy = other.InternalTrapFilterEnergy;
+		InternalFilterRaw = other.InternalFilterRaw;
+		InternalFilterEnergy = other.InternalFilterEnergy;
 	}
 	return *this;
 }
@@ -211,7 +214,8 @@ PhysicsData& PhysicsData::operator=(PhysicsData&& other) noexcept{
 		CMapID = std::move(other.CMapID);
 		TagList = std::move(other.TagList);
 		TraceFitInfo = std::move(other.TraceFitInfo);
-		InternalTrapFilterEnergy = other.InternalTrapFilterEnergy;
+		InternalFilterRaw = other.InternalFilterRaw;
+		InternalFilterEnergy = other.InternalFilterEnergy;
 	}
 	return *this;
 }
@@ -251,10 +255,11 @@ uint64_t PhysicsData::GetSpillID() const{
 }
 
 //Energy
-void PhysicsData::SetEnergy(double value1,double value2){
+void PhysicsData::SetEnergy(double value1,double value2,double ivalue1,double ivalue2){
 	this->RawEnergyWRandom = value1;
 	this->Energy = value2;
-	this->InternalTrapFilterEnergy = value1;
+	this->InternalFilterRaw = ivalue1;
+	this->InternalFilterEnergy = ivalue2;
 }
 
 double PhysicsData::GetEnergy() const{
@@ -624,6 +629,10 @@ std::pair<double,double> PhysicsData::GetTraceFitValue(const std::string& name) 
 	return this->TraceFitInfo.at(name);
 }
 
-double PhysicsData::GetInternalTrapFilterEnergy() const{
-	return this->InternalTrapFilterEnergy;
+double PhysicsData::GetInternalFilterRaw() const{
+	return this->InternalFilterRaw;
+}
+
+double PhysicsData::GetInternalFilterEnergy() const{
+	return this->InternalFilterEnergy;
 }
