@@ -5,6 +5,7 @@
 #include "spdlog/spdlog.h"
 #include <TTree.h>
 #include <algorithm>
+#include <cmath>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -156,7 +157,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 	this->MiddleHits = std::vector<int>(12,0);
 	this->OuterHits = std::vector<int>(12,0);
 
-	this->SumFrontBackEnergy = std::vector<double>(24,0.0);
+	this->CrystalEnergy = std::vector<double>(24,0.0);
 	this->TotalEnergy = std::vector<double>(5,0.0);
 
 	this->IndividualPMTPileup = std::vector<bool>(48,false);
@@ -367,8 +368,8 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 
 	for( int ii = 0; ii < 6; ++ii ){
 		if( this->CenterHits[2*ii] and this->CenterHits[2*ii + 1] ){
-			this->SumFrontBackEnergy[ii] = (this->Center[2*ii] + this->Center[2*ii + 1])/2.0;
-			this->SegmentDataVec[ii].sumenergy = this->SumFrontBackEnergy[ii];
+			this->CrystalEnergy[ii] = std::sqrt(this->Center[2*ii] * this->Center[2*ii + 1]);//(this->Center[2*ii] + this->Center[2*ii + 1])/2.0;
+			this->SegmentDataVec[ii].sumenergy = this->CrystalEnergy[ii];
 			this->SegmentDataVec[ii].avgtimestamp = (this->SegmentDataVec[ii].fronttimestamp+this->SegmentDataVec[ii].backtimestamp)/2.0;
 			this->Position[ii] = this->CalcPosition(this->RawCenter[2*ii],this->RawCenter[2*ii + 1]);
 			this->CenterFire = true;
@@ -377,8 +378,8 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 			this->NumFire[1] += 1;
 		}
 		if( this->InnerHits[2*ii] and this->InnerHits[2*ii + 1] ){
-			this->SumFrontBackEnergy[ii+6] = (this->Inner[2*ii] + this->Inner[2*ii + 1])/2.0;
-			this->SegmentDataVec[ii+6].sumenergy = this->SumFrontBackEnergy[ii+6];
+			this->CrystalEnergy[ii+6] = (this->Inner[2*ii] + this->Inner[2*ii + 1])/2.0;
+			this->SegmentDataVec[ii+6].sumenergy = this->CrystalEnergy[ii+6];
 			this->SegmentDataVec[ii+6].avgtimestamp = (this->SegmentDataVec[ii+6].fronttimestamp+this->SegmentDataVec[ii+6].backtimestamp)/2.0;
 			this->Position[ii + 6] = this->CalcPosition(this->RawInner[2*ii],this->RawInner[2*ii + 1]);
 			this->InnerFire = true;
@@ -387,8 +388,8 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 			this->NumFire[2] += 1;
 		}
 		if( this->MiddleHits[2*ii] and this->MiddleHits[2*ii + 1] ){
-			this->SumFrontBackEnergy[ii+12] = (this->Middle[2*ii] + this->Middle[2*ii + 1])/2.0;
-			this->SegmentDataVec[ii+12].sumenergy = this->SumFrontBackEnergy[ii+12];
+			this->CrystalEnergy[ii+12] = (this->Middle[2*ii] + this->Middle[2*ii + 1])/2.0;
+			this->SegmentDataVec[ii+12].sumenergy = this->CrystalEnergy[ii+12];
 			this->SegmentDataVec[ii+12].avgtimestamp = (this->SegmentDataVec[ii+12].fronttimestamp+this->SegmentDataVec[ii+12].backtimestamp)/2.0;
 			this->Position[ii + 12] = this->CalcPosition(this->RawMiddle[2*ii],this->RawMiddle[2*ii + 1]);
 			this->MiddleFire = true;
@@ -397,8 +398,8 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 			this->NumFire[3] += 1;
 		}
 		if( this->OuterHits[2*ii] and this->OuterHits[2*ii + 1] ){
-			this->SumFrontBackEnergy[ii+18] = (this->Outer[2*ii] + this->Outer[2*ii + 1])/2.0;
-			this->SegmentDataVec[ii+18].sumenergy = this->SumFrontBackEnergy[ii+18];
+			this->CrystalEnergy[ii+18] = (this->Outer[2*ii] + this->Outer[2*ii + 1])/2.0;
+			this->SegmentDataVec[ii+18].sumenergy = this->CrystalEnergy[ii+18];
 			this->SegmentDataVec[ii+18].avgtimestamp = (this->SegmentDataVec[ii+18].fronttimestamp+this->SegmentDataVec[ii+18].backtimestamp)/2.0;
 			this->Position[ii + 18] = this->CalcPosition(this->RawOuter[2*ii],this->RawOuter[2*ii + 1]);
 			this->OuterFire = true;
@@ -418,7 +419,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 				auto front2 = this->Center[2*ii];
 				auto back2 = this->Center[2*ii + 1];
 				//this->console->info("Front {}->{} , Back {}->{}",front,front2,back,back2);
-				this->SumFrontBackEnergy[ii] = (this->Center[2*ii] + this->Center[2*ii + 1])/2.0;
+				this->CrystalEnergy[ii] = (this->Center[2*ii] + this->Center[2*ii + 1])/2.0;
 				//don't update the position
 				//this->Position[ii] = this->CalcPosition(this->Center[2*ii],this->Center[2*ii + 1]);
 			}
@@ -426,15 +427,15 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 	}
 
 	for( int ii = 0; ii < 6; ++ii ){
-		this->TotalEnergy[0] += this->SumFrontBackEnergy[ii];
-		this->TotalEnergy[0] += this->SumFrontBackEnergy[ii+6];
-		this->TotalEnergy[0] += this->SumFrontBackEnergy[ii+12];
-		this->TotalEnergy[0] += this->SumFrontBackEnergy[ii+18];
+		this->TotalEnergy[0] += this->CrystalEnergy[ii];
+		this->TotalEnergy[0] += this->CrystalEnergy[ii+6];
+		this->TotalEnergy[0] += this->CrystalEnergy[ii+12];
+		this->TotalEnergy[0] += this->CrystalEnergy[ii+18];
 
-		this->TotalEnergy[1] += this->SumFrontBackEnergy[ii];
-		this->TotalEnergy[2] += this->SumFrontBackEnergy[ii+6];
-		this->TotalEnergy[3] += this->SumFrontBackEnergy[ii+12];
-		this->TotalEnergy[4] += this->SumFrontBackEnergy[ii+18];
+		this->TotalEnergy[1] += this->CrystalEnergy[ii];
+		this->TotalEnergy[2] += this->CrystalEnergy[ii+6];
+		this->TotalEnergy[3] += this->CrystalEnergy[ii+12];
+		this->TotalEnergy[4] += this->CrystalEnergy[ii+18];
 	}
 	this->TotalDataVec[0].sumenergy = this->TotalEnergy[0];
 	this->TotalDataVec[0].numfire = this->NumFire[0];
@@ -555,7 +556,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		hismanager->Fill(this->MTAS_32518,this->TotalEnergy[0],this->TotalEnergy[1]);
 
 		for( int ii = 0; ii < 24; ++ii ){
-			hismanager->Fill(this->MTAS_3201,this->SumFrontBackEnergy[ii],ii);
+			hismanager->Fill(this->MTAS_3201,this->CrystalEnergy[ii],ii);
 		}
 
 		for( int ii = 0; ii < 6; ++ii ){
@@ -570,30 +571,30 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 			name = "MTAS_326"+id;
 			hismanager->Fill(name,this->Position[ii],(this->RawCenter[2*ii] + this->RawCenter[2*ii + 1])/2.0);
 
-			hismanager->Fill(this->MTAS_3215,this->SumFrontBackEnergy[ii]);
-			hismanager->Fill(this->MTAS_3225,this->SumFrontBackEnergy[ii+6]);
-			hismanager->Fill(this->MTAS_3235,this->SumFrontBackEnergy[ii+12]);
-			hismanager->Fill(this->MTAS_3245,this->SumFrontBackEnergy[ii+18]);
+			hismanager->Fill(this->MTAS_3215,this->CrystalEnergy[ii]);
+			hismanager->Fill(this->MTAS_3225,this->CrystalEnergy[ii+6]);
+			hismanager->Fill(this->MTAS_3235,this->CrystalEnergy[ii+12]);
+			hismanager->Fill(this->MTAS_3245,this->CrystalEnergy[ii+18]);
 
-			hismanager->Fill(this->MTAS_3250,this->TotalEnergy[0],this->SumFrontBackEnergy[ii+6]);
-			hismanager->Fill(this->MTAS_3250,this->TotalEnergy[0],this->SumFrontBackEnergy[ii+12]);
-			hismanager->Fill(this->MTAS_3250,this->TotalEnergy[0],this->SumFrontBackEnergy[ii+18]);
+			hismanager->Fill(this->MTAS_3250,this->TotalEnergy[0],this->CrystalEnergy[ii+6]);
+			hismanager->Fill(this->MTAS_3250,this->TotalEnergy[0],this->CrystalEnergy[ii+12]);
+			hismanager->Fill(this->MTAS_3250,this->TotalEnergy[0],this->CrystalEnergy[ii+18]);
 
-			hismanager->Fill(this->MTAS_3252,this->TotalEnergy[0],this->SumFrontBackEnergy[ii]);
+			hismanager->Fill(this->MTAS_3252,this->TotalEnergy[0],this->CrystalEnergy[ii]);
 
-			hismanager->Fill(this->MTAS_3253,this->TotalEnergy[1],this->SumFrontBackEnergy[ii]);
+			hismanager->Fill(this->MTAS_3253,this->TotalEnergy[1],this->CrystalEnergy[ii]);
 
-			hismanager->Fill(this->MTAS_32508,this->TotalEnergy[0],this->SumFrontBackEnergy[ii+6]);
-			hismanager->Fill(this->MTAS_32508,this->TotalEnergy[0],this->SumFrontBackEnergy[ii+12]);
-			hismanager->Fill(this->MTAS_32508,this->TotalEnergy[0],this->SumFrontBackEnergy[ii+18]);
+			hismanager->Fill(this->MTAS_32508,this->TotalEnergy[0],this->CrystalEnergy[ii+6]);
+			hismanager->Fill(this->MTAS_32508,this->TotalEnergy[0],this->CrystalEnergy[ii+12]);
+			hismanager->Fill(this->MTAS_32508,this->TotalEnergy[0],this->CrystalEnergy[ii+18]);
 
-			hismanager->Fill(this->MTAS_32528,this->TotalEnergy[0],this->SumFrontBackEnergy[ii]);
+			hismanager->Fill(this->MTAS_32528,this->TotalEnergy[0],this->CrystalEnergy[ii]);
 
-			hismanager->Fill(this->MTAS_32538,this->TotalEnergy[1],this->SumFrontBackEnergy[ii]);
+			hismanager->Fill(this->MTAS_32538,this->TotalEnergy[1],this->CrystalEnergy[ii]);
 
 			if( (not this->InnerFire) and (not this->MiddleFire) and (not this->OuterFire) ){
-				hismanager->Fill(this->MTAS_3254,this->TotalEnergy[0],this->SumFrontBackEnergy[ii]);
-				hismanager->Fill(this->MTAS_32548,this->TotalEnergy[0],this->SumFrontBackEnergy[ii]);
+				hismanager->Fill(this->MTAS_3254,this->TotalEnergy[0],this->CrystalEnergy[ii]);
+				hismanager->Fill(this->MTAS_32548,this->TotalEnergy[0],this->CrystalEnergy[ii]);
 			}
 		}
 	}
@@ -891,7 +892,7 @@ void MtasProcessor::CleanupTree(){
 }
 
 void MtasProcessor::Reset(){
-	this->SumFrontBackEnergy = std::vector<double>(24,0.0);
+	this->CrystalEnergy = std::vector<double>(24,0.0);
 	this->TotalEnergy = std::vector<double>(5,0.0);
 
 	this->IndividualPMTPileup = std::vector<bool>(48,false);
@@ -1140,7 +1141,7 @@ void MtasProcessor::FillBetaPlots(PLOTS::PlotRegistry* hismanager){
 		hismanager->Fill(this->MTAS_33518,this->TotalEnergy[0],this->TotalEnergy[1]);
 
 		for( int ii = 0; ii < 24; ++ii ){
-			hismanager->Fill(this->MTAS_3301,this->SumFrontBackEnergy[ii],ii);
+			hismanager->Fill(this->MTAS_3301,this->CrystalEnergy[ii],ii);
 		}
 
 		for( int ii = 0; ii < 6; ++ii ){
@@ -1155,30 +1156,30 @@ void MtasProcessor::FillBetaPlots(PLOTS::PlotRegistry* hismanager){
 			name = "MTAS_336"+id;
 			hismanager->Fill(name,this->Position[ii],(this->RawCenter[2*ii] + this->RawCenter[2*ii + 1])/2.0);
 
-			hismanager->Fill(this->MTAS_3315,this->SumFrontBackEnergy[ii]);
-			hismanager->Fill(this->MTAS_3325,this->SumFrontBackEnergy[ii+6]);
-			hismanager->Fill(this->MTAS_3335,this->SumFrontBackEnergy[ii+12]);
-			hismanager->Fill(this->MTAS_3345,this->SumFrontBackEnergy[ii+18]);
+			hismanager->Fill(this->MTAS_3315,this->CrystalEnergy[ii]);
+			hismanager->Fill(this->MTAS_3325,this->CrystalEnergy[ii+6]);
+			hismanager->Fill(this->MTAS_3335,this->CrystalEnergy[ii+12]);
+			hismanager->Fill(this->MTAS_3345,this->CrystalEnergy[ii+18]);
 
-			hismanager->Fill(this->MTAS_3350,this->TotalEnergy[0],this->SumFrontBackEnergy[ii+6]);
-			hismanager->Fill(this->MTAS_3350,this->TotalEnergy[0],this->SumFrontBackEnergy[ii+12]);
-			hismanager->Fill(this->MTAS_3350,this->TotalEnergy[0],this->SumFrontBackEnergy[ii+18]);
+			hismanager->Fill(this->MTAS_3350,this->TotalEnergy[0],this->CrystalEnergy[ii+6]);
+			hismanager->Fill(this->MTAS_3350,this->TotalEnergy[0],this->CrystalEnergy[ii+12]);
+			hismanager->Fill(this->MTAS_3350,this->TotalEnergy[0],this->CrystalEnergy[ii+18]);
 
-			hismanager->Fill(this->MTAS_3352,this->TotalEnergy[0],this->SumFrontBackEnergy[ii]);
+			hismanager->Fill(this->MTAS_3352,this->TotalEnergy[0],this->CrystalEnergy[ii]);
 
-			hismanager->Fill(this->MTAS_3353,this->TotalEnergy[1],this->SumFrontBackEnergy[ii]);
+			hismanager->Fill(this->MTAS_3353,this->TotalEnergy[1],this->CrystalEnergy[ii]);
 
-			hismanager->Fill(this->MTAS_33508,this->TotalEnergy[0],this->SumFrontBackEnergy[ii+6]);
-			hismanager->Fill(this->MTAS_33508,this->TotalEnergy[0],this->SumFrontBackEnergy[ii+12]);
-			hismanager->Fill(this->MTAS_33508,this->TotalEnergy[0],this->SumFrontBackEnergy[ii+18]);
+			hismanager->Fill(this->MTAS_33508,this->TotalEnergy[0],this->CrystalEnergy[ii+6]);
+			hismanager->Fill(this->MTAS_33508,this->TotalEnergy[0],this->CrystalEnergy[ii+12]);
+			hismanager->Fill(this->MTAS_33508,this->TotalEnergy[0],this->CrystalEnergy[ii+18]);
 
-			hismanager->Fill(this->MTAS_33528,this->TotalEnergy[0],this->SumFrontBackEnergy[ii]);
+			hismanager->Fill(this->MTAS_33528,this->TotalEnergy[0],this->CrystalEnergy[ii]);
 
-			hismanager->Fill(this->MTAS_33538,this->TotalEnergy[1],this->SumFrontBackEnergy[ii]);
+			hismanager->Fill(this->MTAS_33538,this->TotalEnergy[1],this->CrystalEnergy[ii]);
 
 			if( (not this->InnerFire) and (not this->MiddleFire) and (not this->OuterFire) ){
-				hismanager->Fill(this->MTAS_3354,this->TotalEnergy[0],this->SumFrontBackEnergy[ii]);
-				hismanager->Fill(this->MTAS_33548,this->TotalEnergy[0],this->SumFrontBackEnergy[ii]);
+				hismanager->Fill(this->MTAS_3354,this->TotalEnergy[0],this->CrystalEnergy[ii]);
+				hismanager->Fill(this->MTAS_33548,this->TotalEnergy[0],this->CrystalEnergy[ii]);
 			}
 
 
@@ -1234,7 +1235,7 @@ void MtasProcessor::FillNonBetaPlots(PLOTS::PlotRegistry* hismanager){
 		hismanager->Fill(this->MTAS_31518,this->TotalEnergy[0],this->TotalEnergy[1]);
 
 		for( int ii = 0; ii < 24; ++ii ){
-			hismanager->Fill(this->MTAS_3101,this->SumFrontBackEnergy[ii],ii);
+			hismanager->Fill(this->MTAS_3101,this->CrystalEnergy[ii],ii);
 		}
 
 		for( int ii = 0; ii < 6; ++ii ){
@@ -1249,30 +1250,30 @@ void MtasProcessor::FillNonBetaPlots(PLOTS::PlotRegistry* hismanager){
 			name = "MTAS_316"+id;
 			hismanager->Fill(name,this->Position[ii],(this->RawCenter[2*ii] + this->RawCenter[2*ii + 1])/2.0);
 
-			hismanager->Fill(this->MTAS_3115,this->SumFrontBackEnergy[ii]);
-			hismanager->Fill(this->MTAS_3125,this->SumFrontBackEnergy[ii+6]);
-			hismanager->Fill(this->MTAS_3135,this->SumFrontBackEnergy[ii+12]);
-			hismanager->Fill(this->MTAS_3145,this->SumFrontBackEnergy[ii+18]);
+			hismanager->Fill(this->MTAS_3115,this->CrystalEnergy[ii]);
+			hismanager->Fill(this->MTAS_3125,this->CrystalEnergy[ii+6]);
+			hismanager->Fill(this->MTAS_3135,this->CrystalEnergy[ii+12]);
+			hismanager->Fill(this->MTAS_3145,this->CrystalEnergy[ii+18]);
 
-			hismanager->Fill(this->MTAS_3150,this->TotalEnergy[0],this->SumFrontBackEnergy[ii+6]);
-			hismanager->Fill(this->MTAS_3150,this->TotalEnergy[0],this->SumFrontBackEnergy[ii+12]);
-			hismanager->Fill(this->MTAS_3150,this->TotalEnergy[0],this->SumFrontBackEnergy[ii+18]);
+			hismanager->Fill(this->MTAS_3150,this->TotalEnergy[0],this->CrystalEnergy[ii+6]);
+			hismanager->Fill(this->MTAS_3150,this->TotalEnergy[0],this->CrystalEnergy[ii+12]);
+			hismanager->Fill(this->MTAS_3150,this->TotalEnergy[0],this->CrystalEnergy[ii+18]);
 
-			hismanager->Fill(this->MTAS_3152,this->TotalEnergy[0],this->SumFrontBackEnergy[ii]);
+			hismanager->Fill(this->MTAS_3152,this->TotalEnergy[0],this->CrystalEnergy[ii]);
 
-			hismanager->Fill(this->MTAS_3153,this->TotalEnergy[1],this->SumFrontBackEnergy[ii]);
+			hismanager->Fill(this->MTAS_3153,this->TotalEnergy[1],this->CrystalEnergy[ii]);
 
-			hismanager->Fill(this->MTAS_31508,this->TotalEnergy[0],this->SumFrontBackEnergy[ii+6]);
-			hismanager->Fill(this->MTAS_31508,this->TotalEnergy[0],this->SumFrontBackEnergy[ii+12]);
-			hismanager->Fill(this->MTAS_31508,this->TotalEnergy[0],this->SumFrontBackEnergy[ii+18]);
+			hismanager->Fill(this->MTAS_31508,this->TotalEnergy[0],this->CrystalEnergy[ii+6]);
+			hismanager->Fill(this->MTAS_31508,this->TotalEnergy[0],this->CrystalEnergy[ii+12]);
+			hismanager->Fill(this->MTAS_31508,this->TotalEnergy[0],this->CrystalEnergy[ii+18]);
 
-			hismanager->Fill(this->MTAS_31528,this->TotalEnergy[0],this->SumFrontBackEnergy[ii]);
+			hismanager->Fill(this->MTAS_31528,this->TotalEnergy[0],this->CrystalEnergy[ii]);
 
-			hismanager->Fill(this->MTAS_31538,this->TotalEnergy[1],this->SumFrontBackEnergy[ii]);
+			hismanager->Fill(this->MTAS_31538,this->TotalEnergy[1],this->CrystalEnergy[ii]);
 
 			if( (not this->InnerFire) and (not this->MiddleFire) and (not this->OuterFire) ){
-				hismanager->Fill(this->MTAS_3154,this->TotalEnergy[0],this->SumFrontBackEnergy[ii]);
-				hismanager->Fill(this->MTAS_31548,this->TotalEnergy[0],this->SumFrontBackEnergy[ii]);
+				hismanager->Fill(this->MTAS_3154,this->TotalEnergy[0],this->CrystalEnergy[ii]);
+				hismanager->Fill(this->MTAS_31548,this->TotalEnergy[0],this->CrystalEnergy[ii]);
 			}
 
 
@@ -1396,8 +1397,8 @@ const bool& MtasProcessor::DidAnyOuterPileup() const{
 	return this->OuterPileup;
 }
 
-const double& MtasProcessor::GetSumFrontBackEnergy(const int& idx) const{
-	return this->SumFrontBackEnergy[idx];
+const double& MtasProcessor::GetCrystalEnergy(const int& idx) const{
+	return this->CrystalEnergy[idx];
 }
 
 bool MtasProcessor::DidIndividualPMTSaturate(const int& idx) const{

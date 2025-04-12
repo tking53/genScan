@@ -48,7 +48,7 @@ class MtasProcessor : public Processor{
 		const bool& DidAnyMiddlePileup() const;
 		const bool& DidAnyOuterPileup() const;
 
-		const double& GetSumFrontBackEnergy(const int&) const;
+		const double& GetCrystalEnergy(const int&) const;
 		bool DidIndividualPMTSaturate(const int&) const;
 		bool DidIndividualPMTPileup(const int&) const;
 
@@ -110,7 +110,7 @@ class MtasProcessor : public Processor{
 		bool AnyFire;
 			
 		std::vector<double> TotalEnergy;
-		std::vector<double> SumFrontBackEnergy;
+		std::vector<double> CrystalEnergy;
 
 		std::vector<double> TimeStamps;
 			
