@@ -22,20 +22,32 @@ void DumpTH2(TFile*& f,const std::string& actualname,const std::string& drawopti
 	currobj->Draw(drawoptions.c_str());
 }
 
-void DumpAllDrawable(const std::string& filename="GenPeakFitterResults.root",const std::string& restr = ".*",const std::string& drawablename="TH1",const std::string& drawoptions="",double xlow = 1.0,double xhigh = 4000.0,double ylow = 1.0, double yhigh = 4000.0){
+void DumpAllDrawable(const std::string& filename="GenPeakFitterResults.root",const std::string& restr = ".*",const std::string& drawoptions="",double xlow = 1.0,double xhigh = 4000.0,double ylow = 1.0, double yhigh = 4000.0,const std::string& drawablename="TH1"){
 	TFile* f = new TFile(filename.c_str(),"OPEN");
 	TIter next(f->GetListOfKeys());
 	TKey *key;
 	std::regex re(restr);
 
+	bool AllSame = false;
+	TString dopt(drawoptions.c_str());
+	dopt.ToLower();
+	TCanvas* currcanvas;
+	std::string canvasname;
+	if( dopt.Contains("same") ){
+		AllSame = true;
+		canvasname = "Scratch";
+		currcanvas = new TCanvas(canvasname.c_str(),canvasname.c_str(),600,600);
+	}
 	while ((key = (TKey*)next())) {
 		TClass *clsPtr = gROOT->GetClass(key->GetClassName());
 		auto actualname = std::string(key->GetName());
 		if( std::regex_match(actualname,re) ){
 			TString name = key->GetClassName();
 			if( name.Contains(drawablename.c_str()) ){
-				auto canvasname = actualname+"_Scratch";
-				auto currcanvas = new TCanvas(canvasname.c_str(),canvasname.c_str(),600,600);
+				if( not AllSame ){
+					canvasname = actualname+"_Scratch";
+					currcanvas = new TCanvas(canvasname.c_str(),canvasname.c_str(),600,600);
+				}
 				if( name.Contains("TH1") ){
 					DumpTH1(f,actualname,drawoptions,xlow,xhigh);
 					currcanvas->SetLogy(1);
