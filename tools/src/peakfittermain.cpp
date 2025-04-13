@@ -47,7 +47,7 @@ std::map<std::string,double> ParseFixedValues(const std::vector<std::string>& va
 	for( const auto& s : values ){
 		std::vector<std::string> strs;
 		boost::split(strs,s,boost::is_any_of(":"));
-		boost::regex number("^(0|[1-9]\\d*)(\\.\\d+)?(e-?(0|[1-9]\\d*))?");
+		boost::regex number("^(?!-0(\\.0+)?(e|$))-?(0|[1-9]\\d*)(\\.\\d+)?(e-?(0|[1-9]\\d*))?");
 
 		if( strs.size() == 2 ){
 			boost::smatch pmatch;
@@ -73,7 +73,7 @@ std::map<std::string,std::pair<double,double>> ParseBoundedValues(const std::vec
 	for( const auto& s : values ){
 		std::vector<std::string> strs;
 		boost::split(strs,s,boost::is_any_of(":"));
-		boost::regex number("^(0|[1-9]\\d*)(\\.\\d+)?(e-?(0|[1-9]\\d*))?");
+		boost::regex number("^(?!-0(\\.0+)?(e|$))-?(0|[1-9]\\d*)(\\.\\d+)?(e-?(0|[1-9]\\d*))?");
 
 		if( strs.size() == 3 ){
 			boost::smatch lmatch;

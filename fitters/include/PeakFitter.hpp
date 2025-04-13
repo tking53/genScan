@@ -25,7 +25,7 @@ struct PeakFitter{
 	std::map<std::string,std::pair<double,double>> bvalues;
 	TF1* fitfunc;
 	std::vector<TF1*> components;
-	std::map<std::string,int> keys;
+	std::map<std::string,std::pair<int,double>> keys;
 	std::map<std::string,double> Results;
 	std::map<std::string,double> Errors;
 
@@ -59,7 +59,13 @@ struct PeakFitter{
 		this->components.at(0)->SetLineColor(kMagenta);
 		this->components.at(1)->SetLineColor(kGreen);
 
-		this->keys = { {"Area",0},{"Mean",1},{"Sigma",2},{"BkgOffset",3},{"BkgSlope",4}};
+		double bkg_offset = 0;
+		double bkg_slope = 0;
+		double width = this->FitRange.second - this->FitRange.first;
+		double offset = (this->FitRange.second + this->FitRange.first)/2.0;
+		double area = this->fithist->GetBinContent(this->fithist->FindBin(offset));
+
+		this->keys = { {"Area",{0,area}},{"Mean",{1,offset}},{"Sigma",{2,width}},{"BkgOffset",{3,bkg_offset}},{"BkgSlope",{4,bkg_slope}}};
 		AssignFitParNames();
 		VerifyFixedValues();
 		VerifyBoundedValues();
@@ -67,17 +73,10 @@ struct PeakFitter{
 			this->bvalues["Mean"] = this->FitRange; 
 		}
 
-		double bkg_offset = 0;
-		double bkg_slope = 0;
-		double width = this->FitRange.second - this->FitRange.first;
-		double offset = (this->FitRange.second + this->FitRange.first)/2.0;
-		double area = this->fithist->GetBinContent(this->fithist->FindBin(offset));
-
 		auto minbin = this->fithist->FindBin(this->FitRange.first);
 		auto maxbin = this->fithist->FindBin(this->FitRange.second);
 		auto integral = this->fithist->Integral(minbin,maxbin);
 
-		this->fitfunc->SetParameters(area,offset,width,bkg_offset,bkg_slope);
 		FixAndBoundParameters();
 
 		if( integral > 0.0 ){
@@ -121,7 +120,14 @@ struct PeakFitter{
 		this->components.at(1)->SetLineColor(kGreen);
 		this->components.at(2)->SetLineColor(kViolet);
 
-		this->keys = { {"Area",0},{"Mean",1},{"Sigma",2},{"ComptonArea",3},{"BkgOffset",4},{"BkgSlope",5}};
+		double cbkg = 0;
+		double sbkg = 0;
+		double width = this->FitRange.second - this->FitRange.first;
+		double offset = (this->FitRange.second + this->FitRange.first)/2.0;
+		double area = this->fithist->GetBinContent(this->fithist->FindBin(offset));
+		double ca = area;
+
+		this->keys = { {"Area",{0,area}},{"Mean",{1,offset}},{"Sigma",{2,width}},{"ComptonArea",{3,ca}},{"BkgOffset",{4,cbkg}},{"BkgSlope",{5,sbkg}}};
 		AssignFitParNames();
 		VerifyFixedValues();
 		VerifyBoundedValues();
@@ -129,19 +135,10 @@ struct PeakFitter{
 			this->bvalues["Mean"] = this->FitRange; 
 		}
 
-		double ca = 0;
-		double cbkg = 0;
-		double sbkg = 0;
-		double qbkg = 0;
-		double width = this->FitRange.second - this->FitRange.first;
-		double offset = (this->FitRange.second + this->FitRange.first)/2.0;
-		double area = this->fithist->GetBinContent(this->fithist->FindBin(offset));
-
 		auto minbin = this->fithist->FindBin(this->FitRange.first);
 		auto maxbin = this->fithist->FindBin(this->FitRange.second);
 		auto integral = this->fithist->Integral(minbin,maxbin);
 
-		this->fitfunc->SetParameters(area,offset,width,ca,cbkg,sbkg,qbkg);
 		FixAndBoundParameters();
 
 		if( integral > 0.0 ){
@@ -175,11 +172,19 @@ struct PeakFitter{
 	}
 
 	void FixAndBoundParameters(){
-		for( const auto& kv : this->fvalues ){
-			this->fitfunc->FixParameter(this->keys[kv.first],kv.second);
-		}
-		for( const auto& kv : this->bvalues ){
-			this->fitfunc->SetParLimits(this->keys[kv.first],kv.second.first,kv.second.second);
+		for( const auto& kv : this->keys ){
+			auto fres = this->fvalues.find(kv.first);
+			auto bres = this->bvalues.find(kv.first);
+			if( fres != this->fvalues.end() ){
+				this->fitfunc->SetParameter(kv.second.first,fres->second);
+				this->fitfunc->FixParameter(kv.second.first,fres->second);
+			}else if( bres != this->bvalues.end() ){
+				auto middle = (bres->second.first+bres->second.second)/2.0;
+				this->fitfunc->SetParameter(kv.second.first,middle);
+				this->fitfunc->SetParLimits(kv.second.first,bres->second.first,bres->second.second);
+			}else{
+				this->fitfunc->SetParameter(kv.second.first,kv.second.second);
+			}
 		}
 	}
 
@@ -204,8 +209,8 @@ struct PeakFitter{
 
 	void AssignFitValuesErrors(const TFitResultPtr& fitresult){
 		for( const auto& kv :this->keys ){
-			this->Results[kv.first] = fitresult->Parameter(kv.second);
-			this->Errors[kv.first] = fitresult->ParError(kv.second);
+			this->Results[kv.first] = fitresult->Parameter(kv.second.first);
+			this->Errors[kv.first] = fitresult->ParError(kv.second.first);
 		}
 		this->Results["Chi2"] = fitresult->Chi2();
 		this->Errors["NDF"] = fitresult->Ndf();
@@ -213,7 +218,7 @@ struct PeakFitter{
 
 	void AssignFitParNames(){
 		for( const auto& kv :this->keys ){
-			this->fitfunc->SetParName(kv.second,kv.first.c_str());
+			this->fitfunc->SetParName(kv.second.first,kv.first.c_str());
 		}
 	}
 
