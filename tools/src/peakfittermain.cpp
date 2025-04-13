@@ -132,6 +132,7 @@ int main(int argc, char *argv[]) {
 	double xhigh;
 	bool quiet;
 	bool chi2;
+	bool storechi2;
 	int mode;
 	std::map<std::string,double> fixedvalues; 
 	std::map<std::string,std::pair<double,double>> boundedvalues; 
@@ -160,6 +161,7 @@ int main(int argc, char *argv[]) {
 		("data,d",boost::program_options::value<std::string>(&hisname),"histogram to manipulate")
 		("quiet,q",boost::program_options::value<bool>(&quiet)->default_value(false),"quiet output")
 		("chi2,c",boost::program_options::value<bool>(&chi2)->default_value(true),"chi2 fit, or loglikelihood")
+		("storechi2,s",boost::program_options::value<bool>(&storechi2)->default_value(true),"store chi2 plot")
 		;
 
 
@@ -264,7 +266,7 @@ int main(int argc, char *argv[]) {
 			auto outputfile = outputprefix+".root";
 			auto ofile = new TFile(outputfile.c_str(),"RECREATE");
 			for( const auto& f : pfs ){
-				f->WriteHistogram();
+				f->WriteHistogram(storechi2);
 			}
 			ofile->Close();
 			YAML::Emitter  doc;

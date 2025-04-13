@@ -92,11 +92,9 @@ struct PeakFitter{
 
 			if( not fitresult->IsEmpty() ){
 				AssignFitValuesErrors(fitresult);
-
-				this->fitfunc->SetParameters(this->Results["Area"],this->Results["Mean"],this->Results["Sigma"]
-						,this->Results["BkgOffset"],this->Results["BkgSlope"]);
-
+				AssignFitFuncParams();
 				this->fithist->GetListOfFunctions()->Add(this->fitfunc);
+
 				this->components.at(0)->SetParameters(this->Results["Area"],this->Results["Mean"],this->Results["Sigma"]);
 				this->fithist->GetListOfFunctions()->Add(this->components.at(0));
 				this->components.at(1)->SetParameters(this->Results["BkgOffset"],this->Results["BkgSlope"]);
@@ -155,8 +153,8 @@ struct PeakFitter{
 			if( not fitresult->IsEmpty() ){
 				AssignFitValuesErrors(fitresult);
 				AssignFitFuncParams();
-				
 				this->fithist->GetListOfFunctions()->Add(this->fitfunc);
+
 				this->components.at(0)->SetParameters(this->Results["Area"],this->Results["Mean"],this->Results["Sigma"]);
 				this->fithist->GetListOfFunctions()->Add(this->components.at(0));
 				this->components.at(1)->SetParameters(this->Results["ComptonArea"],this->Results["Mean"],this->Results["Sigma"]);
@@ -327,6 +325,7 @@ struct PeakFitter{
 		for( const auto& kv : this->keys ){
 			this->fitfunc->SetParameter(kv.second.first,this->Results[kv.first]);
 		}
+		this->fithist->GetListOfFunctions()->Clear();
 	}
 
 	void AssignFitValuesErrors(const TFitResultPtr& fitresult){
@@ -344,14 +343,44 @@ struct PeakFitter{
 		}
 	}
 
-	void WriteHistogram(){
+	void WriteHistogram(bool storechi2){
 		this->fithist->Write(0,2,0);
-		//auto ressingle = new TRatioPlot(this->fithist,"errfunc");
-		//ressingle->SetSeparationMargin(0.0);
-		//ressingle->SetH1DrawOpt("E1");
-		//ressingle->SetGraphDrawOpt("P X0");
-		//ressingle->Draw("nogrid noconfint");
-		//ressingle->Write(0,2,0);
+		if( storechi2 ){
+			auto name = std::string(this->fithist->GetName());
+			name += "_chi2";
+			TH1* residual = dynamic_cast<TH1*>(this->fithist->Clone(name.c_str()));
+			residual->Reset("ICEMS");
+			residual->SetYTitle("#sigma");
+			residual->GetYaxis()->CenterTitle();
+			
+			name += "_distribution";
+			TH1* chi2dist = new TH1F(name.c_str(),"Chi2 Distribution; #sigma; counts",1000,-10,10);
+			chi2dist->GetXaxis()->CenterTitle();
+			chi2dist->GetYaxis()->CenterTitle();
+
+			int minbin = this->fithist->FindBin(this->FitRange.first);
+			int maxbin = this->fithist->FindBin(this->FitRange.second);
+			for( int ii = minbin; ii <= maxbin; ++ii ){
+				double centroid = this->fithist->GetBinCenter(ii);
+				auto fitval = this->fitfunc->Eval(centroid);
+				auto hisval = this->fithist->GetBinContent(ii);
+				auto hiserr = this->fithist->GetBinError(ii);
+				auto uncert = hiserr;
+				auto binchi2 = (fitval - hisval)*(fitval - hisval)/uncert/uncert;
+				if( hisval > 0.0 ){
+					if( (fitval - hisval) > 0.0 ){
+						residual->SetBinContent(ii,TMath::Sqrt(binchi2));
+						chi2dist->Fill(TMath::Sqrt(binchi2));
+					}else{
+						residual->SetBinContent(ii,-TMath::Sqrt(binchi2));
+						chi2dist->Fill(-TMath::Sqrt(binchi2));
+					}
+					residual->SetBinError(ii,0);
+				}
+			}
+			residual->Write(0,2,0);
+			chi2dist->Write(0,2,0);
+		}
 	}
 
 	template<typename OStream>
