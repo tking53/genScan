@@ -50,7 +50,7 @@ struct calibrationripper{
 	int MaxCardsPerCrate;
 	int MaxChannelsPerBoard;
 
-	calibrationripper(std::string s,bool usefiterror) {
+	calibrationripper(std::string s,bool usefiterror,const std::string parname) {
 		std::vector<std::string> strs;
 		boost::split(strs,s,boost::is_any_of(":"));
 		boost::regex fre(".*\\.((yaml)|(yml)){1}");
@@ -89,8 +89,8 @@ struct calibrationripper{
 		std::set<std::string> names;
 		for( size_t ii = 0; ii < results.size(); ++ii ){
 			auto fitname = results[ii]["HisName"].as<std::string>();
-			auto mean = results[ii]["Values"]["Mean"].as<double>();
-			auto meanerr = results[ii]["Errors"]["Mean"].as<double>();
+			auto mean = results[ii]["Values"][parname].as<double>();
+			auto meanerr = results[ii]["Errors"][parname].as<double>();
 			if( names.find(fitname) != names.end() ){
 				throw std::runtime_error("Parsing "+filename+" found duplicate fit : "+fitname);
 			}else{
@@ -109,6 +109,7 @@ int main(int argc, char *argv[]) {
 	std::string configfile;
 	std::string outputfile;
 	std::string logfile; 
+	std::string parname;
 	int order;
 	bool fixcontstant;
 	bool usefiterror;
@@ -119,6 +120,7 @@ int main(int argc, char *argv[]) {
 		("help,h", "produce help message")
 		("fitpoints,f",boost::program_options::value<std::vector<std::string>>(&fitfiles)->multitoken(),"Add file:energy pair (e.g. fit.yaml:661.657:pkerr, pkerr is optional)")
 		("logfile,l",boost::program_options::value<std::string>(&logfile)->default_value("GenCalRipper.yaml"),"log file to output new calibration params to")
+		("namedparameter,n",boost::program_options::value<std::string>(&parname)->default_value("Mean"),"parameter name used to gen calibration for")
 		("configfile,c",boost::program_options::value<std::string>(&configfile),"configfile to read in and adjust")
 		("outputfile,o",boost::program_options::value<std::string>(&outputfile),"configfile to output to")
 		("polyorder,p",boost::program_options::value<int>(&order)->default_value(1),"order to do calibration")
@@ -143,7 +145,7 @@ int main(int argc, char *argv[]) {
 		std::set<int> BoardMax;
 		std::set<int> ChannelMax;
 		for( const auto& f : fitfiles ){
-			calpoints.push_back(calibrationripper(f,usefiterror));
+			calpoints.push_back(calibrationripper(f,usefiterror,parname));
 			auto i = calpoints.back().MaxCrates;
 			if( CrateMax.empty() ){
 				CrateMax.insert(i);
