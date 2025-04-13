@@ -59,6 +59,30 @@ namespace PulseFit{
 		auto bkg = Linear(x,par+4);
 		return gaussn + ce + bkg;
 	}
+	
+	double SingleTailingGaussN(double* x,double* par){
+		double A = par[0];
+		double mu = par[1];
+		double sigma = par[2];
+		double tau = par[3];
+
+		double mean = x[0] - mu;
+		double c = A;
+		double t1 = 1.0;
+		double t2 = 1.0;
+		if( tau != 0.0 ){
+			c = A/(2.0*tau);
+			t1 = TMath::Exp((mean/tau) + ((sigma*sigma)/(2.0*tau*tau)));
+			if( sigma != 0.0 ){
+				t2 = TMath::Erfc((1.0/TMath::Sqrt(2.0))*((mean/sigma) + (sigma/tau)));
+			}
+		}
+		return c*t1*t2;
+	}
+
+	double DoubleTailingGaussN(double* x,double* par){
+		return SingleTailingGaussN(x,par) + SingleTailingGaussN(x,par+4);
+	}
 
 	double Pulse(double* x,double* par){
 		double amp = par[0];

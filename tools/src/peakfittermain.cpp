@@ -95,6 +95,28 @@ std::map<std::string,std::pair<double,double>> ParseBoundedValues(const std::vec
 	return retvals;
 }
 
+std::vector<std::pair<double,double>> ParseGates(const std::vector<std::string>& values){
+	std::vector<std::pair<double,double>> retvals;
+	for( const auto& s : values ){
+		std::vector<std::string> strs;
+		boost::split(strs,s,boost::is_any_of(":"));
+		boost::regex number("^(?!-0(\\.0+)?(e|$))-?(0|[1-9]\\d*)(\\.\\d+)?(e-?(0|[1-9]\\d*))?");
+
+		if( strs.size() == 2 ){
+			boost::smatch lmatch;
+			boost::smatch umatch;
+			if( boost::regex_match(strs[0],lmatch,number) and boost::regex_match(strs[1],lmatch,number) ){
+				retvals.push_back({std::stod(strs[0]),std::stod(strs[1])});
+			}else{
+				throw std::runtime_error("Invalid bounded pair, not two numbers");
+			}
+		}else{
+			throw std::runtime_error("Unable to parse input");
+		}
+	}
+	return retvals;
+}
+
 int main(int argc, char *argv[]) {
 
 	std::string outputprefix;
@@ -105,6 +127,7 @@ int main(int argc, char *argv[]) {
 	std::vector<int> indices;
 	std::vector<std::string> boundedparams;
 	std::vector<std::string> fixedparams;
+	std::vector<std::string> gates;
 	double xlow;
 	double xhigh;
 	bool quiet;
@@ -112,11 +135,19 @@ int main(int argc, char *argv[]) {
 	int mode;
 	std::map<std::string,double> fixedvalues; 
 	std::map<std::string,std::pair<double,double>> boundedvalues; 
+	std::vector<std::pair<double,double>> gatevalues;
+
+	std::string FittingMessage = "peak fitting mode";
+       	FittingMessage += "\n0->GaussN+LinBkg";
+       	FittingMessage += "\n1->GaussN+CompBkg+LinBkg";
+       	FittingMessage += "\n2->SingleTailGaussN";
+       	FittingMessage += "\n3->DoubleTailGaussN";
 
 	boost::program_options::options_description cmdline_options("Generic Options");
 	cmdline_options.add_options()
 		("help,h", "produce help message")
 		("projectionindices,p",boost::program_options::value<std::vector<int>>(&indices)->multitoken(),"indices to project on if 2d histogram")
+		("gate,g",boost::program_options::value<std::vector<std::string>>(&gates)->multitoken(),"values to gate within in 2d histogram")
 		("boundparameter,b",boost::program_options::value<std::vector<std::string>>(&boundedparams)->multitoken(),"parameter to bound name:low:high")
 		("fixparameter,f",boost::program_options::value<std::vector<std::string>>(&fixedparams)->multitoken(),"parameter to bound name:value")
 		("lowerbound,l",boost::program_options::value<double>(&xlow),"lower bound to perform fit")
@@ -124,7 +155,7 @@ int main(int argc, char *argv[]) {
 		("inputfile,i",boost::program_options::value<std::string>(&inputfile),"file to get the histogram from")
 		("outputprefix,o",boost::program_options::value<std::string>(&outputprefix)->default_value("GenPeakFitterResults"),"file to output to fit info to")
 		("numdimension,n",boost::program_options::value<int>(&dimensionality)->default_value(1),"dimensionality of histogram (1,2)")
-		("mode,m",boost::program_options::value<int>(&mode)->default_value(0),"peak fitting mode 0->GaussNLinBkg 1->MtasLikePeaks")
+		("mode,m",boost::program_options::value<int>(&mode)->default_value(0),FittingMessage.c_str())
 		("axis,a",boost::program_options::value<std::string>(&axis)->default_value("x"),"axis to project onto (x,y,X,Y) if 2D")
 		("data,d",boost::program_options::value<std::string>(&hisname),"histogram to manipulate")
 		("quiet,q",boost::program_options::value<bool>(&quiet)->default_value(false),"quiet output")
@@ -144,6 +175,7 @@ int main(int argc, char *argv[]) {
 		}
 
 		auto numproj = indices.size();
+		auto numgates = gatevalues.size();
 
 		if( not vm.count("lowerbound") ){
 			spdlog::error("missing lowerbound");
@@ -153,8 +185,8 @@ int main(int argc, char *argv[]) {
 			spdlog::error("missing upperbound");
 			exit(EXIT_FAILURE);
 		}	
-		if( dimensionality == 2 and numproj < 1){
-			spdlog::error("dimensionality is 2, but no projections given");
+		if( dimensionality == 2 and numproj < 1 and numgates < 1){
+			spdlog::error("dimensionality is 2, but no projections or gates given");
 			exit(EXIT_FAILURE);
 		}
 
@@ -176,6 +208,7 @@ int main(int argc, char *argv[]) {
 
 		fixedvalues = ParseFixedValues(fixedparams);
 		boundedvalues = ParseBoundedValues(boundedparams);
+		gatevalues = ParseGates(gates);
 	}catch( std::exception& e){
 		spdlog::error(e.what());
 		exit(EXIT_FAILURE);
@@ -200,6 +233,22 @@ int main(int argc, char *argv[]) {
 					}	
 					histofit->SetDirectory(0);
 					pfs.push_back(new PeakFitter(xlow,xhigh,chi2,mode,histofit,fixedvalues,boundedvalues));
+				}
+				int idx = 0;
+				for( const auto& g : gatevalues ){
+					auto name = std::string(mainhis->GetName())+"_gate_"+axis+std::to_string(idx);
+					if( axis.compare("x") == 0 ){
+						auto minbin = dynamic_cast<TH2*>(mainhis)->GetYaxis()->FindBin(g.first);
+						auto maxbin = dynamic_cast<TH2*>(mainhis)->GetYaxis()->FindBin(g.second);
+						histofit = dynamic_cast<TH2*>(mainhis)->ProjectionY(name.c_str(),minbin,maxbin);
+					}else{
+						auto minbin = dynamic_cast<TH2*>(mainhis)->GetXaxis()->FindBin(g.first);
+						auto maxbin = dynamic_cast<TH2*>(mainhis)->GetXaxis()->FindBin(g.second);
+						histofit = dynamic_cast<TH2*>(mainhis)->ProjectionX(name.c_str(),minbin,maxbin);
+					}
+					histofit->SetDirectory(0);
+					pfs.push_back(new PeakFitter(xlow,xhigh,chi2,mode,histofit,fixedvalues,boundedvalues));
+					++idx;
 				}
 			}else if( boost::regex_search(histype,re1d) ){
 				histofit = dynamic_cast<TH1*>(mainhis);
