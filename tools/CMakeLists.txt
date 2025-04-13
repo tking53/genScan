@@ -41,6 +41,11 @@ add_dependencies(GenCMapRegexTest ${EXTERNAL_DEPS})
 target_link_libraries(GenCMapRegexTest PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES})
 list(APPEND EXE_LIST GenCMapRegexTest)
 
+add_executable(GenUIDRegexTest src/uidregexchecker.cpp)
+add_dependencies(GenUIDRegexTest ${EXTERNAL_DEPS})
+target_link_libraries(GenUIDRegexTest PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES})
+list(APPEND EXE_LIST GenUIDRegexTest)
+
 #add_executable(GenPeakLocator src/locatepeaksmain.cpp)
 #add_dependencies(GenPeakLocator ${EXTERNAL_DEPS})
 #target_link_libraries(GenPeakLocator PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES})
