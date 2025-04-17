@@ -344,7 +344,9 @@ endif()
 target_include_directories(GenScanProcessors PUBLIC core/include)
 
 add_executable(GenScanor scanmain.cpp)
-add_dependencies(GenScanor ${EXTERNAL_DEPS})
+if( EXTERNAL_DEPS )
+	add_dependencies(GenScanor ${EXTERNAL_DEPS})
+endif()
 target_link_libraries(GenScanor PRIVATE BSMTraceFitStruct MtasImplantStruct MtasStruct PidStruct RootDevStruct GenScanTranslators GenScanCore )
 
 if( USE_SYSTEM_FMT )

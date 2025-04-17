@@ -7,49 +7,46 @@ set(ALL_DOC_HEADERS ${ALL_DOC_HEADERS} PARENT_SCOPE)
 set(ALL_DOC_SRC ${ALL_DOC_SRC} PARENT_SCOPE)
 
 add_executable(GenConfig src/configmain.cpp)
-add_dependencies(GenConfig ${EXTERNAL_DEPS})
 target_link_libraries(GenConfig PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES})
 list(APPEND EXE_LIST GenConfig)
 
 add_executable(GenDev src/devmain.cpp)
-add_dependencies(GenDev ${EXTERNAL_DEPS})
 target_link_libraries(GenDev PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES})
 list(APPEND EXE_LIST GenDev)
 
 add_executable(GenTraceFit src/fitmain.cpp)
-add_dependencies(GenTraceFit ${EXTERNAL_DEPS})
 target_link_libraries(GenTraceFit PRIVATE Eigen3::Eigen pugixml GenScanFitters GenScanUtility ${ROOT_LIBRARIES})
 list(APPEND EXE_LIST GenTraceFit)
 
 add_executable(GenPeakFit src/peakfittermain.cpp)
-add_dependencies(GenPeakFit ${EXTERNAL_DEPS})
 target_link_libraries(GenPeakFit PRIVATE Eigen3::Eigen GenScanFitters GenScanUtility ${ROOT_LIBRARIES} yaml-cpp)
 list(APPEND EXE_LIST GenPeakFit)
 
 add_executable(GenCalRipper src/calibrationrippermain.cpp)
-add_dependencies(GenPeakFit ${EXTERNAL_DEPS})
 target_link_libraries(GenCalRipper PRIVATE pugixml GenScanFitters GenScanUtility ${ROOT_LIBRARIES} yaml-cpp)
 list(APPEND EXE_LIST GenCalRipper)
 
 add_executable(GenTrapFilter src/trapfiltermain.cpp)
-add_dependencies(GenTrapFilter ${EXTERNAL_DEPS})
 target_link_libraries(GenTrapFilter PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES})
 list(APPEND EXE_LIST GenTrapFilter)
 
 add_executable(GenCMapRegexTest src/channelmapregexchecker.cpp)
-add_dependencies(GenCMapRegexTest ${EXTERNAL_DEPS})
 target_link_libraries(GenCMapRegexTest PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES})
 list(APPEND EXE_LIST GenCMapRegexTest)
 
 add_executable(GenUIDRegexTest src/uidregexchecker.cpp)
-add_dependencies(GenUIDRegexTest ${EXTERNAL_DEPS})
 target_link_libraries(GenUIDRegexTest PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES})
 list(APPEND EXE_LIST GenUIDRegexTest)
 
 #add_executable(GenPeakLocator src/locatepeaksmain.cpp)
-#add_dependencies(GenPeakLocator ${EXTERNAL_DEPS})
 #target_link_libraries(GenPeakLocator PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES})
 #list(APPEND EXE_LIST GenPeakLocator)
+
+if( EXTERNAL_DEPS )
+	foreach(CURREXE ${EXE_LIST})
+		add_dependencies(${CURREXE} ${EXTERNAL_DEPS})	
+	endforeach()
+endif()
 
 if( USE_SYSTEM_FMT )
 	foreach( EXE IN LISTS EXE_LIST )
