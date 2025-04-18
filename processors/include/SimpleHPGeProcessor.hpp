@@ -1,13 +1,12 @@
-#ifndef __MTASSSD_PROCESSOR_HPP__
-#define __MTASSSD_PROCESSOR_HPP__
+#ifndef __SIMPLE_HPGE_PROCESSOR_HPP__
+#define __SIMPLE_HPGE_PROCESSOR_HPP__
 
-#include "PhysicsData.hpp"
 #include "Processor.hpp"
 
-class MtasSSDProcessor : public Processor{
+class SimpleHPGeProcessor : public Processor{
 	public:
-		MtasSSDProcessor(const std::string&);
-		virtual ~MtasSSDProcessor() = default;
+		SimpleHPGeProcessor(const std::string&);
+		virtual ~SimpleHPGeProcessor() = default;
 		[[maybe_unused]] virtual bool PreProcess([[maybe_unused]] EventHistoryManager*,[[maybe_unused]] PLOTS::PlotRegistry*,[[maybe_unused]] CUTS::CutRegistry*) final;
 		[[maybe_unused]] virtual bool Process(EventHistoryManager*,[[maybe_unused]] PLOTS::PlotRegistry*,[[maybe_unused]] CUTS::CutRegistry*) final;
 		[[maybe_unused]] virtual bool PostProcess([[maybe_unused]] EventHistoryManager*,[[maybe_unused]] PLOTS::PlotRegistry*,[[maybe_unused]] CUTS::CutRegistry*) final;
@@ -20,24 +19,14 @@ class MtasSSDProcessor : public Processor{
 		virtual void RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>&) final;
 		virtual void CleanupTree() final;
 
-		double GetMaxEnergy() const;
-
-		double GetTopEnergy(int) const;
-
-		double GetBottomEnergy(int) const;
+		double GetEnergy(int) const;
 
 	private:
 
 		void Reset();
 
-		double MaxErg;
-		double Maxidx;
-
-		std::vector<int> TopSiHits;
-		std::vector<double> TopSi;
-
-		std::vector<int> BottomSiHits;
-		std::vector<double> BottomSi;
+		std::vector<double> Energies;
+		int NumHPGe;
 };
 
 #endif

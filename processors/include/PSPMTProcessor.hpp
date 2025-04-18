@@ -2,9 +2,10 @@
 #define __PSPMT_PROCESSOR_HPP__
 
 #include <vector>
-#include <utility>
 
 #include "Processor.hpp"
+
+#include "ImageManipulation.hpp"
 
 class PSPMTProcessor : public Processor{
 	public:
@@ -21,47 +22,30 @@ class PSPMTProcessor : public Processor{
 		virtual void DeclarePlots(PLOTS::PlotRegistry*);
 		virtual void RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>&) final;
 		virtual void CleanupTree() final;
-
-		struct Image{
-			double dynode;
-			double xa;
-			double xb;
-			double ya;
-			double yb;
-			double anodesum;
-			int numanodes;
-			std::pair<double,double> position;
-			double DynodeTimeStamp;
-		};
-
-		struct EventInfo{
-			Image hg;
-			Image lg;
-			double ampdynode;
-			bool Pileup;
-			bool Saturate;
-			bool RealEvt;
-		};
-
-		EventInfo& GetCurrEvt();
-		EventInfo& GetPrevEvt();
-
 	private:
+		enum IMAGEMETHOD{
+			CORNERS,
+			SIDES
+		};
+
+
 		void Reset();
-		void CalculatePosition(Image&,double,double,double,bool);
+		void CalculatePosition(PSPMT::Image&,double,double,double,bool,PSPMTProcessor::IMAGEMETHOD&);
 		
-		EventInfo CurrEvt;
-		EventInfo PrevEvt;
-		EventInfo NewEvt;
+		int AmpDynodeHits;
+		int DynodeLowHits;
+		std::vector<int> AnodeLowHits;
 
 		int DynodeHighHits;
-		int DynodeLowHits;
-		int AmpDynodeHits;
-		std::vector<int> AnodeLowHits;
 		std::vector<int> AnodeHighHits;
 
 		std::string highgaintag;
 		std::string lowgaintag;
+
+		PSPMT::Image hgImage;
+		PSPMT::Image lgImage;
+		PSPMTProcessor::IMAGEMETHOD CurrMethod;
+		double ampdynode;
 };
 
 #endif

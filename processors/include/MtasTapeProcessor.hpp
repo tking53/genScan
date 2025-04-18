@@ -31,13 +31,32 @@ class MtasTapeProcessor : public Processor{
 		unsigned int GetCurrentCycleNumber() const;
 		TapeCycleState GetCurrentCycleState() const;
 		void IncrementCycleNumber();
+		double GetCycleTimeInSeconds() const;
 
 	private:
 
 		void Reset();
 
+		double CycleStartTime;
+
 		unsigned int CycleCount;
+
+		TapeCycleState PrevState;
 		TapeCycleState CurrState;
+
+		bool isTriggerOn;
+		bool isIrradOn;
+		bool isIrradOff;
+		bool isLightPulseOn;
+		bool isLightPulseOff;
+		bool isTapeMoveOn;
+		bool isTapeMoveOff;
+		bool isBkgOn;
+		bool isBkgOff;
+		bool isMeasureOn;
+		bool isMeasureOff;
+
+		int logicSignalValue;
 };
 
 #endif

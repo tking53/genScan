@@ -52,7 +52,7 @@ class ribf168Processor : public Processor{
 		double TotalImplantTimeNs;
 
 		RIKENIonizationChamberProcessor::EventInfo CurrIonChamber;
-		PSPMTProcessor::EventInfo CurrPSPMT;
+		//PSPMTProcessor::EventInfo CurrPSPMT;
 		HagridProcessor::EventInfo CurrHagrid;
 		RIKENPidProcessor::EventInfo CurrPid;
 		VetoProcessor::EventInfo CurrVeto;

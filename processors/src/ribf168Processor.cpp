@@ -80,7 +80,7 @@ ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf
 
 	if( this->HasPSPMT ){
 		this->PSPMTProc->PreProcess(eventhistory,hismanager,cutmanager);
-		this->CurrPSPMT = this->PSPMTProc->GetCurrEvt();
+		//this->CurrPSPMT = this->PSPMTProc->GetCurrEvt();
 	}
 
 	if( this->HasVeto ){
@@ -88,28 +88,28 @@ ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf
 		this->CurrVeto = this->VetoProc->GetCurrEvt();
 	}
 
-	if( this->HasPSPMT or this->HasRIKENIonChamber ){
-		hismanager->Fill("RIBF168_1001",(this->CurrPSPMT.lg.DynodeTimeStamp - this->CurrIonChamber.FirstTimeStamp)*1.0e-9);
-		hismanager->Fill("RIBF168_1002",(this->CurrPSPMT.hg.DynodeTimeStamp - this->CurrIonChamber.FirstTimeStamp)*1.0e-9);
-	}
+	//if( this->HasPSPMT or this->HasRIKENIonChamber ){
+	//	hismanager->Fill("RIBF168_1001",(this->CurrPSPMT.lg.DynodeTimeStamp - this->CurrIonChamber.FirstTimeStamp)*1.0e-9);
+	//	hismanager->Fill("RIBF168_1002",(this->CurrPSPMT.hg.DynodeTimeStamp - this->CurrIonChamber.FirstTimeStamp)*1.0e-9);
+	//}
 
-	if( this->HasPSPMT and this->HasRIKENIonChamber ){
-		if( this->CurrIonChamber.MaxAnodeEnergy >= 6400 ){
-			if( this->CurrPSPMT.lg.numanodes == 4 ){
-				hismanager->Fill("RIBF168_1901_ABOVE",this->CurrPSPMT.lg.position.first,this->CurrPSPMT.lg.position.second);
-			}
-			if( this->CurrPSPMT.hg.numanodes == 4 ){
-				hismanager->Fill("RIBF168_1902_ABOVE",this->CurrPSPMT.hg.position.first,this->CurrPSPMT.hg.position.second);
-			}
-		}else{
-			if( this->CurrPSPMT.lg.numanodes == 4 ){
-				hismanager->Fill("RIBF168_1901_BELOW",this->CurrPSPMT.lg.position.first,this->CurrPSPMT.lg.position.second);
-			}
-			if( this->CurrPSPMT.hg.numanodes == 4 ){
-				hismanager->Fill("RIBF168_1902_BELOW",this->CurrPSPMT.hg.position.first,this->CurrPSPMT.hg.position.second);
-			}
-		}
-	}
+	//if( this->HasPSPMT and this->HasRIKENIonChamber ){
+	//	if( this->CurrIonChamber.MaxAnodeEnergy >= 6400 ){
+	//		if( this->CurrPSPMT.lg.numanodes == 4 ){
+	//			hismanager->Fill("RIBF168_1901_ABOVE",this->CurrPSPMT.lg.position.first,this->CurrPSPMT.lg.position.second);
+	//		}
+	//		if( this->CurrPSPMT.hg.numanodes == 4 ){
+	//			hismanager->Fill("RIBF168_1902_ABOVE",this->CurrPSPMT.hg.position.first,this->CurrPSPMT.hg.position.second);
+	//		}
+	//	}else{
+	//		if( this->CurrPSPMT.lg.numanodes == 4 ){
+	//			hismanager->Fill("RIBF168_1901_BELOW",this->CurrPSPMT.lg.position.first,this->CurrPSPMT.lg.position.second);
+	//		}
+	//		if( this->CurrPSPMT.hg.numanodes == 4 ){
+	//			hismanager->Fill("RIBF168_1902_BELOW",this->CurrPSPMT.hg.position.first,this->CurrPSPMT.hg.position.second);
+	//		}
+	//	}
+	//}
 
 	if( this->HasRIKENIonChamber and this->HasRIKENPid ){
 		double tof = this->CurrPid.F7AnalogCFDTimeStamp - this->CurrIonChamber.FirstCFDTimeStamp;
@@ -293,7 +293,7 @@ void ribf168Processor::Finalize(){
 	this->PSPMTProc->Finalize();
 	this->VetoProc->Finalize();
 
-	this->CurrPSPMT = this->PSPMTProc->GetCurrEvt();
+	//this->CurrPSPMT = this->PSPMTProc->GetCurrEvt();
 	this->CurrIonChamber = this->RIKENIonizationChamberProc->GetCurrEvt();
 	this->CurrHagrid = this->HagridProc->GetCurrEvt();
 	this->CurrPid = this->RIKENPidProc->GetCurrEvt();

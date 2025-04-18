@@ -9,6 +9,7 @@
 #include "GenericProcessor.hpp"
 #include "GenericAnalyzer.hpp"
 
+#include "anl2021Processor.hpp"
 #include "BSMExpProcessor.hpp"
 #include "e21069b_fp2Processor.hpp"
 #include "ribf168Processor.hpp"
@@ -27,6 +28,7 @@
 #include "RIKENIonizationChamberProcessor.hpp"
 #include "RIKENPidProcessor.hpp"
 #include "RootDevProcessor.hpp"
+#include "SimpleHPGeProcessor.hpp"
 #include "VetoProcessor.hpp"
 
 #include "WaveformAnalyzer.hpp"
@@ -99,6 +101,8 @@ void ProcessorList::PostProcess(EventHistoryManager* History,PLOTS::PlotRegistry
 void ProcessorList::CreateProc(const std::string& name){
 	if( name.compare("GenericProcessor") == 0 ){
 		this->known_processors.push_back(std::make_shared<GenericProcessor>(this->LogName));
+	}else if( name.compare("anl2021Processor") == 0 ){
+		known_processors.push_back(std::make_shared<anl2021Processor>(this->LogName));
 	}else if( name.compare("BSMExpProcessor") == 0 ){
 		known_processors.push_back(std::make_shared<BSMExpProcessor>(this->LogName));
 	}else if( name.compare("e21069b_fp2Processor") == 0 ){
@@ -131,6 +135,8 @@ void ProcessorList::CreateProc(const std::string& name){
 		known_processors.push_back(std::make_shared<RIKENPidProcessor>(this->LogName));
 	}else if( name.compare("RootDevProcessor") == 0 ){
 		known_processors.push_back(std::make_shared<RootDevProcessor>(this->LogName));
+	}else if( name.compare("SimpleHPGeProcessor") == 0 ){
+		known_processors.push_back(std::make_shared<SimpleHPGeProcessor>(this->LogName));
 	}else if( name.compare("VetoProcessor") == 0 ){
 		known_processors.push_back(std::make_shared<VetoProcessor>(this->LogName));
 	}else if( name.compare("YAPProcessor") == 0 ){
