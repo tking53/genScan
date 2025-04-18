@@ -13,6 +13,7 @@
 #include <pugiconfig.hpp>
 
 #include <boost/program_options.hpp>
+#include <boost/algorithm/string.hpp>
 #include <boost/regex.hpp>
 
 //to fix, it broke when doing something like [12,14], should just split on , then split on - and remove regex
@@ -141,7 +142,6 @@ struct BMap{
 	}
 };
 
-
 int main(int argc, char *argv[]) {
 
 	std::string outputfile;
@@ -155,6 +155,8 @@ int main(int argc, char *argv[]) {
 	std::vector<std::string> analyzerlist;
 	std::vector<std::string> cmapregexlist;
 	std::vector<std::string> moduleregexlist;
+	std::map<std::string,int> counters;
+	std::vector<std::string> counterlist; 
 
 	boost::program_options::options_description cmdline_options("Generic Options");
 	cmdline_options.add_options()
@@ -170,6 +172,7 @@ int main(int argc, char *argv[]) {
 		("analyzer,a",boost::program_options::value<std::vector<std::string>>(&analyzerlist),"name of analyzer to include [Allowed Multiple times]")
 		("cmapregex,r",boost::program_options::value<std::vector<std::string>>(&cmapregexlist),"how to populate the type:subtype:group:tags for each channel format is \"type:subtype:group:tags:[crate]:[module]:[channels]\" [Allowed Multiple times] example regex -> mtas:center:1:front:[1]:[0-4]:[0,2,4,6,8,10] defines MTAS's center front ring")
 		("moduleregex,m",boost::program_options::value<std::vector<std::string>>(&moduleregexlist),"how to populate the type:subtype:group:tags for each channel format is \"Revision:Frequency:Firmware:TraceDelay:[crate]:[module]\" [Allowed Multiple times] example regex -> F:250:R42950:264:[0-12]:[0-2] defines the first three modules in all crates use RevF-250 with a 264ns trace delay")
+		("counter,c",boost::program_options::value<std::vector<std::string>>(&counterlist),"replace the value in a regex with an incrementing value VARNAME:default_value only implemented for cmapregex on the subtype, group, and tags")
 		;
 
 
@@ -306,6 +309,25 @@ int main(int argc, char *argv[]) {
 			chaninfo.push_back(new CMap(currcmap));
 		}
 
+		for( const auto& c : counterlist ){
+			std::vector<std::string> strs;
+			boost::split(strs,c,boost::is_any_of(":"));
+			if( strs.size() == 2 ){
+				counters[strs[0]] = std::stoi(strs[1]);
+			}else{
+				counters[strs[0]] = 0;
+			}
+		}
+
+		auto add_attribute = [&counters](pugi::xml_node& n,const std::string& attname,const std::string& attval){
+			if( counters.find(attval) != counters.end() ){
+				n.append_attribute(attname.c_str()) = counters[attval];
+				++(counters[attval]);
+			}else{
+				n.append_attribute(attname.c_str()) = attval.c_str();
+			}
+		};
+
 		pugi::xml_node Map = Configuration.append_child("Map");
 		int cnt = 0;
 		for( int ii = 0; ii < numcrate; ++ii ){
@@ -348,9 +370,9 @@ int main(int argc, char *argv[]) {
 						}
 					}
 					Channel.append_attribute("type") = type.c_str();
-					Channel.append_attribute("subtype") = subtype.c_str();
-					Channel.append_attribute("group") = group.c_str();
-					Channel.append_attribute("tags") = tags.c_str();
+					add_attribute(Channel,"subtype",subtype);
+					add_attribute(Channel,"group",group);
+					add_attribute(Channel,"tags",tags);
 
 					pugi::xml_node Calibration = Channel.append_child("Calibration");
 					Calibration.append_attribute("model") = "linear";
