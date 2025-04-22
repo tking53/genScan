@@ -42,7 +42,7 @@ namespace CUTS{
 
 				// Create a tuple
 				vals.push_back(std::make_tuple(idx,xval,yval));
-				this->console->info("While Parsing : {}, found this cutpoint {} : {} , {}",filename,idx,xval,yval);
+				this->console->debug("While Parsing : {}, found this cutpoint {} : {} , {}",filename,idx,xval,yval);
 
 				++it;
 			}
@@ -55,7 +55,7 @@ namespace CUTS{
 				auto xval = std::get<1>(v);
 				auto yval = std::get<2>(v);
 				this->Cuts[cutid]->SetPoint(idx,xval,yval);
-				this->console->info("Registering point [{},{},{}] to cut [{}]",idx,xval,yval,cutid);
+				this->console->debug("Registering point [{},{},{}] to cut [{}]",idx,xval,yval,cutid);
 			}
 		}else{
 			this->console->error("CutRegistry::AddCut(string,string) : Unable to add cut listed in file : {}, because no points were parsed",filename);
@@ -78,7 +78,7 @@ namespace CUTS{
 				auto xval = xvals.at(ii);
 				auto yval = yvals.at(ii);
 				this->Cuts[cutid]->SetPoint(ii,xval,yval);
-				this->console->info("Registering point [{},{},{}] to cut [{}]",ii,xval,yval,cutid);
+				this->console->debug("Registering point [{},{},{}] to cut [{}]",ii,xval,yval,cutid);
 			}
 		}
 	}

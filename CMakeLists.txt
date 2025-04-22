@@ -115,7 +115,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/Cmake_modules")
 #Find ROOT if USE_ROOT was set.
 find_package(ROOT REQUIRED)
 include(${ROOT_USE_FILE})
-#find_package(ROOT REQUIRED COMPONENTS TreePlayer)
 set(ROOTSYS $ENV{ROOTSYS} CACHE STRING "ROOT directory.")
 message(STATUS "FOUND ROOT LOCATED HERE: ${ROOTSYS}")
 find_program(ROOT_CONFIG_EXECUTABLE root-config PATHS ${ROOTSYS}/bin)
@@ -126,26 +125,37 @@ if (ROOT_CONFIG_EXECUTABLE)
 	COMMAND ${ROOT_CONFIG_EXECUTABLE} --prefix
 	OUTPUT_VARIABLE ROOTSYS
 	OUTPUT_STRIP_TRAILING_WHITESPACE)
+	message(STATUS "ROOTSYS: ${ROOTSYS}")
 
 	execute_process(
 	COMMAND ${ROOT_CONFIG_EXECUTABLE} --version
 	OUTPUT_VARIABLE ROOT_VERSION
 	OUTPUT_STRIP_TRAILING_WHITESPACE)
+	message(STATUS "ROOT Version: ${ROOT_VERSION}")
 
 	execute_process(
 	COMMAND ${ROOT_CONFIG_EXECUTABLE} --incdir
 	OUTPUT_VARIABLE ROOT_INCLUDE_DIR
 	OUTPUT_STRIP_TRAILING_WHITESPACE)
+	message(STATUS "ROOT Include Dir: ${ROOT_INCLUDE_DIR}")
 
 	execute_process(
 	COMMAND ${ROOT_CONFIG_EXECUTABLE} --libs
 	OUTPUT_VARIABLE ROOT_LIBRARIES
 	OUTPUT_STRIP_TRAILING_WHITESPACE)
+	message(STATUS "ROOT Libraries: ${ROOT_LIBRARIES}")
 
 	execute_process(
-	COMMAND ${ROOT_CONFIG_EXECUTABLE} --glibs
+	COMMAND ${root_config_executable} --glibs
 	OUTPUT_VARIABLE ROOT_GUI_LIBRARIES
 	OUTPUT_STRIP_TRAILING_WHITESPACE)
+	message(STATUS "ROOT Gui Libraries: ${ROOT_GUI_LIBRARIES}")
+
+	execute_process(
+	COMMAND ${root_config_executable} --evelibs
+	OUTPUT_VARIABLE ROOT_EVE_GUI_LIBRARIES
+	OUTPUT_STRIP_TRAILING_WHITESPACE)
+	message(STATUS "ROOT Eve Gui Libraries: ${ROOT_EVE_GUI_LIBRARIES}")
 
 	set(ROOT_LIBRARY_DIR ${ROOTSYS}/lib)
 
@@ -172,8 +182,6 @@ if (${ROOT_VERSION} VERSION_LESS "6.10")
 	message(FATAL_ERROR "Minimum ROOT version is 6.10.00.")
 endif (${ROOT_VERSION} VERSION_LESS "6.10")
 mark_as_advanced( GENREFLEX_EXECUTABLE ROOTCINT_EXECUTABLE ROOT_CONFIG_EXECUTABLE)
-#include_directories(${ROOT_INCLUDE_DIR})
-#link_directories(${ROOT_LIBRARY_DIR})
 #------------------------------------------------------------------------------
 
 include(ExternalProject)
