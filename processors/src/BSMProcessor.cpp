@@ -309,11 +309,11 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 			this->GeometricTotalEnergy += this->GeometricFrontBackEnergy[ii];
 		}
 
-		hismanager->Fill(this->BSM_4000,this->AverageTotalEnergy,this->currevttime*1000.0);
-		hismanager->Fill(this->BSM_4001,this->AverageTotalEnergy,this->currevttime);
-		hismanager->Fill(this->BSM_4002,this->AverageTotalEnergy,this->currevttime/60.0);
-		hismanager->Fill(this->BSM_4003,this->AverageTotalEnergy,this->currevttime/(60.0*60.0));
-		hismanager->Fill(this->BSM_4004,this->AverageTotalEnergy,this->currevttime/(60.0*60.0*24.0));
+		hismanager->Fill("BSM_4000",this->AverageTotalEnergy,this->currevttime*1000.0);
+		hismanager->Fill("BSM_4001",this->AverageTotalEnergy,this->currevttime);
+		hismanager->Fill("BSM_4002",this->AverageTotalEnergy,this->currevttime/60.0);
+		hismanager->Fill("BSM_4003",this->AverageTotalEnergy,this->currevttime/(60.0*60.0));
+		hismanager->Fill("BSM_4004",this->AverageTotalEnergy,this->currevttime/(60.0*60.0*24.0));
 
 		for( int ii = 0; ii < this->NumPairs; ++ii ){
 			std::string id = std::to_string(ii);
@@ -434,8 +434,8 @@ void BSMProcessor::Finalize(){
 
 void BSMProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	//BSM diagnostic plots, always want these no matter what
-	this->BSM_3500 = hismanager->RegisterPlot<TH2F>("BSM_3500","#betaSM Channel Hit Mult. (event by event); Channel Hit Multiplicity",20,-1,9,this->NumPMTs,0,this->NumPMTs);
-	this->BSM_3501 = hismanager->RegisterPlot<TH2F>("BSM_3501","#betaSM Channel Hit Mult. (event by event, survive cuts); Channel Hit Multiplicity",20,-1,9,this->NumPMTs,0,this->NumPMTs);
+	hismanager->RegisterPlot<TH2F>("BSM_3500","#betaSM Channel Hit Mult. (event by event); Channel Hit Multiplicity",20,-1,9,this->NumPMTs,0,this->NumPMTs);
+	hismanager->RegisterPlot<TH2F>("BSM_3501","#betaSM Channel Hit Mult. (event by event, survive cuts); Channel Hit Multiplicity",20,-1,9,this->NumPMTs,0,this->NumPMTs);
 
 	for( size_t ii = 0; ii < this->NumPairs; ++ii ){
 		std::string name = "BSM_362"+std::to_string(ii)+"_F";
@@ -623,11 +623,11 @@ void BSMProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3900));
 
 	}
-	this->BSM_4000 = hismanager->RegisterPlot<TH2F>("BSM_4000","Run Time vs #betaSM Total; #betaSM Energy (keV); Run Time (ms)",this->h2dsettings.at(4000));
-	this->BSM_4001 = hismanager->RegisterPlot<TH2F>("BSM_4001","Run Time vs #betaSM Total; #betaSM Energy (keV); Run Time (s)",this->h2dsettings.at(4001));
-	this->BSM_4002 = hismanager->RegisterPlot<TH2F>("BSM_4002","Run Time vs #betaSM Total; #betaSM Energy (keV); Run Time (min)",this->h2dsettings.at(4002));
-	this->BSM_4003 = hismanager->RegisterPlot<TH2F>("BSM_4003","Run Time vs #betaSM Total; #betaSM Energy (keV); Run Time (hr)",this->h2dsettings.at(4003));
-	this->BSM_4004 = hismanager->RegisterPlot<TH2F>("BSM_4004","Run Time vs #betaSM Total; #betaSM Energy (keV); Run Time (day)",this->h2dsettings.at(4004));
+	hismanager->RegisterPlot<TH2F>("BSM_4000","Run Time vs #betaSM Total; #betaSM Energy (keV); Run Time (ms)",this->h2dsettings.at(4000));
+	hismanager->RegisterPlot<TH2F>("BSM_4001","Run Time vs #betaSM Total; #betaSM Energy (keV); Run Time (s)",this->h2dsettings.at(4001));
+	hismanager->RegisterPlot<TH2F>("BSM_4002","Run Time vs #betaSM Total; #betaSM Energy (keV); Run Time (min)",this->h2dsettings.at(4002));
+	hismanager->RegisterPlot<TH2F>("BSM_4003","Run Time vs #betaSM Total; #betaSM Energy (keV); Run Time (hr)",this->h2dsettings.at(4003));
+	hismanager->RegisterPlot<TH2F>("BSM_4004","Run Time vs #betaSM Total; #betaSM Energy (keV); Run Time (day)",this->h2dsettings.at(4004));
 
 	this->console->info("Finished Declaring Plots");
 }

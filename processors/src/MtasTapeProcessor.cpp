@@ -15,8 +15,8 @@ MtasTapeProcessor::MtasTapeProcessor(const std::string& log) : Processor(log,"Mt
 	this->CycleStartTime = 0.0;
 
 	this->CycleCount = 0;
-	this->CurrState = TapeCycleState::UNKNOWN;
-	this->PrevState = TapeCycleState::UNKNOWN;
+	this->CurrState = TAPE::CycleState::UNKNOWN;
+	this->PrevState = TAPE::CycleState::UNKNOWN;
 
 	this->isTriggerOn = false;
 	this->isIrradOn = false;
@@ -31,6 +31,13 @@ MtasTapeProcessor::MtasTapeProcessor(const std::string& log) : Processor(log,"Mt
 	this->isMeasureOff = false;
 
 	this->logicSignalValue = 0;
+
+	std::string tapemove = "tapemove";
+	std::string measure = "measure";
+	std::string background = "background";
+	std::string irradiation = "irradiation";
+	std::string lightpulser = "lightpulser";
+	std::string unknown = "unknown";
 }
 
 [[maybe_unused]] bool MtasTapeProcessor::PreProcess(EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
@@ -102,27 +109,34 @@ MtasTapeProcessor::MtasTapeProcessor(const std::string& log) : Processor(log,"Mt
 
 	if( (isMeasureOn and isMeasureOff) or (isBkgOff and isBkgOn) or (isLightPulseOff and isLightPulseOn) or (isTapeMoveOff and isTapeMoveOff) or (isIrradOff and isIrradOn) ){
 		this->PrevState = this->CurrState;
-		this->CurrState = TapeCycleState::UNKNOWN;
+		this->CurrState = TAPE::CycleState::UNKNOWN;
+		summary->AddEventTag(this->unknown);
 	}else{
 		if( isTapeMoveOn ){
 			this->PrevState = this->CurrState;
-			this->CurrState = TapeCycleState::TAPEMOVE;
+			this->CurrState = TAPE::CycleState::TAPEMOVE;
+			summary->AddEventTag(this->tapemove);
 		}else{
 			if( isMeasureOn ){
 				this->PrevState = this->CurrState;
-				this->CurrState = TapeCycleState::MEASURE;
+				this->CurrState = TAPE::CycleState::MEASURE;
+				summary->AddEventTag(this->measure);
 			}else if( isBkgOn ){
 				this->PrevState = this->CurrState;
-				this->CurrState = TapeCycleState::BACKGROUND;
+				this->CurrState = TAPE::CycleState::BACKGROUND;
+				summary->AddEventTag(this->background);
 			}else if( isIrradOn ){
 				this->PrevState = this->CurrState;
-				this->CurrState = TapeCycleState::IRRADIATION;
+				this->CurrState = TAPE::CycleState::IRRADIATION;
+				summary->AddEventTag(this->irradiation);
 			}else if( isLightPulseOn ){
 				this->PrevState = this->CurrState;
-				this->CurrState = TapeCycleState::LIGHTPULSER;
+				this->CurrState = TAPE::CycleState::LIGHTPULSER;
+				summary->AddEventTag(this->lightpulser);
 			}else{
 				this->PrevState = this->CurrState;
-				this->CurrState = TapeCycleState::UNKNOWN;
+				this->CurrState = TAPE::CycleState::UNKNOWN;
+				summary->AddEventTag(this->unknown);
 			}
 		}
 	}
@@ -187,7 +201,7 @@ unsigned int MtasTapeProcessor::GetCurrentCycleNumber() const{
 	return this->CycleCount;
 }
 
-MtasTapeProcessor::TapeCycleState MtasTapeProcessor::GetCurrentCycleState() const{
+TAPE::CycleState MtasTapeProcessor::GetCurrentCycleState() const{
 	return this->CurrState;
 }
 

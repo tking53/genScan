@@ -2,7 +2,6 @@
 #include "CutManager.hpp"
 #include "EventSummary.hpp"
 #include "HistogramManager.hpp"
-#include "spdlog/spdlog.h"
 #include <TTree.h>
 #include <algorithm>
 #include <cmath>
@@ -191,6 +190,9 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 	this->GenerateHexagonShapes();
 	this->SegmentDataVec = std::vector<ProcessorStruct::MtasSegment>(24,ProcessorStruct::DEFAULT_MTAS_SEGMENT_STRUCT);
 	this->TotalDataVec = std::vector<ProcessorStruct::MtasTotal>(5,ProcessorStruct::DEFAULT_MTAS_TOTAL_STRUCT);
+
+	this->gamma = "gamma";
+	this->muon = "muon";
 }
 
 [[maybe_unused]] bool MtasProcessor::PreProcess(EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
@@ -210,7 +212,8 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		int segmentid = std::stoi(group);
 
 		if( (not isfront and not isback) or (isfront and isback) ){
-			throw std::runtime_error("evt in MtasProcessor is malformed in xml, and has either both front and back tag or neither");
+			this->console->error("evt {} has neither front of back or both front and back tags",*evt);
+			throw std::runtime_error("invalid xml config");
 		}
 
 		int offset = 0;
@@ -227,7 +230,8 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 			offset = 36;
 		}else{
 			this->currsubtype = SUBTYPE::UNKNOWN;
-			throw std::runtime_error("unknown subtype"+subtype+" correct subtypes are center, inner, middle, outer");
+			this->console->error("evt {} has incorrect subtype for mtas, needs to be center/inner/middle/outer",*evt);
+			throw std::runtime_error("invalid xml config");
 		}
 
 		int position = segmentid - 1; 	
@@ -262,7 +266,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 				}
 			}
 			if( evt->GetSaturation() ){
-				summary->AddEventTag("muon");
+				summary->AddEventTag(this->muon);
 				this->IndividualPMTSaturate[pmtposition] = true;
 				this->AnySaturate = true;
 				switch( this->currsubtype ){
@@ -354,7 +358,8 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 				++this->OuterHits[detectorposition];
 			}
 		}else{
-			throw std::runtime_error("we shouldn't have gotten here");
+			this->console->error("we shouldn't have gotten here");
+			throw std::runtime_error("invalid xml config");
 		}
 
 	}
@@ -539,24 +544,24 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 
 		}
 
-		hismanager->Fill(this->MTAS_4200,this->TotalEnergy[0],this->currevttime*1000.0);
-		hismanager->Fill(this->MTAS_4201,this->TotalEnergy[0],this->currevttime);
-		hismanager->Fill(this->MTAS_4202,this->TotalEnergy[0],this->currevttime/60.0);
-		hismanager->Fill(this->MTAS_4203,this->TotalEnergy[0],this->currevttime/(60.0*60.0));
-		hismanager->Fill(this->MTAS_4204,this->TotalEnergy[0],this->currevttime/(60.0*60.0*24.0));
+		hismanager->Fill("MTAS_4200",this->TotalEnergy[0],this->currevttime*1000.0);
+		hismanager->Fill("MTAS_4201",this->TotalEnergy[0],this->currevttime);
+		hismanager->Fill("MTAS_4202",this->TotalEnergy[0],this->currevttime/60.0);
+		hismanager->Fill("MTAS_4203",this->TotalEnergy[0],this->currevttime/(60.0*60.0));
+		hismanager->Fill("MTAS_4204",this->TotalEnergy[0],this->currevttime/(60.0*60.0*24.0));
 
-		hismanager->Fill(this->MTAS_3200,this->TotalEnergy[0]);
+		hismanager->Fill("MTAS_3200",this->TotalEnergy[0]);
 
-		hismanager->Fill(this->MTAS_3210,this->TotalEnergy[1]);
-		hismanager->Fill(this->MTAS_3220,this->TotalEnergy[2]);
-		hismanager->Fill(this->MTAS_3230,this->TotalEnergy[3]);
-		hismanager->Fill(this->MTAS_3240,this->TotalEnergy[4]);
+		hismanager->Fill("MTAS_3210",this->TotalEnergy[1]);
+		hismanager->Fill("MTAS_3220",this->TotalEnergy[2]);
+		hismanager->Fill("MTAS_3230",this->TotalEnergy[3]);
+		hismanager->Fill("MTAS_3240",this->TotalEnergy[4]);
 
-		hismanager->Fill(this->MTAS_3251,this->TotalEnergy[0],this->TotalEnergy[1]);
-		hismanager->Fill(this->MTAS_32518,this->TotalEnergy[0],this->TotalEnergy[1]);
+		hismanager->Fill("MTAS_3251",this->TotalEnergy[0],this->TotalEnergy[1]);
+		hismanager->Fill("MTAS_32518",this->TotalEnergy[0],this->TotalEnergy[1]);
 
 		for( int ii = 0; ii < 24; ++ii ){
-			hismanager->Fill(this->MTAS_3201,this->CrystalEnergy[ii],ii);
+			hismanager->Fill("MTAS_3201",this->CrystalEnergy[ii],ii);
 		}
 
 		for( int ii = 0; ii < 6; ++ii ){
@@ -571,36 +576,36 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 			name = "MTAS_326"+id;
 			hismanager->Fill(name,this->Position[ii],(this->RawCenter[2*ii] + this->RawCenter[2*ii + 1])/2.0);
 
-			hismanager->Fill(this->MTAS_3215,this->CrystalEnergy[ii]);
-			hismanager->Fill(this->MTAS_3225,this->CrystalEnergy[ii+6]);
-			hismanager->Fill(this->MTAS_3235,this->CrystalEnergy[ii+12]);
-			hismanager->Fill(this->MTAS_3245,this->CrystalEnergy[ii+18]);
+			hismanager->Fill("MTAS_3215",this->CrystalEnergy[ii]);
+			hismanager->Fill("MTAS_3225",this->CrystalEnergy[ii+6]);
+			hismanager->Fill("MTAS_3235",this->CrystalEnergy[ii+12]);
+			hismanager->Fill("MTAS_3245",this->CrystalEnergy[ii+18]);
 
-			hismanager->Fill(this->MTAS_3250,this->TotalEnergy[0],this->CrystalEnergy[ii+6]);
-			hismanager->Fill(this->MTAS_3250,this->TotalEnergy[0],this->CrystalEnergy[ii+12]);
-			hismanager->Fill(this->MTAS_3250,this->TotalEnergy[0],this->CrystalEnergy[ii+18]);
+			hismanager->Fill("MTAS_3250",this->TotalEnergy[0],this->CrystalEnergy[ii+6]);
+			hismanager->Fill("MTAS_3250",this->TotalEnergy[0],this->CrystalEnergy[ii+12]);
+			hismanager->Fill("MTAS_3250",this->TotalEnergy[0],this->CrystalEnergy[ii+18]);
 
-			hismanager->Fill(this->MTAS_3252,this->TotalEnergy[0],this->CrystalEnergy[ii]);
+			hismanager->Fill("MTAS_3252",this->TotalEnergy[0],this->CrystalEnergy[ii]);
 
-			hismanager->Fill(this->MTAS_3253,this->TotalEnergy[1],this->CrystalEnergy[ii]);
+			hismanager->Fill("MTAS_3253",this->TotalEnergy[1],this->CrystalEnergy[ii]);
 
-			hismanager->Fill(this->MTAS_32508,this->TotalEnergy[0],this->CrystalEnergy[ii+6]);
-			hismanager->Fill(this->MTAS_32508,this->TotalEnergy[0],this->CrystalEnergy[ii+12]);
-			hismanager->Fill(this->MTAS_32508,this->TotalEnergy[0],this->CrystalEnergy[ii+18]);
+			hismanager->Fill("MTAS_32508",this->TotalEnergy[0],this->CrystalEnergy[ii+6]);
+			hismanager->Fill("MTAS_32508",this->TotalEnergy[0],this->CrystalEnergy[ii+12]);
+			hismanager->Fill("MTAS_32508",this->TotalEnergy[0],this->CrystalEnergy[ii+18]);
 
-			hismanager->Fill(this->MTAS_32528,this->TotalEnergy[0],this->CrystalEnergy[ii]);
+			hismanager->Fill("MTAS_32528",this->TotalEnergy[0],this->CrystalEnergy[ii]);
 
-			hismanager->Fill(this->MTAS_32538,this->TotalEnergy[1],this->CrystalEnergy[ii]);
+			hismanager->Fill("MTAS_32538",this->TotalEnergy[1],this->CrystalEnergy[ii]);
 
 			if( (not this->InnerFire) and (not this->MiddleFire) and (not this->OuterFire) ){
-				hismanager->Fill(this->MTAS_3254,this->TotalEnergy[0],this->CrystalEnergy[ii]);
-				hismanager->Fill(this->MTAS_32548,this->TotalEnergy[0],this->CrystalEnergy[ii]);
+				hismanager->Fill("MTAS_3254",this->TotalEnergy[0],this->CrystalEnergy[ii]);
+				hismanager->Fill("MTAS_32548",this->TotalEnergy[0],this->CrystalEnergy[ii]);
 			}
 		}
 	}
 
 	if( this->TotalEnergy[0] > 0.0 ){
-		summary->AddEventTag("gamma");
+		summary->AddEventTag(this->gamma);
 	}
 
 	Processor::EndProcess();
@@ -633,7 +638,7 @@ void MtasProcessor::Init(const pugi::xml_node& config){
 		this->console->info("Found PositionCorrection Node for {} : p0:{} p1:{} cross:{}, E'= E*(cross/exp(p0+p1*P)); P = (Efront-Eback)/(Efront+Eback)",tag,p0,p1,cross);
 	}
 
-	this->diagnosticplots = config.attribute("diagnostic").as_bool(true);
+	this->diagnosticplots = config.attribute("diagnostic").as_bool(false);
 
 	this->LoadHistogramSettings(config);
 	this->LoadCustomCuts(config);
@@ -662,37 +667,37 @@ void MtasProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	}
 
 	//MTAS diagnostic plots, always want these no matter what
-	this->MTAS_3200 = hismanager->RegisterPlot<TH1F>("MTAS_3200","Mtas Total; Energy (keV)",this->h1dsettings.at(3200));
-	this->MTAS_3201 = hismanager->RegisterPlot<TH2F>("MTAS_3201","Sum F+B; Energy (keV); F+B Pair (arb.)",this->h2dsettings.at(3201));
+	hismanager->RegisterPlot<TH1F>("MTAS_3200","Mtas Total; Energy (keV)",this->h1dsettings.at(3200));
+	hismanager->RegisterPlot<TH2F>("MTAS_3201","Sum F+B; Energy (keV); F+B Pair (arb.)",this->h2dsettings.at(3201));
 
-	this->MTAS_3210 = hismanager->RegisterPlot<TH1F>("MTAS_3210","Mtas Center Sum; Energy (keV)",this->h1dsettings.at(3210));
-	this->MTAS_3215 = hismanager->RegisterPlot<TH1F>("MTAS_3215","Mtas Center Stack; Energy (keV)",this->h1dsettings.at(3215));
+	hismanager->RegisterPlot<TH1F>("MTAS_3210","Mtas Center Sum; Energy (keV)",this->h1dsettings.at(3210));
+	hismanager->RegisterPlot<TH1F>("MTAS_3215","Mtas Center Stack; Energy (keV)",this->h1dsettings.at(3215));
 
-	this->MTAS_3220 = hismanager->RegisterPlot<TH1F>("MTAS_3220","Mtas Inner Sum; Energy (keV)",this->h1dsettings.at(3220));
-	this->MTAS_3225 = hismanager->RegisterPlot<TH1F>("MTAS_3225","Mtas Inner Stack; Energy (keV)",this->h1dsettings.at(3225));
+	hismanager->RegisterPlot<TH1F>("MTAS_3220","Mtas Inner Sum; Energy (keV)",this->h1dsettings.at(3220));
+	hismanager->RegisterPlot<TH1F>("MTAS_3225","Mtas Inner Stack; Energy (keV)",this->h1dsettings.at(3225));
 
-	this->MTAS_3230 = hismanager->RegisterPlot<TH1F>("MTAS_3230","Mtas Middle Sum; Energy (keV)",this->h1dsettings.at(3230));
-	this->MTAS_3235 = hismanager->RegisterPlot<TH1F>("MTAS_3235","Mtas Middle Stack; Energy (keV)",this->h1dsettings.at(3235));
+	hismanager->RegisterPlot<TH1F>("MTAS_3230","Mtas Middle Sum; Energy (keV)",this->h1dsettings.at(3230));
+	hismanager->RegisterPlot<TH1F>("MTAS_3235","Mtas Middle Stack; Energy (keV)",this->h1dsettings.at(3235));
 
-	this->MTAS_3240 = hismanager->RegisterPlot<TH1F>("MTAS_3240","Mtas Outer Sum; Energy (keV)",this->h1dsettings.at(3240));
-	this->MTAS_3245 = hismanager->RegisterPlot<TH1F>("MTAS_3245","Mtas Outer Stack; Energy (keV)",this->h1dsettings.at(3245));
+	hismanager->RegisterPlot<TH1F>("MTAS_3240","Mtas Outer Sum; Energy (keV)",this->h1dsettings.at(3240));
+	hismanager->RegisterPlot<TH1F>("MTAS_3245","Mtas Outer Stack; Energy (keV)",this->h1dsettings.at(3245));
 
-	this->MTAS_3250 = hismanager->RegisterPlot<TH2F>("MTAS_3250","I,M,O vs Mtas Total; Energy (keV); Energy (keV)",this->h2dsettings.at(3250));
-	this->MTAS_3251 = hismanager->RegisterPlot<TH2F>("MTAS_3251","C vs Mtas Total; Energy (keV); Energy (keV)",this->h2dsettings.at(3251));
-	this->MTAS_3252 = hismanager->RegisterPlot<TH2F>("MTAS_3252","C Segment vs Mtas Total; Energy (keV); Energy (keV)",this->h2dsettings.at(3252));
-	this->MTAS_3253 = hismanager->RegisterPlot<TH2F>("MTAS_3253","C Segment vs C; Energy (keV); Energy (keV)",this->h2dsettings.at(3253));
-	this->MTAS_3254 = hismanager->RegisterPlot<TH2F>("MTAS_3254","C Segment vs Mtas Total (veto any I,M,O) ; Energy (keV); Energy (keV)",this->h2dsettings.at(3254));
-	this->MTAS_32508 = hismanager->RegisterPlot<TH2F>("MTAS_32508","I,M,O vs Mtas Total; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(32508));
-	this->MTAS_32518 = hismanager->RegisterPlot<TH2F>("MTAS_32518","C vs Mtas Total; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(32518));
-	this->MTAS_32528 = hismanager->RegisterPlot<TH2F>("MTAS_32528","C Segment vs Mtas Total; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(32528));
-	this->MTAS_32538 = hismanager->RegisterPlot<TH2F>("MTAS_32538","C Segment vs C; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(32538));
-	this->MTAS_32548 = hismanager->RegisterPlot<TH2F>("MTAS_32548","C Segment vs Mtas Total (veto any I,M,O) ; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(32548));
+	hismanager->RegisterPlot<TH2F>("MTAS_3250","I,M,O vs Mtas Total; Energy (keV); Energy (keV)",this->h2dsettings.at(3250));
+	hismanager->RegisterPlot<TH2F>("MTAS_3251","C vs Mtas Total; Energy (keV); Energy (keV)",this->h2dsettings.at(3251));
+	hismanager->RegisterPlot<TH2F>("MTAS_3252","C Segment vs Mtas Total; Energy (keV); Energy (keV)",this->h2dsettings.at(3252));
+	hismanager->RegisterPlot<TH2F>("MTAS_3253","C Segment vs C; Energy (keV); Energy (keV)",this->h2dsettings.at(3253));
+	hismanager->RegisterPlot<TH2F>("MTAS_3254","C Segment vs Mtas Total (veto any I,M,O) ; Energy (keV); Energy (keV)",this->h2dsettings.at(3254));
+	hismanager->RegisterPlot<TH2F>("MTAS_32508","I,M,O vs Mtas Total; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(32508));
+	hismanager->RegisterPlot<TH2F>("MTAS_32518","C vs Mtas Total; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(32518));
+	hismanager->RegisterPlot<TH2F>("MTAS_32528","C Segment vs Mtas Total; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(32528));
+	hismanager->RegisterPlot<TH2F>("MTAS_32538","C Segment vs C; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(32538));
+	hismanager->RegisterPlot<TH2F>("MTAS_32548","C Segment vs Mtas Total (veto any I,M,O) ; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(32548));
 
-	this->MTAS_4200 = hismanager->RegisterPlot<TH2F>("MTAS_4200","Run Time vs Mtas Total; Energy (keV); Run Time (ms)",this->h2dsettings.at(4200));
-	this->MTAS_4201 = hismanager->RegisterPlot<TH2F>("MTAS_4201","Run Time vs Mtas Total; Energy (keV); Run Time (s)",this->h2dsettings.at(4201));
-	this->MTAS_4202 = hismanager->RegisterPlot<TH2F>("MTAS_4202","Run Time vs Mtas Total; Energy (keV); Run Time (min)",this->h2dsettings.at(4202));
-	this->MTAS_4203 = hismanager->RegisterPlot<TH2F>("MTAS_4203","Run Time vs Mtas Total; Energy (keV); Run Time (hr)",this->h2dsettings.at(4203));
-	this->MTAS_4204 = hismanager->RegisterPlot<TH2F>("MTAS_4204","Run Time vs Mtas Total; Energy (keV); Run Time (day)",this->h2dsettings.at(4204));
+	hismanager->RegisterPlot<TH2F>("MTAS_4200","Run Time vs Mtas Total; Energy (keV); Run Time (ms)",this->h2dsettings.at(4200));
+	hismanager->RegisterPlot<TH2F>("MTAS_4201","Run Time vs Mtas Total; Energy (keV); Run Time (s)",this->h2dsettings.at(4201));
+	hismanager->RegisterPlot<TH2F>("MTAS_4202","Run Time vs Mtas Total; Energy (keV); Run Time (min)",this->h2dsettings.at(4202));
+	hismanager->RegisterPlot<TH2F>("MTAS_4203","Run Time vs Mtas Total; Energy (keV); Run Time (hr)",this->h2dsettings.at(4203));
+	hismanager->RegisterPlot<TH2F>("MTAS_4204","Run Time vs Mtas Total; Energy (keV); Run Time (day)",this->h2dsettings.at(4204));
 
 	//center position correction plots
 	for( size_t ii = 0; ii < 6; ++ii ){
@@ -718,38 +723,38 @@ void MtasProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 
 void MtasProcessor::DeclareBetaPlots(PLOTS::PlotRegistry* hismanager){
 	//beta event
-	this->MTAS_3300 = hismanager->RegisterPlot<TH1F>("MTAS_3300","Mtas Total #beta-gated; Energy (keV)",this->h1dsettings.at(3300));
-	this->MTAS_3301 = hismanager->RegisterPlot<TH2F>("MTAS_3301","Sum F+B; Energy (keV); F+B Pair (arb.)",this->h2dsettings.at(3301));
+	hismanager->RegisterPlot<TH1F>("MTAS_3300","Mtas Total #beta-gated; Energy (keV)",this->h1dsettings.at(3300));
+	hismanager->RegisterPlot<TH2F>("MTAS_3301","Sum F+B; Energy (keV); F+B Pair (arb.)",this->h2dsettings.at(3301));
 	
-	this->MTAS_3310 = hismanager->RegisterPlot<TH1F>("MTAS_3310","Mtas Center Sum #beta-gated; Energy (keV)",this->h1dsettings.at(3310));
-	this->MTAS_3315 = hismanager->RegisterPlot<TH1F>("MTAS_3315","Mtas Center Stack #beta-gated; Energy (keV)",this->h1dsettings.at(3315));
+	hismanager->RegisterPlot<TH1F>("MTAS_3310","Mtas Center Sum #beta-gated; Energy (keV)",this->h1dsettings.at(3310));
+	hismanager->RegisterPlot<TH1F>("MTAS_3315","Mtas Center Stack #beta-gated; Energy (keV)",this->h1dsettings.at(3315));
 	
-	this->MTAS_3320 = hismanager->RegisterPlot<TH1F>("MTAS_3320","Mtas Inner Sum #beta-gated; Energy (keV)",this->h1dsettings.at(3320));
-	this->MTAS_3325 = hismanager->RegisterPlot<TH1F>("MTAS_3325","Mtas Inner Stack #beta-gated; Energy (keV)",this->h1dsettings.at(3325));
+	hismanager->RegisterPlot<TH1F>("MTAS_3320","Mtas Inner Sum #beta-gated; Energy (keV)",this->h1dsettings.at(3320));
+	hismanager->RegisterPlot<TH1F>("MTAS_3325","Mtas Inner Stack #beta-gated; Energy (keV)",this->h1dsettings.at(3325));
 	
-	this->MTAS_3330 = hismanager->RegisterPlot<TH1F>("MTAS_3330","Mtas Middle Sum #beta-gated; Energy (keV)",this->h1dsettings.at(3330));
-	this->MTAS_3335 = hismanager->RegisterPlot<TH1F>("MTAS_3335","Mtas Middle Stack #beta-gated; Energy (keV)",this->h1dsettings.at(3335));
+	hismanager->RegisterPlot<TH1F>("MTAS_3330","Mtas Middle Sum #beta-gated; Energy (keV)",this->h1dsettings.at(3330));
+	hismanager->RegisterPlot<TH1F>("MTAS_3335","Mtas Middle Stack #beta-gated; Energy (keV)",this->h1dsettings.at(3335));
 	
-	this->MTAS_3340 = hismanager->RegisterPlot<TH1F>("MTAS_3340","Mtas Outer Sum #beta-gated; Energy (keV)",this->h1dsettings.at(3340));
-	this->MTAS_3345 = hismanager->RegisterPlot<TH1F>("MTAS_3345","Mtas Outer Stack #beta-gated; Energy (keV)",this->h1dsettings.at(3345));
+	hismanager->RegisterPlot<TH1F>("MTAS_3340","Mtas Outer Sum #beta-gated; Energy (keV)",this->h1dsettings.at(3340));
+	hismanager->RegisterPlot<TH1F>("MTAS_3345","Mtas Outer Stack #beta-gated; Energy (keV)",this->h1dsettings.at(3345));
 	
-	this->MTAS_3350 = hismanager->RegisterPlot<TH2F>("MTAS_3350","I,M,O vs Mtas Total #beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(3350));
-	this->MTAS_3351 = hismanager->RegisterPlot<TH2F>("MTAS_3351","C vs Mtas Total #beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(3351));
-	this->MTAS_3352 = hismanager->RegisterPlot<TH2F>("MTAS_3352","C Segment vs Mtas Total #beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(3352));
-	this->MTAS_3353 = hismanager->RegisterPlot<TH2F>("MTAS_3353","C Segment vs C #beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(3353));
-	this->MTAS_3354 = hismanager->RegisterPlot<TH2F>("MTAS_3354","C Segment vs Mtas Total (veto any I,M,O) #beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(3354));
+	hismanager->RegisterPlot<TH2F>("MTAS_3350","I,M,O vs Mtas Total #beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(3350));
+	hismanager->RegisterPlot<TH2F>("MTAS_3351","C vs Mtas Total #beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(3351));
+	hismanager->RegisterPlot<TH2F>("MTAS_3352","C Segment vs Mtas Total #beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(3352));
+	hismanager->RegisterPlot<TH2F>("MTAS_3353","C Segment vs C #beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(3353));
+	hismanager->RegisterPlot<TH2F>("MTAS_3354","C Segment vs Mtas Total (veto any I,M,O) #beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(3354));
 	
-	this->MTAS_33508 = hismanager->RegisterPlot<TH2F>("MTAS_33508","I,M,O vs Mtas Total #beta-gated; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(33508));
-	this->MTAS_33518 = hismanager->RegisterPlot<TH2F>("MTAS_33518","C vs Mtas Total #beta-gated; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(33518));
-	this->MTAS_33528 = hismanager->RegisterPlot<TH2F>("MTAS_33528","C Segment vs Mtas Total #beta-gated; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(33528));
-	this->MTAS_33538 = hismanager->RegisterPlot<TH2F>("MTAS_33538","C Segment vs C #beta-gated; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(33538));
-	this->MTAS_33548 = hismanager->RegisterPlot<TH2F>("MTAS_33548","C Segment vs Mtas Total (veto any I,M,O)  #beta-gated; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(33548));
+	hismanager->RegisterPlot<TH2F>("MTAS_33508","I,M,O vs Mtas Total #beta-gated; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(33508));
+	hismanager->RegisterPlot<TH2F>("MTAS_33518","C vs Mtas Total #beta-gated; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(33518));
+	hismanager->RegisterPlot<TH2F>("MTAS_33528","C Segment vs Mtas Total #beta-gated; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(33528));
+	hismanager->RegisterPlot<TH2F>("MTAS_33538","C Segment vs C #beta-gated; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(33538));
+	hismanager->RegisterPlot<TH2F>("MTAS_33548","C Segment vs Mtas Total (veto any I,M,O)  #beta-gated; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(33548));
 	
-	this->MTAS_4300 = hismanager->RegisterPlot<TH2F>("MTAS_4300","Run Time vs Mtas Total #beta-gated; Energy (keV); Run Time (ms)",this->h2dsettings.at(4300));
-	this->MTAS_4301 = hismanager->RegisterPlot<TH2F>("MTAS_4301","Run Time vs Mtas Total #beta-gated; Energy (keV); Run Time (s)",this->h2dsettings.at(4301));
-	this->MTAS_4302 = hismanager->RegisterPlot<TH2F>("MTAS_4302","Run Time vs Mtas Total #beta-gated; Energy (keV); Run Time (min)",this->h2dsettings.at(4302));
-	this->MTAS_4303 = hismanager->RegisterPlot<TH2F>("MTAS_4303","Run Time vs Mtas Total #beta-gated; Energy (keV); Run Time (hr)",this->h2dsettings.at(4303));
-	this->MTAS_4304 = hismanager->RegisterPlot<TH2F>("MTAS_4304","Run Time vs Mtas Total #beta-gated; Energy (keV); Run Time (day)",this->h2dsettings.at(4304));
+	hismanager->RegisterPlot<TH2F>("MTAS_4300","Run Time vs Mtas Total #beta-gated; Energy (keV); Run Time (ms)",this->h2dsettings.at(4300));
+	hismanager->RegisterPlot<TH2F>("MTAS_4301","Run Time vs Mtas Total #beta-gated; Energy (keV); Run Time (s)",this->h2dsettings.at(4301));
+	hismanager->RegisterPlot<TH2F>("MTAS_4302","Run Time vs Mtas Total #beta-gated; Energy (keV); Run Time (min)",this->h2dsettings.at(4302));
+	hismanager->RegisterPlot<TH2F>("MTAS_4303","Run Time vs Mtas Total #beta-gated; Energy (keV); Run Time (hr)",this->h2dsettings.at(4303));
+	hismanager->RegisterPlot<TH2F>("MTAS_4304","Run Time vs Mtas Total #beta-gated; Energy (keV); Run Time (day)",this->h2dsettings.at(4304));
 
 	if( this->diagnosticplots ){
 		hismanager->RegisterPlot<TH2F>("MTAS_3431","Raw IndividualPMT C PMTs #beta-gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3431));
@@ -782,38 +787,38 @@ void MtasProcessor::DeclareBetaPlots(PLOTS::PlotRegistry* hismanager){
 
 void MtasProcessor::DeclareAntiBetaPlots(PLOTS::PlotRegistry* hismanager){
 	//not beta event
-	this->MTAS_3100 = hismanager->RegisterPlot<TH1F>("MTAS_3100","Mtas Total anti-#beta-gated; Energy (keV)",this->h1dsettings.at(3100));
-	this->MTAS_3101 = hismanager->RegisterPlot<TH2F>("MTAS_3101","Sum F+B; Energy (keV); F+B Pair (arb.)",this->h2dsettings.at(3101));
+	hismanager->RegisterPlot<TH1F>("MTAS_3100","Mtas Total anti-#beta-gated; Energy (keV)",this->h1dsettings.at(3100));
+	hismanager->RegisterPlot<TH2F>("MTAS_3101","Sum F+B; Energy (keV); F+B Pair (arb.)",this->h2dsettings.at(3101));
 	
-	this->MTAS_3110 = hismanager->RegisterPlot<TH1F>("MTAS_3110","Mtas Center Sum anti-#beta-gated; Energy (keV)",this->h1dsettings.at(3110));
-	this->MTAS_3115 = hismanager->RegisterPlot<TH1F>("MTAS_3115","Mtas Center Stack anti-#beta-gated; Energy (keV)",this->h1dsettings.at(3115));
+	hismanager->RegisterPlot<TH1F>("MTAS_3110","Mtas Center Sum anti-#beta-gated; Energy (keV)",this->h1dsettings.at(3110));
+	hismanager->RegisterPlot<TH1F>("MTAS_3115","Mtas Center Stack anti-#beta-gated; Energy (keV)",this->h1dsettings.at(3115));
 	
-	this->MTAS_3120 = hismanager->RegisterPlot<TH1F>("MTAS_3120","Mtas Inner Sum anti-#beta-gated; Energy (keV)",this->h1dsettings.at(3120));
-	this->MTAS_3125 = hismanager->RegisterPlot<TH1F>("MTAS_3125","Mtas Inner Stack anti-#beta-gated; Energy (keV)",this->h1dsettings.at(3125));
+	hismanager->RegisterPlot<TH1F>("MTAS_3120","Mtas Inner Sum anti-#beta-gated; Energy (keV)",this->h1dsettings.at(3120));
+	hismanager->RegisterPlot<TH1F>("MTAS_3125","Mtas Inner Stack anti-#beta-gated; Energy (keV)",this->h1dsettings.at(3125));
 	
-	this->MTAS_3130 = hismanager->RegisterPlot<TH1F>("MTAS_3130","Mtas Middle Sum anti-#beta-gated; Energy (keV)",this->h1dsettings.at(3130));
-	this->MTAS_3135 = hismanager->RegisterPlot<TH1F>("MTAS_3135","Mtas Middle Stack anti-#beta-gated; Energy (keV)",this->h1dsettings.at(3135));
+	hismanager->RegisterPlot<TH1F>("MTAS_3130","Mtas Middle Sum anti-#beta-gated; Energy (keV)",this->h1dsettings.at(3130));
+	hismanager->RegisterPlot<TH1F>("MTAS_3135","Mtas Middle Stack anti-#beta-gated; Energy (keV)",this->h1dsettings.at(3135));
 	
-	this->MTAS_3140 = hismanager->RegisterPlot<TH1F>("MTAS_3140","Mtas Outer Sum anti-#beta-gated; Energy (keV)",this->h1dsettings.at(3140));
-	this->MTAS_3145 = hismanager->RegisterPlot<TH1F>("MTAS_3145","Mtas Outer Stack anti-#beta-gated; Energy (keV)",this->h1dsettings.at(3145));
+	hismanager->RegisterPlot<TH1F>("MTAS_3140","Mtas Outer Sum anti-#beta-gated; Energy (keV)",this->h1dsettings.at(3140));
+	hismanager->RegisterPlot<TH1F>("MTAS_3145","Mtas Outer Stack anti-#beta-gated; Energy (keV)",this->h1dsettings.at(3145));
 	
-	this->MTAS_3150 = hismanager->RegisterPlot<TH2F>("MTAS_3150","I,M,O vs Mtas Total anti-#beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(3150));
-	this->MTAS_3151 = hismanager->RegisterPlot<TH2F>("MTAS_3151","C vs Mtas Total anti-#beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(3151));
-	this->MTAS_3152 = hismanager->RegisterPlot<TH2F>("MTAS_3152","C Segment vs Mtas Total anti-#beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(3152));
-	this->MTAS_3153 = hismanager->RegisterPlot<TH2F>("MTAS_3153","C Segment vs C anti-#beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(3153));
-	this->MTAS_3154 = hismanager->RegisterPlot<TH2F>("MTAS_3154","C Segment vs Mtas Total (veto any I,M,O) anti-#beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(3154));
+	hismanager->RegisterPlot<TH2F>("MTAS_3150","I,M,O vs Mtas Total anti-#beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(3150));
+	hismanager->RegisterPlot<TH2F>("MTAS_3151","C vs Mtas Total anti-#beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(3151));
+	hismanager->RegisterPlot<TH2F>("MTAS_3152","C Segment vs Mtas Total anti-#beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(3152));
+	hismanager->RegisterPlot<TH2F>("MTAS_3153","C Segment vs C anti-#beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(3153));
+	hismanager->RegisterPlot<TH2F>("MTAS_3154","C Segment vs Mtas Total (veto any I,M,O) anti-#beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(3154));
 	
-	this->MTAS_31508 = hismanager->RegisterPlot<TH2F>("MTAS_31508","I,M,O vs Mtas Total anti-#beta-gated; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(31508));
-	this->MTAS_31518 = hismanager->RegisterPlot<TH2F>("MTAS_31518","C vs Mtas Total anti-#beta-gated; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(31518));
-	this->MTAS_31528 = hismanager->RegisterPlot<TH2F>("MTAS_31528","C Segment vs Mtas Total anti-#beta-gated; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(31528));
-	this->MTAS_31538 = hismanager->RegisterPlot<TH2F>("MTAS_31538","C Segment vs Mtas Total anti-#beta-gated; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(31538));
-	this->MTAS_31548 = hismanager->RegisterPlot<TH2F>("MTAS_31548","C Segment vs Mtas Total (veto any I,M,O) anti-#beta-gated; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(31548));
+	hismanager->RegisterPlot<TH2F>("MTAS_31508","I,M,O vs Mtas Total anti-#beta-gated; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(31508));
+	hismanager->RegisterPlot<TH2F>("MTAS_31518","C vs Mtas Total anti-#beta-gated; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(31518));
+	hismanager->RegisterPlot<TH2F>("MTAS_31528","C Segment vs Mtas Total anti-#beta-gated; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(31528));
+	hismanager->RegisterPlot<TH2F>("MTAS_31538","C Segment vs Mtas Total anti-#beta-gated; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(31538));
+	hismanager->RegisterPlot<TH2F>("MTAS_31548","C Segment vs Mtas Total (veto any I,M,O) anti-#beta-gated; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(31548));
 	
-	this->MTAS_4100 = hismanager->RegisterPlot<TH2F>("MTAS_4100","Run Time vs Mtas Total anti-#beta-gated; Energy (keV); Run Time (ms)",this->h2dsettings.at(4100));
-	this->MTAS_4101 = hismanager->RegisterPlot<TH2F>("MTAS_4101","Run Time vs Mtas Total anti-#beta-gated; Energy (keV); Run Time (s)",this->h2dsettings.at(4101));
-	this->MTAS_4102 = hismanager->RegisterPlot<TH2F>("MTAS_4102","Run Time vs Mtas Total anti-#beta-gated; Energy (keV); Run Time (min)",this->h2dsettings.at(4102));
-	this->MTAS_4103 = hismanager->RegisterPlot<TH2F>("MTAS_4103","Run Time vs Mtas Total anti-#beta-gated; Energy (keV); Run Time (hr)",this->h2dsettings.at(4103));
-	this->MTAS_4104 = hismanager->RegisterPlot<TH2F>("MTAS_4104","Run Time vs Mtas Total anti-#beta-gated; Energy (keV); Run Time (day)",this->h2dsettings.at(4104));
+	hismanager->RegisterPlot<TH2F>("MTAS_4100","Run Time vs Mtas Total anti-#beta-gated; Energy (keV); Run Time (ms)",this->h2dsettings.at(4100));
+	hismanager->RegisterPlot<TH2F>("MTAS_4101","Run Time vs Mtas Total anti-#beta-gated; Energy (keV); Run Time (s)",this->h2dsettings.at(4101));
+	hismanager->RegisterPlot<TH2F>("MTAS_4102","Run Time vs Mtas Total anti-#beta-gated; Energy (keV); Run Time (min)",this->h2dsettings.at(4102));
+	hismanager->RegisterPlot<TH2F>("MTAS_4103","Run Time vs Mtas Total anti-#beta-gated; Energy (keV); Run Time (hr)",this->h2dsettings.at(4103));
+	hismanager->RegisterPlot<TH2F>("MTAS_4104","Run Time vs Mtas Total anti-#beta-gated; Energy (keV); Run Time (day)",this->h2dsettings.at(4104));
 
 	if( this->diagnosticplots ){
 		hismanager->RegisterPlot<TH2F>("MTAS_3411","Raw IndividualPMT C PMTs anti-#beta-gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3411));
@@ -1124,24 +1129,18 @@ void MtasProcessor::GenerateHexagonShapes(){
 
 void MtasProcessor::FillBetaPlots(PLOTS::PlotRegistry* hismanager){
 	if( (not this->AnySaturate) and (not this->AnyPileup) ){
-		hismanager->Fill(this->MTAS_4300,this->TotalEnergy[0],this->currevttime*1000.0);
-		hismanager->Fill(this->MTAS_4301,this->TotalEnergy[0],this->currevttime);
-		hismanager->Fill(this->MTAS_4302,this->TotalEnergy[0],this->currevttime/60.0);
-		hismanager->Fill(this->MTAS_4303,this->TotalEnergy[0],this->currevttime/(60.0*60.0));
-		hismanager->Fill(this->MTAS_4304,this->TotalEnergy[0],this->currevttime/(60.0*60.0*24.0));
+		hismanager->Fill("MTAS_3300",this->TotalEnergy[0]);
 
-		hismanager->Fill(this->MTAS_3300,this->TotalEnergy[0]);
+		hismanager->Fill("MTAS_3310",this->TotalEnergy[1]);
+		hismanager->Fill("MTAS_3320",this->TotalEnergy[2]);
+		hismanager->Fill("MTAS_3330",this->TotalEnergy[3]);
+		hismanager->Fill("MTAS_3340",this->TotalEnergy[4]);
 
-		hismanager->Fill(this->MTAS_3310,this->TotalEnergy[1]);
-		hismanager->Fill(this->MTAS_3320,this->TotalEnergy[2]);
-		hismanager->Fill(this->MTAS_3330,this->TotalEnergy[3]);
-		hismanager->Fill(this->MTAS_3340,this->TotalEnergy[4]);
-
-		hismanager->Fill(this->MTAS_3351,this->TotalEnergy[0],this->TotalEnergy[1]);
-		hismanager->Fill(this->MTAS_33518,this->TotalEnergy[0],this->TotalEnergy[1]);
+		hismanager->Fill("MTAS_3351",this->TotalEnergy[0],this->TotalEnergy[1]);
+		hismanager->Fill("MTAS_33518",this->TotalEnergy[0],this->TotalEnergy[1]);
 
 		for( int ii = 0; ii < 24; ++ii ){
-			hismanager->Fill(this->MTAS_3301,this->CrystalEnergy[ii],ii);
+			hismanager->Fill("MTAS_3301",this->CrystalEnergy[ii],ii);
 		}
 
 		for( int ii = 0; ii < 6; ++ii ){
@@ -1156,35 +1155,44 @@ void MtasProcessor::FillBetaPlots(PLOTS::PlotRegistry* hismanager){
 			name = "MTAS_336"+id;
 			hismanager->Fill(name,this->Position[ii],(this->RawCenter[2*ii] + this->RawCenter[2*ii + 1])/2.0);
 
-			hismanager->Fill(this->MTAS_3315,this->CrystalEnergy[ii]);
-			hismanager->Fill(this->MTAS_3325,this->CrystalEnergy[ii+6]);
-			hismanager->Fill(this->MTAS_3335,this->CrystalEnergy[ii+12]);
-			hismanager->Fill(this->MTAS_3345,this->CrystalEnergy[ii+18]);
+			hismanager->Fill("MTAS_3315",this->CrystalEnergy[ii]);
+			hismanager->Fill("MTAS_3325",this->CrystalEnergy[ii+6]);
+			hismanager->Fill("MTAS_3335",this->CrystalEnergy[ii+12]);
+			hismanager->Fill("MTAS_3345",this->CrystalEnergy[ii+18]);
 
-			hismanager->Fill(this->MTAS_3350,this->TotalEnergy[0],this->CrystalEnergy[ii+6]);
-			hismanager->Fill(this->MTAS_3350,this->TotalEnergy[0],this->CrystalEnergy[ii+12]);
-			hismanager->Fill(this->MTAS_3350,this->TotalEnergy[0],this->CrystalEnergy[ii+18]);
+			hismanager->Fill("MTAS_3350",this->TotalEnergy[0],this->CrystalEnergy[ii+6]);
+			hismanager->Fill("MTAS_3350",this->TotalEnergy[0],this->CrystalEnergy[ii+12]);
+			hismanager->Fill("MTAS_3350",this->TotalEnergy[0],this->CrystalEnergy[ii+18]);
 
-			hismanager->Fill(this->MTAS_3352,this->TotalEnergy[0],this->CrystalEnergy[ii]);
+			hismanager->Fill("MTAS_3352",this->TotalEnergy[0],this->CrystalEnergy[ii]);
 
-			hismanager->Fill(this->MTAS_3353,this->TotalEnergy[1],this->CrystalEnergy[ii]);
+			hismanager->Fill("MTAS_3353",this->TotalEnergy[1],this->CrystalEnergy[ii]);
 
-			hismanager->Fill(this->MTAS_33508,this->TotalEnergy[0],this->CrystalEnergy[ii+6]);
-			hismanager->Fill(this->MTAS_33508,this->TotalEnergy[0],this->CrystalEnergy[ii+12]);
-			hismanager->Fill(this->MTAS_33508,this->TotalEnergy[0],this->CrystalEnergy[ii+18]);
+			hismanager->Fill("MTAS_33508",this->TotalEnergy[0],this->CrystalEnergy[ii+6]);
+			hismanager->Fill("MTAS_33508",this->TotalEnergy[0],this->CrystalEnergy[ii+12]);
+			hismanager->Fill("MTAS_33508",this->TotalEnergy[0],this->CrystalEnergy[ii+18]);
 
-			hismanager->Fill(this->MTAS_33528,this->TotalEnergy[0],this->CrystalEnergy[ii]);
+			hismanager->Fill("MTAS_33528",this->TotalEnergy[0],this->CrystalEnergy[ii]);
 
-			hismanager->Fill(this->MTAS_33538,this->TotalEnergy[1],this->CrystalEnergy[ii]);
+			hismanager->Fill("MTAS_33538",this->TotalEnergy[1],this->CrystalEnergy[ii]);
 
 			if( (not this->InnerFire) and (not this->MiddleFire) and (not this->OuterFire) ){
-				hismanager->Fill(this->MTAS_3354,this->TotalEnergy[0],this->CrystalEnergy[ii]);
-				hismanager->Fill(this->MTAS_33548,this->TotalEnergy[0],this->CrystalEnergy[ii]);
+				hismanager->Fill("MTAS_3354",this->TotalEnergy[0],this->CrystalEnergy[ii]);
+				hismanager->Fill("MTAS_33548",this->TotalEnergy[0],this->CrystalEnergy[ii]);
 			}
 
 
 		}
+	}
+}
 
+void MtasProcessor::FillNoLogicBetaPlots(PLOTS::PlotRegistry* hismanager){
+	if( (not this->AnySaturate) and (not this->AnyPileup) ){
+		hismanager->Fill("MTAS_4300",this->TotalEnergy[0],this->currevttime*1000.0);
+		hismanager->Fill("MTAS_4301",this->TotalEnergy[0],this->currevttime);
+		hismanager->Fill("MTAS_4302",this->TotalEnergy[0],this->currevttime/60.0);
+		hismanager->Fill("MTAS_4303",this->TotalEnergy[0],this->currevttime/(60.0*60.0));
+		hismanager->Fill("MTAS_4304",this->TotalEnergy[0],this->currevttime/(60.0*60.0*24.0));
 		if( this->diagnosticplots ){
 			for( int ii = 0; ii < 6; ++ii ){
 				hismanager->Fill("MTAS_3431",this->RawCenter[2*ii],2*ii);
@@ -1212,30 +1220,23 @@ void MtasProcessor::FillBetaPlots(PLOTS::PlotRegistry* hismanager){
 				hismanager->Fill("MTAS_3534",this->CalOuter[2*ii + 1],2*ii + 1);
 			}
 		}
-
 	}
 }
 
 void MtasProcessor::FillNonBetaPlots(PLOTS::PlotRegistry* hismanager){
 	if( (not this->AnySaturate) and (not this->AnyPileup) ){
-		hismanager->Fill(this->MTAS_4100,this->TotalEnergy[0],this->currevttime*1000.0);
-		hismanager->Fill(this->MTAS_4101,this->TotalEnergy[0],this->currevttime);
-		hismanager->Fill(this->MTAS_4102,this->TotalEnergy[0],this->currevttime/60.0);
-		hismanager->Fill(this->MTAS_4103,this->TotalEnergy[0],this->currevttime/(60.0*60.0));
-		hismanager->Fill(this->MTAS_4104,this->TotalEnergy[0],this->currevttime/(60.0*60.0*24.0));
+		hismanager->Fill("MTAS_3100",this->TotalEnergy[0]);
 
-		hismanager->Fill(this->MTAS_3100,this->TotalEnergy[0]);
+		hismanager->Fill("MTAS_3110",this->TotalEnergy[1]);
+		hismanager->Fill("MTAS_3120",this->TotalEnergy[2]);
+		hismanager->Fill("MTAS_3130",this->TotalEnergy[3]);
+		hismanager->Fill("MTAS_3140",this->TotalEnergy[4]);
 
-		hismanager->Fill(this->MTAS_3110,this->TotalEnergy[1]);
-		hismanager->Fill(this->MTAS_3120,this->TotalEnergy[2]);
-		hismanager->Fill(this->MTAS_3130,this->TotalEnergy[3]);
-		hismanager->Fill(this->MTAS_3140,this->TotalEnergy[4]);
-
-		hismanager->Fill(this->MTAS_3151,this->TotalEnergy[0],this->TotalEnergy[1]);
-		hismanager->Fill(this->MTAS_31518,this->TotalEnergy[0],this->TotalEnergy[1]);
+		hismanager->Fill("MTAS_3151",this->TotalEnergy[0],this->TotalEnergy[1]);
+		hismanager->Fill("MTAS_31518",this->TotalEnergy[0],this->TotalEnergy[1]);
 
 		for( int ii = 0; ii < 24; ++ii ){
-			hismanager->Fill(this->MTAS_3101,this->CrystalEnergy[ii],ii);
+			hismanager->Fill("MTAS_3101",this->CrystalEnergy[ii],ii);
 		}
 
 		for( int ii = 0; ii < 6; ++ii ){
@@ -1250,34 +1251,43 @@ void MtasProcessor::FillNonBetaPlots(PLOTS::PlotRegistry* hismanager){
 			name = "MTAS_316"+id;
 			hismanager->Fill(name,this->Position[ii],(this->RawCenter[2*ii] + this->RawCenter[2*ii + 1])/2.0);
 
-			hismanager->Fill(this->MTAS_3115,this->CrystalEnergy[ii]);
-			hismanager->Fill(this->MTAS_3125,this->CrystalEnergy[ii+6]);
-			hismanager->Fill(this->MTAS_3135,this->CrystalEnergy[ii+12]);
-			hismanager->Fill(this->MTAS_3145,this->CrystalEnergy[ii+18]);
+			hismanager->Fill("MTAS_3115",this->CrystalEnergy[ii]);
+			hismanager->Fill("MTAS_3125",this->CrystalEnergy[ii+6]);
+			hismanager->Fill("MTAS_3135",this->CrystalEnergy[ii+12]);
+			hismanager->Fill("MTAS_3145",this->CrystalEnergy[ii+18]);
 
-			hismanager->Fill(this->MTAS_3150,this->TotalEnergy[0],this->CrystalEnergy[ii+6]);
-			hismanager->Fill(this->MTAS_3150,this->TotalEnergy[0],this->CrystalEnergy[ii+12]);
-			hismanager->Fill(this->MTAS_3150,this->TotalEnergy[0],this->CrystalEnergy[ii+18]);
+			hismanager->Fill("MTAS_3150",this->TotalEnergy[0],this->CrystalEnergy[ii+6]);
+			hismanager->Fill("MTAS_3150",this->TotalEnergy[0],this->CrystalEnergy[ii+12]);
+			hismanager->Fill("MTAS_3150",this->TotalEnergy[0],this->CrystalEnergy[ii+18]);
 
-			hismanager->Fill(this->MTAS_3152,this->TotalEnergy[0],this->CrystalEnergy[ii]);
+			hismanager->Fill("MTAS_3152",this->TotalEnergy[0],this->CrystalEnergy[ii]);
 
-			hismanager->Fill(this->MTAS_3153,this->TotalEnergy[1],this->CrystalEnergy[ii]);
+			hismanager->Fill("MTAS_3153",this->TotalEnergy[1],this->CrystalEnergy[ii]);
 
-			hismanager->Fill(this->MTAS_31508,this->TotalEnergy[0],this->CrystalEnergy[ii+6]);
-			hismanager->Fill(this->MTAS_31508,this->TotalEnergy[0],this->CrystalEnergy[ii+12]);
-			hismanager->Fill(this->MTAS_31508,this->TotalEnergy[0],this->CrystalEnergy[ii+18]);
+			hismanager->Fill("MTAS_31508",this->TotalEnergy[0],this->CrystalEnergy[ii+6]);
+			hismanager->Fill("MTAS_31508",this->TotalEnergy[0],this->CrystalEnergy[ii+12]);
+			hismanager->Fill("MTAS_31508",this->TotalEnergy[0],this->CrystalEnergy[ii+18]);
 
-			hismanager->Fill(this->MTAS_31528,this->TotalEnergy[0],this->CrystalEnergy[ii]);
+			hismanager->Fill("MTAS_31528",this->TotalEnergy[0],this->CrystalEnergy[ii]);
 
-			hismanager->Fill(this->MTAS_31538,this->TotalEnergy[1],this->CrystalEnergy[ii]);
+			hismanager->Fill("MTAS_31538",this->TotalEnergy[1],this->CrystalEnergy[ii]);
 
 			if( (not this->InnerFire) and (not this->MiddleFire) and (not this->OuterFire) ){
-				hismanager->Fill(this->MTAS_3154,this->TotalEnergy[0],this->CrystalEnergy[ii]);
-				hismanager->Fill(this->MTAS_31548,this->TotalEnergy[0],this->CrystalEnergy[ii]);
+				hismanager->Fill("MTAS_3154",this->TotalEnergy[0],this->CrystalEnergy[ii]);
+				hismanager->Fill("MTAS_31548",this->TotalEnergy[0],this->CrystalEnergy[ii]);
 			}
-
-
 		}
+	}
+}
+
+void MtasProcessor::FillNoLogicNonBetaPlots(PLOTS::PlotRegistry* hismanager){
+	if( (not this->AnySaturate) and (not this->AnyPileup) ){
+		hismanager->Fill("MTAS_4100",this->TotalEnergy[0],this->currevttime*1000.0);
+		hismanager->Fill("MTAS_4101",this->TotalEnergy[0],this->currevttime);
+		hismanager->Fill("MTAS_4102",this->TotalEnergy[0],this->currevttime/60.0);
+		hismanager->Fill("MTAS_4103",this->TotalEnergy[0],this->currevttime/(60.0*60.0));
+		hismanager->Fill("MTAS_4104",this->TotalEnergy[0],this->currevttime/(60.0*60.0*24.0));
+
 
 		if( this->diagnosticplots ){
 			for( int ii = 0; ii < 6; ++ii ){

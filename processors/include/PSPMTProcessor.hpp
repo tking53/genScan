@@ -22,6 +22,10 @@ class PSPMTProcessor : public Processor{
 		virtual void DeclarePlots(PLOTS::PlotRegistry*);
 		virtual void RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>&) final;
 		virtual void CleanupTree() final;
+
+		const PSPMT::Image& GetLowGainImage() const;
+		const PSPMT::Image& GetHighGainImage() const;
+
 	private:
 		enum IMAGEMETHOD{
 			CORNERS,

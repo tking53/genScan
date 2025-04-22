@@ -1,6 +1,7 @@
 #ifndef __MTASTAPE_PROCESSOR_HPP__
 #define __MTASTAPE_PROCESSOR_HPP__
 
+#include "TapeCycle.hpp"
 #include "Processor.hpp"
 
 class MtasTapeProcessor : public Processor{
@@ -19,17 +20,8 @@ class MtasTapeProcessor : public Processor{
 		virtual void RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>&) final;
 		virtual void CleanupTree() final;
 
-		enum TapeCycleState{
-			UNKNOWN,
-			TAPEMOVE,
-			MEASURE,
-			BACKGROUND,
-			LIGHTPULSER,
-			IRRADIATION
-		};
-
 		unsigned int GetCurrentCycleNumber() const;
-		TapeCycleState GetCurrentCycleState() const;
+		TAPE::CycleState GetCurrentCycleState() const;
 		void IncrementCycleNumber();
 		double GetCycleTimeInSeconds() const;
 
@@ -41,8 +33,8 @@ class MtasTapeProcessor : public Processor{
 
 		unsigned int CycleCount;
 
-		TapeCycleState PrevState;
-		TapeCycleState CurrState;
+		TAPE::CycleState PrevState;
+		TAPE::CycleState CurrState;
 
 		bool isTriggerOn;
 		bool isIrradOn;
@@ -57,6 +49,13 @@ class MtasTapeProcessor : public Processor{
 		bool isMeasureOff;
 
 		int logicSignalValue;
+
+		std::string tapemove;
+		std::string measure;
+		std::string background;
+		std::string irradiation;
+		std::string lightpulser;
+		std::string unknown;
 };
 
 #endif

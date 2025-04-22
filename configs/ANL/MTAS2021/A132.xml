@@ -8,10 +8,13 @@
 	<Description>Automatically Generated xml by GenConfig</Description>
 	<Global EventWidth="500" EventWidthUnit="ns" CorrelationType="rolling-trigger" />
 	<DetectorDriver >
-		<Processor name="MtasTapeProcessor" />
-		<Processor name="MtasSSDProcessor" />
-		<Processor name="SimpleHPGeProcessor" number="2" />
-		<Processor name="PSPMTProcessor" method="corners"/>
+		<!-- <Processor name="anl2021Processor" > -->
+			<Processor name="MtasProcessor" />
+			<Processor name="MtasTapeProcessor" />
+			<Processor name="MtasSSDProcessor" />
+			<Processor name="SimpleHPGeProcessor" number="2" />
+			<Processor name="PSPMTProcessor" method="corners"/>
+		<!-- </Processor> -->
 	</DetectorDriver>
 	<Map>
 		<Crate number="0">

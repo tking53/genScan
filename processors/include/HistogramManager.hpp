@@ -15,8 +15,9 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 #include <boost/sort/spreadsort/string_sort.hpp>
-#include <boost/unordered_map.hpp>
-//#include <boost/unordered/unordered_node_map.hpp>
+//#include <boost/container/map.hpp>
+//#include <boost/unordered_map.hpp>
+#include <boost/unordered/unordered_node_map.hpp>
 
 #include "TH1.h"
 #include "TH2.h"
@@ -222,13 +223,13 @@ namespace PLOTS{
 			}
 
 			template<typename T>
-			TH1* RegisterPlot(std::string name,std::string title,const HisHelper1D& h){
-				return this->RegisterPlot<T>(name,title,h.nbinsx,h.xlow,h.xhigh);
+			void RegisterPlot(std::string name,std::string title,const HisHelper1D& h){
+				this->RegisterPlot<T>(name,title,h.nbinsx,h.xlow,h.xhigh);
 			}
 			
 			template<typename T>
-			TH2* RegisterPlot(std::string name,std::string title,const HisHelper2D& h){
-				return this->RegisterPlot<T>(name,title,h.nbinsx,h.xlow,h.xhigh,h.nbinsy,h.ylow,h.yhigh);
+			void RegisterPlot(std::string name,std::string title,const HisHelper2D& h){
+				this->RegisterPlot<T>(name,title,h.nbinsx,h.xlow,h.xhigh,h.nbinsy,h.ylow,h.yhigh);
 			}
 
 			[[nodiscard]] TH2Poly* RegisterPlot(std::string name,std::string title){
@@ -254,7 +255,7 @@ namespace PLOTS{
 			}
 
 			template<typename T>
-			TH1* RegisterPlot(std::string name,std::string title,int nbinsx,double xmin,double xmax){
+			void RegisterPlot(std::string name,std::string title,int nbinsx,double xmin,double xmax){
 				static_assert(std::is_base_of<TH1,T>::value,"T must inherit from TH1");
 				if( not PlotExist(name) ){
 					this->Plots_1D[name] = new T(name.c_str(),title.c_str(),nbinsx,xmin,xmax);
@@ -269,7 +270,6 @@ namespace PLOTS{
 					//this->console->debug("1D plots load factor : {}, bucket counts : {} after adding {}",this->Plots_1D.load_factor(),this->Plots_1D.bucket_count(),name);
 					this->ShiftLineColor();
 					this->PlotIDs.push_back(name);
-					return this->Plots_1D[name];
 				}else{
 					std::string mess = "Unable to register plot "+name+" as it already exists";
 					this->console->error("{}",mess);
@@ -278,7 +278,7 @@ namespace PLOTS{
 			}
 
 			template<typename T>
-			TH2* RegisterPlot(std::string name,std::string title,int nbinsx,double xmin,double xmax,int nbinsy,double ymin,double ymax){
+			void RegisterPlot(std::string name,std::string title,int nbinsx,double xmin,double xmax,int nbinsy,double ymin,double ymax){
 				static_assert(std::is_base_of<TH2,T>::value,"T must inherit from TH2");
 				if( not PlotExist(name) ){
 					this->Plots_2D[name] = new T(name.c_str(),title.c_str(),nbinsx,xmin,xmax,nbinsy,ymin,ymax);
@@ -291,7 +291,6 @@ namespace PLOTS{
 					this->Plots_2D[name]->GetYaxis()->CenterTitle(true);
 					//this->console->debug("2D plots load factor : {}, bucket counts : {} after adding {}",this->Plots_2D.load_factor(),this->Plots_2D.bucket_count(),name);
 					this->PlotIDs.push_back(name);
-					return this->Plots_2D[name];
 				}else{
 					std::string mess = "Unable to register plot "+name+" as it already exists";
 					this->console->error("{}",mess);
@@ -564,6 +563,19 @@ namespace PLOTS{
 				return this->roll_bins;
 			}
 		private:
+			//template<class T>
+			//struct InternalHisInfo{
+			//	std::string name;
+			//	std::string title;
+			//	T HisInfo;
+			//};
+			//struct InternalPolyHisInfo{
+			//	std::string name;
+			//	std::string title;
+			//	std::vector<double> binxcoords;
+			//	std::vector<double> binycoords;
+			//};
+
 			bool Plot1DExist(const std::string& name){
 				return this->Plots_1D.find(name) != this->Plots_1D.end();
 			}
@@ -592,11 +604,9 @@ namespace PLOTS{
 			}
 
 			std::vector<std::string> PlotIDs;
-			//boost::unordered_node_map<std::string,TH1*> Plots_1D;
-			//boost::unordered_node_map<std::string,TH2*> Plots_2D;
-			boost::unordered_map<std::string,TH1*> Plots_1D;
-			boost::unordered_map<std::string,TH2*> Plots_2D;
-			boost::unordered_map<std::string,TH2Poly*> Plots_2DPoly;
+			boost::unordered_node_map<std::string,TH1*> Plots_1D;
+			boost::unordered_node_map<std::string,TH2*> Plots_2D;
+			boost::unordered_node_map<std::string,TH2Poly*> Plots_2DPoly;
 			std::string LogName;
 			std::string outputprefix;
 

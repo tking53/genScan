@@ -267,3 +267,11 @@ void PSPMTProcessor::CalculatePosition(PSPMT::Image& img,double rotation,double 
 
 	img.position = { x*std::cos(rotation) + xcenter -y*std::sin(rotation) + ycenter, x*std::sin(rotation) + xcenter + y*std::cos(rotation) + ycenter};
 }
+
+const PSPMT::Image& PSPMTProcessor::GetLowGainImage() const{
+	return this->lgImage;
+}
+
+const PSPMT::Image& PSPMTProcessor::GetHighGainImage() const{
+	return this->hgImage;
+}
