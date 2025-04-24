@@ -359,3 +359,10 @@ const PSPMT::Image& PSPMTProcessor::GetLowGainImage() const{
 const PSPMT::Image& PSPMTProcessor::GetHighGainImage() const{
 	return this->hgImage;
 }
+const PSPMT::Image& PSPMTProcessor::GetLowGainImageQdc() const{
+	return this->lgImageQdc;
+}
+
+const PSPMT::Image& PSPMTProcessor::GetHighGainImageQdc() const{
+	return this->hgImageQdc;
+}

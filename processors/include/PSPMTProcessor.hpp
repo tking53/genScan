@@ -27,6 +27,9 @@ class PSPMTProcessor : public Processor{
 		const PSPMT::Image& GetLowGainImage() const;
 		const PSPMT::Image& GetHighGainImage() const;
 
+		const PSPMT::Image& GetLowGainImageQdc() const;
+		const PSPMT::Image& GetHighGainImageQdc() const;
+
 	private:
 		enum IMAGEMETHOD{
 			CORNERS,
