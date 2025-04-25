@@ -8,13 +8,14 @@
 	<Description>Automatically Generated xml by GenConfig</Description>
 	<Global EventWidth="500" EventWidthUnit="ns" CorrelationType="rolling-trigger" />
 	<DetectorDriver >
-		<!-- <Processor name="anl2021Processor" > -->
+		<Processor name="RootDevProcessor" included_types="generic"/>
+		<Processor name="anl2021Processor" >
 			<Processor name="MtasProcessor" />
 			<Processor name="MtasTapeProcessor" />
 			<Processor name="MtasSSDProcessor" />
 			<Processor name="SimpleHPGeProcessor" number="2" />
 			<Processor name="PSPMTProcessor" method="corners"/>
-		<!-- </Processor> -->
+		</Processor>
 	</DetectorDriver>
 	<Map>
 		<Crate number="0">
@@ -252,7 +253,7 @@
 				<Channel number="10" type="tape" subtype="measure" group="down" tags="">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="11" type="generic" subtype="MTC" group="up" tags="">
+				<Channel number="11" type="tape" subtype="MTC" group="up" tags="">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 				<Channel number="12" type="generic" subtype="stop" group="up" tags="">
@@ -311,10 +312,10 @@
 				<Channel number="13" type="generic" subtype="generic" group="generic" tags="93">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="14" type="generic" subtype="generic" group="generic" tags="94">
+				<Channel number="14" type="hagrid" subtype="generic" group="generic" tags="94">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="15" type="generic" subtype="generic" group="generic" tags="95">
+				<Channel number="15" type="hagrid" subtype="generic" group="generic" tags="95">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 			</Module>

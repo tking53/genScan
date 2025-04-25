@@ -11,6 +11,8 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log) : Processor(log,"PSPMTPro
 	this->ampdynode = 0.0;
 	this->highgaintag = "highgain";
 	this->lowgaintag = "lowgain";
+	this->AnodeHighHits = std::vector<int>(4,0);
+	this->AnodeLowHits = std::vector<int>(4,0);
 	this->Reset();
 }
 
@@ -231,12 +233,22 @@ void PSPMTProcessor::CleanupTree(){
 }
 
 void PSPMTProcessor::Reset(){
-	this->hgImage = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, { -10.0, -10.0 }, 0.0};
-	this->lgImage = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, { -10.0, -10.0 }, 0.0};
+	this->hgImage.ResetDynode();
+	this->hgImage.ResetAnode();
+	this->hgImage.ResetPosition(-10.0,-10.0);
+	this->hgImage.ResetCorners();
+
+	this->lgImage.ResetDynode();
+	this->lgImage.ResetAnode();
+	this->lgImage.ResetPosition(-10.0,-10.0);
+	this->lgImage.ResetCorners();
+
 	this->DynodeHighHits = 0;
 	this->DynodeLowHits = 0;
-	this->AnodeHighHits = std::vector<int>(4,0);
-	this->AnodeLowHits = std::vector<int>(4,0);
+	for( int ii = 0; ii < 4; ++ii ){
+		this->AnodeHighHits[ii] = 0;
+		this->AnodeLowHits[ii] = 0;
+	}
 }
 
 void PSPMTProcessor::CalculatePosition(PSPMT::Image& img,double rotation,double xcenter,double ycenter,bool xflip,PSPMTProcessor::IMAGEMETHOD& method){

@@ -647,25 +647,31 @@ void BSMProcessor::CleanupTree(){
 void BSMProcessor::Reset(){
 	this->AverageTotalEnergy = 0.0;
 	this->GeometricTotalEnergy = 0.0;
-	this->SumFrontBackEnergy = std::vector<double>(this->NumPairs,0.0);
-	this->GeometricFrontBackEnergy = std::vector<double>(this->NumPairs,0.0);
-	this->UnCorrectedBSM = std::vector<double>(this->NumPMTs,0.0);
-	this->CorrectedBSM = std::vector<double>(this->NumPMTs,0.0);
-	this->Position = std::vector<double>(this->NumPairs,0.0);
-	this->TDiff = std::vector<double>(this->NumPairs,0.0);
 	this->NumValidSegments = 0;
-	this->IndividualPMTPileup = std::vector<bool>(this->NumPMTs,false);
 	this->AnyPileup = false;
-	this->IndividualPMTSaturate = std::vector<bool>(this->NumPMTs,false);
 	this->AnySaturate = false;
 	this->FirstTime = -1.0;
 	this->LastTime = -1.0;
 	this->TimeStamps.clear();
-	this->BSMHits = std::vector<int>(this->NumPMTs,0);
-	this->RawBSM = std::vector<double>(this->NumPMTs,0.0);
-	this->HitTimeStamps = std::vector<double>(this->NumPMTs,0.0);
-	this->TotalMult = std::vector<int>(this->NumPMTs,0);
-	this->Pairs = std::vector<PhysicsData*>(this->NumPMTs,nullptr);
+
+	for( int ii = 0; ii < this->NumPairs; ++ii ){
+		this->SumFrontBackEnergy[ii] = 0.0;
+		this->GeometricFrontBackEnergy[ii] = 0.0;
+		this->Position[ii] = 0.0;
+		this->TDiff[ii] = 0.0;
+	}
+
+	for( int ii = 0; ii < this->NumPMTs; ++ii ){
+		this->UnCorrectedBSM[ii] = 0.0;
+		this->CorrectedBSM[ii] = 0.0;
+		this->BSMHits[ii] = 0;
+		this->RawBSM[ii] = 0.0;
+		this->HitTimeStamps[ii] = 0.0;
+		this->TotalMult[ii] = 0;
+		this->Pairs[ii] = nullptr;
+		this->IndividualPMTPileup[ii] = false;
+		this->IndividualPMTSaturate[ii] = false;
+	}
 }
 
 void BSMProcessor::FillGSPileupTracePlots(PLOTS::PlotRegistry* hismanager) const{

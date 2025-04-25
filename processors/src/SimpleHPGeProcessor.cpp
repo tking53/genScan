@@ -64,7 +64,9 @@ void SimpleHPGeProcessor::CleanupTree(){
 }
 
 void SimpleHPGeProcessor::Reset(){
-	this->Energies = std::vector<double>(this->NumHPGe,0.0);
+	for( int ii = 0; ii < this->NumHPGe; ++ii ){
+		this->Energies[ii] = 0.0;
+	}
 }
 
 double SimpleHPGeProcessor::GetEnergy(int idx) const{

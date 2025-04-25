@@ -15,6 +15,7 @@ EventHistoryManager::EventHistoryManager(const std::string& log,size_t histsize)
 	this->UIDCacheHits = 0;
 	this->UIDCacheMisses = 0;
 	this->EventCount = 0;
+	this->CurrHistorySize = 0;
 }	
 
 unsigned long long EventHistoryManager::GetEventCount() const{
@@ -38,6 +39,10 @@ EventSummary* EventHistoryManager::GetPreviousEventSummary(size_t offset){
 	}
 	return &(this->History.at(offset));
 	//offset = 0 is the current event
+}
+
+EventSummary* EventHistoryManager::GetOldestEventSummary(){
+	return &(this->History.back());
 }
 
 void EventHistoryManager::InitMappedUIDs(const ChannelMap* cmap,const ProcessorList* proclist){
@@ -72,6 +77,7 @@ void EventHistoryManager::InitMappedUIDs(const ChannelMap* cmap,const ProcessorL
 void EventHistoryManager::RotateBuffer(){
 	this->History.push_front(EventSummary(this,this->MappedUIDs));
 	++(this->EventCount);
+	this->CurrHistorySize = (this->EventCount > this->MaxHistorySize) ? this->MaxHistorySize : this->CurrHistorySize + 1;
 }
 
 bool EventHistoryManager::IsCurrentEventSummaryEmpty(){
@@ -80,4 +86,12 @@ bool EventHistoryManager::IsCurrentEventSummaryEmpty(){
 
 void EventHistoryManager::BuildCurrentEventDetectorSummary(){
 	this->History.at(0).BuildDetectorSummary();
+}
+
+size_t EventHistoryManager::GetMaxHistorySize() const{
+	return this->MaxHistorySize;
+}
+
+size_t EventHistoryManager::GetMaxHistoryID() const{
+	return this->CurrHistorySize;
 }

@@ -38,6 +38,7 @@ class anl2021Processor : public Processor{
 		std::string implant;
 		std::string beta;
 		std::string gamma;
+		std::string muon;
 		std::string tapemove;
 		std::string measure;
 		std::string background;

@@ -295,8 +295,8 @@ int main(int argc, char *argv[]) {
 		plotter.join();
 	}
 
-	auto server = new THttpServer("http:8080?top=genScanor");
-	server->SetTimer(100, kFALSE);
+	//auto server = new THttpServer("http:8080?top=genScanor");
+	//server->SetTimer(100, kFALSE);
 	
 	std::signal(SIGINT, signalHandler);
 
@@ -310,7 +310,7 @@ int main(int argc, char *argv[]) {
 
 			if( not EvtManager->IsCurrentEventSummaryEmpty() ) [[likely]] {
 				processorlist->ThreshAndCal(EvtManager->GetCurrentEventSummary()->GetRawEvents(),cmap.get());
-				processorlist->ProcessRaw(EvtManager->GetCurrentEventSummary()->GetRawEvents(),HistogramManager.get());
+				processorlist->ProcessRaw(EvtManager.get(),HistogramManager.get());
 				StatsManager->IncrementStats(EvtManager->GetCurrentEventSummary()->GetRawEvents());
 
 				EvtManager->BuildCurrentEventDetectorSummary();

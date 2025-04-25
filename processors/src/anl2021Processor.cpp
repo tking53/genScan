@@ -40,6 +40,14 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 		{3300,{16384,0,16384}}
 	};
 
+	this->h2dsettings = {
+		{3700,{8192,0,8192,1000,0,100000}}
+	};
+
+	this->beta = "beta";
+	this->gamma = "gamma";
+	this->muon = "muon";
+
 	this->HasMTAS = false;
 	this->HasTape = false;
 	this->HasSilicon = false;
@@ -98,13 +106,34 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 [[maybe_unused]] bool anl2021Processor::Process( EventHistoryManager* eventhistory, PLOTS::PlotRegistry* hismanager, CUTS::CutRegistry* cutmanager){
 	Processor::Process();
 	//determine if we had a beta trigger in MTAS and are in the correct cycle
-	
+	auto numhist = eventhistory->GetMaxHistoryID();
 	auto summary = eventhistory->GetCurrentEventSummary();
+	auto isomer_tdiff = 0.0;
+	auto erg = MtasProc->GetTotalEnergy(0);
+	bool possible_gamma_isomer = summary->ContainsEventTag(this->gamma) and not summary->ContainsEventTag(this->beta) and not summary->ContainsEventTag(this->muon); 
+
+	if( numhist > 1 ){
+		//current event has gamma not-muon, not-beta
+		if( possible_gamma_isomer ){
+			//search through history and try to find past event that has does have beta but does not have muon or gamma
+			for( size_t ii = 1; ii < numhist; ++ii ){
+				auto currhist = eventhistory->GetPreviousEventSummary(ii);
+				if( currhist->ContainsEventTag(this->beta) and not currhist->ContainsEventTag(this->gamma) and not currhist->ContainsEventTag(this->muon) ){
+					isomer_tdiff = summary->GetRawEvents().front().GetTimeStamp() - currhist->GetRawEvents().front().GetTimeStamp();
+					hismanager->Fill("ISOMER_3701",erg,isomer_tdiff*1.0e-3);
+				}
+			}
+		}
+	}
+
 	if( TapeProc->GetCurrentCycleState() == TAPE::MEASURE ){
-	       	if( summary->ContainsEventTag(this->beta) ){
+		if( summary->ContainsEventTag(this->beta) ){
 			this->MtasProc->FillBetaPlots(hismanager);
 		}else{
 			this->MtasProc->FillNonBetaPlots(hismanager);
+		}
+		if( possible_gamma_isomer ){
+			hismanager->Fill("ISOMER_3700",erg,isomer_tdiff*1.0e-3);
 		}
 	}else if( TapeProc->GetCurrentCycleState() == TAPE::BACKGROUND ){
 		if( not this->MtasProc->DidAnyPileup() and not this->MtasProc->DidAnySaturate() ){
@@ -220,6 +249,9 @@ void anl2021Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH1F>("BKG_3100","Mtas Background Cycle Gated anti-#beta Gated; Energy (keV)",this->h1dsettings.at(3100));
 	hismanager->RegisterPlot<TH1F>("BKG_3200","Mtas Background Cycle Gated; Energy (keV)",this->h1dsettings.at(3200));
 	hismanager->RegisterPlot<TH1F>("BKG_3300","Mtas Background Cycle Gated #beta Gated; Energy (keV)",this->h1dsettings.at(3300));
+	
+	hismanager->RegisterPlot<TH2F>("ISOMER_3700","Mtas delayed #gamma Measure Cycle Gated (no-#beta); Energy (keV); Time (us)",this->h2dsettings.at(3700));
+	hismanager->RegisterPlot<TH2F>("ISOMER_3701","Mtas delayed #gamma No Cycle (no-#beta); Energy (keV); Time (us)",this->h2dsettings.at(3700));
 
 	this->console->info("Finished Declaring Plots");
 }

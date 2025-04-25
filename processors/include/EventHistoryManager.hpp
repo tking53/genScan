@@ -41,6 +41,7 @@ class EventHistoryManager{
 		void BuildCurrentEventDetectorSummary();
 
 		EventSummary* GetPreviousEventSummary(size_t);
+		EventSummary* GetOldestEventSummary();
 
 		inline void IncrementUIDCacheHits(){
 			++(this->UIDCacheHits);
@@ -57,11 +58,15 @@ class EventHistoryManager{
 		inline void IncrementCacheMisses(){
 			++(this->CacheMisses);
 		}
+
+		size_t GetMaxHistoryID() const;
+		size_t GetMaxHistorySize() const;
 		
 	private:
 		std::string LogName;
 		std::shared_ptr<spdlog::logger> console;
 		size_t MaxHistorySize;
+		size_t CurrHistorySize;
 
 		unsigned long long EventCount;
 

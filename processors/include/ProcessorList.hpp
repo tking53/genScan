@@ -49,7 +49,7 @@ class ProcessorList{
 		void DeclarePlots(PLOTS::PlotRegistry*) const;
 
 		void ThreshAndCal(boost::container::devector<PhysicsData>&,ChannelMap*);
-		void ProcessRaw(boost::container::devector<PhysicsData>&,PLOTS::PlotRegistry*);
+		void ProcessRaw(EventHistoryManager*,PLOTS::PlotRegistry*);
 
 		void Finalize();
 

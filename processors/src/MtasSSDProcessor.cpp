@@ -116,11 +116,12 @@ void MtasSSDProcessor::Reset(){
 	this->Maxidx = -1;
 	this->MaxErg = 0.0;
 
-	this->TopSiHits = std::vector<int>(7,0);
-	this->TopSi = std::vector<double>(7,0.0);
-
-	this->BottomSiHits = std::vector<int>(7,0);
-	this->BottomSi = std::vector<double>(7,0.0);
+	for( int ii = 0; ii < 7; ++ii ){
+		this->TopSiHits[ii] = 0;
+		this->BottomSiHits[ii] = 0;
+		this->TopSi[ii] = 0.0;
+		this->BottomSi[ii] = 0.0;
+	}
 }
 
 double MtasSSDProcessor::GetMaxEnergy() const{

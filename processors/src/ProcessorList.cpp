@@ -228,18 +228,28 @@ void ProcessorList::ThreshAndCal(boost::container::devector<PhysicsData>& RawEve
 	}
 }
 
-void ProcessorList::ProcessRaw(boost::container::devector<PhysicsData>& RawEvents,PLOTS::PlotRegistry* HistogramManager){
+void ProcessorList::ProcessRaw(EventHistoryManager* History,PLOTS::PlotRegistry* HistogramManager){
+	auto RawEvents = History->GetCurrentEventSummary()->GetRawEvents();
+
+
 	auto evtsize = RawEvents.size();
 	double deltats = 0.0;
+	double historyts = 0.0;
 	auto scalarsize = HistogramManager->GetScalarBins();
 
 	if( evtsize > 1 ){
 		deltats = RawEvents.back().GetTimeStamp()-RawEvents.front().GetTimeStamp();
 	}
+	auto evtcnt = History->GetEventCount();
+	if(evtcnt > 1 ){
+		auto OldEvents = History->GetOldestEventSummary()->GetRawEvents();
+		historyts = RawEvents.front().GetTimeStamp() - OldEvents.front().GetTimeStamp();
+	}	
 	
 	HistogramManager->Fill("Event_Size",evtsize);
 	HistogramManager->Fill("Event_Width",deltats);
 	HistogramManager->Fill("Event_Scale",deltats,evtsize);
+	HistogramManager->Fill("History_Width",historyts*1.0e-3);
 
 	for( auto& evt : RawEvents ){
 		auto gChanID = evt.GetGlobalChannelID();

@@ -98,6 +98,9 @@ MtasTapeProcessor::MtasTapeProcessor(const std::string& log) : Processor(log,"Mt
 				this->isMeasureOff = true;
 				this->logicSignalValue += 1024;
 			}
+		}else if( subtype.compare("MTC") == 0 ){
+			//no-op
+			continue;
 		}else{
 			//have MTC, stop and LPT
 			//from old map file
