@@ -355,7 +355,7 @@ add_executable(GenScanor scanmain.cpp)
 if( EXTERNAL_DEPS )
 	add_dependencies(GenScanor ${EXTERNAL_DEPS})
 endif()
-target_link_libraries(GenScanor PRIVATE BSMTraceFitStruct MtasImplantStruct MtasStruct PidStruct RootDevStruct GenScanTranslators GenScanCore )
+target_link_libraries(GenScanor PRIVATE BSMTraceFitStruct MtasImplantStruct MtasStruct PidStruct RootDevStruct GenScanTranslators GenScanCore ROOT::RHTTP)
 
 if( USE_SYSTEM_FMT )
 	target_link_libraries(GenScanor PRIVATE fmt::fmt)

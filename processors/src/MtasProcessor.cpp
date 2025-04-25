@@ -5,6 +5,7 @@
 #include <TTree.h>
 #include <algorithm>
 #include <cmath>
+#include <cstddef>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -897,24 +898,31 @@ void MtasProcessor::CleanupTree(){
 }
 
 void MtasProcessor::Reset(){
-	this->CrystalEnergy = std::vector<double>(24,0.0);
-	this->TotalEnergy = std::vector<double>(5,0.0);
+	for( size_t ii = 0; ii < 24; ++ii ){
+		this->CrystalEnergy[ii] = 0.0;
+		this->IndividualPMTPileup[ii] = false;
+		this->IndividualPMTPileup[24+ii] = false;
+		this->IndividualPMTSaturate[ii] = false;
+		this->IndividualPMTSaturate[24+ii] = false;
+		this->Position[ii] = 0.0;
+	}
+	for( size_t ii = 0; ii < 5; ++ii ){
+		this->TotalEnergy[ii] = 0.0;
+		this->NumFire[ii] = 0;
+	}
 
-	this->IndividualPMTPileup = std::vector<bool>(48,false);
 	this->CenterPileup = false;
 	this->InnerPileup = false;
 	this->MiddlePileup = false;
 	this->OuterPileup = false;
 	this->AnyPileup = false;
 
-	this->IndividualPMTSaturate = std::vector<bool>(48,false);
 	this->CenterSaturate = false;
 	this->InnerSaturate = false;
 	this->MiddleSaturate = false;
 	this->OuterSaturate = false;
 	this->AnySaturate = false;
 
-	this->NumFire = std::vector<int>(5,0);
 	this->CenterFire = false;
 	this->InnerFire = false;
 	this->MiddleFire = false;
@@ -926,26 +934,27 @@ void MtasProcessor::Reset(){
 
 	this->TimeStamps.clear();
 
-	this->Position = std::vector<double>(24,0.0);
-	this->Center = std::vector<double>(12,0.0);
-	this->Inner = std::vector<double>(12,0.0);
-	this->Middle = std::vector<double>(12,0.0);
-	this->Outer = std::vector<double>(12,0.0);
+	for( size_t ii = 0; ii < 12; ++ii ){
+		this->Center[ii] = 0.0;
+		this->Inner[ii] = 0.0;
+		this->Middle[ii] = 0.0;
+		this->Outer[ii] = 0.0;
 
-	this->RawCenter = std::vector<double>(12,0.0);
-	this->RawInner = std::vector<double>(12,0.0);
-	this->RawMiddle = std::vector<double>(12,0.0);
-	this->RawOuter = std::vector<double>(12,0.0);
+		this->RawCenter[ii] = 0.0;
+		this->RawInner[ii] = 0.0;
+		this->RawMiddle[ii] = 0.0;
+		this->RawOuter[ii] = 0.0;
 
-	this->CalCenter = std::vector<double>(12,0.0);
-	this->CalInner = std::vector<double>(12,0.0);
-	this->CalMiddle = std::vector<double>(12,0.0);
-	this->CalOuter = std::vector<double>(12,0.0);
+		this->CalCenter[ii] = 0.0;
+		this->CalInner[ii] = 0.0;
+		this->CalMiddle[ii] = 0.0;
+		this->CalOuter[ii] = 0.0;
 
-	this->CenterHits = std::vector<int>(12,0);
-	this->InnerHits = std::vector<int>(12,0);
-	this->MiddleHits = std::vector<int>(12,0);
-	this->OuterHits = std::vector<int>(12,0);
+		this->CenterHits[ii] = 0.0;
+		this->InnerHits[ii] = 0.0;
+		this->MiddleHits[ii] = 0.0;
+		this->OuterHits[ii] = 0.0;
+	}
 
 	this->CenterFire = false;
 	this->InnerFire = false;

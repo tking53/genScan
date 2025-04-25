@@ -41,6 +41,8 @@
 
 #include "EventHistoryManager.hpp"
 
+#include <THttpServer.h>
+
 volatile bool ctrlCPressed = false;
 
 void signalHandler(int signum) {
@@ -120,7 +122,7 @@ int main(int argc, char *argv[]) {
 		spdlog::error("Can only have either 4, 8, 16, 32, or 64 channels per board, supplied with {} max_channels option",MAX_CHANNELS_PER_BOARD);
 		exit(EXIT_FAILURE);
 	}
-	
+
 	int MAX_BOARDS = MAX_CARDS_PER_CRATE*MAX_CRATES;
 	int MAX_CHANNELS = MAX_CHANNELS_PER_BOARD*MAX_BOARDS;
 
@@ -248,6 +250,10 @@ int main(int argc, char *argv[]) {
 
 	console->info("Generating Plot Registry");
 	std::shared_ptr<PLOTS::PlotRegistry> HistogramManager(new PLOTS::PlotRegistry(logname,StringManip::StripFileExtension(outputfile),port));
+	
+	std::shared_ptr<RootFileManager> RootManager(new RootFileManager(logname,StringManip::StripFileExtension(outputfile),enabletree));
+	console->info("Created Root File Manager");
+
 	auto ebins = PLOTS::SG;
 	auto sbins = PLOTS::SE;
 	auto wbins = PLOTS::SE;
@@ -255,9 +261,6 @@ int main(int argc, char *argv[]) {
 	auto rbins = PLOTS::S4;
 	HistogramManager->Initialize(MAX_CHANNELS,ebins,sbins,wbins,zbins,rbins);
 	console->info("Generated Raw, Scalar, and Cal plots for {} Channels, There are {} bins for Raw and Cal, and {} bins for Scalar",MAX_CHANNELS,ebins,sbins);
-	
-	std::shared_ptr<RootFileManager> RootManager(new RootFileManager(logname,StringManip::StripFileExtension(outputfile),enabletree));
-	console->info("Created Root File Manager");
 	
 	//Init the processors/analyzers
 	std::shared_ptr<ProcessorList> processorlist = std::make_shared<ProcessorList>(logname);
@@ -292,6 +295,9 @@ int main(int argc, char *argv[]) {
 		plotter.join();
 	}
 
+	auto server = new THttpServer("http:8080?top=genScanor");
+	server->SetTimer(100, kFALSE);
+	
 	std::signal(SIGINT, signalHandler);
 
 	std::shared_ptr<EventHistoryManager> EvtManager( new EventHistoryManager(logname,limit));
