@@ -221,6 +221,8 @@ namespace PLOTS{
 				RegisterPlot<TH2F>("Total_Saturate","Map of Channels that Saturated; Linearized Mod Num (arb.); Channel Num (arb.)",PLOTS::SA,0,PLOTS::SA,PLOTS::S6,0,PLOTS::S6);
 				RegisterPlot<TH2F>("Total_Hits","Map of Channels that Fired; Linearized Mod Num (arb.); Channel Num (arb.)",PLOTS::SA,0,PLOTS::SA,PLOTS::S6,0,PLOTS::S6);
 				RegisterPlot<TH1F>("History_Width","History Width; Time (us);",100000,0,100000);
+				RegisterPlot<TH1F>("Event_Delta","Time Between Beginning of Consecutive Events; Time (ns);",100000,0,100000);
+				RegisterPlot<TH1F>("Event_Spacing","Time Between End and Beginning of Consecutive Events; Time (ns);",100000,0,100000);
 			}
 
 			template<typename T>

@@ -235,6 +235,8 @@ void ProcessorList::ProcessRaw(EventHistoryManager* History,PLOTS::PlotRegistry*
 	auto evtsize = RawEvents.size();
 	double deltats = 0.0;
 	double historyts = 0.0;
+	double historydelta = 0.0;
+	double historyspacing = 0.0;
 	auto scalarsize = HistogramManager->GetScalarBins();
 
 	if( evtsize > 1 ){
@@ -244,11 +246,17 @@ void ProcessorList::ProcessRaw(EventHistoryManager* History,PLOTS::PlotRegistry*
 	if(evtcnt > 1 ){
 		auto OldEvents = History->GetOldestEventSummary()->GetRawEvents();
 		historyts = RawEvents.front().GetTimeStamp() - OldEvents.front().GetTimeStamp();
+
+		auto PrevEvent = History->GetPreviousEventSummary(1)->GetRawEvents();
+		historydelta = RawEvents.front().GetTimeStamp() - PrevEvent.front().GetTimeStamp();
+		historyspacing = RawEvents.front().GetTimeStamp() - PrevEvent.back().GetTimeStamp();
 	}	
 	
 	HistogramManager->Fill("Event_Size",evtsize);
 	HistogramManager->Fill("Event_Width",deltats);
 	HistogramManager->Fill("Event_Scale",deltats,evtsize);
+	HistogramManager->Fill("Event_Delta",historydelta);
+	HistogramManager->Fill("Event_Spacing",historyspacing);
 	HistogramManager->Fill("History_Width",historyts*1.0e-3);
 
 	for( auto& evt : RawEvents ){
