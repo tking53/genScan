@@ -17,6 +17,9 @@ SimpleHPGeProcessor::SimpleHPGeProcessor(const std::string& log) : Processor(log
 	for( const auto& evt : this->SummaryData ){
 		auto detpos = std::stoi(evt->GetGroup());
 		this->Energies[detpos] = evt->GetEnergy();
+		this->TS[detpos] = evt->GetTimeStamp();
+		this->Pileup[detpos] = evt->GetPileup();
+		this->Saturate[detpos] = evt->GetSaturation();
 	}
 
 	for( size_t ii = 0; ii < this->Energies.size(); ++ii ){
@@ -48,6 +51,9 @@ void SimpleHPGeProcessor::Init(const pugi::xml_node& config){
 		
 void SimpleHPGeProcessor::Finalize(){
 	this->Energies = std::vector<double>(this->NumHPGe,0.0);
+	this->TS = std::vector<double>(this->NumHPGe,-1.0);
+	this->Saturate = std::vector<bool>(this->NumHPGe,false);
+	this->Pileup = std::vector<bool>(this->NumHPGe,false);
 	this->console->info("{} has been finalized",this->ProcessorName);
 }
 
@@ -66,9 +72,28 @@ void SimpleHPGeProcessor::CleanupTree(){
 void SimpleHPGeProcessor::Reset(){
 	for( int ii = 0; ii < this->NumHPGe; ++ii ){
 		this->Energies[ii] = 0.0;
+		this->TS[ii] = -1.0;
+		this->Saturate[ii] = false;
+		this->Pileup[ii] = false;
 	}
 }
 
 double SimpleHPGeProcessor::GetEnergy(int idx) const{
 	return this->Energies[idx];
+}
+
+double SimpleHPGeProcessor::GetCrystalFireTime(int idx) const{
+	return this->TS[idx];
+}
+
+bool SimpleHPGeProcessor::DidCrystalPileup(int idx) const{
+	return this->Pileup[idx];
+}
+
+bool SimpleHPGeProcessor::DidCrystalSaturate(int idx) const{
+	return this->Saturate[idx];
+}
+
+int SimpleHPGeProcessor::GetNumCrystals() const{
+	return this->NumHPGe;
 }

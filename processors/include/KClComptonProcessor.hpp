@@ -1,12 +1,14 @@
-#ifndef __SIMPLE_HPGE_PROCESSOR_HPP__
-#define __SIMPLE_HPGE_PROCESSOR_HPP__
+#ifndef __KCL_COMPTON_PROCESSOR_HPP__
+#define __KCL_COMPTON_PROCESSOR_HPP__
 
+#include "BSMProcessor.hpp"
+#include "SimpleHPGeProcessor.hpp"
 #include "Processor.hpp"
 
-class SimpleHPGeProcessor : public Processor{
+class KClComptonProcessor : public Processor{
 	public:
-		SimpleHPGeProcessor(const std::string&);
-		virtual ~SimpleHPGeProcessor() = default;
+		KClComptonProcessor(const std::string&);
+		virtual ~KClComptonProcessor() = default;
 		[[maybe_unused]] virtual bool PreProcess([[maybe_unused]] EventHistoryManager*,[[maybe_unused]] PLOTS::PlotRegistry*,[[maybe_unused]] CUTS::CutRegistry*) final;
 		[[maybe_unused]] virtual bool Process(EventHistoryManager*,[[maybe_unused]] PLOTS::PlotRegistry*,[[maybe_unused]] CUTS::CutRegistry*) final;
 		[[maybe_unused]] virtual bool PostProcess([[maybe_unused]] EventHistoryManager*,[[maybe_unused]] PLOTS::PlotRegistry*,[[maybe_unused]] CUTS::CutRegistry*) final;
@@ -18,22 +20,12 @@ class SimpleHPGeProcessor : public Processor{
 		virtual void DeclarePlots(PLOTS::PlotRegistry*);
 		virtual void RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>&) final;
 		virtual void CleanupTree() final;
-
-		double GetEnergy(int) const;
-		double GetCrystalFireTime(int) const;
-		bool DidCrystalPileup(int) const;
-		bool DidCrystalSaturate(int) const;
-		int GetNumCrystals() const;
-
 	private:
+		bool HasHPGe;
+		bool HasBSM;
 
-		void Reset();
-
-		std::vector<double> Energies;
-		std::vector<double> TS;
-		std::vector<bool> Saturate;
-		std::vector<bool> Pileup;
-		int NumHPGe;
+		std::unique_ptr<BSMProcessor> BSMProc;
+		std::unique_ptr<SimpleHPGeProcessor> HPGeProc;
 };
 
 #endif
