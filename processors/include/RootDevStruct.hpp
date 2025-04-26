@@ -23,7 +23,9 @@ namespace ProcessorStruct{
 		bool pileup = false;                   //Did pixie detect pileup in the event
 		bool saturation = false;               //Did the trace go out of the ADC range
 		std::vector<unsigned int> trace = {};  //The trace if present
+		int tracelength = 0;
 		std::vector<unsigned int> qdcSums = {};  //output the onboard qdc sums if present
+		int qdclength = 0;
 	};
 	static const RootDev DEFAULT_RD_STRUCT;
 }

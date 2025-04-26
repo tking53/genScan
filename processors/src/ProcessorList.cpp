@@ -271,6 +271,7 @@ void ProcessorList::ProcessRaw(EventHistoryManager* History,PLOTS::PlotRegistry*
 		HistogramManager->Fill("Cal",evt.GetEnergy(),gChanID);
 		HistogramManager->Fill("InternalCal",evt.GetInternalFilterEnergy(),gChanID);
 		HistogramManager->Fill("Event_Mult",gChanID,evtsize);
+		HistogramManager->Fill("Trace_Size",gChanID,evt.GetRawTrace().size());
 		HistogramManager->Fill("Total_Rate",rate_x,rate_y);
 		if( evt.GetPileup() ){
 			HistogramManager->Fill("Total_Pileup",gBoardID,evt.GetChannel());

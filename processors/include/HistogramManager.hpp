@@ -223,6 +223,7 @@ namespace PLOTS{
 				RegisterPlot<TH1F>("History_Width","History Width; Time (us);",100000,0,100000);
 				RegisterPlot<TH1F>("Event_Delta","Time Between Beginning of Consecutive Events; Time (ns);",100000,0,100000);
 				RegisterPlot<TH1F>("Event_Spacing","Time Between End and Beginning of Consecutive Events; Time (ns);",100000,0,100000);
+				RegisterPlot<TH2F>("Trace_Size","Trace Size vs Channel; Channel (arb.); EventTrace Size (arb.);",numchannels,0,numchannels,500,0,500);
 			}
 
 			template<typename T>

@@ -463,15 +463,15 @@ void BSMProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3620));
 		
 		name = "BSM_363"+std::to_string(ii);
-		title = "#betaSM"+std::to_string(ii+1)+" Energy vs #betaSM TDiff(F-B); TDiff(F-B) (pixie ticks); Energy (keV)";
+		title = "#betaSM"+std::to_string(ii+1)+" Energy vs #betaSM TDiff(F-B); TDiff(F-B) (ns); Energy (keV)";
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3630));
 		
 		name = "BSM_363"+std::to_string(ii)+"_F";
-		title = "#betaSM"+std::to_string(ii+1)+"_F Energy vs #betaSM TDiff(F-B); TDiff(F-B) (pixie ticks); Energy (keV)";
+		title = "#betaSM"+std::to_string(ii+1)+"_F Energy vs #betaSM TDiff(F-B); TDiff(F-B) (ns); Energy (keV)";
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3630));
 		
 		name = "BSM_363"+std::to_string(ii)+"_B";
-		title = "#betaSM"+std::to_string(ii+1)+"_B Energy vs #betaSM TDiff(F-B); TDiff(F-B) (pixie ticks); Energy (keV)";
+		title = "#betaSM"+std::to_string(ii+1)+"_B Energy vs #betaSM TDiff(F-B); TDiff(F-B) (ns); Energy (keV)";
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3630));
 		
 		name = "BSM_367"+std::to_string(ii);

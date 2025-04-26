@@ -32,7 +32,9 @@ RootDevProcessor::RootDevProcessor(const std::string& log) : Processor(log,"Root
 			this->CurrData.pileup = evt->GetPileup();
 			this->CurrData.saturation = evt->GetSaturation();
 			this->CurrData.trace = std::vector<unsigned int>(evt->GetRawTraceData().begin(),evt->GetRawTraceData().end());
+			this->CurrData.tracelength = this->CurrData.trace.size();
 			this->CurrData.qdcSums = evt->GetQDCSums();
+			this->CurrData.qdclength = this->CurrData.qdcSums.size();
 
 			this->DataVec.push_back(this->CurrData);
 		}
