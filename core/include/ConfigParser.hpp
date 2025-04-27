@@ -1,6 +1,7 @@
 #ifndef __CONFIG_PARSER_HPP__
 #define __CONFIG_PARSER_HPP__
 
+#include <sstream>
 #include <string>
 #include <vector>
 #include <memory>
@@ -49,6 +50,8 @@ class ConfigParser{
 		void SetCorrelationType(std::string*);
 
 		std::vector<std::pair<std::string,std::string>> GetCutDetails() const;
+
+		void GetConfigFileStr(std::stringstream&) const;
 	protected:
 		void ParseDescription();
 		void ParseAuthor();

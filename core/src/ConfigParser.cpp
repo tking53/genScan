@@ -545,3 +545,7 @@ void ConfigParser::SetCorrelationType(std::string* val){
 std::vector<std::pair<std::string,std::string>> ConfigParser::GetCutDetails() const{
 	return this->CutFiles;
 }
+
+void ConfigParser::GetConfigFileStr(std::stringstream& ss) const{
+	this->XMLDoc.save(ss);
+}

@@ -1,9 +1,13 @@
+#include <TString.h>
+#include <TTree.h>
 #include <chrono>
 #include <cstdlib>
+#include <ctime>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <memory>
-#include <iostream>
+#include <filesystem>
 #include <thread>
 #include <csignal>
 
@@ -349,7 +353,18 @@ int main(int argc, char *argv[]) {
 	RootManager->WriteTNamed("MAX_CRATES",std::to_string(MAX_CRATES));
 	RootManager->WriteTNamed("MAX_CARDS_PER_CRATE",std::to_string(MAX_CARDS_PER_CRATE));
 	RootManager->WriteTNamed("MAX_CHANNELS_PER_BOARD",std::to_string(MAX_CHANNELS_PER_BOARD));
-	RootManager->WriteTNamed("ConfigFile",configfile);
+	//dump the config file info
+	std::filesystem::path configfilepath(configfile);
+	auto abspath = TString(std::filesystem::absolute(configfilepath).string());
+	std::stringstream configbuffer;
+	cfgparser->GetConfigFileStr(configbuffer);
+	auto data = TString(configbuffer.str());
+	TTree* cfgdata = new TTree("configdata","config data used to scan data");
+	cfgdata->Branch("filename",&abspath);
+	cfgdata->Branch("data",&data);
+	cfgdata->Fill();
+	cfgdata->Write(0,2,0);
+	//need to move above into RootManager
 	RootManager->FinalizeTrees();
 	std::chrono::time_point<std::chrono::high_resolution_clock> global_stop_time = std::chrono::high_resolution_clock::now();
 	auto global_run_time = global_stop_time - global_start_time;
