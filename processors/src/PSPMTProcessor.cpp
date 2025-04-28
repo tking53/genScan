@@ -303,6 +303,16 @@ void PSPMTProcessor::Reset(){
 	this->lgImage.ResetPosition(-10.0,-10.0);
 	this->lgImage.ResetCorners();
 
+	this->hgImageQdc.ResetDynode();
+	this->hgImageQdc.ResetAnode();
+	this->hgImageQdc.ResetPosition(-10.0,-10.0);
+	this->hgImageQdc.ResetCorners();
+
+	this->lgImageQdc.ResetDynode();
+	this->lgImageQdc.ResetAnode();
+	this->lgImageQdc.ResetPosition(-10.0,-10.0);
+	this->lgImageQdc.ResetCorners();
+
 	this->DynodeHighHits = 0;
 	this->DynodeLowHits = 0;
 	for( int ii = 0; ii < 4; ++ii ){
