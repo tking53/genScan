@@ -19,57 +19,24 @@
 			<Module number="0" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
 				<Channel number="0" type="bsm" subtype="bsm" group="1" tags="front">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
-					<TrapFilter len="6" gap="8" blen="10" tau="0.08">
+					<TrapFilter len="8" gap="8" blen="10" tau="0.08">
 						<Calibration >0.0 1.0e-2</Calibration>
 					</TrapFilter>
 				</Channel>
 				<Channel number="1" type="bsm" subtype="bsm" group="1" tags="back">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
-					<TrapFilter len="6" gap="8" blen="10" tau="0.08">
+					<TrapFilter len="8" gap="8" blen="10" tau="0.08">
 						<Calibration >0.0 1.0e-2</Calibration>
 					</TrapFilter>
 				</Channel>
-				<Channel number="2" type="hpge" subtype="gammax" group="0" tags="">
+				<!-- This is where things are before KClComton_012.ldf -->
+				<Channel number="2" type="hpge" subtype="gammax" group="0" tags="original">
 					<Calibration model="linear" min="0">0.0 0.32141728</Calibration>
 				</Channel>
-				<Channel number="3" type="generic" subtype="generic" group="generic" tags="3">
-					<Calibration model="linear" min="0">0.0 1.0</Calibration>
-				</Channel>
-				<Channel number="4" type="generic" subtype="generic" group="generic" tags="4">
-					<Calibration model="linear" min="0">0.0 1.0</Calibration>
-				</Channel>
-				<Channel number="5" type="generic" subtype="generic" group="generic" tags="5">
-					<Calibration model="linear" min="0">0.0 1.0</Calibration>
-				</Channel>
-				<Channel number="6" type="generic" subtype="generic" group="generic" tags="6">
-					<Calibration model="linear" min="0">0.0 1.0</Calibration>
-				</Channel>
-				<Channel number="7" type="generic" subtype="generic" group="generic" tags="7">
-					<Calibration model="linear" min="0">0.0 1.0</Calibration>
-				</Channel>
-				<Channel number="8" type="generic" subtype="generic" group="generic" tags="8">
-					<Calibration model="linear" min="0">0.0 1.0</Calibration>
-				</Channel>
-				<Channel number="9" type="generic" subtype="generic" group="generic" tags="9">
-					<Calibration model="linear" min="0">0.0 1.0</Calibration>
-				</Channel>
-				<Channel number="10" type="generic" subtype="generic" group="generic" tags="10">
-					<Calibration model="linear" min="0">0.0 1.0</Calibration>
-				</Channel>
-				<Channel number="11" type="generic" subtype="generic" group="generic" tags="11">
-					<Calibration model="linear" min="0">0.0 1.0</Calibration>
-				</Channel>
-				<Channel number="12" type="generic" subtype="generic" group="generic" tags="12">
-					<Calibration model="linear" min="0">0.0 1.0</Calibration>
-				</Channel>
-				<Channel number="13" type="generic" subtype="generic" group="generic" tags="13">
-					<Calibration model="linear" min="0">0.0 1.0</Calibration>
-				</Channel>
-				<Channel number="14" type="generic" subtype="generic" group="generic" tags="14">
-					<Calibration model="linear" min="0">0.0 1.0</Calibration>
-				</Channel>
-				<Channel number="15" type="generic" subtype="generic" group="generic" tags="15">
-					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+			</Module>
+			<Module number="1" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
+				<Channel number="0" type="hpge" subtype="gammax" group="0" tags="new">
+					<Calibration model="linear" min="0">0.0 0.32141728</Calibration>
 				</Channel>
 			</Module>
 		</Crate>
