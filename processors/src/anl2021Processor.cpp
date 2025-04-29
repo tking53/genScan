@@ -41,7 +41,10 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 	};
 
 	this->h2dsettings = {
-		{3700,{8192,0,8192,1000,0,100000}}
+		{3700,{8192,0,8192,1000,0,10000}},
+		{3701,{8192,0,8192,1000,0,10000}},
+		{3800,{8192,0,8192,1000,0,10000}},
+		{3801,{8192,0,8192,1000,0,10000}}
 	};
 
 	this->beta = "beta";
@@ -111,52 +114,10 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 
 	if( not hasmuon ){
 		auto numhist = eventhistory->GetMaxHistoryID();
-		auto isomer_tdiff = 0.0;
 		auto erg = MtasProc->GetTotalEnergy(0);
 
 		bool hasbeta = summary->ContainsEventTag(this->beta);
 		bool hasgamma = summary->ContainsEventTag(this->gamma);
-		bool possible_gamma_isomer = hasgamma and not hasbeta; 
-
-		if( numhist > 1 ){
-			//current event has gamma not-muon, not-beta
-			if( possible_gamma_isomer ){
-				//search through history and try to find past event that has does have beta but does not have muon or gamma
-				for( size_t ii = 1; ii < numhist; ++ii ){
-					auto currhist = eventhistory->GetPreviousEventSummary(ii);
-					if( currhist->ContainsEventTag(this->beta) and not currhist->ContainsEventTag(this->gamma) and not currhist->ContainsEventTag(this->muon) ){
-						isomer_tdiff = summary->GetRawEvents().front().GetTimeStamp() - currhist->GetRawEvents().front().GetTimeStamp();
-						hismanager->Fill("ISOMER_3701",erg,isomer_tdiff*1.0e-3);
-						break;
-					}
-				}
-			}
-		}
-
-		//debugging things
-		//switch(TapeProc->GetCurrentCycleState()){
-		//	case TAPE::CycleState::TAPEMOVE:
-		//		this->console->info("MOVE");
-		//		break;
-		//	case TAPE::CycleState::MEASURE:
-		//		this->console->info("MEASURE");
-		//		break;
-		//	case TAPE::CycleState::BACKGROUND:
-		//		this->console->info("BKG");
-		//		break;
-		//	case TAPE::CycleState::UNKNOWN:
-		//		this->console->info("UNKNOWN");
-		//		break;
-		//	case TAPE::CycleState::IRRADIATION:
-		//		this->console->info("IRRADIATION");
-		//		break;
-		//	case TAPE::CycleState::LIGHTPULSER:
-		//		this->console->info("LIGHTPULSER");
-		//		break;
-		//	default:
-		//		this->console->info("ItBroke");
-		//		break;
-		//}
 
 		if( TapeProc->GetCurrentCycleState() == TAPE::MEASURE ){
 			if( hasbeta ){
@@ -164,9 +125,47 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 			}else{
 				this->MtasProc->FillNonBetaPlots(hismanager);
 			}
-			if( possible_gamma_isomer ){
-				hismanager->Fill("ISOMER_3700",erg,isomer_tdiff*1.0e-3);
+
+			if( numhist > 1 ){
+				//current event has gamma not-muon, not-beta
+				for( size_t ii = 1; ii < eventhistory->GetMaxHistoryID(); ++ii ){
+					auto prevsummary =  eventhistory->GetPreviousEventSummary(ii);
+					auto prevmuon = prevsummary->ContainsEventTag(this->muon);
+					if( prevmuon ){
+						continue;
+					}
+					auto prevbeta = prevsummary->ContainsEventTag(this->beta);
+					auto prevgamma = prevsummary->ContainsEventTag(this->gamma);
+					auto isomer_tdiff = summary->GetRawEvents().front().GetTimeStamp() - prevsummary->GetRawEvents().front().GetTimeStamp();
+					//this looks for a beta decay into a delayed level
+					//like 137Cs
+					if( not hasbeta and hasgamma and prevbeta ){
+						hismanager->Fill("ISOMER_3700",erg,isomer_tdiff);
+						hismanager->Fill("ISOMER_3701",erg,isomer_tdiff*1.0e-3);
+						break;
+					}
+				}
+				for( size_t ii = 1; ii < eventhistory->GetMaxHistoryID(); ++ii ){
+					auto prevsummary =  eventhistory->GetPreviousEventSummary(ii);
+					auto prevmuon = prevsummary->ContainsEventTag(this->muon);
+					if( prevmuon ){
+						continue;
+					}
+					auto prevbeta = prevsummary->ContainsEventTag(this->beta);
+					auto prevgamma = prevsummary->ContainsEventTag(this->gamma);
+					auto isomer_tdiff = summary->GetRawEvents().front().GetTimeStamp() - prevsummary->GetRawEvents().front().GetTimeStamp();
+
+					//this looks for a gamma decay into a delayed beta
+					//i.e. beam isomer, but need mtas energy for this old event
+					if( hasbeta and not prevbeta and prevgamma ){
+						auto olderg = prevsummary->GetEventObservable("MTAS_Total").value();
+						hismanager->Fill("ISOMER_3800",olderg,isomer_tdiff);
+						hismanager->Fill("ISOMER_3801",olderg,isomer_tdiff*1.0e-3);
+						break;
+					}
+				}
 			}
+
 		}else if( TapeProc->GetCurrentCycleState() == TAPE::BACKGROUND ){
 			if( not this->MtasProc->DidAnyPileup() and not this->MtasProc->DidAnySaturate() ){
 				hismanager->Fill("BKG_3200",this->MtasProc->GetTotalEnergy(0));
@@ -289,8 +288,11 @@ void anl2021Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH1F>("BKG_3200","Mtas Background Cycle Gated; Energy (keV)",this->h1dsettings.at(3200));
 	hismanager->RegisterPlot<TH1F>("BKG_3300","Mtas Background Cycle Gated #beta Gated; Energy (keV)",this->h1dsettings.at(3300));
 	
-	hismanager->RegisterPlot<TH2F>("ISOMER_3700","Mtas delayed #gamma Measure Cycle Gated (no-#beta); Energy (keV); Time (us)",this->h2dsettings.at(3700));
-	hismanager->RegisterPlot<TH2F>("ISOMER_3701","Mtas delayed #gamma No Cycle (no-#beta); Energy (keV); Time (us)",this->h2dsettings.at(3700));
+	hismanager->RegisterPlot<TH2F>("ISOMER_3700","Mtas prev-#beta curr-no-#beta Measure Cycle Gated; Energy (keV); Time (ns)",this->h2dsettings.at(3700));
+	hismanager->RegisterPlot<TH2F>("ISOMER_3701","Mtas prev-#beta curr-no-#beta Measure Cycle Gated; Energy (keV); Time (us)",this->h2dsettings.at(3701));
+
+	hismanager->RegisterPlot<TH2F>("ISOMER_3800","Mtas prev-#gamma curr-#beta Measure Cycle Gated; Energy (keV); Time (ns)",this->h2dsettings.at(3800));
+	hismanager->RegisterPlot<TH2F>("ISOMER_3801","Mtas prev-#gamma curr-#beta Measure Cycle Gated; Energy (keV); Time (us)",this->h2dsettings.at(3801));
 
 	this->console->info("Finished Declaring Plots");
 }

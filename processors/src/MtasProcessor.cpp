@@ -598,6 +598,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 	if( this->TotalEnergy[0] > 0.0 ){
 		summary->AddEventTag(this->gamma);
 	}
+	summary->AddEventObservable("MTAS_Total",this->TotalEnergy[0]);
 
 	Processor::EndProcess();
 	return true;
@@ -672,14 +673,14 @@ void MtasProcessor::OldCenterCalculation(){
 	for( int ii = 0; ii < 6; ++ii ){
 		//already requiring pairs, so if we have 1 pair we divide by 1, 2 we divide by 2 which was supposed to be each chunk by 4
 		//therefore 6 pairs is 12
-		if( this->NumFire[0] > 0 ){
+		if( this->NumFire[0] == 6 ){
 			this->TotalEnergy[0] += this->CrystalEnergy[ii]/this->NumFire[0];
 		}
 		this->TotalEnergy[0] += this->CrystalEnergy[ii+6];
 		this->TotalEnergy[0] += this->CrystalEnergy[ii+12];
 		this->TotalEnergy[0] += this->CrystalEnergy[ii+18];
 
-		if( this->NumFire[0] > 0 ){
+		if( this->NumFire[0] == 6 ){
 			this->TotalEnergy[1] += this->CrystalEnergy[ii]/this->NumFire[0];
 		}
 		this->TotalEnergy[2] += this->CrystalEnergy[ii+6];

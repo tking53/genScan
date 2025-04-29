@@ -9,7 +9,7 @@
 	<Global EventWidth="500" EventWidthUnit="ns" CorrelationType="rolling-trigger" />
 	<DetectorDriver >
 		<Processor name="RootDevProcessor" included_types="generic"/>
-		<Processor name="anl2021Processor" siliconthresh="100.0">
+		<Processor name="anl2021Processor" siliconthresh="1.0">
 			<Processor name="MtasProcessor" oldcenter="true"/>
 			<Processor name="MtasTapeProcessor" />
 			<Processor name="MtasSSDProcessor" />
