@@ -69,6 +69,10 @@ class MtasProcessor : public Processor{
 		void DeclareBetaPlots(PLOTS::PlotRegistry*);
 		void DeclareAntiBetaPlots(PLOTS::PlotRegistry*);
 
+		bool UseOldCenter;
+		void NewCenterCalculation();
+		void OldCenterCalculation();
+
 		std::vector<double> Position;
 
 		std::vector<double> Center;
