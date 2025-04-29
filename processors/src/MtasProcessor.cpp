@@ -120,18 +120,33 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		{4102, {8192,0.0,8192.0,1024,0.0,1024}},
 		{4103, {8192,0.0,8192.0,1024,0.0,1024}},
 		{4104, {8192,0.0,8192.0,1024,0.0,1024}},
+		{41008, {2048,0.0,16384.0,1024,0.0,1024}},
+		{41018, {2048,0.0,16384.0,1024,0.0,1024}},
+		{41028, {2048,0.0,16384.0,1024,0.0,1024}},
+		{41038, {2048,0.0,16384.0,1024,0.0,1024}},
+		{41048, {2048,0.0,16384.0,1024,0.0,1024}},
 
 		{4200, {8192,0.0,8192.0,1024,0.0,1024}},
 		{4201, {8192,0.0,8192.0,1024,0.0,1024}},
 		{4202, {8192,0.0,8192.0,1024,0.0,1024}},
 		{4203, {8192,0.0,8192.0,1024,0.0,1024}},
 		{4204, {8192,0.0,8192.0,1024,0.0,1024}},
+		{42008, {2048,0.0,16384.0,1024,0.0,1024}},
+		{42018, {2048,0.0,16384.0,1024,0.0,1024}},
+		{42028, {2048,0.0,16384.0,1024,0.0,1024}},
+		{42038, {2048,0.0,16384.0,1024,0.0,1024}},
+		{42048, {2048,0.0,16384.0,1024,0.0,1024}},
 
 		{4300, {8192,0.0,8192.0,1024,0.0,1024}},
 		{4301, {8192,0.0,8192.0,1024,0.0,1024}},
 		{4302, {8192,0.0,8192.0,1024,0.0,1024}},
 		{4303, {8192,0.0,8192.0,1024,0.0,1024}},
-		{4304, {8192,0.0,8192.0,1024,0.0,1024}}
+		{4304, {8192,0.0,8192.0,1024,0.0,1024}},
+		{43008, {2048,0.0,16384.0,1024,0.0,1024}},
+		{43018, {2048,0.0,16384.0,1024,0.0,1024}},
+		{43028, {2048,0.0,16384.0,1024,0.0,1024}},
+		{43038, {2048,0.0,16384.0,1024,0.0,1024}},
+		{43048, {2048,0.0,16384.0,1024,0.0,1024}}
 	};
 
 	this->Position = std::vector<double>(24,0.0);
@@ -370,19 +385,10 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		this->LastTime = *(std::max_element(this->TimeStamps.begin(),this->TimeStamps.end()));
 	}
 
-	currevttime = (this->FirstTime - globalfirsttime)*1.0e-9;
+	this->currevttime = (this->FirstTime - globalfirsttime)*1.0e-9;
 
 	for( int ii = 0; ii < 6; ++ii ){
-		if( this->CenterHits[2*ii] and this->CenterHits[2*ii + 1] ){
-			this->CrystalEnergy[ii] = std::sqrt(this->Center[2*ii] * this->Center[2*ii + 1]);//(this->Center[2*ii] + this->Center[2*ii + 1])/2.0;
-			this->SegmentDataVec[ii].sumenergy = this->CrystalEnergy[ii];
-			this->SegmentDataVec[ii].avgtimestamp = (this->SegmentDataVec[ii].fronttimestamp+this->SegmentDataVec[ii].backtimestamp)/2.0;
-			this->Position[ii] = this->CalcPosition(this->RawCenter[2*ii],this->RawCenter[2*ii + 1]);
-			this->CenterFire = true;
-			this->AnyFire = true;
-			this->NumFire[0] += 1;
-			this->NumFire[1] += 1;
-		}
+		//the center calculation is done later since we swapped modules at some point in history
 		if( this->InnerHits[2*ii] and this->InnerHits[2*ii + 1] ){
 			this->CrystalEnergy[ii+6] = (this->Inner[2*ii] + this->Inner[2*ii + 1])/2.0;
 			this->SegmentDataVec[ii+6].sumenergy = this->CrystalEnergy[ii+6];
@@ -415,34 +421,12 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		}
 	}
 
-	for( size_t ii = 0; ii < 6; ++ii ){
-		if( ( this->PosCorrectionMap[2*ii] != nullptr ) and ( this->PosCorrectionMap[2*ii + 1] != nullptr ) ){
-			if( this->CenterHits[2*ii] and this->CenterHits[2*ii + 1] ){
-				auto front = this->Center[2*ii];
-				auto back = this->Center[2*ii + 1];
-				this->Center[2*ii] = this->PosCorrectionMap[2*ii]->Correct(this->Center[2*ii],this->Position[ii]);
-				this->Center[2*ii + 1] = this->PosCorrectionMap[2*ii + 1]->Correct(this->Center[2*ii + 1],this->Position[ii]);
-				auto front2 = this->Center[2*ii];
-				auto back2 = this->Center[2*ii + 1];
-				//this->console->info("Front {}->{} , Back {}->{}",front,front2,back,back2);
-				this->CrystalEnergy[ii] = (this->Center[2*ii] + this->Center[2*ii + 1])/2.0;
-				//don't update the position
-				//this->Position[ii] = this->CalcPosition(this->Center[2*ii],this->Center[2*ii + 1]);
-			}
-		}	
+	if( this->UseOldCenter ){
+		this->OldCenterCalculation();
+	}else{
+		this->NewCenterCalculation();
 	}
 
-	for( int ii = 0; ii < 6; ++ii ){
-		this->TotalEnergy[0] += this->CrystalEnergy[ii];
-		this->TotalEnergy[0] += this->CrystalEnergy[ii+6];
-		this->TotalEnergy[0] += this->CrystalEnergy[ii+12];
-		this->TotalEnergy[0] += this->CrystalEnergy[ii+18];
-
-		this->TotalEnergy[1] += this->CrystalEnergy[ii];
-		this->TotalEnergy[2] += this->CrystalEnergy[ii+6];
-		this->TotalEnergy[3] += this->CrystalEnergy[ii+12];
-		this->TotalEnergy[4] += this->CrystalEnergy[ii+18];
-	}
 	this->TotalDataVec[0].sumenergy = this->TotalEnergy[0];
 	this->TotalDataVec[0].numfire = this->NumFire[0];
 	this->TotalDataVec[0].saturate = this->AnySaturate;
@@ -551,6 +535,12 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		hismanager->Fill("MTAS_4203",this->TotalEnergy[0],this->currevttime/(60.0*60.0));
 		hismanager->Fill("MTAS_4204",this->TotalEnergy[0],this->currevttime/(60.0*60.0*24.0));
 
+		hismanager->Fill("MTAS_42008",this->TotalEnergy[0],this->currevttime*1000.0);
+		hismanager->Fill("MTAS_42018",this->TotalEnergy[0],this->currevttime);
+		hismanager->Fill("MTAS_42028",this->TotalEnergy[0],this->currevttime/60.0);
+		hismanager->Fill("MTAS_42038",this->TotalEnergy[0],this->currevttime/(60.0*60.0));
+		hismanager->Fill("MTAS_42048",this->TotalEnergy[0],this->currevttime/(60.0*60.0*24.0));
+
 		hismanager->Fill("MTAS_3200",this->TotalEnergy[0]);
 
 		hismanager->Fill("MTAS_3210",this->TotalEnergy[1]);
@@ -623,6 +613,81 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 	return true;
 }
 
+void MtasProcessor::NewCenterCalculation(){
+	for( int ii = 0; ii < 6; ++ii ){
+		if( this->CenterHits[2*ii] and this->CenterHits[2*ii + 1] ){
+			this->CrystalEnergy[ii] = std::sqrt(this->Center[2*ii] * this->Center[2*ii + 1]);//(this->Center[2*ii] + this->Center[2*ii + 1])/2.0;
+			this->SegmentDataVec[ii].sumenergy = this->CrystalEnergy[ii];
+			this->SegmentDataVec[ii].avgtimestamp = (this->SegmentDataVec[ii].fronttimestamp+this->SegmentDataVec[ii].backtimestamp)/2.0;
+			this->Position[ii] = this->CalcPosition(this->RawCenter[2*ii],this->RawCenter[2*ii + 1]);
+			this->CenterFire = true;
+			this->AnyFire = true;
+			this->NumFire[0] += 1;
+			this->NumFire[1] += 1;
+		}
+	}
+	for( size_t ii = 0; ii < 6; ++ii ){
+		if( ( this->PosCorrectionMap[2*ii] != nullptr ) and ( this->PosCorrectionMap[2*ii + 1] != nullptr ) ){
+			if( this->CenterHits[2*ii] and this->CenterHits[2*ii + 1] ){
+				auto front = this->Center[2*ii];
+				auto back = this->Center[2*ii + 1];
+				this->Center[2*ii] = this->PosCorrectionMap[2*ii]->Correct(this->Center[2*ii],this->Position[ii]);
+				this->Center[2*ii + 1] = this->PosCorrectionMap[2*ii + 1]->Correct(this->Center[2*ii + 1],this->Position[ii]);
+				auto front2 = this->Center[2*ii];
+				auto back2 = this->Center[2*ii + 1];
+				//this->console->info("Front {}->{} , Back {}->{}",front,front2,back,back2);
+				this->CrystalEnergy[ii] = (this->Center[2*ii] + this->Center[2*ii + 1])/2.0;
+				//don't update the position
+				//this->Position[ii] = this->CalcPosition(this->Center[2*ii],this->Center[2*ii + 1]);
+			}
+		}	
+	}
+
+	for( int ii = 0; ii < 6; ++ii ){
+		this->TotalEnergy[0] += this->CrystalEnergy[ii];
+		this->TotalEnergy[0] += this->CrystalEnergy[ii+6];
+		this->TotalEnergy[0] += this->CrystalEnergy[ii+12];
+		this->TotalEnergy[0] += this->CrystalEnergy[ii+18];
+
+		this->TotalEnergy[1] += this->CrystalEnergy[ii];
+		this->TotalEnergy[2] += this->CrystalEnergy[ii+6];
+		this->TotalEnergy[3] += this->CrystalEnergy[ii+12];
+		this->TotalEnergy[4] += this->CrystalEnergy[ii+18];
+	}
+}
+
+void MtasProcessor::OldCenterCalculation(){
+	for( int ii = 0; ii < 6; ++ii ){
+		if( this->CenterHits[2*ii] and this->CenterHits[2*ii + 1] ){
+			this->CrystalEnergy[ii] = (this->Center[2*ii] + this->Center[2*ii + 1])/2.0;
+			this->SegmentDataVec[ii].sumenergy = this->CrystalEnergy[ii];
+			this->SegmentDataVec[ii].avgtimestamp = (this->SegmentDataVec[ii].fronttimestamp+this->SegmentDataVec[ii].backtimestamp)/2.0;
+			this->Position[ii] = this->CalcPosition(this->RawCenter[2*ii],this->RawCenter[2*ii + 1]);
+			this->CenterFire = true;
+			this->AnyFire = true;
+			this->NumFire[0] += 1;
+			this->NumFire[1] += 1;
+		}
+	}
+	for( int ii = 0; ii < 6; ++ii ){
+		//already requiring pairs, so if we have 1 pair we divide by 1, 2 we divide by 2 which was supposed to be each chunk by 4
+		//therefore 6 pairs is 12
+		if( this->NumFire[0] > 0 ){
+			this->TotalEnergy[0] += this->CrystalEnergy[ii]/this->NumFire[0];
+		}
+		this->TotalEnergy[0] += this->CrystalEnergy[ii+6];
+		this->TotalEnergy[0] += this->CrystalEnergy[ii+12];
+		this->TotalEnergy[0] += this->CrystalEnergy[ii+18];
+
+		if( this->NumFire[0] > 0 ){
+			this->TotalEnergy[1] += this->CrystalEnergy[ii]/this->NumFire[0];
+		}
+		this->TotalEnergy[2] += this->CrystalEnergy[ii+6];
+		this->TotalEnergy[3] += this->CrystalEnergy[ii+12];
+		this->TotalEnergy[4] += this->CrystalEnergy[ii+18];
+	}
+}
+
 void MtasProcessor::Init(const pugi::xml_node& config){
 	this->console->info("Init called with pugi::xml_node");
 
@@ -640,6 +705,7 @@ void MtasProcessor::Init(const pugi::xml_node& config){
 	}
 
 	this->diagnosticplots = config.attribute("diagnostic").as_bool(false);
+	this->UseOldCenter = config.attribute("oldcenter").as_bool(false);
 
 	this->LoadHistogramSettings(config);
 	this->LoadCustomCuts(config);
@@ -700,6 +766,12 @@ void MtasProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH2F>("MTAS_4203","Run Time vs Mtas Total; Energy (keV); Run Time (hr)",this->h2dsettings.at(4203));
 	hismanager->RegisterPlot<TH2F>("MTAS_4204","Run Time vs Mtas Total; Energy (keV); Run Time (day)",this->h2dsettings.at(4204));
 
+	hismanager->RegisterPlot<TH2F>("MTAS_42008","Run Time vs Mtas Total; Energy (8 keV/bin); Run Time (ms)",this->h2dsettings.at(42008));
+	hismanager->RegisterPlot<TH2F>("MTAS_42018","Run Time vs Mtas Total; Energy (8 keV/bin); Run Time (s)",this->h2dsettings.at(42018));
+	hismanager->RegisterPlot<TH2F>("MTAS_42028","Run Time vs Mtas Total; Energy (8 keV/bin); Run Time (min)",this->h2dsettings.at(42028));
+	hismanager->RegisterPlot<TH2F>("MTAS_42038","Run Time vs Mtas Total; Energy (8 keV/bin); Run Time (hr)",this->h2dsettings.at(42038));
+	hismanager->RegisterPlot<TH2F>("MTAS_42048","Run Time vs Mtas Total; Energy (8 keV/bin); Run Time (day)",this->h2dsettings.at(42048));
+
 	//center position correction plots
 	for( size_t ii = 0; ii < 6; ++ii ){
 		std::string name = "MTAS_326"+std::to_string(ii)+"_F";
@@ -756,6 +828,12 @@ void MtasProcessor::DeclareBetaPlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH2F>("MTAS_4302","Run Time vs Mtas Total #beta-gated; Energy (keV); Run Time (min)",this->h2dsettings.at(4302));
 	hismanager->RegisterPlot<TH2F>("MTAS_4303","Run Time vs Mtas Total #beta-gated; Energy (keV); Run Time (hr)",this->h2dsettings.at(4303));
 	hismanager->RegisterPlot<TH2F>("MTAS_4304","Run Time vs Mtas Total #beta-gated; Energy (keV); Run Time (day)",this->h2dsettings.at(4304));
+	
+	hismanager->RegisterPlot<TH2F>("MTAS_43008","Run Time vs Mtas Total #beta-gated; Energy (8 keV/bin); Run Time (ms)",this->h2dsettings.at(43008));
+	hismanager->RegisterPlot<TH2F>("MTAS_43018","Run Time vs Mtas Total #beta-gated; Energy (8 keV/bin); Run Time (s)",this->h2dsettings.at(43018));
+	hismanager->RegisterPlot<TH2F>("MTAS_43028","Run Time vs Mtas Total #beta-gated; Energy (8 keV/bin); Run Time (min)",this->h2dsettings.at(43028));
+	hismanager->RegisterPlot<TH2F>("MTAS_43038","Run Time vs Mtas Total #beta-gated; Energy (8 keV/bin); Run Time (hr)",this->h2dsettings.at(43038));
+	hismanager->RegisterPlot<TH2F>("MTAS_43048","Run Time vs Mtas Total #beta-gated; Energy (8 keV/bin); Run Time (day)",this->h2dsettings.at(43048));
 
 	if( this->diagnosticplots ){
 		hismanager->RegisterPlot<TH2F>("MTAS_3431","Raw IndividualPMT C PMTs #beta-gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3431));
@@ -820,6 +898,12 @@ void MtasProcessor::DeclareAntiBetaPlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH2F>("MTAS_4102","Run Time vs Mtas Total anti-#beta-gated; Energy (keV); Run Time (min)",this->h2dsettings.at(4102));
 	hismanager->RegisterPlot<TH2F>("MTAS_4103","Run Time vs Mtas Total anti-#beta-gated; Energy (keV); Run Time (hr)",this->h2dsettings.at(4103));
 	hismanager->RegisterPlot<TH2F>("MTAS_4104","Run Time vs Mtas Total anti-#beta-gated; Energy (keV); Run Time (day)",this->h2dsettings.at(4104));
+	
+	hismanager->RegisterPlot<TH2F>("MTAS_41008","Run Time vs Mtas Total anti-#beta-gated; Energy (8 keV/bin); Run Time (ms)",this->h2dsettings.at(41008));
+	hismanager->RegisterPlot<TH2F>("MTAS_41018","Run Time vs Mtas Total anti-#beta-gated; Energy (8 keV/bin); Run Time (s)",this->h2dsettings.at(41018));
+	hismanager->RegisterPlot<TH2F>("MTAS_41028","Run Time vs Mtas Total anti-#beta-gated; Energy (8 keV/bin); Run Time (min)",this->h2dsettings.at(41028));
+	hismanager->RegisterPlot<TH2F>("MTAS_41038","Run Time vs Mtas Total anti-#beta-gated; Energy (8 keV/bin); Run Time (hr)",this->h2dsettings.at(41038));
+	hismanager->RegisterPlot<TH2F>("MTAS_41048","Run Time vs Mtas Total anti-#beta-gated; Energy (8 keV/bin); Run Time (day)",this->h2dsettings.at(41048));
 
 	if( this->diagnosticplots ){
 		hismanager->RegisterPlot<TH2F>("MTAS_3411","Raw IndividualPMT C PMTs anti-#beta-gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3411));
@@ -1202,6 +1286,11 @@ void MtasProcessor::FillNoLogicBetaPlots(PLOTS::PlotRegistry* hismanager){
 		hismanager->Fill("MTAS_4302",this->TotalEnergy[0],this->currevttime/60.0);
 		hismanager->Fill("MTAS_4303",this->TotalEnergy[0],this->currevttime/(60.0*60.0));
 		hismanager->Fill("MTAS_4304",this->TotalEnergy[0],this->currevttime/(60.0*60.0*24.0));
+		hismanager->Fill("MTAS_43008",this->TotalEnergy[0],this->currevttime*1000.0);
+		hismanager->Fill("MTAS_43018",this->TotalEnergy[0],this->currevttime);
+		hismanager->Fill("MTAS_43028",this->TotalEnergy[0],this->currevttime/60.0);
+		hismanager->Fill("MTAS_43038",this->TotalEnergy[0],this->currevttime/(60.0*60.0));
+		hismanager->Fill("MTAS_43048",this->TotalEnergy[0],this->currevttime/(60.0*60.0*24.0));
 		if( this->diagnosticplots ){
 			for( int ii = 0; ii < 6; ++ii ){
 				hismanager->Fill("MTAS_3431",this->RawCenter[2*ii],2*ii);
@@ -1296,6 +1385,11 @@ void MtasProcessor::FillNoLogicNonBetaPlots(PLOTS::PlotRegistry* hismanager){
 		hismanager->Fill("MTAS_4102",this->TotalEnergy[0],this->currevttime/60.0);
 		hismanager->Fill("MTAS_4103",this->TotalEnergy[0],this->currevttime/(60.0*60.0));
 		hismanager->Fill("MTAS_4104",this->TotalEnergy[0],this->currevttime/(60.0*60.0*24.0));
+		hismanager->Fill("MTAS_41008",this->TotalEnergy[0],this->currevttime*1000.0);
+		hismanager->Fill("MTAS_41018",this->TotalEnergy[0],this->currevttime);
+		hismanager->Fill("MTAS_41028",this->TotalEnergy[0],this->currevttime/60.0);
+		hismanager->Fill("MTAS_41038",this->TotalEnergy[0],this->currevttime/(60.0*60.0));
+		hismanager->Fill("MTAS_41048",this->TotalEnergy[0],this->currevttime/(60.0*60.0*24.0));
 
 
 		if( this->diagnosticplots ){

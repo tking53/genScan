@@ -106,50 +106,86 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 [[maybe_unused]] bool anl2021Processor::Process( EventHistoryManager* eventhistory, PLOTS::PlotRegistry* hismanager, CUTS::CutRegistry* cutmanager){
 	Processor::Process();
 	//determine if we had a beta trigger in MTAS and are in the correct cycle
-	auto numhist = eventhistory->GetMaxHistoryID();
 	auto summary = eventhistory->GetCurrentEventSummary();
-	auto isomer_tdiff = 0.0;
-	auto erg = MtasProc->GetTotalEnergy(0);
-	bool possible_gamma_isomer = summary->ContainsEventTag(this->gamma) and not summary->ContainsEventTag(this->beta) and not summary->ContainsEventTag(this->muon); 
+	bool hasmuon = summary->ContainsEventTag(this->muon);
 
-	if( numhist > 1 ){
-		//current event has gamma not-muon, not-beta
-		if( possible_gamma_isomer ){
-			//search through history and try to find past event that has does have beta but does not have muon or gamma
-			for( size_t ii = 1; ii < numhist; ++ii ){
-				auto currhist = eventhistory->GetPreviousEventSummary(ii);
-				if( currhist->ContainsEventTag(this->beta) and not currhist->ContainsEventTag(this->gamma) and not currhist->ContainsEventTag(this->muon) ){
-					isomer_tdiff = summary->GetRawEvents().front().GetTimeStamp() - currhist->GetRawEvents().front().GetTimeStamp();
-					hismanager->Fill("ISOMER_3701",erg,isomer_tdiff*1.0e-3);
+	if( not hasmuon ){
+		auto numhist = eventhistory->GetMaxHistoryID();
+		auto isomer_tdiff = 0.0;
+		auto erg = MtasProc->GetTotalEnergy(0);
+
+		bool hasbeta = summary->ContainsEventTag(this->beta);
+		bool hasgamma = summary->ContainsEventTag(this->gamma);
+		bool possible_gamma_isomer = hasgamma and not hasbeta; 
+
+		if( numhist > 1 ){
+			//current event has gamma not-muon, not-beta
+			if( possible_gamma_isomer ){
+				//search through history and try to find past event that has does have beta but does not have muon or gamma
+				for( size_t ii = 1; ii < numhist; ++ii ){
+					auto currhist = eventhistory->GetPreviousEventSummary(ii);
+					if( currhist->ContainsEventTag(this->beta) and not currhist->ContainsEventTag(this->gamma) and not currhist->ContainsEventTag(this->muon) ){
+						isomer_tdiff = summary->GetRawEvents().front().GetTimeStamp() - currhist->GetRawEvents().front().GetTimeStamp();
+						hismanager->Fill("ISOMER_3701",erg,isomer_tdiff*1.0e-3);
+						break;
+					}
 				}
 			}
 		}
-	}
 
-	if( TapeProc->GetCurrentCycleState() == TAPE::MEASURE ){
-		if( summary->ContainsEventTag(this->beta) ){
-			this->MtasProc->FillBetaPlots(hismanager);
-		}else{
-			this->MtasProc->FillNonBetaPlots(hismanager);
-		}
-		if( possible_gamma_isomer ){
-			hismanager->Fill("ISOMER_3700",erg,isomer_tdiff*1.0e-3);
-		}
-	}else if( TapeProc->GetCurrentCycleState() == TAPE::BACKGROUND ){
-		if( not this->MtasProc->DidAnyPileup() and not this->MtasProc->DidAnySaturate() ){
-			hismanager->Fill("BKG_3200",this->MtasProc->GetTotalEnergy(0));
-			if( summary->ContainsEventTag(this->beta) ){
-				hismanager->Fill("BKG_3300",this->MtasProc->GetTotalEnergy(0));
+		//debugging things
+		//switch(TapeProc->GetCurrentCycleState()){
+		//	case TAPE::CycleState::TAPEMOVE:
+		//		this->console->info("MOVE");
+		//		break;
+		//	case TAPE::CycleState::MEASURE:
+		//		this->console->info("MEASURE");
+		//		break;
+		//	case TAPE::CycleState::BACKGROUND:
+		//		this->console->info("BKG");
+		//		break;
+		//	case TAPE::CycleState::UNKNOWN:
+		//		this->console->info("UNKNOWN");
+		//		break;
+		//	case TAPE::CycleState::IRRADIATION:
+		//		this->console->info("IRRADIATION");
+		//		break;
+		//	case TAPE::CycleState::LIGHTPULSER:
+		//		this->console->info("LIGHTPULSER");
+		//		break;
+		//	default:
+		//		this->console->info("ItBroke");
+		//		break;
+		//}
+
+		if( TapeProc->GetCurrentCycleState() == TAPE::MEASURE ){
+			if( hasbeta ){
+				this->MtasProc->FillBetaPlots(hismanager);
 			}else{
-				hismanager->Fill("BKG_3100",this->MtasProc->GetTotalEnergy(0));
+				this->MtasProc->FillNonBetaPlots(hismanager);
 			}
+			if( possible_gamma_isomer ){
+				hismanager->Fill("ISOMER_3700",erg,isomer_tdiff*1.0e-3);
+			}
+		}else if( TapeProc->GetCurrentCycleState() == TAPE::BACKGROUND ){
+			if( not this->MtasProc->DidAnyPileup() and not this->MtasProc->DidAnySaturate() ){
+				hismanager->Fill("BKG_3200",this->MtasProc->GetTotalEnergy(0));
+				if( summary->ContainsEventTag(this->beta) ){
+					hismanager->Fill("BKG_3300",this->MtasProc->GetTotalEnergy(0));
+				}else{
+					hismanager->Fill("BKG_3100",this->MtasProc->GetTotalEnergy(0));
+				}
+			}
+		}else{
+			//no-op
+			//these are when we're in move or irradiate which we probably should check irradiate
 		}
-	}
-	
-	if( summary->ContainsEventTag(this->beta) ){
-		this->MtasProc->FillNoLogicBetaPlots(hismanager);
-	}else{
-		this->MtasProc->FillNoLogicNonBetaPlots(hismanager);
+
+		if( hasbeta ){
+			this->MtasProc->FillNoLogicBetaPlots(hismanager);
+		}else{
+			this->MtasProc->FillNoLogicNonBetaPlots(hismanager);
+		}
 	}
 
 	Processor::EndProcess();
@@ -183,6 +219,9 @@ void anl2021Processor::Init(const pugi::xml_node& config){
 	for( pugi::xml_node proc = config.child("Processor"); proc; proc = proc.next_sibling("Processor") ){
 		std::string name = proc.attribute("name").as_string();
 		if( name.compare("MtasProcessor") == 0 ){
+			if( not proc.attribute("oldcenter").as_bool(false) ){
+				throw std::runtime_error("Need oldcenter=\"true\" on the MtasProcessor child tag for anl2021Processor"); 
+			}
 			this->MtasProc->Init(proc);
 			this->HasMTAS = true;
 		}else if( name.compare("MtasSSDProcessor") == 0 ){

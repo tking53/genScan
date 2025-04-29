@@ -9,7 +9,7 @@
 MtasTapeProcessor::MtasTapeProcessor(const std::string& log) : Processor(log,"MtasTapeProcessor",{"tape"}){
 
 	this->h2dsettings = {
-		{1000,{16,0,16,1024,0,1204}}
+		{1000,{1024,0,1024,16,0,16}}
 	};
 
 	this->CycleStartTime = 0.0;
@@ -111,35 +111,43 @@ MtasTapeProcessor::MtasTapeProcessor(const std::string& log) : Processor(log,"Mt
 	}
 
 	if( (isMeasureOn and isMeasureOff) or (isBkgOff and isBkgOn) or (isLightPulseOff and isLightPulseOn) or (isTapeMoveOff and isTapeMoveOff) or (isIrradOff and isIrradOn) ){
-		this->PrevState = this->CurrState;
-		this->CurrState = TAPE::CycleState::UNKNOWN;
-		summary->AddEventTag(this->unknown);
+		//this->PrevState = this->CurrState;
+		//this->CurrState = TAPE::CycleState::UNKNOWN;
+		//summary->AddEventTag(this->unknown);
+		//this->console->info("confused signaling");
 	}else{
 		if( isTapeMoveOn ){
 			this->PrevState = this->CurrState;
 			this->CurrState = TAPE::CycleState::TAPEMOVE;
 			summary->AddEventTag(this->tapemove);
+			//this->console->info("TapeMove");
 		}else{
 			if( isMeasureOn ){
 				this->PrevState = this->CurrState;
 				this->CurrState = TAPE::CycleState::MEASURE;
 				summary->AddEventTag(this->measure);
+				//this->console->info("Measure");
 			}else if( isBkgOn ){
 				this->PrevState = this->CurrState;
 				this->CurrState = TAPE::CycleState::BACKGROUND;
 				summary->AddEventTag(this->background);
+				//this->console->info("bkg");
 			}else if( isIrradOn ){
 				this->PrevState = this->CurrState;
 				this->CurrState = TAPE::CycleState::IRRADIATION;
 				summary->AddEventTag(this->irradiation);
+				//this->console->info("irrad");
 			}else if( isLightPulseOn ){
 				this->PrevState = this->CurrState;
 				this->CurrState = TAPE::CycleState::LIGHTPULSER;
 				summary->AddEventTag(this->lightpulser);
+				//this->console->info("light");
 			}else{
-				this->PrevState = this->CurrState;
-				this->CurrState = TAPE::CycleState::UNKNOWN;
-				summary->AddEventTag(this->unknown);
+				//possibly is MTC signaling
+				//this->PrevState = this->CurrState;
+				//this->CurrState = TAPE::CycleState::UNKNOWN;
+				//summary->AddEventTag(this->unknown);
+				//this->console->info("unhandled case");
 			}
 		}
 	}
