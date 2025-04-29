@@ -7,7 +7,9 @@
 
 PSPMTProcessor::PSPMTProcessor(const std::string& log) : Processor(log,"PSPMTProcessor",{"pspmt"}){
 	this->hgImage = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, { -10.0, -10.0 }, 0.0};
-	this->lgImage = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, { -10.0, -10.0 }, 0.0};
+	this->hgImage = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, { -10.0, -10.0 }, 0.0};
+	this->lgImageQdc = { 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, { -10.0, -10.0 }, 0.0};
+	this->lgImageQdc = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, { -10.0, -10.0 }, 0.0};
 	this->ampdynode = 0.0;
 	this->highgaintag = "highgain";
 	this->lowgaintag = "lowgain";
@@ -26,6 +28,7 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log) : Processor(log,"PSPMTPro
 		auto group = evt->GetGroup();
 		bool islowgain = evt->HasTag(this->lowgaintag);
 		bool ishighgain = evt->HasTag(this->highgaintag);
+		bool hasQDCs = ! evt->GetQDCSums().empty();
 
 		if( (ishighgain and islowgain) or (not ishighgain and not islowgain) ){
 			this->console->error("evt: {} in PSPMTProcessor has malformed xml, has both lowgain and highgain tag or neither",*evt);
@@ -33,12 +36,17 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log) : Processor(log,"PSPMTPro
 		}
 
 		if( subtype.compare("anode") == 0 ){
+			// The logic for the QDCs here comes directly from PAASS and the UTK folks for how they setup things
 			if( group.compare("xa") == 0 ){
 				if( islowgain ){
 					if( not this->AnodeLowHits[0] ){
 						++this->AnodeLowHits[0];
 						this->lgImage.xa += evt->GetEnergy();
 						++this->lgImage.numanodes;
+						if (hasQDCs){
+							this->lgImageQdc.xa += (evt->GetQDCSums()[0] - evt->GetQDCSums()[2]);
+							++this->lgImageQdc.numanodes;
+						}
 					}else{
 						++this->AnodeLowHits[0];
 					}
@@ -47,6 +55,10 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log) : Processor(log,"PSPMTPro
 						++this->AnodeHighHits[0];
 						this->hgImage.xa += evt->GetEnergy();
 						++this->hgImage.numanodes;
+						if (hasQDCs){
+							this->hgImageQdc.xa += (evt->GetQDCSums()[0] - evt->GetQDCSums()[2]);
+							++this->hgImageQdc.numanodes;
+						}
 					}else{
 						++this->AnodeHighHits[0];
 					}
@@ -57,6 +69,10 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log) : Processor(log,"PSPMTPro
 						++this->AnodeLowHits[1];
 						this->lgImage.xb += evt->GetEnergy();
 						++this->lgImage.numanodes;
+						if (hasQDCs){
+							this->lgImageQdc.xb += (evt->GetQDCSums()[0] - evt->GetQDCSums()[2]);
+							++this->lgImageQdc.numanodes;
+						}
 					}else{
 						++this->AnodeLowHits[1];
 					}
@@ -65,6 +81,10 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log) : Processor(log,"PSPMTPro
 						++this->AnodeHighHits[1];
 						this->hgImage.xb += evt->GetEnergy();
 						++this->hgImage.numanodes;
+						if (hasQDCs){
+							this->hgImageQdc.xb += (evt->GetQDCSums()[0] - evt->GetQDCSums()[2]);
+							++this->hgImageQdc.numanodes;
+						}
 					}else{
 						++this->AnodeHighHits[1];
 					}
@@ -75,6 +95,10 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log) : Processor(log,"PSPMTPro
 						++this->AnodeLowHits[2];
 						this->lgImage.ya += evt->GetEnergy();
 						++this->lgImage.numanodes;
+						if (hasQDCs){
+							this->lgImageQdc.ya += (evt->GetQDCSums()[0] - evt->GetQDCSums()[2]);
+							++this->lgImageQdc.numanodes;
+						}
 					}else{
 						++this->AnodeLowHits[2];
 					}
@@ -83,6 +107,10 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log) : Processor(log,"PSPMTPro
 						++this->AnodeHighHits[2];
 						this->hgImage.ya += evt->GetEnergy();
 						++this->hgImage.numanodes;
+						if (hasQDCs){
+							this->hgImageQdc.ya += (evt->GetQDCSums()[0] - evt->GetQDCSums()[2]);
+							++this->hgImageQdc.numanodes;
+						}
 					}else{
 						++this->AnodeHighHits[2];
 					}
@@ -93,6 +121,10 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log) : Processor(log,"PSPMTPro
 						++this->AnodeLowHits[3];
 						this->lgImage.yb += evt->GetEnergy();
 						++this->lgImage.numanodes;
+						if (hasQDCs){
+							this->lgImageQdc.yb += (evt->GetQDCSums()[0] - evt->GetQDCSums()[2]);
+							++this->lgImageQdc.numanodes;
+						}
 					}else{
 						++this->AnodeLowHits[3];
 					}
@@ -101,6 +133,10 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log) : Processor(log,"PSPMTPro
 						++this->AnodeHighHits[3];
 						this->hgImage.yb += evt->GetEnergy();
 						++this->hgImage.numanodes;
+						if (hasQDCs){
+							this->hgImageQdc.yb += (evt->GetQDCSums()[0] - evt->GetQDCSums()[2]);
+							++this->hgImageQdc.numanodes;
+						}
 					}else{
 						++this->AnodeHighHits[3];
 					}
@@ -122,6 +158,10 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log) : Processor(log,"PSPMTPro
 						++this->DynodeLowHits;
 						this->lgImage.dynode += evt->GetEnergy();
 						this->lgImage.DynodeTimeStamp = evt->GetTimeStamp();
+						if (hasQDCs){
+							this->lgImageQdc.dynode += (evt->GetQDCSums()[0] - evt->GetQDCSums()[2]);
+							this->lgImageQdc.DynodeTimeStamp = evt->GetTimeStamp();
+						}
 					}else{
 						++this->DynodeLowHits;
 					}
@@ -130,6 +170,10 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log) : Processor(log,"PSPMTPro
 						++this->DynodeHighHits;
 						this->hgImage.dynode += evt->GetEnergy();
 						this->hgImage.DynodeTimeStamp = evt->GetTimeStamp();
+						if (hasQDCs){
+							this->hgImageQdc.dynode += (evt->GetQDCSums()[0] - evt->GetQDCSums()[2]);
+							this->hgImageQdc.DynodeTimeStamp = evt->GetTimeStamp();
+						}
 					}else{
 						++this->DynodeHighHits;
 					}
@@ -142,6 +186,7 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log) : Processor(log,"PSPMTPro
 
 	if( this->lgImage.numanodes == 4 ){
 		this->CalculatePosition(this->lgImage,0.0,0.0,0.0,false,this->CurrMethod);
+		this->CalculatePosition(this->lgImageQdc,0.0,0.0,0.0,false,this->CurrMethod);
 		hismanager->Fill("PSPMT_1901",this->lgImage.position.first,this->lgImage.position.second);
 
 		hismanager->Fill("PSPMT_2001",this->lgImage.dynode);
@@ -157,10 +202,13 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log) : Processor(log,"PSPMTPro
 		hismanager->Fill("PSPMT_2201",this->lgImage.yb,3);
 
 		hismanager->Fill("PSPMT_2301",this->lgImage.dynode,this->lgImage.anodesum);
+
+		FillRootStruct(this->lowgain, this->lgImage, this->lgImageQdc);
 	}
 		
 	if( this->hgImage.numanodes == 4 ){
 		this->CalculatePosition(this->hgImage,0.0,0.0,0.0,false,this->CurrMethod);
+		this->CalculatePosition(this->hgImageQdc,0.0,0.0,0.0,false,this->CurrMethod);
 		hismanager->Fill("PSPMT_1902",this->hgImage.position.first,this->hgImage.position.second);
 
 		hismanager->Fill("PSPMT_2002",this->hgImage.dynode);
@@ -176,6 +224,8 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log) : Processor(log,"PSPMTPro
 		hismanager->Fill("PSPMT_2202",this->hgImage.yb,3);
 
 		hismanager->Fill("PSPMT_2302",this->hgImage.dynode,this->hgImage.anodesum);
+
+		FillRootStruct(this->highgain, this->hgImage, this->hgImageQdc);
 	}
 
 	Processor::EndProcess();
@@ -211,6 +261,8 @@ void PSPMTProcessor::Finalize(){
 void PSPMTProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH2F>("PSPMT_1901","Low Gain Image; Position (arb.); Position (arb.)",1024,0,1,1024,0,1);
 	hismanager->RegisterPlot<TH2F>("PSPMT_1902","High Gain Image; Position (arb.); Position (arb.)",1024,0,1,1024,0,1);
+	hismanager->RegisterPlot<TH2F>("PSPMT_1903","Low Gain QDC::Image; Position (arb.); Position (arb.)",1024,0,1,1024,0,1);
+	hismanager->RegisterPlot<TH2F>("PSPMT_1904","High Gain QDC::Image; Position (arb.); Position (arb.)",1024,0,1,1024,0,1);
 
 	hismanager->RegisterPlot<TH1F>("PSPMT_2001","Low Gain Dynode; Energy (arb.)",65536,0,65536);
 	hismanager->RegisterPlot<TH1F>("PSPMT_2002","High Gain Dynode; Energy (arb.)",65536,0,65536);
@@ -223,13 +275,21 @@ void PSPMTProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	
 	hismanager->RegisterPlot<TH2F>("PSPMT_2301","Low Gain Anodesum vs Low Gain Dynode; Energy (arb.)",8192,0,65536,8192,0,4*65536);
 	hismanager->RegisterPlot<TH2F>("PSPMT_2302","High Gain Anodesum vs High Gain Dynode; Energy (arb.)",8192,0,65536,8192,0,4*65536);
+	hismanager->RegisterPlot<TH2F>("PSPMT_2303","Low Gain QDC::Anodesum vs Low Gain QDC::Dynode; Energy (arb.)",8192,0,65536,8192,0,4*65536);
+	hismanager->RegisterPlot<TH2F>("PSPMT_2304","High Gain QDC::Anodesum vs High Gain QDC::Dynode; Energy (arb.)",8192,0,65536,8192,0,4*65536);
 	this->console->info("Finished Declaring Plots");
 }
 
 void PSPMTProcessor::RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>& outputtrees){
+	this->OutputTree = new TTree("Pspmt","PSPMT Processor Output");
+	this->OutputTree->Branch("highgain", &(this->highgain));
+	this->OutputTree->Branch("lowgain",  &(this->lowgain));
+	outputtrees[this->ProcessorName] = this->OutputTree;
 }
 
 void PSPMTProcessor::CleanupTree(){
+	this->highgain = ProcessorStruct::DEFAULT_PSPMT_STRUCT;
+	this->lowgain  = ProcessorStruct::DEFAULT_PSPMT_STRUCT;
 }
 
 void PSPMTProcessor::Reset(){
@@ -242,6 +302,16 @@ void PSPMTProcessor::Reset(){
 	this->lgImage.ResetAnode();
 	this->lgImage.ResetPosition(-10.0,-10.0);
 	this->lgImage.ResetCorners();
+
+	this->hgImageQdc.ResetDynode();
+	this->hgImageQdc.ResetAnode();
+	this->hgImageQdc.ResetPosition(-10.0,-10.0);
+	this->hgImageQdc.ResetCorners();
+
+	this->lgImageQdc.ResetDynode();
+	this->lgImageQdc.ResetAnode();
+	this->lgImageQdc.ResetPosition(-10.0,-10.0);
+	this->lgImageQdc.ResetCorners();
 
 	this->DynodeHighHits = 0;
 	this->DynodeLowHits = 0;
@@ -280,10 +350,29 @@ void PSPMTProcessor::CalculatePosition(PSPMT::Image& img,double rotation,double 
 	img.position = { x*std::cos(rotation) + xcenter -y*std::sin(rotation) + ycenter, x*std::sin(rotation) + xcenter + y*std::cos(rotation) + ycenter};
 }
 
+void PSPMTProcessor::FillRootStruct(ProcessorStruct::PSPMT& Rstruct, const PSPMT::Image& enImage, const PSPMT::Image& qdcImage){
+
+	Rstruct.xpos = enImage.position.first;
+	Rstruct.ypos = enImage.position.second;
+	Rstruct.xposqdc = qdcImage.position.first;
+	Rstruct.yposqdc = qdcImage.position.second;
+	Rstruct.dynodeen = enImage.dynode;
+	Rstruct.dynodeqdc = qdcImage.dynode;
+	Rstruct.dynodets = enImage.DynodeTimeStamp;
+
+};
+
 const PSPMT::Image& PSPMTProcessor::GetLowGainImage() const{
 	return this->lgImage;
 }
 
 const PSPMT::Image& PSPMTProcessor::GetHighGainImage() const{
 	return this->hgImage;
+}
+const PSPMT::Image& PSPMTProcessor::GetLowGainImageQdc() const{
+	return this->lgImageQdc;
+}
+
+const PSPMT::Image& PSPMTProcessor::GetHighGainImageQdc() const{
+	return this->hgImageQdc;
 }
