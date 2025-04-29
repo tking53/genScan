@@ -8,6 +8,33 @@ set(ALL_DOC_SRC ${ALL_DOC_SRC} PARENT_SCOPE)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
+#file(GLOB linkdef_files "${CMAKE_CURRENT_SOURCE_DIR}/include/*LinkDef.hpp")
+#
+#foreach(ldef ${linkdef_files})
+#	get_filename_component(barename ${ldef} NAME_WE)
+#	string(REGEX MATCH "^(.*)LinkDef*$" dummy ${barename})
+#	set(LibName ${CMAKE_MATCH_1})
+#	message(STATUS "Found LinkDef ${ldef} ${LibName}")
+#
+#	set(RootName "${LibName}_root")
+#	set(HeaderName "include/${LibName}.hpp")
+#	set(CxxName "${RootName}.cxx")
+#	set(LinkName "include/${barename}.hpp")
+#	message(STATUS "Attempting to generate dictionary for ${barename} using ${RootName} ${HeaderName} ${LinkName}")
+#	#ROOT_GENERATE_DICTIONARY(${RootName} ${HeaderName} LINKDEF ${LinkName})
+#	add_custom_command( OUTPUT ${CxxName} 
+#		COMMAND ${CMAKE_COMMAND} ROOT_GENERATE_DICTIONARY ${RootName} ${HeaderName} LINKDEF ${LinkName}
+#		DEPENDS ${ldef} 
+#		)
+#	add_library(${LibName} SHARED ${CxxName} ${RootName})
+#	target_link_libraries(${LibName} ${ROOT_LIBRARIES})
+#	add_dependencies(${LibName} ${EXTERNAL_PROCESSOR_DEPS} ${EXTERNAL_LOG_DEPS})
+#	list(APPEND PROCESSOR_STRUCT_LIBS ${LibName})
+#	list(APPEND PROCESSOR_STRUCTS "lib${LibName}.so")
+#	list(APPEND PROCESSOR_STRUCT_PCM "${CMAKE_CURRENT_BINARY_DIR}/lib${RootName}_rdict.pcm")
+#	list(APPEND PROCESSOR_STRUCT_RMAP "${CMAKE_CURRENT_BINARY_DIR}/lib${RootName}.rootmap")
+#endforeach()
+
 ROOT_GENERATE_DICTIONARY(RootDevStruct_root RootDevStruct.hpp LINKDEF include/RootDevStructLinkDef.hpp )
 add_library(RootDevStruct SHARED RootDevStruct_root.cxx RootDevStruct_root)
 target_link_libraries(RootDevStruct ${ROOT_LIBRARIES})
@@ -43,13 +70,6 @@ list(APPEND PROCESSOR_STRUCT_LIBS PidStruct)
 list(APPEND PROCESSOR_STRUCT_PCM ${CMAKE_CURRENT_BINARY_DIR}/libPidStruct_root_rdict.pcm)
 list(APPEND PROCESSOR_STRUCT_RMAP ${CMAKE_CURRENT_BINARY_DIR}/libPidStruct_root.rootmap)
 
-ROOT_GENERATE_DICTIONARY(PSPMTStruct_root PSPMTStruct.hpp LINKDEF include/PSPMTStructLinkDef.hpp )
-add_library(PSPMTStruct SHARED PSPMTStruct_root.cxx PSPMTStruct_root)
-target_link_libraries(PSPMTStruct ${ROOT_LIBRARIES})
-add_dependencies(PSPMTStruct ${EXTERNAL_PROCESSOR_DEPS} ${EXTERNAL_LOG_DEPS})
-list(APPEND PROCESSOR_STRUCT_LIBS PSPMTStruct)
-list(APPEND PROCESSOR_STRUCT_PCM ${CMAKE_CURRENT_BINARY_DIR}/libPSPMTStruct_root_rdict.pcm)
-list(APPEND PROCESSOR_STRUCT_RMAP ${CMAKE_CURRENT_BINARY_DIR}/libPSPMTStruct_root.rootmap)
 
 add_library(GenScanProcessors ${src_files})
 target_link_libraries(GenScanProcessors PUBLIC ${ROOT_LIBRARIES} GenScanFitters GenScanUtility pugixml)

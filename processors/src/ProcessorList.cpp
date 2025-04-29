@@ -9,6 +9,7 @@
 #include "GenericProcessor.hpp"
 #include "GenericAnalyzer.hpp"
 
+#include "anl2021Processor.hpp"
 #include "BSMExpProcessor.hpp"
 #include "e21069b_fp2Processor.hpp"
 #include "KClComptonProcessor.hpp"
@@ -101,6 +102,8 @@ void ProcessorList::PostProcess(EventHistoryManager* History,PLOTS::PlotRegistry
 void ProcessorList::CreateProc(const std::string& name){
 	if( name.compare("GenericProcessor") == 0 ){
 		this->known_processors.push_back(std::make_shared<GenericProcessor>(this->LogName));
+	}else if( name.compare("anl2021Processor") == 0 ){
+		known_processors.push_back(std::make_shared<anl2021Processor>(this->LogName));
 	}else if( name.compare("BSMExpProcessor") == 0 ){
 		known_processors.push_back(std::make_shared<BSMExpProcessor>(this->LogName));
 	}else if( name.compare("e21069b_fp2Processor") == 0 ){

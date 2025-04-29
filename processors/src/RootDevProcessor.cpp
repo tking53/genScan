@@ -27,8 +27,6 @@ RootDevProcessor::RootDevProcessor(const std::string& log) : Processor(log,"Root
 			this->CurrData.detNum = evt->GetLocation();
 			this->CurrData.type = evt->GetType();
 			this->CurrData.subtype = evt->GetSubType();
-			this->CurrData.gchanid = evt->GetGlobalChannelID();
-			this->CurrData.gmodid = evt->GetGlobalBoardID();
 			this->CurrData.group = evt->GetGroup();
 			this->CurrData.tag = evt->GetTags();
 			this->CurrData.pileup = evt->GetPileup();
