@@ -39,15 +39,5 @@ struct FP {
 };
 static const FP DEFAULT_FP_STRUCT;
 
-struct FP2{
-	PidDet xplas1;
-	PidDet xplas2;
-	PidDet xplas3;
-	PidDet xplas4;
-	PidDet pin1;
-	PidDet pin2;
-	PidDet pin3;
-	PidDet pin4;
-};
 };
 #endif // !__PIDSTRUCT_HPP__
