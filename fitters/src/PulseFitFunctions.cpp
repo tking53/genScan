@@ -80,6 +80,10 @@ namespace PulseFit{
 		return c*t1*t2;
 	}
 
+	double SingleTailingGaussNLinBkg(double* x,double* par){
+		return SingleTailingGaussN(x,par) + Linear(x,par+4);
+	}
+
 	double DoubleTailingGaussN(double* x,double* par){
 		return SingleTailingGaussN(x,par) + SingleTailingGaussN(x,par+4);
 	}

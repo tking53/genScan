@@ -46,6 +46,8 @@ struct PeakFitter{
 			this->InitSingleTailingGaussNFit();
 		}else if( mode == 3 ){
 			this->InitDoubleTailingGaussNFit();
+		}else if( mode == 4 ){
+			this->InitSingleTailingGaussNLinBkgFit();
 		}else{
 			throw std::runtime_error("Unknown peak fitting mode");
 		}
@@ -284,6 +286,65 @@ struct PeakFitter{
 		}
 	}
 	
+	void InitSingleTailingGaussNLinBkgFit(){
+		this->fithist->SetLineColor(kBlack);
+
+		this->fitfunc = new TF1("SingleTailingGaussNLinBkg",&PulseFit::SingleTailingGaussNLinBkg,FitRange.first,FitRange.second,6);
+		this->fitfunc->SetLineColor(kRed);
+		this->components = {
+			new TF1("TailingGaussN1",&PulseFit::SingleTailingGaussN,FitRange.first,FitRange.second,4),
+			new TF1("LinBkg",&PulseFit::Linear,FitRange.first,FitRange.second,2)
+		};
+		this->components.at(0)->SetLineColor(kMagenta);
+		this->components.at(1)->SetLineColor(kGreen);
+		
+		auto minbin = this->fithist->FindBin(this->FitRange.first);
+		auto maxbin = this->fithist->FindBin(this->FitRange.second);
+
+		double width = this->FitRange.second - this->FitRange.first;
+		double offset = (this->FitRange.second + this->FitRange.first)/2.0;
+		double area = this->fithist->GetBinContent(this->fithist->FindBin(offset));
+		double tau = this->fithist->GetBinContent(maxbin) - this->fithist->GetBinContent(minbin);
+		double bkgoffset = 0.0;
+		double bkgslope = 0.0;
+
+		this->keys = {{"Area",{0,area}},{"Mean",{1,offset}},{"Sigma",{2,width}},{"Tau",{3,tau}},{"BkgOffset",{4,bkgoffset}},{"BkgSlope",{5,bkgslope}}};
+		AssignFitParNames();
+		VerifyFixedValues();
+		VerifyBoundedValues();
+		if( this->fvalues.find("Mean") == this->fvalues.end() and this->bvalues.find("Mean") == this->bvalues.end() ){
+			this->bvalues["Mean"] = this->FitRange; 
+		}
+
+		auto integral = this->fithist->Integral(minbin,maxbin);
+
+		FixAndBoundParameters();
+
+		if( integral > 0.0 ){
+			std::string option = "0SQ";
+			if( this->loglikelihood ){
+				option+="L";
+			}
+			TFitResultPtr fitresult = this->fithist->Fit(this->fitfunc,option.c_str(),"",FitRange.first,FitRange.second);
+
+			if( not fitresult->IsEmpty() ){
+				AssignFitValuesErrors(fitresult);
+				AssignFitFuncParams();
+				this->fithist->GetListOfFunctions()->Add(this->fitfunc);
+				
+				this->components.at(0)->SetParameters(this->Results["Area"],this->Results["Mean"],this->Results["Sigma"],this->Results["Tau"]);
+				this->fithist->GetListOfFunctions()->Add(this->components.at(0));
+
+				this->components.at(1)->SetParameters(this->Results["BkgOffset"],this->Results["BkgSlope"]);
+				this->fithist->GetListOfFunctions()->Add(this->components.at(1));
+
+				TLine* gauss_centroid = new TLine(this->Results["Mean"],0,
+						this->Results["Mean"],0.75*(this->fithist->GetBinContent(this->fithist->FindBin(this->Results["Mean"]))));
+				gauss_centroid->SetLineColor(kAzure);
+				this->fithist->GetListOfFunctions()->Add(gauss_centroid);
+			}
+		}
+	}
 
 	void FixAndBoundParameters(){
 		for( const auto& kv : this->keys ){

@@ -143,6 +143,7 @@ int main(int argc, char *argv[]) {
        	FittingMessage += "\n1->GaussN+CompBkg+LinBkg";
        	FittingMessage += "\n2->SingleTailGaussN";
        	FittingMessage += "\n3->DoubleTailGaussN";
+       	FittingMessage += "\n4->SingleTailGaussN+LinBkg";
 
 	boost::program_options::options_description cmdline_options("Generic Options");
 	cmdline_options.add_options()

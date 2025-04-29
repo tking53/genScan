@@ -19,6 +19,7 @@ namespace PulseFit{
 	double TailingGaussN(double*,double*);
 	double SingleTailingGaussN(double*,double*);
 	double DoubleTailingGaussN(double*,double*);
+	double SingleTailingGaussNLinBkg(double*,double*);
 
 	//eigen
 	double TraceFunc(double,double,double,double,double);
