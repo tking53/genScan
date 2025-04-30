@@ -35,14 +35,52 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 	}
 
 	this->h1dsettings = {
+		{1000,{16384,0,16384}},
+		{1001,{16384,0,16384}},
+		{1002,{16384,0,16384}},
+		{1003,{16384,0,16384}},
+
 		{3100,{16384,0,16384}},
+
 		{3200,{16384,0,16384}},
+
 		{3300,{16384,0,16384}}
 	};
 
 	this->h2dsettings = {
+		{3160,{8192,0,8192,512,0,512}},
+		{3161,{8192,0,8192,512,0,512}},
+		{3162,{8192,0,8192,512,0,512}},
+		{3163,{8192,0,8192,512,0,512}},
+
+		{3260,{8192,0,8192,512,0,512}},
+		{3261,{8192,0,8192,512,0,512}},
+		{3262,{8192,0,8192,512,0,512}},
+		{3263,{8192,0,8192,512,0,512}},
+
+		{3360,{8192,0,8192,512,0,512}},
+		{3361,{8192,0,8192,512,0,512}},
+		{3362,{8192,0,8192,512,0,512}},
+		{3363,{8192,0,8192,512,0,512}},
+
+		{31608,{2048,0,16384,512,0,512}},
+		{31618,{2048,0,16384,512,0,512}},
+		{31628,{2048,0,16384,512,0,512}},
+		{31638,{2048,0,16384,512,0,512}},
+
+		{32608,{2048,0,16384,512,0,512}},
+		{32618,{2048,0,16384,512,0,512}},
+		{32628,{2048,0,16384,512,0,512}},
+		{32638,{2048,0,16384,512,0,512}},
+
+		{33608,{2048,0,16384,512,0,512}},
+		{33618,{2048,0,16384,512,0,512}},
+		{33628,{2048,0,16384,512,0,512}},
+		{33638,{2048,0,16384,512,0,512}},
+
 		{3700,{8192,0,8192,1000,0,10000}},
 		{3701,{8192,0,8192,1000,0,10000}},
+
 		{3800,{8192,0,8192,1000,0,10000}},
 		{3801,{8192,0,8192,1000,0,10000}}
 	};
@@ -115,15 +153,52 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 	if( not hasmuon ){
 		auto numhist = eventhistory->GetMaxHistoryID();
 		auto erg = MtasProc->GetTotalEnergy(0);
+		auto cyclestarttime = TapeProc->GetCycleTimeInSeconds();
+		//mtas gives the time in ns
+		auto firstmtastime = MtasProc->GetFirstFireTime()*1.0e-9;
+		auto cycletime = firstmtastime - cyclestarttime;
 
 		bool hasbeta = summary->ContainsEventTag(this->beta);
 		bool hasgamma = summary->ContainsEventTag(this->gamma);
 
 		if( TapeProc->GetCurrentCycleState() == TAPE::MEASURE ){
+			hismanager->Fill("CYCLE_1000",cycletime*1.0e3);
+			hismanager->Fill("CYCLE_1001",cycletime);
+			hismanager->Fill("CYCLE_1002",cycletime/60.0);
+			hismanager->Fill("CYCLE_1003",cycletime/(60.0*60.0));
+
+			hismanager->Fill("MEASURE_3260",erg,cycletime*1.0e3);
+			hismanager->Fill("MEASURE_3261",erg,cycletime);
+			hismanager->Fill("MEASURE_3262",erg,cycletime/60.0);
+			hismanager->Fill("MEASURE_3263",erg,cycletime/(60.0*60.0));
+
+			hismanager->Fill("MEASURE_32608",erg,cycletime*1.0e3);
+			hismanager->Fill("MEASURE_32618",erg,cycletime);
+			hismanager->Fill("MEASURE_32628",erg,cycletime/60.0);
+			hismanager->Fill("MEASURE_32638",erg,cycletime/(60.0*60.0));
+
 			if( hasbeta ){
 				this->MtasProc->FillBetaPlots(hismanager);
+				hismanager->Fill("MEASURE_3360",erg,cycletime*1.0e3);
+				hismanager->Fill("MEASURE_3361",erg,cycletime);
+				hismanager->Fill("MEASURE_3362",erg,cycletime/60.0);
+				hismanager->Fill("MEASURE_3363",erg,cycletime/(60.0*60.0));
+
+				hismanager->Fill("MEASURE_33608",erg,cycletime*1.0e3);
+				hismanager->Fill("MEASURE_33618",erg,cycletime);
+				hismanager->Fill("MEASURE_33628",erg,cycletime/60.0);
+				hismanager->Fill("MEASURE_33638",erg,cycletime/(60.0*60.0));
 			}else{
 				this->MtasProc->FillNonBetaPlots(hismanager);
+				hismanager->Fill("MEASURE_3160",erg,cycletime*1.0e3);
+				hismanager->Fill("MEASURE_3161",erg,cycletime);
+				hismanager->Fill("MEASURE_3162",erg,cycletime/60.0);
+				hismanager->Fill("MEASURE_3163",erg,cycletime/(60.0*60.0));
+
+				hismanager->Fill("MEASURE_31608",erg,cycletime*1.0e3);
+				hismanager->Fill("MEASURE_31618",erg,cycletime);
+				hismanager->Fill("MEASURE_31628",erg,cycletime/60.0);
+				hismanager->Fill("MEASURE_31638",erg,cycletime/(60.0*60.0));
 			}
 
 			if( numhist > 1 ){
@@ -178,6 +253,7 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 		}else{
 			//no-op
 			//these are when we're in move or irradiate which we probably should check irradiate
+			//we can find beam isomers from the implant if we do this
 		}
 
 		if( hasbeta ){
@@ -293,6 +369,42 @@ void anl2021Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 
 	hismanager->RegisterPlot<TH2F>("ISOMER_3800","Mtas prev-#gamma curr-#beta Measure Cycle Gated; Energy (keV); Time (ns)",this->h2dsettings.at(3800));
 	hismanager->RegisterPlot<TH2F>("ISOMER_3801","Mtas prev-#gamma curr-#beta Measure Cycle Gated; Energy (keV); Time (us)",this->h2dsettings.at(3801));
+
+	hismanager->RegisterPlot<TH2F>("MEASURE_3160","Mtas Total vs Cycle Time (ms) anti-#beta-gated; Mtas Total Energy (keV); Cycle Time (ms)",this->h2dsettings.at(3160));
+	hismanager->RegisterPlot<TH2F>("MEASURE_3161","Mtas Total vs Cycle Time (s) anti-#beta-gated; Mtas Total Energy (keV); Cycle Time (s)",this->h2dsettings.at(3161));
+	hismanager->RegisterPlot<TH2F>("MEASURE_3162","Mtas Total vs Cycle Time (min) anti-#beta-gated; Mtas Total Energy (keV); Cycle Time (min)",this->h2dsettings.at(3162));
+	hismanager->RegisterPlot<TH2F>("MEASURE_3163","Mtas Total vs Cycle Time (hr) anti-#beta-gated; Mtas Total Energy (keV); Cycle Time (hr)",this->h2dsettings.at(3163));
+
+	hismanager->RegisterPlot<TH2F>("MEASURE_3260","Mtas Total vs Cycle Time (ms); Mtas Total Energy (keV); Cycle Time (ms)",this->h2dsettings.at(3260));
+	hismanager->RegisterPlot<TH2F>("MEASURE_3261","Mtas Total vs Cycle Time (s); Mtas Total Energy (keV); Cycle Time (s)",this->h2dsettings.at(3261));
+	hismanager->RegisterPlot<TH2F>("MEASURE_3262","Mtas Total vs Cycle Time (min); Mtas Total Energy (keV); Cycle Time (min)",this->h2dsettings.at(3262));
+	hismanager->RegisterPlot<TH2F>("MEASURE_3263","Mtas Total vs Cycle Time (hr); Mtas Total Energy (keV); Cycle Time (hr)",this->h2dsettings.at(3263));
+
+	hismanager->RegisterPlot<TH2F>("MEASURE_3360","Mtas Total vs Cycle Time (ms) #beta-gated; Mtas Total Energy (keV); Cycle Time (ms)",this->h2dsettings.at(3360));
+	hismanager->RegisterPlot<TH2F>("MEASURE_3361","Mtas Total vs Cycle Time (s) #beta-gated; Mtas Total Energy (keV); Cycle Time (s)",this->h2dsettings.at(3361));
+	hismanager->RegisterPlot<TH2F>("MEASURE_3362","Mtas Total vs Cycle Time (min) #beta-gated; Mtas Total Energy (keV); Cycle Time (min)",this->h2dsettings.at(3362));
+	hismanager->RegisterPlot<TH2F>("MEASURE_3363","Mtas Total vs Cycle Time (hr) #beta-gated; Mtas Total Energy (keV); Cycle Time (hr)",this->h2dsettings.at(3363));
+
+	hismanager->RegisterPlot<TH2F>("MEASURE_31608","Mtas Total vs Cycle Time (ms) anti-#beta-gated; Mtas Total Energy (8 keV/bin); Cycle Time (ms)",this->h2dsettings.at(31608));
+	hismanager->RegisterPlot<TH2F>("MEASURE_31618","Mtas Total vs Cycle Time (s) anti-#beta-gated; Mtas Total Energy (8 keV/bin); Cycle Time (s)",this->h2dsettings.at(31618));
+	hismanager->RegisterPlot<TH2F>("MEASURE_31628","Mtas Total vs Cycle Time (min) anti-#beta-gated; Mtas Total Energy (8 keV/bin); Cycle Time (min)",this->h2dsettings.at(31628));
+	hismanager->RegisterPlot<TH2F>("MEASURE_31638","Mtas Total vs Cycle Time (hr) anti-#beta-gated; Mtas Total Energy (8 keV/bin); Cycle Time (hr)",this->h2dsettings.at(31638));
+
+	hismanager->RegisterPlot<TH2F>("MEASURE_32608","Mtas Total vs Cycle Time (ms); Mtas Total Energy (8 keV/bin); Cycle Time (ms)",this->h2dsettings.at(32608));
+	hismanager->RegisterPlot<TH2F>("MEASURE_32618","Mtas Total vs Cycle Time (s); Mtas Total Energy (8 keV/bin); Cycle Time (s)",this->h2dsettings.at(32618));
+	hismanager->RegisterPlot<TH2F>("MEASURE_32628","Mtas Total vs Cycle Time (min); Mtas Total Energy (8 keV/bin); Cycle Time (min)",this->h2dsettings.at(32628));
+	hismanager->RegisterPlot<TH2F>("MEASURE_32638","Mtas Total vs Cycle Time (hr); Mtas Total Energy (8 keV/bin); Cycle Time (hr)",this->h2dsettings.at(32638));
+
+	hismanager->RegisterPlot<TH2F>("MEASURE_33608","Mtas Total vs Cycle Time (ms) #beta-gated; Mtas Total Energy (8 keV/bin); Cycle Time (ms)",this->h2dsettings.at(33608));
+	hismanager->RegisterPlot<TH2F>("MEASURE_33618","Mtas Total vs Cycle Time (s) #beta-gated; Mtas Total Energy (8 keV/bin); Cycle Time (s)",this->h2dsettings.at(33618));
+	hismanager->RegisterPlot<TH2F>("MEASURE_33628","Mtas Total vs Cycle Time (min) #beta-gated; Mtas Total Energy (8 keV/bin); Cycle Time (min)",this->h2dsettings.at(33628));
+	hismanager->RegisterPlot<TH2F>("MEASURE_33638","Mtas Total vs Cycle Time (hr) #beta-gated; Mtas Total Energy (8 keV/bin); Cycle Time (hr)",this->h2dsettings.at(33638));
+
+	hismanager->RegisterPlot<TH1F>("CYCLE_1000","Cycle Time; Cycle Time (ms);",this->h1dsettings.at(1000));
+	hismanager->RegisterPlot<TH1F>("CYCLE_1001","Cycle Time; Cycle Time (s);",this->h1dsettings.at(1001));
+	hismanager->RegisterPlot<TH1F>("CYCLE_1002","Cycle Time; Cycle Time (min);",this->h1dsettings.at(1002));
+	hismanager->RegisterPlot<TH1F>("CYCLE_1003","Cycle Time; Cycle Time (hr);",this->h1dsettings.at(1003));
+
 
 	this->console->info("Finished Declaring Plots");
 }

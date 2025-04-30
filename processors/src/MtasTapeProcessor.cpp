@@ -54,7 +54,7 @@ MtasTapeProcessor::MtasTapeProcessor(const std::string& log) : Processor(log,"Mt
 			throw std::runtime_error("invalid xml config");
 		}
 		if( subtype.compare("trigger") == 0 ){
-			this->CycleStartTime = evt->GetTimeStamp()*1.0e9;
+			this->CycleStartTime = evt->GetTimeStamp()*1.0e-9;
 			this->isTriggerOn = true;
 			++(this->CycleCount);
 			this->logicSignalValue += 1;
