@@ -7,7 +7,9 @@
 #include "MtasTapeProcessor.hpp"
 #include "SimpleHPGeProcessor.hpp"
 #include "PSPMTProcessor.hpp"
-#include <utility>
+
+#include "Gates.hpp"
+#include <vector>
 
 class anl2021Processor : public Processor{
 	public:
@@ -34,6 +36,10 @@ class anl2021Processor : public Processor{
 
 		double SiliconThreshold;
 		double ImplantThreshold;
+
+		Gate<double> EarlyCycle;
+		Gate<double> MidCycle;
+		Gate<double> LateCycle;
 
 		std::string implant;
 		std::string beta;

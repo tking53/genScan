@@ -10,6 +10,9 @@
 	<DetectorDriver >
 		<Processor name="RootDevProcessor" included_types="generic"/>
 		<Processor name="anl2021Processor" siliconthresh="1.0">
+			<EarlyCycle lowerbound="" upperbound="" />
+			<MidCycle lowerbound="" upperbound="" />
+			<LateCycle lowerbound="" upperbound="" />
 			<Processor name="MtasProcessor" oldcenter="true"/>
 			<Processor name="MtasTapeProcessor" />
 			<Processor name="MtasSSDProcessor" />

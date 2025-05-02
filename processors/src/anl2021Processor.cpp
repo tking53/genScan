@@ -39,6 +39,8 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 		{1001,{16384,0,16384}},
 		{1002,{16384,0,16384}},
 		{1003,{16384,0,16384}},
+		
+		{1010,{16384,-8192,8191}},
 
 		{3100,{16384,0,16384}},
 
@@ -103,6 +105,15 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 
 [[maybe_unused]] bool anl2021Processor::PreProcess(EventHistoryManager* eventhistory, PLOTS::PlotRegistry* hismanager, CUTS::CutRegistry* cutmanager){
 	Processor::PreProcess();
+
+	hismanager->Fill("EARLY_1010",this->EarlyCycle.GetLowerBound());
+	hismanager->Fill("EARLY_1010",this->EarlyCycle.GetUpperBound());
+
+	hismanager->Fill("MID_1010",this->MidCycle.GetLowerBound());
+	hismanager->Fill("MID_1010",this->MidCycle.GetUpperBound());
+
+	hismanager->Fill("LATE_1010",this->LateCycle.GetLowerBound());
+	hismanager->Fill("LATE_1010",this->LateCycle.GetUpperBound());
 
 	auto summary = eventhistory->GetCurrentEventSummary();
 	auto types = summary->GetKnownTypes();
@@ -178,6 +189,15 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 			hismanager->Fill("MEASURE_32638",erg,cycletime/(60.0*60.0));
 
 			if( hasbeta ){
+				if( this->EarlyCycle.IsWithin(cycletime) ){
+					hismanager->Fill("EARLY_3300",erg);
+				}else if( this->MidCycle.IsWithin(cycletime) ){
+					hismanager->Fill("MID_3300",erg);
+				}else if( this->LateCycle.IsWithin(cycletime) ){
+					hismanager->Fill("LATE_3300",erg);
+				}else{
+					//no-op
+				}
 				this->MtasProc->FillBetaPlots(hismanager);
 				hismanager->Fill("MEASURE_3360",erg,cycletime*1.0e3);
 				hismanager->Fill("MEASURE_3361",erg,cycletime);
@@ -318,6 +338,27 @@ void anl2021Processor::Init(const pugi::xml_node& config){
 
 	this->SiliconThreshold = config.attribute("siliconthresh").as_double(0.0);
 	this->ImplantThreshold = config.attribute("implantthresh").as_double(0.0);
+	//need to load in early and late time gate for generating duplicates of 3350 3351 since they're not easy to make without a shitload of memory
+	auto earlygate = config.child("EarlyCycle");
+	if( earlygate ){
+		this->EarlyCycle = Gate<double>(earlygate.attribute("lowerbound").as_double(0.0),earlygate.attribute("upperbound").as_double(0.0));
+	}else{
+		this->EarlyCycle = Gate<double>(0.0,0.0);
+	}
+
+	auto midgate = config.child("MidCycle");
+	if( midgate ){
+		this->EarlyCycle = Gate<double>(midgate.attribute("lowerbound").as_double(0.0),midgate.attribute("upperbound").as_double(0.0));
+	}else{
+		this->EarlyCycle = Gate<double>(0.0,0.0);
+	}
+
+	auto lategate = config.child("LateCycle");
+	if( lategate ){
+		this->EarlyCycle = Gate<double>(lategate.attribute("lowerbound").as_double(0.0),lategate.attribute("upperbound").as_double(0.0));
+	}else{
+		this->EarlyCycle = Gate<double>(0.0,0.0);
+	}
 
 	if( not this->HasMTAS ){
 		throw std::runtime_error("missing MtasProcessor in anl2021Processor");
@@ -404,6 +445,14 @@ void anl2021Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH1F>("CYCLE_1001","Cycle Time; Cycle Time (s);",this->h1dsettings.at(1001));
 	hismanager->RegisterPlot<TH1F>("CYCLE_1002","Cycle Time; Cycle Time (min);",this->h1dsettings.at(1002));
 	hismanager->RegisterPlot<TH1F>("CYCLE_1003","Cycle Time; Cycle Time (hr);",this->h1dsettings.at(1003));
+
+	hismanager->RegisterPlot<TH1F>("EARLY_1010","Early Cycle Gate; Value (arb.)",this->h1dsettings.at(1010));
+	hismanager->RegisterPlot<TH1F>("MID_1010","Mid Cycle Gate; Value (arb.)",this->h1dsettings.at(1010));
+	hismanager->RegisterPlot<TH1F>("LATE_1010","Late Cycle Gate; Value (arb.)",this->h1dsettings.at(1010));
+
+	hismanager->RegisterPlot<TH1F>("EARLY_3300","Mtas Total #beta-gated Early Cycle Time",this->h1dsettings.at(3300));
+	hismanager->RegisterPlot<TH1F>("MID_3300","Mtas Total #beta-gated MID Cycle Time",this->h1dsettings.at(3300));
+	hismanager->RegisterPlot<TH1F>("LATE_3300","Mtas Total #beta-gated LATE Cycle Time",this->h1dsettings.at(3300));
 
 
 	this->console->info("Finished Declaring Plots");
