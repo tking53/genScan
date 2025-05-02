@@ -5,12 +5,16 @@
 	</Description>
 	<Global EventWidth="5.0e-7" EventWidthUnit="s" CorrelationType="rolling-window" />
 	<DetectorDriver>
-		<Processor name="MtasProcessor"/>
-		<Processor name="MtasImplantProcessor" /> yso_thresh_hg="200" />
+		<!-- <Processor name="e21027Processor" > -->
+			<Processor name="VetoProcessor" />
+			<Processor name="MtasProcessor"/>
+			<Processor name="MtasImplantProcessor" /> 
+			<!-- yso_thresh_hg="200" /> -->
+			<Processor name="PidProcessor">
+				<Histogram id="1" xlow="-100" xhigh="100" />
+			</Processor>
+		<!-- </Processor> -->
 		<!-- <Processor name="RootDevProcessor" included_types="mtasimplant,mtas,generic:ogs,mtasimplant:dynode,generic:beam_start,generic:beam_stop,generic:move_start,generic_move_stop" /> -->
-		<Processor name="PidProcessor">
-			<Histogram id="1" xlow="-100" xhigh="100" />
-		</Processor>
 	</DetectorDriver>
 	<Map>
 		<Crate number="0">
@@ -57,7 +61,7 @@
 				<Channel number="13" type="pid" subtype="ppac" group="1" tags="tas,db3,anode">
 					<Calibration model="linear">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="14" type="generic" subtype="OGS" group="mtas-veto">
+				<Channel number="14" type="veto" subtype="ogs" group="mtas">
 					<Calibration model="linear">0.0 1.0</Calibration>
 				</Channel>
 				<Channel number="15" type="generic" subtype="Pulser" >
@@ -362,7 +366,7 @@
 				</Channel>
 			</Module>
 			<Module number="5" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
-				<Channel number="0" type="mtasimplant" subtype="anode"  group="1" tags="highgain"> <Calibration model="linear" min="0">0.0 1.0</Calibration>	</Channel>
+				<Channel number="0" type="mtasimplant" subtype="anode"  group="1" tags="highgain"> 		<Calibration model="linear" min="0">0.0 1.0</Calibration>	</Channel>
 				<Channel number="1" type="mtasimplant" subtype="anode"  group="2" tags="highgain">		<Calibration model="linear" min="0">0.0 1.0</Calibration>		</Channel>
 				<Channel number="2" type="mtasimplant" subtype="anode"  group="3" tags="highgain">		<Calibration model="linear" min="0">0.0 1.0</Calibration>		</Channel>
 				<Channel number="3" type="mtasimplant" subtype="anode"  group="4" tags="highgain">		<Calibration model="linear" min="0">0.0 1.0</Calibration>		</Channel>
