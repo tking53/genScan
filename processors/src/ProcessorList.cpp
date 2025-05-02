@@ -12,6 +12,7 @@
 #include "anl2021Processor.hpp"
 #include "BSMExpProcessor.hpp"
 #include "e21069b_fp2Processor.hpp"
+#include "e21027Processor.hpp"
 #include "KClComptonProcessor.hpp"
 #include "ribf168Processor.hpp"
 #include "YAPProcessor.hpp"
@@ -106,6 +107,8 @@ void ProcessorList::CreateProc(const std::string& name){
 		known_processors.push_back(std::make_shared<anl2021Processor>(this->LogName));
 	}else if( name.compare("BSMExpProcessor") == 0 ){
 		known_processors.push_back(std::make_shared<BSMExpProcessor>(this->LogName));
+	}else if( name.compare("e21027Processor") == 0 ){
+		known_processors.push_back(std::make_shared<e21027Processor>(this->LogName));
 	}else if( name.compare("e21069b_fp2Processor") == 0 ){
 		known_processors.push_back(std::make_shared<e21069b_fp2Processor>(this->LogName));
 	}else if( name.compare("KClComptonProcessor") == 0 ){

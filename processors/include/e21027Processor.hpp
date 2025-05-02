@@ -5,6 +5,7 @@
 #include "MtasProcessor.hpp"
 #include "MtasImplantProcessor.hpp"
 #include "PidProcessor.hpp"
+#include "VetoProcessor.hpp"
 
 class e21027Processor : public Processor{
 	public:
@@ -26,8 +27,7 @@ class e21027Processor : public Processor{
 		bool HasMTAS;
 		bool HasSIPM;
 		bool HasPID;
-
-		double ImplantThreshold;
+		bool HasVeto;
 
 		std::string implant;
 		std::string beta;
@@ -37,6 +37,7 @@ class e21027Processor : public Processor{
 		std::shared_ptr<MtasProcessor> MtasProc;
 		std::shared_ptr<MtasImplantProcessor> ImplantProc;
 		std::shared_ptr<PidProcessor> PidProc;
+		std::shared_ptr<VetoProcessor> VetoProc;
 };
 
 #endif
