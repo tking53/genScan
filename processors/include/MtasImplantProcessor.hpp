@@ -4,6 +4,8 @@
 #include "Processor.hpp"
 #include "MtasImplantStruct.hpp"
 
+#include "ImageManipulation.hpp"
+
 class MtasImplantProcessor : public Processor{
 	public:
 		MtasImplantProcessor(const std::string&);
@@ -20,10 +22,13 @@ class MtasImplantProcessor : public Processor{
 		virtual void RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>&) final;
 		virtual void CleanupTree() final;
 
+		const SIPMIMP::Image& GetLowGainImage() const;
+		const SIPMIMP::Image& GetHighGainImage() const;
+	
 		void Reset();
 	private:
 		std::pair<unsigned int,unsigned int> CalcXY(const unsigned int&) const;
-		void CalcPosition(const std::vector<double>&,std::pair<double,double>&,std::pair<unsigned int,unsigned int>&);
+		void CalcPosition(const std::vector<double>&,std::pair<double,double>&,std::pair<unsigned int,unsigned int>&, double&);
 
 		enum IMPLANTSIPMTYPE{
 			HIGHGAINANODE,
@@ -47,25 +52,15 @@ class MtasImplantProcessor : public Processor{
 		std::vector<short> HighGainAnodeHitMap;
 		short HighGainDynodeHits;
 		short HighGainAnodeHits;
-		double HighGainDynode;
-		double HighGainDynodeOQDC;
-		double HighGainDynodeTS;
+		SIPMIMP::Image hgImage;
 		std::vector<double> HighGainAnodes;
-		std::vector<double> HighGainAnodesOQDC;
-		std::pair<double,double> HighResHighGainPosition;
-		std::pair<unsigned int,unsigned int> LowResHighGainPosition;
 		ProcessorStruct::MtasImplant HighGain;
 
 		std::vector<short> LowGainAnodeHitMap;
 		short LowGainDynodeHits;
 		short LowGainAnodeHits;
-		double LowGainDynode;
-		double LowGainDynodeOQDC;
-		double LowGainDynodeTS;
+		SIPMIMP::Image lgImage;
 		std::vector<double> LowGainAnodes;
-		std::vector<double> LowGainAnodesOQDC;
-		std::pair<double,double> HighResLowGainPosition;
-		std::pair<unsigned int,unsigned int> LowResLowGainPosition;
 		ProcessorStruct::MtasImplant LowGain;
 };
 

@@ -40,4 +40,33 @@ namespace PSPMT{
 }
 
 
+namespace SIPMIMP {
+	struct Image{
+		double dynode;
+		double DynodeTimeStamp;
+		std::pair<unsigned int, unsigned int> lowResPosition;
+		std::pair<double,double> highResPosition;
+		double anodesum;
+
+	void ResetDynode(double val = 0.0,double ts = 0.0){
+		dynode = val;
+		DynodeTimeStamp = ts;
+	}
+
+	void ResetAnode(double val = 0.0){
+		anodesum = val;
+	}
+
+	void ResetHighResPosition(double x = 0.0,double y = 0.0){
+		highResPosition.first = x;
+		highResPosition.second = y;
+	}
+	void ResetLowResPosition(unsigned int x = -1,unsigned int y = -1){
+		lowResPosition.first = x;
+		lowResPosition.second = y;
+	}
+
+	};
+
+}
 #endif

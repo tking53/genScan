@@ -7,6 +7,9 @@
 
 MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(log,"MtasImplantProcessor",{"mtasimplant"}){
 
+	this->hgImage = { 0.0, 0.0, {0, 0}, {0.0, 0.0}, 0.0};
+	this->lgImage = { 0.0, 0.0, {0, 0}, {0.0, 0.0}, 0.0};
+
 	this->h2dsettings = {
 		{7000,{16384,0,16384,64,0,64}},
 		{7003,{16384,0,16384,64,0,64}},
@@ -51,15 +54,15 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 
 		if( subtype.compare("dynode") == 0 and ishighgain ){
 			++(this->HighGainDynodeHits);
-			if( evt->GetEnergy() > this->HighGainDynode ){
-				this->HighGainDynode = evt->GetEnergy();
-				this->HighGainDynodeTS = evt->GetTimeStamp();
+			if( evt->GetEnergy() > this->hgImage.dynode ){
+				this->hgImage.dynode = evt->GetEnergy();
+				this->hgImage.DynodeTimeStamp = evt->GetTimeStamp();
 			}
 		}else if(subtype.compare("dynode") == 0 and islowgain ){
 			++(this->LowGainDynodeHits);
-			if( evt->GetEnergy() > this->LowGainDynode ){
-				this->LowGainDynode = evt->GetEnergy();
-				this->LowGainDynodeTS = evt->GetTimeStamp();
+			if( evt->GetEnergy() > this->lgImage.dynode ){
+				this->lgImage.dynode = evt->GetEnergy();
+				this->lgImage.DynodeTimeStamp = evt->GetTimeStamp();
 			}
 		}else if(subtype.compare("anode") == 0 and ishighgain ){
 			pixelid = std::stoi(group);
@@ -86,25 +89,27 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 		}
 	}
 
-	this->CalcPosition(this->HighGainAnodes,this->HighResHighGainPosition,this->LowResHighGainPosition);
-	this->HighGain.highresx = this->HighResHighGainPosition.first;
-	this->HighGain.highresy = this->HighResHighGainPosition.second;
-	this->HighGain.lowresx = this->LowResHighGainPosition.first;
-	this->HighGain.lowresy = this->LowResHighGainPosition.second;
-	this->HighGain.dynodeerg = this->HighGainDynode;
-	this->HighGain.dynodets = this->HighGainDynodeTS;
-	hismanager->Fill("MTASIMPLANT_7012",this->LowResHighGainPosition.first,this->LowResHighGainPosition.second);
-	hismanager->Fill("MTASIMPLANT_7014",this->HighResHighGainPosition.first,this->HighResHighGainPosition.second);
+	this->CalcPosition(this->HighGainAnodes,this->hgImage.highResPosition,this->hgImage.lowResPosition, this->hgImage.anodesum);
+	this->HighGain.highresx = this->hgImage.highResPosition.first;
+	this->HighGain.highresy = this->hgImage.highResPosition.second;
+	this->HighGain.lowresx = this->hgImage.lowResPosition.first;
+	this->HighGain.lowresy = this->hgImage.lowResPosition.second;
+	this->HighGain.dynodeerg = this->hgImage.dynode;
+	this->HighGain.dynodets = this->hgImage.DynodeTimeStamp;
+	this->HighGain.anodesum = this->hgImage.anodesum;
+	hismanager->Fill("MTASIMPLANT_7012",this->hgImage.lowResPosition.first,this->hgImage.lowResPosition.second);
+	hismanager->Fill("MTASIMPLANT_7014",this->hgImage.highResPosition.first,this->hgImage.highResPosition.second);
 
-	this->CalcPosition(this->LowGainAnodes,this->HighResLowGainPosition,this->LowResLowGainPosition);
-	this->LowGain.highresx = this->HighResLowGainPosition.first;
-	this->LowGain.highresy = this->HighResLowGainPosition.second;
-	this->LowGain.lowresx = this->LowResLowGainPosition.first;
-	this->LowGain.lowresy = this->LowResLowGainPosition.second;
-	this->LowGain.dynodeerg = this->LowGainDynode;
-	this->LowGain.dynodets = this->LowGainDynodeTS;
-	hismanager->Fill("MTASIMPLANT_7013",this->LowResLowGainPosition.first,this->LowResLowGainPosition.second);
-	hismanager->Fill("MTASIMPLANT_7015",this->HighResLowGainPosition.first,this->HighResLowGainPosition.second);
+	this->CalcPosition(this->LowGainAnodes,this->lgImage.highResPosition,this->lgImage.lowResPosition, this->lgImage.anodesum);
+	this->LowGain.highresx = this->lgImage.highResPosition.first;
+	this->LowGain.highresy = this->lgImage.highResPosition.second;
+	this->LowGain.lowresx = this->lgImage.lowResPosition.first;
+	this->LowGain.lowresy = this->lgImage.lowResPosition.second;
+	this->LowGain.dynodeerg = this->lgImage.dynode;
+	this->LowGain.dynodets = this->lgImage.DynodeTimeStamp;
+	this->LowGain.anodesum = this->lgImage.anodesum;
+	hismanager->Fill("MTASIMPLANT_7013",this->lgImage.lowResPosition.first,this->lgImage.lowResPosition.second);
+	hismanager->Fill("MTASIMPLANT_7015",this->lgImage.highResPosition.first,this->lgImage.highResPosition.second);
 
 	hismanager->Fill("MTASIMPLANT_7030",this->HighGainDynodeHits,0);
 	hismanager->Fill("MTASIMPLANT_7030",this->LowGainDynodeHits,1);
@@ -116,11 +121,11 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 		hismanager->Fill("MTASIMPLANT_7043",this->LowGainAnodeHitMap[ii],ii);
 	}
 
-	if( this->LowGainDynode > this->IsIonThresh.first and this->LowGainDynode < this->IsIonThresh.second ){
+	if( this->lgImage.dynode > this->IsIonThresh.first and this->lgImage.dynode < this->IsIonThresh.second ){
 		summary->AddEventTag("ion");
 	}
 
-	if( this->HighGainDynode > this->IsBetaThresh.first and this->HighGainDynode < this->IsBetaThresh.second ){
+	if( this->hgImage.dynode > this->IsBetaThresh.first and this->hgImage.dynode < this->IsBetaThresh.second ){
 		summary->AddEventTag("beta");
 	}
 
@@ -196,31 +201,27 @@ void MtasImplantProcessor::Reset(){
 	this->HighGainAnodeHitMap = std::vector<short>(64,0);
 	this->HighGainDynodeHits = 0;
 	this->HighGainAnodeHits = 0;
-	this->HighGainDynode = 0.0;
-	this->HighGainDynodeOQDC = 0.0;
-	this->HighGainDynodeTS = -1.0;
 	this->HighGainAnodes = std::vector<double>(64,0.0);
-	this->HighGainAnodesOQDC = std::vector<double>(64,0.0);
-	this->HighResHighGainPosition = std::pair<double,double>(-99.0,-99.0);
-	this->LowResHighGainPosition = std::pair<unsigned int,unsigned int>(-99,-99);
+	this->hgImage.ResetAnode();
+	this->hgImage.ResetDynode();
+	this->hgImage.ResetHighResPosition();
+	this->hgImage.ResetLowResPosition();
 	
 	this->LowGainAnodeHitMap = std::vector<short>(64,0);
 	this->LowGainDynodeHits = 0;
 	this->LowGainAnodeHits = 0;
-	this->LowGainDynode = 0.0;
-	this->LowGainDynodeOQDC = 0.0;
-	this->LowGainDynodeTS = -1.0;
 	this->LowGainAnodes = std::vector<double>(64,0.0);
-	this->LowGainAnodesOQDC = std::vector<double>(64,0.0);
-	this->HighResLowGainPosition = std::pair<double,double>(-99.0,-99.0);
-	this->LowResLowGainPosition = std::pair<unsigned int,unsigned int>(-99,-99);
+	this->lgImage.ResetAnode();
+	this->lgImage.ResetDynode();
+	this->lgImage.ResetHighResPosition();
+	this->lgImage.ResetLowResPosition();
 }
 		
 std::pair<unsigned int,unsigned int> MtasImplantProcessor::CalcXY(const unsigned int& idx) const{
 	return std::make_pair(idx%8,8-idx/8);
 }
 
-void MtasImplantProcessor::CalcPosition(const std::vector<double>& ergs,std::pair<double,double>& highres,std::pair<unsigned int,unsigned int>& lowres){
+void MtasImplantProcessor::CalcPosition(const std::vector<double>& ergs,std::pair<double,double>& highres,std::pair<unsigned int,unsigned int>& lowres, double& anodeSum){
 	double max_erg = ergs.front();
 	double esum = 0.0;
 	unsigned int idx = 0;
@@ -237,5 +238,14 @@ void MtasImplantProcessor::CalcPosition(const std::vector<double>& ergs,std::pai
 		ytmp += e*pixel.second;
 		++idx;
 	}
+	anodeSum = esum;
 	highres = std::make_pair(xtmp/esum,ytmp/esum);
+}
+
+const SIPMIMP::Image& MtasImplantProcessor::GetLowGainImage() const{
+	return this->lgImage;
+}
+
+const SIPMIMP::Image& MtasImplantProcessor::GetHighGainImage() const{
+	return this->hgImage;
 }

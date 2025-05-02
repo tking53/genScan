@@ -9,6 +9,7 @@ namespace ProcessorStruct{
 		int lowresy = -999;
 		double dynodeerg = 0.0;
 		double dynodets = -1.0;
+		double anodesum = 0.0;
 	};
 	static const MtasImplant DEFAULT_MTAS_IMPLANT_STRUCT;
 }
