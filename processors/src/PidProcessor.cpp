@@ -72,6 +72,8 @@ PidProcessor::PidProcessor(const std::string& log) : Processor(log,"PidProcessor
 
 	};
 
+	fp1Tofs.reserve(10);
+	fp2Tofs.reserve(10);
 
 }
 
@@ -255,94 +257,93 @@ PidProcessor::PidProcessor(const std::string& log) : Processor(log,"PidProcessor
 		}
 	};
 
+	fp1Tofs[0] = db3.ppac0.anode.time - fp1.xplas.at(0).time ;
+	fp1Tofs[1] = db3.ppac0.anode.time - fp1.xplas.at(1).time ;
+	fp1Tofs[2] = db3.ppac1.anode.time - fp1.xplas.at(0).time ;
+	fp1Tofs[3] = db3.ppac1.anode.time - fp1.xplas.at(1).time ;
+	fp1Tofs[4] = db3.scint.left.time  - fp1.xplas.at(0).time ;
+	fp1Tofs[5] = db3.scint.left.time  - fp1.xplas.at(1).time ;
+	fp1Tofs[6] = db3.scint.right.time - fp1.xplas.at(0).time ;
+	fp1Tofs[7] = db3.scint.right.time - fp1.xplas.at(1).time ;
+
+	fp2Tofs[0] = db3.ppac0.anode.time - fp2.xplas.at(0).time ;
+	fp2Tofs[1] = db3.ppac0.anode.time - fp2.xplas.at(1).time ;
+	fp2Tofs[2] = db3.ppac1.anode.time - fp2.xplas.at(0).time ;
+	fp2Tofs[3] = db3.ppac1.anode.time - fp2.xplas.at(1).time ;
+	fp2Tofs[4] = db3.scint.left.time  - fp2.xplas.at(0).time ;
+	fp2Tofs[5] = db3.scint.left.time  - fp2.xplas.at(1).time ;
+	fp2Tofs[6] = db3.scint.right.time - fp2.xplas.at(0).time ;
+	fp2Tofs[7] = db3.scint.right.time - fp2.xplas.at(1).time ;
+
+
 	Processor::EndProcess();
 	return true;
 }
 
 [[maybe_unused]] bool PidProcessor::Process([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 
+	hismanager->Fill("PID_1", fp1Tofs.at(0));
+	hismanager->Fill("PID_2", fp1Tofs.at(1));
+	hismanager->Fill("PID_3", fp1Tofs.at(2));
+	hismanager->Fill("PID_4", fp1Tofs.at(3));
+	hismanager->Fill("PID_5", fp1Tofs.at(4));
+	hismanager->Fill("PID_6", fp1Tofs.at(5));
+	hismanager->Fill("PID_7", fp1Tofs.at(6));
+	hismanager->Fill("PID_8", fp1Tofs.at(7));
 
-	d3p0aF1X1TD = db3.ppac0.anode.time - fp1.xplas.at(0).time ;
-	d3p0aF1X2TD = db3.ppac0.anode.time - fp1.xplas.at(1).time ;
-	d3p1aF1X1TD = db3.ppac1.anode.time - fp1.xplas.at(0).time ;
-	d3p1aF1X2TD = db3.ppac1.anode.time - fp1.xplas.at(1).time ;
-	d3SLF1X1TD  = db3.scint.left.time  - fp1.xplas.at(0).time ;
-	d3SLF1X2TD  = db3.scint.left.time  - fp1.xplas.at(1).time ;
-	d3SRF1X1TD  = db3.scint.right.time - fp1.xplas.at(0).time ;
-	d3SRF1X2TD  = db3.scint.right.time - fp1.xplas.at(1).time ;
+	hismanager->Fill("PID_9",  fp1Tofs[0], fp1.pin.at(0).energy);
+	hismanager->Fill("PID_10", fp1Tofs[0], fp1.pin.at(1).energy);
+	hismanager->Fill("PID_11", fp1Tofs[0], fp1.pin.at(2).energy);
+	hismanager->Fill("PID_12", fp1Tofs[0], fp1.pin.at(3).energy);
 
-	d3p0aF2X1TD = db3.ppac0.anode.time - fp2.xplas.at(0).time ;
-	d3p0aF2X2TD = db3.ppac0.anode.time - fp2.xplas.at(1).time ;
-	d3p1aF2X1TD = db3.ppac1.anode.time - fp2.xplas.at(0).time ;
-	d3p1aF2X2TD = db3.ppac1.anode.time - fp2.xplas.at(1).time ;
-	d3SLF2X1TD  = db3.scint.left.time  - fp2.xplas.at(0).time ;
-	d3SLF2X2TD  = db3.scint.left.time  - fp2.xplas.at(1).time ;
-	d3SRF2X1TD  = db3.scint.right.time - fp2.xplas.at(0).time ;
-	d3SRF2X2TD  = db3.scint.right.time - fp2.xplas.at(1).time ;
+	hismanager->Fill("PID_13", fp1Tofs[2], fp1.pin.at(0).energy);
+	hismanager->Fill("PID_14", fp1Tofs[2], fp1.pin.at(1).energy);
+	hismanager->Fill("PID_15", fp1Tofs[2], fp1.pin.at(2).energy);
+	hismanager->Fill("PID_16", fp1Tofs[2], fp1.pin.at(3).energy);
 
+	hismanager->Fill("PID_17", fp1Tofs[4], fp1.pin.at(0).energy);
+	hismanager->Fill("PID_18", fp1Tofs[4], fp1.pin.at(1).energy);
+	hismanager->Fill("PID_19", fp1Tofs[4], fp1.pin.at(2).energy);
+	hismanager->Fill("PID_20", fp1Tofs[4], fp1.pin.at(3).energy);
 
-	hismanager->Fill("PID_1", d3p0aF1X1TD);
-	hismanager->Fill("PID_2", d3p0aF1X2TD);
-	hismanager->Fill("PID_3", d3p1aF1X1TD);
-	hismanager->Fill("PID_4", d3p1aF1X2TD);
-	hismanager->Fill("PID_5", d3SLF1X1TD );
-	hismanager->Fill("PID_6", d3SLF1X2TD );
-	hismanager->Fill("PID_7", d3SRF1X1TD);
-	hismanager->Fill("PID_8", d3SRF1X2TD);
-
-	hismanager->Fill("PID_9",  d3p0aF1X1TD, fp1.pin.at(0).energy);
-	hismanager->Fill("PID_10", d3p0aF1X1TD, fp1.pin.at(1).energy);
-	hismanager->Fill("PID_11", d3p0aF1X1TD, fp1.pin.at(2).energy);
-	hismanager->Fill("PID_12", d3p0aF1X1TD, fp1.pin.at(3).energy);
-
-	hismanager->Fill("PID_13", d3p1aF1X1TD, fp1.pin.at(0).energy);
-	hismanager->Fill("PID_14", d3p1aF1X1TD, fp1.pin.at(1).energy);
-	hismanager->Fill("PID_15", d3p1aF1X1TD, fp1.pin.at(2).energy);
-	hismanager->Fill("PID_16", d3p1aF1X1TD, fp1.pin.at(3).energy);
-
-	hismanager->Fill("PID_17", d3SLF1X1TD, fp1.pin.at(0).energy);
-	hismanager->Fill("PID_18", d3SLF1X1TD, fp1.pin.at(1).energy);
-	hismanager->Fill("PID_19", d3SLF1X1TD, fp1.pin.at(2).energy);
-	hismanager->Fill("PID_20", d3SLF1X1TD, fp1.pin.at(3).energy);
-
-	hismanager->Fill("PID_21", d3SRF1X1TD, fp1.pin.at(0).energy);
-	hismanager->Fill("PID_22", d3SRF1X1TD, fp1.pin.at(1).energy);
-	hismanager->Fill("PID_23", d3SRF1X1TD, fp1.pin.at(2).energy);
-	hismanager->Fill("PID_24", d3SRF1X1TD, fp1.pin.at(3).energy);
+	hismanager->Fill("PID_21", fp1Tofs[6], fp1.pin.at(0).energy);
+	hismanager->Fill("PID_22", fp1Tofs[6], fp1.pin.at(1).energy);
+	hismanager->Fill("PID_23", fp1Tofs[6], fp1.pin.at(2).energy);
+	hismanager->Fill("PID_24", fp1Tofs[6], fp1.pin.at(3).energy);
 
 	hismanager->Fill("PID_25",fp1.pin.at(0).energy,fp1.pin.at(1).energy);
 	hismanager->Fill("PID_26",fp1.pin.at(0).energy,fp1.pin.at(2).energy);
 	hismanager->Fill("PID_27",fp1.pin.at(0).energy,fp1.pin.at(3).energy);
 
 
-	hismanager->Fill("PID_101", d3p0aF2X1TD);
-	hismanager->Fill("PID_102", d3p0aF2X2TD);
-	hismanager->Fill("PID_103", d3p1aF2X1TD);
-	hismanager->Fill("PID_104", d3p1aF2X2TD);
-	hismanager->Fill("PID_105", d3SLF2X1TD );
-	hismanager->Fill("PID_106", d3SLF2X2TD );
-	hismanager->Fill("PID_107", d3SRF2X1TD);
-	hismanager->Fill("PID_108", d3SRF2X2TD);
+	hismanager->Fill("PID_101", fp2Tofs.at(0));
+	hismanager->Fill("PID_102", fp2Tofs.at(1));
+	hismanager->Fill("PID_103", fp2Tofs.at(2));
+	hismanager->Fill("PID_104", fp2Tofs.at(3));
+	hismanager->Fill("PID_105", fp2Tofs.at(4));
+	hismanager->Fill("PID_106", fp2Tofs.at(5));
+	hismanager->Fill("PID_107", fp2Tofs.at(6));
+	hismanager->Fill("PID_108", fp2Tofs.at(7));
 
-	hismanager->Fill("PID_109", d3p0aF2X1TD, fp2.pin.at(0).energy);
-	hismanager->Fill("PID_110", d3p0aF2X1TD, fp2.pin.at(1).energy);
-	hismanager->Fill("PID_111", d3p0aF2X1TD, fp2.pin.at(2).energy);
-	hismanager->Fill("PID_112", d3p0aF2X1TD, fp2.pin.at(3).energy);
+	hismanager->Fill("PID_109", fp2Tofs[0], fp2.pin.at(0).energy);
+	hismanager->Fill("PID_110", fp2Tofs[0], fp2.pin.at(1).energy);
+	hismanager->Fill("PID_111", fp2Tofs[0], fp2.pin.at(2).energy);
+	hismanager->Fill("PID_112", fp2Tofs[0], fp2.pin.at(3).energy);
 
-	hismanager->Fill("PID_113", d3p1aF2X1TD, fp2.pin.at(0).energy);
-	hismanager->Fill("PID_114", d3p1aF2X1TD, fp2.pin.at(1).energy);
-	hismanager->Fill("PID_115", d3p1aF2X1TD, fp2.pin.at(2).energy);
-	hismanager->Fill("PID_116", d3p1aF2X1TD, fp2.pin.at(3).energy);
+	hismanager->Fill("PID_113", fp2Tofs[2], fp2.pin.at(0).energy);
+	hismanager->Fill("PID_114", fp2Tofs[2], fp2.pin.at(1).energy);
+	hismanager->Fill("PID_115", fp2Tofs[2], fp2.pin.at(2).energy);
+	hismanager->Fill("PID_116", fp2Tofs[2], fp2.pin.at(3).energy);
 
-	hismanager->Fill("PID_117", d3SLF2X1TD, fp2.pin.at(0).energy);
-	hismanager->Fill("PID_118", d3SLF2X1TD, fp2.pin.at(1).energy);
-	hismanager->Fill("PID_119", d3SLF2X1TD, fp2.pin.at(2).energy);
-	hismanager->Fill("PID_120", d3SLF2X1TD, fp2.pin.at(3).energy);
+	hismanager->Fill("PID_117", fp2Tofs[4], fp2.pin.at(0).energy);
+	hismanager->Fill("PID_118", fp2Tofs[4], fp2.pin.at(1).energy);
+	hismanager->Fill("PID_119", fp2Tofs[4], fp2.pin.at(2).energy);
+	hismanager->Fill("PID_120", fp2Tofs[4], fp2.pin.at(3).energy);
 
-	hismanager->Fill("PID_121", d3SRF2X1TD, fp2.pin.at(0).energy);
-	hismanager->Fill("PID_122", d3SRF2X1TD, fp2.pin.at(1).energy);
-	hismanager->Fill("PID_123", d3SRF2X1TD, fp2.pin.at(2).energy);
-	hismanager->Fill("PID_124", d3SRF2X1TD, fp2.pin.at(3).energy);
+	hismanager->Fill("PID_121", fp2Tofs[6], fp2.pin.at(0).energy);
+	hismanager->Fill("PID_122", fp2Tofs[6], fp2.pin.at(1).energy);
+	hismanager->Fill("PID_123", fp2Tofs[6], fp2.pin.at(2).energy);
+	hismanager->Fill("PID_124", fp2Tofs[6], fp2.pin.at(3).energy);
 
 	hismanager->Fill("PID_125",fp2.pin.at(0).energy,fp2.pin.at(1).energy);
 	hismanager->Fill("PID_126",fp2.pin.at(0).energy,fp2.pin.at(2).energy);
@@ -352,6 +353,7 @@ PidProcessor::PidProcessor(const std::string& log) : Processor(log,"PidProcessor
 }
 
 [[maybe_unused]] bool PidProcessor::PostProcess([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+	Reset();
 	return true;
 }
 
@@ -461,6 +463,18 @@ void PidProcessor::CleanupTree(){
 	this->fp2 = ProcessorStruct::DEFAULT_FP_STRUCT;
 }
 
+void PidProcessor::Reset(){
+
+	for ( auto& iter: fp1Tofs){
+		iter = std::numeric_limits<double>::max();
+	}
+	for ( auto& iter: fp2Tofs){
+		iter = std::numeric_limits<double>::max();
+	}
+
+}
+
+
 void PidProcessor::FillStruct(PhysicsData* data, ProcessorStruct::PidDet &det){
 
 	det.energy = data->GetEnergy();
@@ -468,3 +482,18 @@ void PidProcessor::FillStruct(PhysicsData* data, ProcessorStruct::PidDet &det){
 	det.saturation = data->GetSaturation();
 	det.pileup = data->GetPileup();
 };
+
+
+const std::vector<double>& PidProcessor::GetFP1Tofs() const {
+	return this->fp1Tofs;
+}
+const std::vector<double>& PidProcessor::GetFP2Tofs() const {
+	return this->fp2Tofs;
+}
+
+const ProcessorStruct::FP& PidProcessor::GetFP1() const {
+	return this->fp1;
+}
+const ProcessorStruct::FP& PidProcessor::GetFP2() const {
+	return this->fp2;
+}

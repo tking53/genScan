@@ -19,6 +19,15 @@ class PidProcessor : public Processor{
 		void DeclarePlots(PLOTS::PlotRegistry*);
 		virtual void RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>&) final;
 		virtual void CleanupTree() final;
+
+		void Reset();		
+
+		const std::vector<double>& GetFP1Tofs() const;
+		const std::vector<double>& GetFP2Tofs() const;
+		
+	const ProcessorStruct::FP& GetFP1() const;
+	const ProcessorStruct::FP& GetFP2() const;
+
 	private:
 
 	ProcessorStruct::DBOX db3;
@@ -64,25 +73,11 @@ class PidProcessor : public Processor{
 	DETSUBTYPE currDETSUBTYPE;
 	BOXID currBOXID;
 
-	double d3p0aF1X1TD ;
-	double d3p0aF1X2TD ;
-	double d3p1aF1X1TD ;
-	double d3p1aF1X2TD ;
-	double d3SLF1X1TD  ;
-	double d3SLF1X2TD  ;
-	double d3SRF1X1TD  ;
-	double d3SRF1X2TD  ;
-	;
-	double d3p0aF2X1TD ;
-	double d3p0aF2X2TD ;
-	double d3p1aF2X1TD ;
-	double d3p1aF2X2TD ;
-	double d3SLF2X1TD  ;
-	double d3SLF2X2TD  ;
-	double d3SRF2X1TD  ;
-	double d3SRF2X2TD  ;
-
-
+	std::vector<double> fp1Tofs ;
+	std::vector<double> fp2Tofs ;
+	
+	
+	
 };
 
 #endif
