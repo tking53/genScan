@@ -757,9 +757,11 @@
 			</Module>
 
 			<Module number="9" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
-				<Channel number="0" type="mtasimplant" subtype="anode"  group="1" tags="lowgain"> <Calibration model="linear" min="0">
-					0.0 1.0
-				</Calibration>	</Channel>
+				<Channel number="0" type="mtasimplant" subtype="anode"  group="1" tags="lowgain"> 
+					<Calibration model="linear" min="0">
+						0.0 1.0
+					</Calibration>	
+				</Channel>
 				<Channel number="1" type="mtasimplant" subtype="anode"  group="2" tags="lowgain">
 					<Calibration model="linear" min="0">
 						0.0 1.0
