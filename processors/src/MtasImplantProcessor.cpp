@@ -19,6 +19,12 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 		{7000,{16384,0,16384,64,0,64}},
 		{7003,{16384,0,16384,64,0,64}},
 
+		{7007,{4096,0,4096,4096,0,4096}},
+		{70078,{4096,0,32768,4096,0,32768}},
+
+		{7008,{16384,0,16384,1024,-1,1}},
+		{7009,{16384,0,16384,1024,-1,1}},
+
 		{7012,{10,0,10,10,0,10}},
 		{7013,{10,0,10,10,0,10}},
 		{7014,{1000,0,10,1000,0,10}},
@@ -106,6 +112,8 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 	hismanager->Fill("IMPLANT_7005",this->hgImage.dynode);
 	hismanager->Fill("IMPLANT_7012",this->hgImage.lowResPosition.first,this->hgImage.lowResPosition.second);
 	hismanager->Fill("IMPLANT_7014",this->hgImage.highResPosition.first,this->hgImage.highResPosition.second);
+	//need to gen psd
+	//hismanager->Fill("IMPLANT_7008",this->hgImage.dynode,this->hgPSD);
 
 	this->CalcPosition(this->LowGainAnodes,this->lgImage.highResPosition,this->lgImage.lowResPosition, this->lgImage.anodesum);
 	this->LowGain.highresx = this->lgImage.highResPosition.first;
@@ -118,6 +126,11 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 	hismanager->Fill("IMPLANT_7006",this->lgImage.dynode);
 	hismanager->Fill("IMPLANT_7013",this->lgImage.lowResPosition.first,this->lgImage.lowResPosition.second);
 	hismanager->Fill("IMPLANT_7015",this->lgImage.highResPosition.first,this->lgImage.highResPosition.second);
+	//need to gen psd
+	//hismanager->Fill("IMPLANT_7009",this->lgImage.dynode,this->lgPSD);
+
+	hismanager->Fill("IMPLANT_7007",this->lgImage.dynode,this->hgImage.dynode);
+	hismanager->Fill("IMPLANT_70078",this->lgImage.dynode,this->hgImage.dynode);
 
 	hismanager->Fill("IMPLANT_7030",this->HighGainDynodeHits,0);
 	hismanager->Fill("IMPLANT_7030",this->LowGainDynodeHits,1);
@@ -181,6 +194,12 @@ void MtasImplantProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH2F>("IMPLANT_7003","Low Gain Anodes",this->h2dsettings.at(7003));
 	hismanager->RegisterPlot<TH1F>("IMPLANT_7005","High Gain Dynode",this->h1dsettings.at(7005));	
 	hismanager->RegisterPlot<TH1F>("IMPLANT_7006","Low Gain Dynode",this->h1dsettings.at(7005));	
+
+	hismanager->RegisterPlot<TH2F>("IMPLANT_7007","High Gain dynode vs Low Gain dynode; Low Gain Dynode Energy (keV); High Gain Dynode Energy (keV);",this->h2dsettings.at(7007));
+	hismanager->RegisterPlot<TH2F>("IMPLANT_70078","High Gain dynode vs Low Gain dynode; Low Gain Dynode Energy (8 keV/bin); High Gain Dynode Energy (8 keV/bin);",this->h2dsettings.at(70078));
+
+	hismanager->RegisterPlot<TH2F>("IMPLANT_7008","High Gain Dynode PSD; Energy (keV); PSD (arb.)",this->h2dsettings.at(7008));
+	hismanager->RegisterPlot<TH2F>("IMPLANT_7009","Low Gain Dynode PSD; Energy (keV); PSD (arb.)",this->h2dsettings.at(7009));
 
 	hismanager->RegisterPlot<TH2F>("IMPLANT_7012","High Gain Pixel Position",this->h2dsettings.at(7012));
 	hismanager->RegisterPlot<TH2F>("IMPLANT_7013","Low Gain Pixel Position",this->h2dsettings.at(7013));
