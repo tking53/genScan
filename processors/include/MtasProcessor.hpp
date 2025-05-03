@@ -155,10 +155,23 @@ class MtasProcessor : public Processor{
 		double hexagonpad;
 		std::vector<Geometry::hexagon> HexagonShapes;
 
+		//anti-beta hit map
+		TH2Poly* MTAS_2400;
+		TH2Poly* MTAS_2401;
+		TH2Poly* MTAS_2402;
+		TH2Poly* MTAS_2403;
+
+		//general hit map
 		TH2Poly* MTAS_2500;
 		TH2Poly* MTAS_2501;
 		TH2Poly* MTAS_2502;
 		TH2Poly* MTAS_2503;
+
+		//beta hit map
+		TH2Poly* MTAS_2600;
+		TH2Poly* MTAS_2601;
+		TH2Poly* MTAS_2602;
+		TH2Poly* MTAS_2603;
 
 };
 

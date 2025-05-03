@@ -104,7 +104,8 @@ e21027Processor::e21027Processor(const std::string& log) : Processor(log,"e21027
 	auto erg = MtasProc->GetTotalEnergy(0);
 
 	auto hasion = summary->ContainsEventTag(this->implant);
-	auto hasbeta = summary->ContainsEventTag("beta");
+	auto hasbeta = summary->ContainsEventTag(this->beta);
+	auto hasgamma = summary->ContainsEventTag(this->gamma);
 
 	if( hasion ){
 		for (unsigned int iPins = 0 ; iPins < this->PidProc->GetFP1().pin.size(); ++iPins){
@@ -114,11 +115,17 @@ e21027Processor::e21027Processor(const std::string& log) : Processor(log,"e21027
 			hismanager->Fill("EXP_" + std::to_string(10012 +iPins ), this->PidProc->GetFP1Tofs().at(6),this->PidProc->GetFP1().pin.at(iPins).energy);
 		}
 	}
+
+	if( hasgamma and not hasbeta ){
+		//search through the old indices to find the delayed
+	}
 	
 	if( hasbeta ){
 		this->MtasProc->FillBetaPlots(hismanager);
+		this->MtasProc->FillNoLogicBetaPlots(hismanager);
 	}else{
 		this->MtasProc->FillNonBetaPlots(hismanager);
+		this->MtasProc->FillNoLogicNonBetaPlots(hismanager);
 	}
 
 
