@@ -10,6 +10,7 @@
 		<Processor name="MtasProcessor"/>
 		<Processor name="MtasImplantProcessor" beta_thresh_low="25.0" beta_thresh_high="3500.0"/> 
 		<Processor name="PidProcessor">
+			<Isotope name="A1" cutid="PID_A1" filename="PIDA1.cxx"/>
 			<Histogram id="1" xlow="-100" xhigh="100" />
 		</Processor>
 		</Processor>
@@ -757,11 +758,10 @@
 			</Module>
 
 			<Module number="9" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
-				<Channel number="0" type="mtasimplant" subtype="anode"  group="1" tags="lowgain"> 
+				<Channel number="0" type="mtasimplant" subtype="anode"  group="1" tags="lowgain">
 					<Calibration model="linear" min="0">
 						0.0 1.0
-					</Calibration>	
-				</Channel>
+					</Calibration>	</Channel>
 				<Channel number="1" type="mtasimplant" subtype="anode"  group="2" tags="lowgain">
 					<Calibration model="linear" min="0">
 						0.0 1.0
@@ -1048,17 +1048,17 @@
 						0.0 1.0
 					</Calibration>
 				</Channel>
-				<Channel number="9" type="mtasimplant" subtype="anode"  group="56" tags="lowgain">
+				<Channel number="9" type="mtasimplant" subtype="anode"  group="57" tags="lowgain">
 					<Calibration model="linear" min="0">
 						0.0 1.0
 					</Calibration>
 				</Channel>
-				<Channel number="10" type="mtasimplant" subtype="anode" group="57" tags="lowgain">
+				<Channel number="10" type="mtasimplant" subtype="anode" group="58" tags="lowgain">
 					<Calibration model="linear" min="0">
 						0.0 1.0
 					</Calibration>
 				</Channel>
-				<Channel number="11" type="mtasimplant" subtype="anode" group="58" tags="lowgain">
+				<Channel number="11" type="mtasimplant" subtype="anode" group="59" tags="lowgain">
 					<Calibration model="linear" min="0">
 						0.0 1.0
 					</Calibration>
@@ -1068,23 +1068,22 @@
 						0.0 1.0
 					</Calibration>
 				</Channel>
-				<Channel number="13" type="mtasimplant" subtype="anode" group="59" tags="lowgain">
+				<Channel number="13" type="mtasimplant" subtype="anode" group="60" tags="lowgain">
 					<Calibration model="linear" min="0">
 						0.0 1.0
 					</Calibration>
 				</Channel>
-				<Channel number="14" type="mtasimplant" subtype="anode" group="60" tags="lowgain">
+				<Channel number="14" type="mtasimplant" subtype="anode" group="61" tags="lowgain">
 					<Calibration model="linear" min="0">
 						0.0 1.0
 					</Calibration>
 				</Channel>
-				<Channel number="15" type="mtasimplant" subtype="anode" group="61" tags="lowgain">
+				<Channel number="15" type="mtasimplant" subtype="anode" group="62" tags="lowgain">
 					<Calibration model="linear" min="0">
 						0.0 1.0
 					</Calibration>
 				</Channel>
 			</Module>
-
 		</Crate>
 	</Map>
 </Configuration>
