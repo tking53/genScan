@@ -3,6 +3,8 @@
 #include "EventSummary.hpp"
 #include "HistogramManager.hpp"
 #include <TTree.h>
+#include <algorithm>
+#include <cmath>
 #include <stdexcept>
 
 e21027Processor::e21027Processor(const std::string& log) : Processor(log,"e21027Processor",{}){
@@ -58,11 +60,16 @@ e21027Processor::e21027Processor(const std::string& log) : Processor(log,"e21027
 	this->HasVeto = false;
 	this->HasPID = false;
 
+	this->ion_beta_limits = std::unique_ptr<boost::circular_buffer<std::pair<unsigned long long,unsigned long long>>>(nullptr);
+
 	this->Reset();
 }
 
 [[maybe_unused]] bool e21027Processor::PreProcess(EventHistoryManager* eventhistory, PLOTS::PlotRegistry* hismanager, CUTS::CutRegistry* cutmanager){
 	Processor::PreProcess();
+	if( this->ion_beta_limits == nullptr ){
+		this->ion_beta_limits.reset(new boost::circular_buffer<std::pair<unsigned long long,unsigned long long>>(eventhistory->GetMaxHistorySize()));
+	}
 
 	auto summary = eventhistory->GetCurrentEventSummary();
 	auto types = summary->GetKnownTypes();
@@ -114,20 +121,37 @@ e21027Processor::e21027Processor(const std::string& log) : Processor(log,"e21027
 			hismanager->Fill("EXP_" + std::to_string(10008 +iPins ), this->PidProc->GetFP1Tofs().at(4),this->PidProc->GetFP1().pin.at(iPins).energy);
 			hismanager->Fill("EXP_" + std::to_string(10012 +iPins ), this->PidProc->GetFP1Tofs().at(6),this->PidProc->GetFP1().pin.at(iPins).energy);
 		}
+		////found new ion, need to add it to the limit list
+		////and then correlate it with all known betas
+		//auto ion_idx = static_cast<unsigned long long>(summary->GetEventObservable("Event_idx").value());
+		////use the boost::circular_buffer to queue the things
+		//this->ion_beta_limits->push_front({ion_idx,0});
+		////search through the summaries previous and we'll grab their idx
+		//for( size_t ii = 1; ii < eventhistory->GetMaxHistorySize(); ++ii ){
+		//	auto prevsummary = eventhistory->GetPreviousEventSummary(ii);
+		//	auto preveventidx = static_cast<unsigned long long>(prevsummary->GetEventObservable("Event_idx").value());
+		//	auto isprevbeta = prevsummary->ContainsEventTag(this->beta);
+		//	if( isprevbeta ){
+		//		this->ion_beta_limits->at(0).second = std::max(this->ion_beta_limits->at(0).second,preveventidx);
+		//		//determine which tdiff plot to fill
+		//		//these are all the negative time portions of the tdiff
+		//	}
+		//}
 	}
 
-	if( hasgamma and not hasbeta ){
-		//search through the old indices to find the delayed
-	}
+	//if( hasgamma and not hasbeta ){
+	//	//search through the old indices to find the delayed gamma from a beta
+	//}
 	
 	if( hasbeta ){
 		this->MtasProc->FillBetaPlots(hismanager);
 		this->MtasProc->FillNoLogicBetaPlots(hismanager);
+		//found new beta, need to go through the known ion list and correlate it with us
+		//and update their secondary
 	}else{
 		this->MtasProc->FillNonBetaPlots(hismanager);
 		this->MtasProc->FillNoLogicNonBetaPlots(hismanager);
 	}
-
 
 	Processor::EndProcess();
 	return true;
@@ -191,6 +215,8 @@ void e21027Processor::Init(const pugi::xml_node& config){
 
 	this->LoadHistogramSettings(config);
 	this->LoadCustomCuts(config);
+
+	this->isotopetags = this->PidProc->GetIsotopeTags();
 }
 		
 void e21027Processor::Finalize(){

@@ -237,7 +237,6 @@ void ProcessorList::ThreshAndCal(boost::container::devector<PhysicsData>& RawEve
 void ProcessorList::ProcessRaw(EventHistoryManager* History,PLOTS::PlotRegistry* HistogramManager){
 	auto RawEvents = History->GetCurrentEventSummary()->GetRawEvents();
 
-
 	auto evtsize = RawEvents.size();
 	double deltats = 0.0;
 	double historyts = 0.0;

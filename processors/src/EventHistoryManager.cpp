@@ -86,6 +86,7 @@ bool EventHistoryManager::IsCurrentEventSummaryEmpty(){
 
 void EventHistoryManager::BuildCurrentEventDetectorSummary(){
 	this->History.at(0).BuildDetectorSummary();
+	this->History.at(0).AddEventObservable("Event_idx",this->EventCount);
 }
 
 size_t EventHistoryManager::GetMaxHistorySize() const{

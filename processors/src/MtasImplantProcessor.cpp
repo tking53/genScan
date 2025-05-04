@@ -144,10 +144,15 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 
 	if( this->lgImage.dynode > this->IsIonThresh.first and this->lgImage.dynode < this->IsIonThresh.second ){
 		summary->AddEventTag("ion");
+		summary->AddEventObservable("ION_X",this->lgImage.highResPosition.first);
+		summary->AddEventObservable("ION_Y",this->lgImage.highResPosition.second);
 	}
 
 	if( this->hgImage.dynode > this->IsBetaThresh.first and this->hgImage.dynode < this->IsBetaThresh.second ){
 		summary->AddEventTag("beta");
+		summary->AddEventObservable("BETA_X",this->hgImage.highResPosition.first);
+		summary->AddEventObservable("BETA_Y",this->hgImage.highResPosition.second);
+		summary->AddEventObservable("BETA_Energy",this->hgImage.dynode);
 	}
 
 	Processor::EndProcess();

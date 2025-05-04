@@ -4,6 +4,7 @@
 #include "HistogramManager.hpp"
 #include <TTree.h>
 #include <limits>
+#include <stdexcept>
 
 PidProcessor::PidProcessor(const std::string& log) : Processor(log,"PidProcessor",{"pid"}){
 	
@@ -80,7 +81,8 @@ PidProcessor::PidProcessor(const std::string& log) : Processor(log,"PidProcessor
 
 [[maybe_unused]] bool PidProcessor::PreProcess(EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	Processor::PreProcess();
-	eventhistory->GetCurrentEventSummary()->GetDetectorSummary(this->AllDefaultRegex["pid"],this->SummaryData);
+	auto summary = eventhistory->GetCurrentEventSummary();
+	summary->GetDetectorSummary(this->AllDefaultRegex["pid"],this->SummaryData);
 
 	for (const auto& evt: this->SummaryData){
 		auto group = evt->GetGroup();
@@ -276,13 +278,6 @@ PidProcessor::PidProcessor(const std::string& log) : Processor(log,"PidProcessor
 	fp2Tofs[6] = db3.scint.right.time - fp2.xplas.at(0).time ;
 	fp2Tofs[7] = db3.scint.right.time - fp2.xplas.at(1).time ;
 
-
-	Processor::EndProcess();
-	return true;
-}
-
-[[maybe_unused]] bool PidProcessor::Process([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
-
 	hismanager->Fill("PID_1", fp1Tofs.at(0));
 	hismanager->Fill("PID_2", fp1Tofs.at(1));
 	hismanager->Fill("PID_3", fp1Tofs.at(2));
@@ -350,6 +345,20 @@ PidProcessor::PidProcessor(const std::string& log) : Processor(log,"PidProcessor
 	hismanager->Fill("PID_126",fp2.pin.at(0).energy,fp2.pin.at(2).energy);
 	hismanager->Fill("PID_127",fp2.pin.at(0).energy,fp2.pin.at(3).energy);
 
+
+	//in here tell it if what cut we made it in
+	//for( const auto& kv : this->isotopes ){
+	// 	if( cutmanager->IsWithin(kv.second,tof,erg) ){
+	// 		summary->AddEventTag(kv.first);
+	// 	}
+	//}
+
+
+	Processor::EndProcess();
+	return true;
+}
+
+[[maybe_unused]] bool PidProcessor::Process([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	return true;
 }
 
@@ -363,6 +372,29 @@ void PidProcessor::Init(const pugi::xml_node& config){
 	this->LoadCustomCuts(config);
 	this->LoadHistogramSettings(config);
 
+	for( pugi::xml_node isotope = config.child("Isotope"); isotope; isotope = isotope.next_sibling("Isotope") ){
+		std::string tagname = isotope.attribute("name").as_string("");
+		if( tagname.empty() ){
+			throw std::runtime_error("isotope qualified, but no name given");
+		}
+		std::string cutname = isotope.attribute("cutid").as_string("");
+		if( cutname.empty() ){
+			throw std::runtime_error("isotope qualified, but no cutname provided");
+		}
+		std::string filename = isotope.attribute("filename").as_string("");
+		if( filename.empty() ){
+			throw std::runtime_error("isotope qualified, but cut file not given");
+		}
+
+		this->isotopes[tagname] = cutname;
+
+		this->customcuts[cutname] = filename;
+		this->console->info("Found Isotope : {} associated with Cut {} using file {}",tagname,cutname,filename);
+	}
+
+	for( const auto& kv : this->isotopes ){
+		this->isotopetags.push_back(kv.first);
+	}
 }
 		
 void PidProcessor::Finalize(){
@@ -494,4 +526,8 @@ const ProcessorStruct::FP& PidProcessor::GetFP1() const {
 }
 const ProcessorStruct::FP& PidProcessor::GetFP2() const {
 	return this->fp2;
+}
+
+const std::vector<std::string>& PidProcessor::GetIsotopeTags() const{
+	return this->isotopetags;
 }

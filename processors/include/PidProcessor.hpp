@@ -24,60 +24,63 @@ class PidProcessor : public Processor{
 
 		const std::vector<double>& GetFP1Tofs() const;
 		const std::vector<double>& GetFP2Tofs() const;
-		
-	const ProcessorStruct::FP& GetFP1() const;
-	const ProcessorStruct::FP& GetFP2() const;
+
+		const ProcessorStruct::FP& GetFP1() const;
+		const ProcessorStruct::FP& GetFP2() const;
+
+		const std::vector<std::string>& GetIsotopeTags() const;
 
 	private:
 
-	ProcessorStruct::DBOX db3;
-	ProcessorStruct::DBOX db4;
-	ProcessorStruct::DBOX db5;	
-	ProcessorStruct::FP fp1;
-	ProcessorStruct::FP fp2;
-	double currRF;
+		ProcessorStruct::DBOX db3;
+		ProcessorStruct::DBOX db4;
+		ProcessorStruct::DBOX db5;	
+		ProcessorStruct::FP fp1;
+		ProcessorStruct::FP fp2;
+		double currRF;
 
 
-	void FillStruct(PhysicsData* data, ProcessorStruct::PidDet &det);
+		void FillStruct(PhysicsData* data, ProcessorStruct::PidDet &det);
 
-	enum DETPOSITION{
-		UP,
-		DOWN,
-		LEFT,
-		RIGHT,
-		ANODE,
-		
-	};
+		enum DETPOSITION{
+			UP,
+			DOWN,
+			LEFT,
+			RIGHT,
+			ANODE,
 
-	enum BOXID{
-		DB3,
-		DB4,
-		DB5,
-		FP1,
-		FP2,
-		
-	};
+		};
 
-	enum DETSUBTYPE	{
-		SCINT,
-		PPAC0,
-		PPAC1,
-		PIN1,
-		PIN2,
-		PIN3,
-		PIN4,
-		RF
-	};
+		enum BOXID{
+			DB3,
+			DB4,
+			DB5,
+			FP1,
+			FP2,
 
-	DETPOSITION currDETPOSITION;
-	DETSUBTYPE currDETSUBTYPE;
-	BOXID currBOXID;
+		};
 
-	std::vector<double> fp1Tofs ;
-	std::vector<double> fp2Tofs ;
-	
-	
-	
+		enum DETSUBTYPE	{
+			SCINT,
+			PPAC0,
+			PPAC1,
+			PIN1,
+			PIN2,
+			PIN3,
+			PIN4,
+			RF
+		};
+
+		DETPOSITION currDETPOSITION;
+		DETSUBTYPE currDETSUBTYPE;
+		BOXID currBOXID;
+
+		std::vector<double> fp1Tofs ;
+		std::vector<double> fp2Tofs ;
+
+		std::map<std::string,std::string> isotopes;
+		std::vector<std::string> isotopetags;
+
 };
 
 #endif

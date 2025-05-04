@@ -6,6 +6,7 @@
 #include "MtasImplantProcessor.hpp"
 #include "PidProcessor.hpp"
 #include "VetoProcessor.hpp"
+#include <vector>
 
 class e21027Processor : public Processor{
 	public:
@@ -33,6 +34,9 @@ class e21027Processor : public Processor{
 		std::string beta;
 		std::string gamma;
 		std::string unknown;
+
+		std::vector<std::string> isotopetags;
+		std::unique_ptr<boost::circular_buffer<std::pair<unsigned long long,unsigned long long>>> ion_beta_limits;
 
 		std::shared_ptr<MtasProcessor> MtasProc;
 		std::shared_ptr<MtasImplantProcessor> ImplantProc;
