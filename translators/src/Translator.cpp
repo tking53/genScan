@@ -1,3 +1,4 @@
+#include <filesystem>
 #include <fstream>
 #include <limits>
 #include <stdexcept>
@@ -24,11 +25,9 @@ Translator::~Translator(){
 }
 		
 bool Translator::AddFile(const std::string& filename){
-	std::ifstream file(filename);
-	if( file.is_open() ){
-		file.seekg(0, std::ios::end);
-		this->FileSizes.push_back(file.tellg());
-		file.close();
+	std::filesystem::path filepath(filename);
+	if( std::filesystem::exists(filepath) ){
+		this->FileSizes.push_back(std::filesystem::file_size(filepath));
 		this->InputFiles.push_back(filename);
 		this->console->info("Added File {} to list of files to translate, File Size : {}",this->InputFiles.back(),this->FileSizes.back());
 		return true;
