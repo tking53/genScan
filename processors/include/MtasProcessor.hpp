@@ -68,6 +68,9 @@ class MtasProcessor : public Processor{
 
 		void DeclareBetaPlots(PLOTS::PlotRegistry*);
 		void DeclareAntiBetaPlots(PLOTS::PlotRegistry*);
+		void DeclareNoLogicBetaPlots(PLOTS::PlotRegistry*);
+		void DeclareNoLogicAntiBetaPlots(PLOTS::PlotRegistry*);
+		void DeclareNoLogicPlots(PLOTS::PlotRegistry*);
 
 		bool UseOldCenter;
 		void NewCenterCalculation();
@@ -145,6 +148,7 @@ class MtasProcessor : public Processor{
 		double currevttime;
 
 		bool diagnosticplots;
+		bool nologictimeplots;
 
 		std::vector<std::unique_ptr<Correction::ExpoPosCorrection>> PosCorrectionMap;
 
