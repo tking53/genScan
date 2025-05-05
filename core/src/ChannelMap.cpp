@@ -131,7 +131,7 @@ ChannelMap::FirmwareVersion ChannelMap::CalcFirmwareEnum(const std::string& type
 	auto gcid = this->GetGlobalChanID(crid,bid,cid);
 	auto gbid = this->GetGlobalBoardID(crid,bid);
 	if( (gcid >= MAX_FID) or (gbid >= MAX_BOARDS) or (cid >= MAX_CHANNELS_PER_BOARD) ){
-		std::string mess = "Invalid config file, Crate : "+std::to_string(crid)+"Board : "+std::to_string(bid)+" Channel : "+std::to_string(cid)+" Is Invalid";
+		std::string mess = "Invalid config file, Crate : "+std::to_string(crid)+" Board : "+std::to_string(bid)+" Channel : "+std::to_string(cid)+" Is Invalid, specified crate/board/channel that exceeds the limit";
 		throw std::runtime_error(mess);
 	}
 	std::string currunique_id = t + ":" + st + ":" + g;
