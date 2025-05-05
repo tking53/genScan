@@ -115,7 +115,7 @@ Spy::Spy()
 	// Create an embedded canvas and add to the main frame, centered in x and y
 	// and with 30 pixel margins all around
 	fCanvas = new TRootEmbeddedCanvas("Canvas", fMain, 600, 400);
-	fLcan = new TGLayoutHints(kLHintsCenterX|kLHintsCenterY,30,30,30,30);
+	fLcan = new TGLayoutHints(kLHintsCenterX|kLHintsCenterY|kLHintsExpandY|kLHintsExpandX,30,30,30,30);
 	fMain->AddFrame(fCanvas, fLcan);
 
 	// Create a horizontal frame containing three text buttons
