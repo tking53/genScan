@@ -56,6 +56,9 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		{3152, {4096,0.0,4096.0,4096,0.0,4096.0}},
 		{3153, {4096,0.0,4096.0,4096,0.0,4096.0}},
 		{3154, {4096,0.0,4096.0,4096,0.0,4096.0}},
+		{3155, {4096,0.0,4096.0,4096,0.0,4096.0}},
+		{3156, {4096,0.0,4096.0,4096,0.0,4096.0}},
+		{3157, {4096,0.0,4096.0,4096,0.0,4096.0}},
 
 		{3160, {1024,-1.0,1.0,8192,0.0,8192.0}},
 
@@ -64,6 +67,9 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		{31528, {2048,0.0,16384.0,2048,0.0,16384.0}},
 		{31538, {2048,0.0,16384.0,2048,0.0,16384.0}},
 		{31548, {2048,0.0,16384.0,2048,0.0,16384.0}},
+		{31558, {2048,0.0,16384.0,2048,0.0,16384.0}},
+		{31568, {2048,0.0,16384.0,2048,0.0,16384.0}},
+		{31578, {2048,0.0,16384.0,2048,0.0,16384.0}},
 
 		{3201, {16384,0.0,16384,24,0,24}},
 		{3250, {4096,0.0,4096.0,4096,0.0,4096.0}},
@@ -71,6 +77,9 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		{3252, {4096,0.0,4096.0,4096,0.0,4096.0}},
 		{3253, {4096,0.0,4096.0,4096,0.0,4096.0}},
 		{3254, {4096,0.0,4096.0,4096,0.0,4096.0}},
+		{3255, {4096,0.0,4096.0,4096,0.0,4096.0}},
+		{3256, {4096,0.0,4096.0,4096,0.0,4096.0}},
+		{3257, {4096,0.0,4096.0,4096,0.0,4096.0}},
 
 		{3260, {1024,-1.0,1.0,8192,0.0,8192.0}},
 
@@ -79,6 +88,9 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		{32528, {2048,0.0,16384.0,2048,0.0,16384.0}},
 		{32538, {2048,0.0,16384.0,2048,0.0,16384.0}},
 		{32548, {2048,0.0,16384.0,2048,0.0,16384.0}},
+		{32558, {2048,0.0,16384.0,2048,0.0,16384.0}},
+		{32568, {2048,0.0,16384.0,2048,0.0,16384.0}},
+		{32578, {2048,0.0,16384.0,2048,0.0,16384.0}},
 
 		{3301, {16384,0.0,16384,24,0,24}},
 		{3350, {4096,0.0,4096.0,4096,0.0,4096.0}},
@@ -86,6 +98,9 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		{3352, {4096,0.0,4096.0,4096,0.0,4096.0}},
 		{3353, {4096,0.0,4096.0,4096,0.0,4096.0}},
 		{3354, {4096,0.0,4096.0,4096,0.0,4096.0}},
+		{3355, {4096,0.0,4096.0,4096,0.0,4096.0}},
+		{3356, {4096,0.0,4096.0,4096,0.0,4096.0}},
+		{3357, {4096,0.0,4096.0,4096,0.0,4096.0}},
 
 		{3360, {1024,-1.0,1.0,8192,0.0,8192.0}},
 
@@ -94,6 +109,9 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		{33528, {2048,0.0,16384.0,2048,0.0,16384.0}},
 		{33538, {2048,0.0,16384.0,2048,0.0,16384.0}},
 		{33548, {2048,0.0,16384.0,2048,0.0,16384.0}},
+		{33558, {2048,0.0,16384.0,2048,0.0,16384.0}},
+		{33568, {2048,0.0,16384.0,2048,0.0,16384.0}},
+		{33578, {2048,0.0,16384.0,2048,0.0,16384.0}},
 
 		{3411, {8192,0.0,8192.0,12,0,12}},
 		{3412, {8192,0.0,8192.0,12,0,12}},
@@ -588,6 +606,15 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 
 		hismanager->Fill("MTAS_3251",this->TotalEnergy[0],this->TotalEnergy[1]);
 		hismanager->Fill("MTAS_32518",this->TotalEnergy[0],this->TotalEnergy[1]);
+		
+		if( (not this->MiddleFire) and (not this->OuterFire) ){
+			hismanager->Fill("MTAS_3257",this->TotalEnergy[0],this->TotalEnergy[1]);
+			hismanager->Fill("MTAS_32578",this->TotalEnergy[0],this->TotalEnergy[1]);
+			if( not this->InnerFire ){
+				hismanager->Fill("MTAS_3256",this->TotalEnergy[0],this->TotalEnergy[1]);
+				hismanager->Fill("MTAS_32568",this->TotalEnergy[0],this->TotalEnergy[1]);
+			}
+		}
 
 		for( int ii = 0; ii < 24; ++ii ){
 			hismanager->Fill("MTAS_3201",this->CrystalEnergy[ii],ii);
@@ -626,9 +653,13 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 
 			hismanager->Fill("MTAS_32538",this->TotalEnergy[1],this->CrystalEnergy[ii]);
 
-			if( (not this->InnerFire) and (not this->MiddleFire) and (not this->OuterFire) ){
-				hismanager->Fill("MTAS_3254",this->TotalEnergy[0],this->CrystalEnergy[ii]);
-				hismanager->Fill("MTAS_32548",this->TotalEnergy[0],this->CrystalEnergy[ii]);
+			if( (not this->MiddleFire) and (not this->OuterFire) ){
+				hismanager->Fill("MTAS_3255",this->TotalEnergy[0],this->CrystalEnergy[ii]);
+				hismanager->Fill("MTAS_32558",this->TotalEnergy[0],this->CrystalEnergy[ii]);
+				if( not this->InnerFire ){
+					hismanager->Fill("MTAS_3254",this->TotalEnergy[0],this->CrystalEnergy[ii]);
+					hismanager->Fill("MTAS_32548",this->TotalEnergy[0],this->CrystalEnergy[ii]);
+				}
 			}
 		}
 	}
@@ -828,12 +859,18 @@ void MtasProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH2F>("MTAS_3252","C Segment vs Mtas Total; Energy (keV); Energy (keV)",this->h2dsettings.at(3252));
 	hismanager->RegisterPlot<TH2F>("MTAS_3253","C Segment vs C; Energy (keV); Energy (keV)",this->h2dsettings.at(3253));
 	hismanager->RegisterPlot<TH2F>("MTAS_3254","C Segment vs Mtas Total (veto any I,M,O) ; Energy (keV); Energy (keV)",this->h2dsettings.at(3254));
+	hismanager->RegisterPlot<TH2F>("MTAS_3255","C Segment vs Mtas Total (veto any M,O) ; Energy (keV); Energy (keV)",this->h2dsettings.at(3255));
+	hismanager->RegisterPlot<TH2F>("MTAS_3256","C vs Mtas Total (veto any I,M,O) ; Energy (keV); Energy (keV)",this->h2dsettings.at(3256));
+	hismanager->RegisterPlot<TH2F>("MTAS_3257","C vs Mtas Total (veto any M,O) ; Energy (keV); Energy (keV)",this->h2dsettings.at(3257));
 
 	hismanager->RegisterPlot<TH2F>("MTAS_32508","I,M,O vs Mtas Total; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(32508));
 	hismanager->RegisterPlot<TH2F>("MTAS_32518","C vs Mtas Total; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(32518));
 	hismanager->RegisterPlot<TH2F>("MTAS_32528","C Segment vs Mtas Total; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(32528));
 	hismanager->RegisterPlot<TH2F>("MTAS_32538","C Segment vs C; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(32538));
 	hismanager->RegisterPlot<TH2F>("MTAS_32548","C Segment vs Mtas Total (veto any I,M,O) ; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(32548));
+	hismanager->RegisterPlot<TH2F>("MTAS_32558","C Segment vs Mtas Total (veto any M,O) ; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(32558));
+	hismanager->RegisterPlot<TH2F>("MTAS_32568","C Segment vs Mtas Total (veto any I,M,O) ; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(32568));
+	hismanager->RegisterPlot<TH2F>("MTAS_32578","C Segment vs Mtas Total (veto any M,O) ; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(32578));
 
 	//center position correction plots
 	for( size_t ii = 0; ii < 6; ++ii ){
@@ -961,12 +998,18 @@ void MtasProcessor::DeclareBetaPlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH2F>("MTAS_3352","C Segment vs Mtas Total #beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(3352));
 	hismanager->RegisterPlot<TH2F>("MTAS_3353","C Segment vs C #beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(3353));
 	hismanager->RegisterPlot<TH2F>("MTAS_3354","C Segment vs Mtas Total (veto any I,M,O) #beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(3354));
+	hismanager->RegisterPlot<TH2F>("MTAS_3355","C Segment vs Mtas Total (veto any M,O) #beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(3355));
+	hismanager->RegisterPlot<TH2F>("MTAS_3356","C vs Mtas Total (veto any I,M,O) #beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(3356));
+	hismanager->RegisterPlot<TH2F>("MTAS_3357","C vs Mtas Total (veto any M,O) #beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(3357));
 	
 	hismanager->RegisterPlot<TH2F>("MTAS_33508","I,M,O vs Mtas Total #beta-gated; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(33508));
 	hismanager->RegisterPlot<TH2F>("MTAS_33518","C vs Mtas Total #beta-gated; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(33518));
 	hismanager->RegisterPlot<TH2F>("MTAS_33528","C Segment vs Mtas Total #beta-gated; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(33528));
 	hismanager->RegisterPlot<TH2F>("MTAS_33538","C Segment vs C #beta-gated; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(33538));
 	hismanager->RegisterPlot<TH2F>("MTAS_33548","C Segment vs Mtas Total (veto any I,M,O)  #beta-gated; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(33548));
+	hismanager->RegisterPlot<TH2F>("MTAS_33558","C Segment vs Mtas Total (veto any M,O)  #beta-gated; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(33558));
+	hismanager->RegisterPlot<TH2F>("MTAS_33568","C vs Mtas Total (veto any I,M,O)  #beta-gated; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(33568));
+	hismanager->RegisterPlot<TH2F>("MTAS_33578","C vs Mtas Total (veto any M,O)  #beta-gated; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(33578));
 	
 	if( this->diagnosticplots ){
 		hismanager->RegisterPlot<TH2F>("MTAS_3431","Raw IndividualPMT C PMTs #beta-gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3431));
@@ -1019,12 +1062,18 @@ void MtasProcessor::DeclareAntiBetaPlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH2F>("MTAS_3152","C Segment vs Mtas Total anti-#beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(3152));
 	hismanager->RegisterPlot<TH2F>("MTAS_3153","C Segment vs C anti-#beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(3153));
 	hismanager->RegisterPlot<TH2F>("MTAS_3154","C Segment vs Mtas Total (veto any I,M,O) anti-#beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(3154));
+	hismanager->RegisterPlot<TH2F>("MTAS_3155","C Segment vs Mtas Total (veto any M,O) anti-#beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(3155));
+	hismanager->RegisterPlot<TH2F>("MTAS_3156","C vs Mtas Total (veto any I,M,O) anti-#beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(3156));
+	hismanager->RegisterPlot<TH2F>("MTAS_3157","C vs Mtas Total (veto any M,O) anti-#beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(3157));
 	
 	hismanager->RegisterPlot<TH2F>("MTAS_31508","I,M,O vs Mtas Total anti-#beta-gated; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(31508));
 	hismanager->RegisterPlot<TH2F>("MTAS_31518","C vs Mtas Total anti-#beta-gated; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(31518));
 	hismanager->RegisterPlot<TH2F>("MTAS_31528","C Segment vs Mtas Total anti-#beta-gated; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(31528));
 	hismanager->RegisterPlot<TH2F>("MTAS_31538","C Segment vs Mtas Total anti-#beta-gated; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(31538));
 	hismanager->RegisterPlot<TH2F>("MTAS_31548","C Segment vs Mtas Total (veto any I,M,O) anti-#beta-gated; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(31548));
+	hismanager->RegisterPlot<TH2F>("MTAS_31558","C Segment vs Mtas Total (veto any M,O) anti-#beta-gated; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(31558));
+	hismanager->RegisterPlot<TH2F>("MTAS_31568","C vs Mtas Total (veto any I,M,O) anti-#beta-gated; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(31568));
+	hismanager->RegisterPlot<TH2F>("MTAS_31578","C vs Mtas Total (veto any M,O) anti-#beta-gated; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(31578));
 	
 	if( this->diagnosticplots ){
 		hismanager->RegisterPlot<TH2F>("MTAS_3411","Raw IndividualPMT C PMTs anti-#beta-gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3411));
@@ -1423,6 +1472,15 @@ void MtasProcessor::FillBetaPlots(PLOTS::PlotRegistry* hismanager){
 		hismanager->Fill("MTAS_3351",this->TotalEnergy[0],this->TotalEnergy[1]);
 		hismanager->Fill("MTAS_33518",this->TotalEnergy[0],this->TotalEnergy[1]);
 
+		if( (not this->MiddleFire) and (not this->OuterFire) ){
+			hismanager->Fill("MTAS_3357",this->TotalEnergy[0],this->TotalEnergy[1]);
+			hismanager->Fill("MTAS_33578",this->TotalEnergy[0],this->TotalEnergy[1]);
+			if( not this->InnerFire ){
+				hismanager->Fill("MTAS_3356",this->TotalEnergy[0],this->TotalEnergy[1]);
+				hismanager->Fill("MTAS_33568",this->TotalEnergy[0],this->TotalEnergy[1]);
+			}
+		}
+
 		for( int ii = 0; ii < 24; ++ii ){
 			hismanager->Fill("MTAS_3301",this->CrystalEnergy[ii],ii);
 		}
@@ -1460,12 +1518,14 @@ void MtasProcessor::FillBetaPlots(PLOTS::PlotRegistry* hismanager){
 
 			hismanager->Fill("MTAS_33538",this->TotalEnergy[1],this->CrystalEnergy[ii]);
 
-			if( (not this->InnerFire) and (not this->MiddleFire) and (not this->OuterFire) ){
-				hismanager->Fill("MTAS_3354",this->TotalEnergy[0],this->CrystalEnergy[ii]);
-				hismanager->Fill("MTAS_33548",this->TotalEnergy[0],this->CrystalEnergy[ii]);
+			if( (not this->MiddleFire) and (not this->OuterFire) ){
+				hismanager->Fill("MTAS_3355",this->TotalEnergy[0],this->CrystalEnergy[ii]);
+				hismanager->Fill("MTAS_33558",this->TotalEnergy[0],this->CrystalEnergy[ii]);
+				if( not this->InnerFire ){
+					hismanager->Fill("MTAS_3354",this->TotalEnergy[0],this->CrystalEnergy[ii]);
+					hismanager->Fill("MTAS_33548",this->TotalEnergy[0],this->CrystalEnergy[ii]);
+				}
 			}
-
-
 		}
 	}
 }
@@ -1608,6 +1668,16 @@ void MtasProcessor::FillNonBetaPlots(PLOTS::PlotRegistry* hismanager){
 		hismanager->Fill("MTAS_3151",this->TotalEnergy[0],this->TotalEnergy[1]);
 		hismanager->Fill("MTAS_31518",this->TotalEnergy[0],this->TotalEnergy[1]);
 
+		if( (not this->MiddleFire) and (not this->OuterFire) ){
+			hismanager->Fill("MTAS_3157",this->TotalEnergy[0],this->TotalEnergy[1]);
+			hismanager->Fill("MTAS_31578",this->TotalEnergy[0],this->TotalEnergy[1]);
+			if( not this->InnerFire ){
+				hismanager->Fill("MTAS_3156",this->TotalEnergy[0],this->TotalEnergy[1]);
+				hismanager->Fill("MTAS_31568",this->TotalEnergy[0],this->TotalEnergy[1]);
+			}
+		}
+
+
 		for( int ii = 0; ii < 24; ++ii ){
 			hismanager->Fill("MTAS_3101",this->CrystalEnergy[ii],ii);
 		}
@@ -1645,10 +1715,15 @@ void MtasProcessor::FillNonBetaPlots(PLOTS::PlotRegistry* hismanager){
 
 			hismanager->Fill("MTAS_31538",this->TotalEnergy[1],this->CrystalEnergy[ii]);
 
-			if( (not this->InnerFire) and (not this->MiddleFire) and (not this->OuterFire) ){
-				hismanager->Fill("MTAS_3154",this->TotalEnergy[0],this->CrystalEnergy[ii]);
-				hismanager->Fill("MTAS_31548",this->TotalEnergy[0],this->CrystalEnergy[ii]);
+			if( (not this->MiddleFire) and (not this->OuterFire) ){
+				hismanager->Fill("MTAS_3155",this->TotalEnergy[0],this->CrystalEnergy[ii]);
+				hismanager->Fill("MTAS_31558",this->TotalEnergy[0],this->CrystalEnergy[ii]);
+				if( not this->InnerFire ){
+					hismanager->Fill("MTAS_3154",this->TotalEnergy[0],this->CrystalEnergy[ii]);
+					hismanager->Fill("MTAS_31548",this->TotalEnergy[0],this->CrystalEnergy[ii]);
+				}
 			}
+
 		}
 	}
 }
