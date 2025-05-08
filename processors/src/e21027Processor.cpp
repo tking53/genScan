@@ -33,22 +33,24 @@ e21027Processor::e21027Processor(const std::string& log) : Processor(log,"e21027
 	// };
 
 	this->h2dsettings = {
-		{10000,{10000,-1000,10000,16000,0,16000}},
-		{10001,{10000,-1000,10000,16000,0,16000}},
-		{10002,{10000,-1000,10000,16000,0,16000}},
-		{10003,{10000,-1000,10000,16000,0,16000}},
-		{10004,{10000,-1000,10000,16000,0,16000}},
-		{10005,{10000,-1000,10000,16000,0,16000}},
-		{10006,{10000,-1000,10000,16000,0,16000}},
-		{10007,{10000,-1000,10000,16000,0,16000}},
-		{10008,{10000,-1000,10000,16000,0,16000}},
-		{10009,{10000,-1000,10000,16000,0,16000}},
-		{10010,{10000,-1000,10000,16000,0,16000}},
-		{10011,{10000,-1000,10000,16000,0,16000}},
-		{10012,{10000,-1000,10000,16000,0,16000}},
-		{10013,{10000,-1000,10000,16000,0,16000}},
-		{10014,{10000,-1000,10000,16000,0,16000}},
-		{10015,{10000,-1000,10000,16000,0,16000}}
+		{3650,{4096,0,4096,4096,0,4096}},
+
+		{10000,{2000,-1000,2000,16000,0,16000}},
+		{10001,{2000,-1000,2000,16000,0,16000}},
+		{10002,{2000,-1000,2000,16000,0,16000}},
+		{10003,{2000,-1000,2000,16000,0,16000}},
+		{10004,{2000,-1000,2000,16000,0,16000}},
+		{10005,{2000,-1000,2000,16000,0,16000}},
+		{10006,{2000,-1000,2000,16000,0,16000}},
+		{10007,{2000,-1000,2000,16000,0,16000}},
+		{10008,{2000,-1000,2000,16000,0,16000}},
+		{10009,{2000,-1000,2000,16000,0,16000}},
+		{10010,{2000,-1000,2000,16000,0,16000}},
+		{10011,{2000,-1000,2000,16000,0,16000}},
+		{10012,{2000,-1000,2000,16000,0,16000}},
+		{10013,{2000,-1000,2000,16000,0,16000}},
+		{10014,{2000,-1000,2000,16000,0,16000}},
+		{10015,{2000,-1000,2000,16000,0,16000}}
 	};
 
 	this->beta = "beta";
@@ -113,44 +115,54 @@ e21027Processor::e21027Processor(const std::string& log) : Processor(log,"e21027
 	auto hasion = summary->ContainsEventTag(this->implant);
 	auto hasbeta = summary->ContainsEventTag(this->beta);
 	auto hasgamma = summary->ContainsEventTag(this->gamma);
+	auto hasmuon = summary->ContainsEventTag("muon");
 
-	if( hasion ){
-		for (unsigned int iPins = 0 ; iPins < this->PidProc->GetFP1().pin.size(); ++iPins){
-			hismanager->Fill("EXP_" + std::to_string(10000 +iPins ), this->PidProc->GetFP1Tofs().at(0),this->PidProc->GetFP1().pin.at(iPins).energy);
-			hismanager->Fill("EXP_" + std::to_string(10004 +iPins ), this->PidProc->GetFP1Tofs().at(2),this->PidProc->GetFP1().pin.at(iPins).energy);
-			hismanager->Fill("EXP_" + std::to_string(10008 +iPins ), this->PidProc->GetFP1Tofs().at(4),this->PidProc->GetFP1().pin.at(iPins).energy);
-			hismanager->Fill("EXP_" + std::to_string(10012 +iPins ), this->PidProc->GetFP1Tofs().at(6),this->PidProc->GetFP1().pin.at(iPins).energy);
+	if( not hasmuon ){
+		if( hasion ){
+			for (unsigned int iPins = 0 ; iPins < this->PidProc->GetFP1().pin.size(); ++iPins){
+				hismanager->Fill("EXP_" + std::to_string(10000 +iPins ), this->PidProc->GetFP1Tofs().at(0),this->PidProc->GetFP1().pin.at(iPins).energy);
+				hismanager->Fill("EXP_" + std::to_string(10004 +iPins ), this->PidProc->GetFP1Tofs().at(2),this->PidProc->GetFP1().pin.at(iPins).energy);
+				hismanager->Fill("EXP_" + std::to_string(10008 +iPins ), this->PidProc->GetFP1Tofs().at(4),this->PidProc->GetFP1().pin.at(iPins).energy);
+				hismanager->Fill("EXP_" + std::to_string(10012 +iPins ), this->PidProc->GetFP1Tofs().at(6),this->PidProc->GetFP1().pin.at(iPins).energy);
+			}
+			////found new ion, need to add it to the limit list
+			////and then correlate it with all known betas
+			//auto ion_idx = static_cast<unsigned long long>(summary->GetEventObservable("Event_idx").value());
+			////use the boost::circular_buffer to queue the things
+			//this->ion_beta_limits->push_front({ion_idx,0});
+			////search through the summaries previous and we'll grab their idx
+			//for( size_t ii = 1; ii < eventhistory->GetMaxHistorySize(); ++ii ){
+			//	auto prevsummary = eventhistory->GetPreviousEventSummary(ii);
+			//	auto preveventidx = static_cast<unsigned long long>(prevsummary->GetEventObservable("Event_idx").value());
+			//	auto isprevbeta = prevsummary->ContainsEventTag(this->beta);
+			//	if( isprevbeta ){
+			//		this->ion_beta_limits->at(0).second = std::max(this->ion_beta_limits->at(0).second,preveventidx);
+			//		//determine which tdiff plot to fill
+			//		//these are all the negative time portions of the tdiff
+			//	}
+			//}
 		}
-		////found new ion, need to add it to the limit list
-		////and then correlate it with all known betas
-		//auto ion_idx = static_cast<unsigned long long>(summary->GetEventObservable("Event_idx").value());
-		////use the boost::circular_buffer to queue the things
-		//this->ion_beta_limits->push_front({ion_idx,0});
-		////search through the summaries previous and we'll grab their idx
-		//for( size_t ii = 1; ii < eventhistory->GetMaxHistorySize(); ++ii ){
-		//	auto prevsummary = eventhistory->GetPreviousEventSummary(ii);
-		//	auto preveventidx = static_cast<unsigned long long>(prevsummary->GetEventObservable("Event_idx").value());
-		//	auto isprevbeta = prevsummary->ContainsEventTag(this->beta);
-		//	if( isprevbeta ){
-		//		this->ion_beta_limits->at(0).second = std::max(this->ion_beta_limits->at(0).second,preveventidx);
-		//		//determine which tdiff plot to fill
-		//		//these are all the negative time portions of the tdiff
-		//	}
-		//}
-	}
 
-	//if( hasgamma and not hasbeta ){
-	//	//search through the old indices to find the delayed gamma from a beta
-	//}
-	
-	if( hasbeta ){
-		this->MtasProc->FillBetaPlots(hismanager);
-		this->MtasProc->FillNoLogicBetaPlots(hismanager);
-		//found new beta, need to go through the known ion list and correlate it with us
-		//and update their secondary
-	}else{
-		this->MtasProc->FillNonBetaPlots(hismanager);
-		this->MtasProc->FillNoLogicNonBetaPlots(hismanager);
+		//if( hasgamma and not hasbeta ){
+		//	//search through the old indices to find the delayed gamma from a beta
+		//}
+
+		if( hasbeta ){
+			this->MtasProc->FillBetaPlots(hismanager);
+			this->MtasProc->FillNoLogicBetaPlots(hismanager);
+			auto total = this->MtasProc->GetTotalEnergy(0);
+			auto dynode = this->ImplantProc->GetHighGainImage().dynode;
+			hismanager->Fill("EXP_3650",total,dynode);
+			//found new beta, need to go through the known ion list and correlate it with us
+			//and update their secondary
+			//auto beta_idx = static_cast<unsigned long long>(summary->GetEventObservable("Event_idx")).value();
+			//for( size_t ii = 0; ii < this->ion_beta_limits->size(); ++ii ){
+			// 	this->ion_beta_limits->at(ii).second = beta_idx;	
+			//}
+		}else{
+			this->MtasProc->FillNonBetaPlots(hismanager);
+			this->MtasProc->FillNoLogicNonBetaPlots(hismanager);
+		}
 	}
 
 	Processor::EndProcess();
@@ -253,6 +265,8 @@ void e21027Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH2F>("EXP_10013","DB3SR-FP1XP1 vs Pin 2 Energy :: LG_Dynode Gated",	this->h2dsettings.at(10013));
 	hismanager->RegisterPlot<TH2F>("EXP_10014","DB3SR-FP1XP1 vs Pin 3 Energy :: LG_Dynode Gated",	this->h2dsettings.at(10014));
 	hismanager->RegisterPlot<TH2F>("EXP_10015","DB3SR-FP1XP1 vs Pin 4 Energy :: LG_Dynode Gated",	this->h2dsettings.at(10015));
+
+	hismanager->RegisterPlot<TH2F>("EXP_3650","High Gain Dynode vs MTAS Total; MTAS Total Energy (keV); HG Dynode Energy (keV);",this->h2dsettings.at(3650));
 
 	this->console->info("Finished Declaring Plots");
 }
