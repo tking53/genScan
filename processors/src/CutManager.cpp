@@ -22,6 +22,7 @@ namespace CUTS{
 		std::ifstream input(filename);
 		std::string line;
 		std::vector<std::tuple<int,double,double>> vals;
+		this->console->info("Attempting to Load Cut {} from {}",cutid,filename);
 		while( input.good() ){
 			std::getline(input,line);
 			std::sregex_iterator it(line.begin(), line.end(),this->SetPointRegex);

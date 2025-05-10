@@ -6,13 +6,103 @@
 	</Description>
 	<Global EventWidth="5.0e-7" EventWidthUnit="s" CorrelationType="rolling-window" />
 	<DetectorDriver>
+		<Processor name="RootDevProcessor" included_types="mtasimplant" />
+		<Analyzer name="WaveformAnalyzer" included_types="mtasimplant" >
+			<settings Crate="[0]" Module="[0]" Channel="[0]" CalcDerivative="true" >
+				<PreTrigger min="5" max="43" />
+				<PostTrigger min="200" max="249" />
+				<QDC bounds="0,10,20,30,40,50,60" />
+				<PSD begin="45" middle="85" end="240" pre="5" post="10" fraction="0.75" />
+			</settings>
+		</Analyzer>
 		<Processor name="e21027Processor">
 			<Processor name="VetoProcessor" />
-			<Processor name="MtasProcessor" />
-			<Processor name="MtasImplantProcessor" beta_thresh_low="25.0" beta_thresh_high="3500.0" />
-			<Processor name="PidProcessor">
-				<Histogram id="1" xlow="-100" xhigh="100" />
+			<Processor name="MtasProcessor" >
+				<Histogram id="3100" nbinsx="65536" xhigh="65536" />
+				<Histogram id="3110" nbinsx="65536" xhigh="65536" />
+				<Histogram id="3120" nbinsx="65536" xhigh="65536" />
+				<Histogram id="3130" nbinsx="65536" xhigh="65536" />
+				<Histogram id="3140" nbinsx="65536" xhigh="65536" />
+				<Histogram id="3115" nbinsx="65536" xhigh="65536" />
+				<Histogram id="3125" nbinsx="65536" xhigh="65536" />
+				<Histogram id="3135" nbinsx="65536" xhigh="65536" />
+				<Histogram id="3145" nbinsx="65536" xhigh="65536" />
+				
+				<Histogram id="3200" nbinsx="65536" xhigh="65536" />
+				<Histogram id="3210" nbinsx="65536" xhigh="65536" />
+				<Histogram id="3220" nbinsx="65536" xhigh="65536" />
+				<Histogram id="3230" nbinsx="65536" xhigh="65536" />
+				<Histogram id="3240" nbinsx="65536" xhigh="65536" />
+				<Histogram id="3215" nbinsx="65536" xhigh="65536" />
+				<Histogram id="3225" nbinsx="65536" xhigh="65536" />
+				<Histogram id="3235" nbinsx="65536" xhigh="65536" />
+				<Histogram id="3245" nbinsx="65536" xhigh="65536" />
+				
+				<Histogram id="3300" nbinsx="65536" xhigh="65536" />
+				<Histogram id="3310" nbinsx="65536" xhigh="65536" />
+				<Histogram id="3320" nbinsx="65536" xhigh="65536" />
+				<Histogram id="3330" nbinsx="65536" xhigh="65536" />
+				<Histogram id="3340" nbinsx="65536" xhigh="65536" />
+				<Histogram id="3315" nbinsx="65536" xhigh="65536" />
+				<Histogram id="3325" nbinsx="65536" xhigh="65536" />
+				<Histogram id="3335" nbinsx="65536" xhigh="65536" />
+				<Histogram id="3345" nbinsx="65536" xhigh="65536" />
 			</Processor>
+			<Processor name="MtasImplantProcessor" beta_thresh_low="400.0" beta_thresh_high="15000.0" ion_thresh_low="15000.0" ion_thresh_high="45000.0">
+				<Histogram id="7005" nbinsx="65536" xlow="0" xhigh="65536" />
+				<Histogram id="70208" ylow="0" yhigh="65536" />
+			</Processor>
+			<Processor name="PidProcessor" PIDPlot="21" >
+				<Histogram id="1" xlow="-100" xhigh="100" />
+
+				<Isotope name="A1" cutid="PID_A1" filename="A1.cxx" />
+				
+				<Isotope name="B1" cutid="PID_B1" filename="B1.cxx" />
+				<Isotope name="B2" cutid="PID_B2" filename="B2.cxx" />
+				<Isotope name="B3" cutid="PID_B3" filename="B3.cxx" />
+				
+				<Isotope name="C1" cutid="PID_C1" filename="C1.cxx" />
+				<Isotope name="C2" cutid="PID_C2" filename="C2.cxx" />
+				<Isotope name="C3" cutid="PID_C3" filename="C3.cxx" />
+				<Isotope name="C4" cutid="PID_C4" filename="C4.cxx" />
+				
+				<Isotope name="D1" cutid="PID_D1" filename="D1.cxx" />
+				<Isotope name="D2" cutid="PID_D2" filename="D2.cxx" />
+				<Isotope name="D3" cutid="PID_D3" filename="D3.cxx" />
+				<Isotope name="D4" cutid="PID_D4" filename="D4.cxx" />
+
+				<!-- Pin1 PIDs -->
+				<Histogram  id="9" xlow="178" xhigh="188" ylow="5000" yhigh="8000" />
+				<Histogram id="13" xlow="178" xhigh="188" ylow="5000" yhigh="8000" />
+				<Histogram id="17" xlow="173" xhigh="183" ylow="5000" yhigh="8000" />
+				<Histogram id="21" xlow="178" xhigh="188" ylow="5000" yhigh="8000" />
+				
+				<!-- Pin2 PIDs -->
+				<Histogram id="10" xlow="178" xhigh="188" ylow="8000" yhigh="12000" />
+				<Histogram id="14" xlow="178" xhigh="188" ylow="8000" yhigh="12000" />
+				<Histogram id="18" xlow="173" xhigh="183" ylow="8000" yhigh="12000" />
+				<Histogram id="22" xlow="178" xhigh="188" ylow="8000" yhigh="12000" />
+			</Processor>
+
+			<!-- MTAS Gate in Energy-->
+			<Gate label="MTAS_Total" lowerbound="166.0" upperbound="291.0" />
+			<Gate label="MTAS_Total" lowerbound="408.0" upperbound="522.0" />
+			<Gate label="MTAS_Total" lowerbound="597.0" upperbound="729.0" />
+			<Gate label="MTAS_Total" lowerbound="987.0" upperbound="1150.0" />
+			<Gate label="MTAS_Total" lowerbound="1332.0" upperbound="1493.0" />
+
+			<!-- Pin1 PIDs -->
+			<Histogram id="10000" xlow="-80" xhigh="88" ylow="5000" yhigh="8000" />
+			<Histogram id="10004" xlow="-80" xhigh="88" ylow="5000" yhigh="8000" />
+			<Histogram id="10008" xlow="-30" xhigh="83" ylow="5000" yhigh="8000" />
+			<Histogram id="10012" xlow="-80" xhigh="88" ylow="5000" yhigh="8000" />
+
+			<!-- Pin2 PIDs -->
+			<Histogram id="10001" xlow="-80" xhigh="88" ylow="8000" yhigh="12000" />
+			<Histogram id="10005" xlow="-80" xhigh="88" ylow="8000" yhigh="12000" />
+			<Histogram id="10009" xlow="-30" xhigh="83" ylow="8000" yhigh="12000" />
+			<Histogram id="10013" xlow="-80" xhigh="88" ylow="8000" yhigh="12000" />
+
 		</Processor>
 	</DetectorDriver>
 	<Map>
@@ -22,6 +112,11 @@
 					<Calibration model="linear" min="0">
 						0.0 1.0
 					</Calibration>
+					<TrapFilter len="47" gap="16" blen="8" tau="0.94">
+						<Calibration >	
+							0.0 1.0e-3	
+						</Calibration>
+					</TrapFilter>
 				</Channel>
 				<Channel number="1" type="mtasimplant" subtype="dynode" group="" tags="lowgain">
 					<Calibration model="linear" min="0">

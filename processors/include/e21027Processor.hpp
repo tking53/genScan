@@ -6,6 +6,9 @@
 #include "MtasImplantProcessor.hpp"
 #include "PidProcessor.hpp"
 #include "VetoProcessor.hpp"
+
+#include "Gates.hpp"
+
 #include <vector>
 
 class e21027Processor : public Processor{
@@ -23,6 +26,7 @@ class e21027Processor : public Processor{
 		virtual void DeclarePlots(PLOTS::PlotRegistry*);
 		virtual void RegisterTree(std::unordered_map<std::string,TTree*>&) final;
 		virtual void CleanupTree() final;
+		virtual void RegisterCuts(CUTS::CutRegistry*);
 	private:
 		void Reset();
 		bool HasMTAS;
@@ -37,6 +41,8 @@ class e21027Processor : public Processor{
 
 		std::vector<std::string> isotopetags;
 		std::unique_ptr<boost::circular_buffer<std::pair<unsigned long long,unsigned long long>>> ion_beta_limits;
+
+		std::vector<Gate<double>> MTAS_Total_Gates;
 
 		std::shared_ptr<MtasProcessor> MtasProc;
 		std::shared_ptr<MtasImplantProcessor> ImplantProc;

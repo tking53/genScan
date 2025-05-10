@@ -22,11 +22,14 @@ class PidProcessor : public Processor{
 
 		void Reset();		
 
-		const std::vector<double>& GetFP1Tofs() const;
-		const std::vector<double>& GetFP2Tofs() const;
+		size_t GetNumFP1Pins() const;
+		size_t GetNumFP2Pins() const;
 
-		const ProcessorStruct::FP& GetFP1() const;
-		const ProcessorStruct::FP& GetFP2() const;
+		double GetFP1Tof(size_t) const;
+		double GetFP2Tof(size_t) const;
+
+		double GetFP1PinEnergy(size_t) const;
+		double GetFP2PinEnergy(size_t) const;
 
 		const std::vector<std::string>& GetIsotopeTags() const;
 
@@ -80,6 +83,8 @@ class PidProcessor : public Processor{
 
 		std::map<std::string,std::string> isotopes;
 		std::vector<std::string> isotopetags;
+
+		int PIDPLOT;
 
 };
 

@@ -30,6 +30,11 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 		{7014,{1000,0,10,1000,0,10}},
 		{7015,{1000,0,10,1000,0,10}},
 		
+		{7020,{4096,0,4096,4096,0,4096}},
+		{70208,{4096,0,32768,4096,0,32768}},
+		{7021,{4096,0,4096,4096,0,4096}},
+		{70218,{4096,0,32768,4096,0,32768}},
+
 		{7030,{10,0,10,4,0,4}},
 		{7040,{10,0,10,64,0,64}},
 		{7043,{10,0,10,64,0,64}}
@@ -132,6 +137,11 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 	hismanager->Fill("IMPLANT_7007",this->lgImage.dynode,this->hgImage.dynode);
 	hismanager->Fill("IMPLANT_70078",this->lgImage.dynode,this->hgImage.dynode);
 
+	hismanager->Fill("IMPLANT_7020",this->hgImage.dynode,this->hgImage.anodesum);
+	hismanager->Fill("IMPLANT_70208",this->hgImage.dynode,this->hgImage.anodesum);
+	hismanager->Fill("IMPLANT_7021",this->lgImage.dynode,this->lgImage.anodesum);
+	hismanager->Fill("IMPLANT_70218",this->lgImage.dynode,this->lgImage.anodesum);
+
 	hismanager->Fill("IMPLANT_7030",this->HighGainDynodeHits,0);
 	hismanager->Fill("IMPLANT_7030",this->LowGainDynodeHits,1);
 	hismanager->Fill("IMPLANT_7030",this->HighGainAnodeHits,2);
@@ -211,6 +221,12 @@ void MtasImplantProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH2F>("IMPLANT_7014","High Gain Position",this->h2dsettings.at(7014));
 	hismanager->RegisterPlot<TH2F>("IMPLANT_7015","Low Gain Position",this->h2dsettings.at(7015));
 	
+	
+	hismanager->RegisterPlot<TH2F>("IMPLANT_7020","High Gain dynode vs High Gain Anode Sum; Anode Sum Energy (keV); Dynode Energy (keV);",this->h2dsettings.at(7020));
+	hismanager->RegisterPlot<TH2F>("IMPLANT_70208","High Gain dynode vs High Gain Anode Sum; Anode Sum Energy (8 keV/bin); Dynode Energy (8 keV/bin);",this->h2dsettings.at(70208));
+	hismanager->RegisterPlot<TH2F>("IMPLANT_7021","Low Gain dynode vs Low Gain Anode Sum; Anode Sum Energy (keV); Dynode Energy (keV);",this->h2dsettings.at(7021));
+	hismanager->RegisterPlot<TH2F>("IMPLANT_70218","Low Gain dynode vs Low Gain Anode Sum; Anode Sum Energy (8 keV/bin); Dynode Energy (8 keV/bin);",this->h2dsettings.at(70218));
+
 	hismanager->RegisterPlot<TH2F>("IMPLANT_7030","SiPM Mults (DyH,DyL,AnH,AnL)",this->h2dsettings.at(7030));
 	hismanager->RegisterPlot<TH2F>("IMPLANT_7040","Individual High Gain Anode Mults",this->h2dsettings.at(7040));
 	hismanager->RegisterPlot<TH2F>("IMPLANT_7043","Individual Low Gain Anode Mults",this->h2dsettings.at(7043));

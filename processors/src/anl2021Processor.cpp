@@ -59,6 +59,11 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 		{3261,{8192,0,8192,512,0,512}},
 		{3262,{8192,0,8192,512,0,512}},
 		{3263,{8192,0,8192,512,0,512}},
+		
+		{3350,{4096,0,4096,4096,0,4096}},
+		{33508,{2048,0,8192,2048,0,8192}},
+		{3351,{4096,0,4096,4096,0,4096}},
+		{33518,{2048,0,8192,2048,0,8192}},
 
 		{3360,{8192,0,8192,512,0,512}},
 		{3361,{8192,0,8192,512,0,512}},
@@ -164,6 +169,7 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 	if( not hasmuon ){
 		auto numhist = eventhistory->GetMaxHistoryID();
 		auto erg = MtasProc->GetTotalEnergy(0);
+		auto cerg = MtasProc->GetTotalEnergy(1);
 		auto cyclestarttime = TapeProc->GetCycleTimeInSeconds();
 		//mtas gives the time in ns
 		auto firstmtastime = MtasProc->GetFirstFireTime()*1.0e-9;
@@ -191,10 +197,22 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 			if( hasbeta ){
 				if( this->EarlyCycle.IsWithin(cycletime) ){
 					hismanager->Fill("EARLY_3300",erg);
+					hismanager->Fill("EARLY_3351",erg,cerg);
+					for( size_t ii = 6; ii < 24; ++ii ){
+						hismanager->Fill("EARLY_3350",MtasProc->GetCrystalEnergy(ii),erg);
+					}
 				}else if( this->MidCycle.IsWithin(cycletime) ){
 					hismanager->Fill("MID_3300",erg);
+					hismanager->Fill("MID_3351",erg,cerg);
+					for( size_t ii = 6; ii < 24; ++ii ){
+						hismanager->Fill("MID_3350",MtasProc->GetCrystalEnergy(ii),erg);
+					}
 				}else if( this->LateCycle.IsWithin(cycletime) ){
 					hismanager->Fill("LATE_3300",erg);
+					hismanager->Fill("LATE_3351",erg,cerg);
+					for( size_t ii = 6; ii < 24; ++ii ){
+						hismanager->Fill("LATE_3350",MtasProc->GetCrystalEnergy(ii),erg);
+					}
 				}else{
 					//no-op
 				}
@@ -348,16 +366,16 @@ void anl2021Processor::Init(const pugi::xml_node& config){
 
 	auto midgate = config.child("MidCycle");
 	if( midgate ){
-		this->EarlyCycle = Gate<double>(midgate.attribute("lowerbound").as_double(0.0),midgate.attribute("upperbound").as_double(0.0));
+		this->MidCycle = Gate<double>(midgate.attribute("lowerbound").as_double(0.0),midgate.attribute("upperbound").as_double(0.0));
 	}else{
-		this->EarlyCycle = Gate<double>(0.0,0.0);
+		this->MidCycle = Gate<double>(0.0,0.0);
 	}
 
 	auto lategate = config.child("LateCycle");
 	if( lategate ){
-		this->EarlyCycle = Gate<double>(lategate.attribute("lowerbound").as_double(0.0),lategate.attribute("upperbound").as_double(0.0));
+		this->LateCycle = Gate<double>(lategate.attribute("lowerbound").as_double(0.0),lategate.attribute("upperbound").as_double(0.0));
 	}else{
-		this->EarlyCycle = Gate<double>(0.0,0.0);
+		this->LateCycle = Gate<double>(0.0,0.0);
 	}
 
 	if( not this->HasMTAS ){
@@ -453,6 +471,22 @@ void anl2021Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH1F>("EARLY_3300","Mtas Total #beta-gated Early Cycle Time",this->h1dsettings.at(3300));
 	hismanager->RegisterPlot<TH1F>("MID_3300","Mtas Total #beta-gated MID Cycle Time",this->h1dsettings.at(3300));
 	hismanager->RegisterPlot<TH1F>("LATE_3300","Mtas Total #beta-gated LATE Cycle Time",this->h1dsettings.at(3300));
+
+	hismanager->RegisterPlot<TH2F>("EARLY_3350","I,M,O vs Mtas Total #beta-gated Early Cycle Time",this->h2dsettings.at(3350));
+	hismanager->RegisterPlot<TH2F>("MID_3350","I,M,O vs Mtas Total #beta-gated MID Cycle Time",this->h2dsettings.at(3350));
+	hismanager->RegisterPlot<TH2F>("LATE_3350","I,M,O vs Mtas Total #beta-gated LATE Cycle Time",this->h2dsettings.at(3350));
+
+	hismanager->RegisterPlot<TH2F>("EARLY_33508","I,M,O vs Mtas Total #beta-gated Early Cycle Time; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(33508));
+	hismanager->RegisterPlot<TH2F>("MID_33508","I,M,O vs Mtas Total #beta-gated MID Cycle Time; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(33508));
+	hismanager->RegisterPlot<TH2F>("LATE_33508","I,M,O vs Mtas Total #beta-gated LATE Cycle Time; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(33508));
+
+	hismanager->RegisterPlot<TH2F>("EARLY_3351","C vs Mtas Total #beta-gated Early Cycle Time",this->h2dsettings.at(3351));
+	hismanager->RegisterPlot<TH2F>("MID_3351","C vs Mtas Total #beta-gated MID Cycle Time",this->h2dsettings.at(3351));
+	hismanager->RegisterPlot<TH2F>("LATE_3351","C vs Mtas Total #beta-gated LATE Cycle Time",this->h2dsettings.at(3351));
+
+	hismanager->RegisterPlot<TH2F>("EARLY_33518","C vs Mtas Total #beta-gated Early Cycle Time; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(33518));
+	hismanager->RegisterPlot<TH2F>("MID_33518","C vs Mtas Total #beta-gated MID Cycle Time; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(33518));
+	hismanager->RegisterPlot<TH2F>("LATE_33518","C vs Mtas Total #beta-gated LATE Cycle Time; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(33518));
 
 
 	this->console->info("Finished Declaring Plots");

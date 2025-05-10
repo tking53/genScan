@@ -56,7 +56,7 @@ class Processor : public std::enable_shared_from_this<Processor> {
 		[[noreturn]] virtual void Finalize();
 
 		[[noreturn]] virtual void DeclarePlots([[maybe_unused]] PLOTS::PlotRegistry*);
-		virtual void RegisterCuts(CUTS::CutRegistry*) final;
+		virtual void RegisterCuts(CUTS::CutRegistry*);
 
 		virtual void CleanupTree();
 

@@ -219,6 +219,7 @@ void Processor::LoadHistogramSettings(const pugi::xml_node& config){
 
 void Processor::RegisterCuts(CUTS::CutRegistry* CutManager){
 	for( const auto& kv : this->customcuts ){
+		this->console->info("Cut {} using {}",kv.first,kv.second);
 		CutManager->AddCut(kv.first,kv.second);
 	}
 }

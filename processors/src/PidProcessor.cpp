@@ -348,11 +348,16 @@ PidProcessor::PidProcessor(const std::string& log) : Processor(log,"PidProcessor
 
 
 	//in here tell it if what cut we made it in
-	//for( const auto& kv : this->isotopes ){
-	// 	if( cutmanager->IsWithin(kv.second,tof,erg) ){
-	// 		summary->AddEventTag(kv.first);
-	// 	}
-	//}
+	for( const auto& kv : this->isotopes ){
+		//hismanager->Fill("PID_21", fp1Tofs[6], fp1.pin.at(0).energy);
+		if( this->PIDPLOT == 21 ){
+			if( cutmanager->IsWithin(kv.second,fp1Tofs[6],fp1.pin[0].energy) ){
+				summary->AddEventTag(kv.first);
+			}
+		}else{
+			this->console->error("No PID used");
+		}
+	}
 
 
 	Processor::EndProcess();
@@ -372,6 +377,8 @@ void PidProcessor::Init(const pugi::xml_node& config){
 	this->console->info("Init called with pugi::xml_node");
 	this->LoadCustomCuts(config);
 	this->LoadHistogramSettings(config);
+
+	this->PIDPLOT = config.attribute("PIDPlot").as_int(-1);
 
 	for( pugi::xml_node isotope = config.child("Isotope"); isotope; isotope = isotope.next_sibling("Isotope") ){
 		std::string tagname = isotope.attribute("name").as_string("");
@@ -514,19 +521,28 @@ void PidProcessor::FillStruct(PhysicsData* data, ProcessorStruct::PidDet &det){
 	det.pileup = data->GetPileup();
 };
 
-
-const std::vector<double>& PidProcessor::GetFP1Tofs() const {
-	return this->fp1Tofs;
-}
-const std::vector<double>& PidProcessor::GetFP2Tofs() const {
-	return this->fp2Tofs;
+size_t PidProcessor::GetNumFP1Pins() const{
+	return this->fp1.pin.size();
 }
 
-const ProcessorStruct::FP& PidProcessor::GetFP1() const {
-	return this->fp1;
+size_t PidProcessor::GetNumFP2Pins() const{
+	return this->fp2.pin.size();
 }
-const ProcessorStruct::FP& PidProcessor::GetFP2() const {
-	return this->fp2;
+
+double PidProcessor::GetFP1Tof(size_t idx) const {
+	return this->fp1Tofs.at(idx);
+}
+
+double PidProcessor::GetFP2Tof(size_t idx) const {
+	return this->fp2Tofs.at(idx);
+}
+
+double PidProcessor::GetFP1PinEnergy(size_t idx) const {
+	return this->fp1.pin.at(idx).energy;
+}
+
+double PidProcessor::GetFP2PinEnergy(size_t idx) const {
+	return this->fp2.pin.at(idx).energy;
 }
 
 const std::vector<std::string>& PidProcessor::GetIsotopeTags() const{

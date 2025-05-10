@@ -6,13 +6,13 @@
 	<Global EventWidth="5.0e-7" EventWidthUnit="s" CorrelationType="rolling-window" />
 	<DetectorDriver>
 		<Processor name="e21027Processor" >
-		<Processor name="VetoProcessor" />
-		<Processor name="MtasProcessor"/>
-		<Processor name="MtasImplantProcessor" beta_thresh_low="25.0" beta_thresh_high="3500.0"/> 
-		<Processor name="PidProcessor">
-			<Isotope name="A1" cutid="PID_A1" filename="PIDA1.cxx"/>
-			<Histogram id="1" xlow="-100" xhigh="100" />
-		</Processor>
+			<Processor name="VetoProcessor" />
+			<Processor name="MtasProcessor"/>
+			<Processor name="MtasImplantProcessor" beta_thresh_low="25.0" beta_thresh_high="3500.0"/> 
+			<Processor name="PidProcessor">
+				<!-- <Isotope name="A1" cutid="PID_A1" filename="PIDA1.cxx"/> -->
+				<Histogram id="1" xlow="-100" xhigh="100" />
+			</Processor>
 		</Processor>
 		<!-- <Processor name="RootDevProcessor" included_types="mtasimplant,mtas,generic:ogs,mtasimplant:dynode,generic:beam_start,generic:beam_stop,generic:move_start,generic_move_stop" /> -->
 	</DetectorDriver>
