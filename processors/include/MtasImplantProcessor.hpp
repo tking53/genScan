@@ -24,6 +24,7 @@ class MtasImplantProcessor : public Processor{
 
 		const SIPMIMP::Image& GetLowGainImage() const;
 		const SIPMIMP::Image& GetHighGainImage() const;
+		const double& GetHighGainPSD() const;
 	
 		void Reset();
 	private:
@@ -53,6 +54,7 @@ class MtasImplantProcessor : public Processor{
 		short HighGainDynodeHits;
 		short HighGainAnodeHits;
 		SIPMIMP::Image hgImage;
+		double hgPSD;
 		std::vector<double> HighGainAnodes;
 		ProcessorStruct::MtasImplant HighGain;
 

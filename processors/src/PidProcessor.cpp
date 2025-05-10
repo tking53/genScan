@@ -27,6 +27,30 @@ PidProcessor::PidProcessor(const std::string& log) : Processor(log,"PidProcessor
 		{ 106, { 10000,-1000,1000} },
 		{ 107, { 10000,-1000,1000} },
 		{ 108, { 10000,-1000,1000} },
+
+		//DB3 PPAC0
+		{300, {2000,-1000,1000}},
+		{301, {2000,-1000,1000}},
+		
+		//DB3 PPAC1
+		{310, {2000,-1000,1000}},
+		{311, {2000,-1000,1000}},
+		
+		//DB4 PPAC0
+		{400, {2000,-1000,1000}},
+		{401, {2000,-1000,1000}},
+		
+		//DB4 PPAC1
+		{410, {2000,-1000,1000}},
+		{411, {2000,-1000,1000}},
+		
+		//DB5 PPAC0
+		{500, {2000,-1000,1000}},
+		{501, {2000,-1000,1000}},
+		
+		//DB5 PPAC1
+		{510, {2000,-1000,1000}},
+		{511, {2000,-1000,1000}}
 	};
 
 	this->h2dsettings = {
@@ -72,6 +96,24 @@ PidProcessor::PidProcessor(const std::string& log) : Processor(log,"PidProcessor
 		{ 125, { 2000,0,16000,2000,0,16000} },
 		{ 126, { 2000,0,16000,2000,0,16000} },
 		{ 127, { 2000,0,16000,2000,0,16000} },
+
+		//DB3 PPAC0 Image
+		{3000, {2000,-1000,1000,2000,-1000,1000}},
+		
+		//DB3 PPAC1 Image
+		{3010, {2000,-1000,1000,2000,-1000,1000}},
+
+		//DB4 PPAC0 Image
+		{4000, {2000,-1000,1000,2000,-1000,1000}},
+
+		//DB3 PPAC1 Image
+		{4010, {2000,-1000,1000,2000,-1000,1000}},
+
+		//DB5 PPAC0 Image
+		{5000, {2000,-1000,1000,2000,-1000,1000}},
+		
+		//DB3 PPAC1 Image
+		{5010, {2000,-1000,1000,2000,-1000,1000}}
 
 	};
 
@@ -270,6 +312,24 @@ PidProcessor::PidProcessor(const std::string& log) : Processor(log,"PidProcessor
 	fp1Tofs[6] = db3.scint.right.time - fp1.xplas.at(0).time ;
 	fp1Tofs[7] = db3.scint.right.time - fp1.xplas.at(1).time ;
 
+	db3.ppac0.xpos = this->CalcPPACPosition(db3.ppac0.left.time,db3.ppac0.right.time);
+	db3.ppac0.ypos = this->CalcPPACPosition(db3.ppac0.up.time  ,db3.ppac0.down.time);
+
+	db3.ppac1.xpos = this->CalcPPACPosition(db3.ppac1.left.time,db3.ppac1.right.time);
+	db3.ppac1.ypos = this->CalcPPACPosition(db3.ppac1.up.time  ,db3.ppac1.down.time);
+
+	db4.ppac0.xpos = this->CalcPPACPosition(db4.ppac0.left.time,db4.ppac0.right.time);
+	db4.ppac0.ypos = this->CalcPPACPosition(db4.ppac0.up.time  ,db4.ppac0.down.time);
+
+	db4.ppac1.xpos = this->CalcPPACPosition(db4.ppac1.left.time,db4.ppac1.right.time);
+	db4.ppac1.ypos = this->CalcPPACPosition(db4.ppac1.up.time  ,db4.ppac1.down.time);
+
+	db5.ppac0.xpos = this->CalcPPACPosition(db5.ppac0.left.time,db5.ppac0.right.time);
+	db5.ppac0.ypos = this->CalcPPACPosition(db5.ppac0.up.time  ,db5.ppac0.down.time);
+
+	db5.ppac1.xpos = this->CalcPPACPosition(db5.ppac1.left.time,db5.ppac1.right.time);
+	db5.ppac1.ypos = this->CalcPPACPosition(db5.ppac1.up.time  ,db5.ppac1.down.time);
+
 	fp2Tofs[0] = db3.ppac0.anode.time - fp2.xplas.at(0).time ;
 	fp2Tofs[1] = db3.ppac0.anode.time - fp2.xplas.at(1).time ;
 	fp2Tofs[2] = db3.ppac1.anode.time - fp2.xplas.at(0).time ;
@@ -346,6 +406,29 @@ PidProcessor::PidProcessor(const std::string& log) : Processor(log,"PidProcessor
 	hismanager->Fill("PID_126",fp2.pin.at(0).energy,fp2.pin.at(2).energy);
 	hismanager->Fill("PID_127",fp2.pin.at(0).energy,fp2.pin.at(3).energy);
 
+	hismanager->Fill("PID_300",db3.ppac0.xpos);
+	hismanager->Fill("PID_301",db3.ppac0.ypos);
+	hismanager->Fill("PID_3000",db3.ppac0.xpos,db3.ppac0.ypos);
+	
+	hismanager->Fill("PID_310",db3.ppac1.xpos);
+	hismanager->Fill("PID_311",db3.ppac1.ypos);
+	hismanager->Fill("PID_3010",db3.ppac1.xpos,db3.ppac1.ypos);
+
+	hismanager->Fill("PID_400",db4.ppac0.xpos);
+	hismanager->Fill("PID_401",db4.ppac0.ypos);
+	hismanager->Fill("PID_4000",db4.ppac0.xpos,db4.ppac0.ypos);
+	
+	hismanager->Fill("PID_410",db4.ppac1.xpos);
+	hismanager->Fill("PID_411",db4.ppac1.ypos);
+	hismanager->Fill("PID_4010",db4.ppac1.xpos,db4.ppac1.ypos);
+	
+	hismanager->Fill("PID_500",db5.ppac0.xpos);
+	hismanager->Fill("PID_501",db5.ppac0.ypos);
+	hismanager->Fill("PID_5000",db5.ppac0.xpos,db5.ppac0.ypos);
+
+	hismanager->Fill("PID_510",db5.ppac1.xpos);
+	hismanager->Fill("PID_511",db5.ppac1.ypos);
+	hismanager->Fill("PID_5010",db5.ppac1.xpos,db5.ppac1.ypos);
 
 	//in here tell it if what cut we made it in
 	for( const auto& kv : this->isotopes ){
@@ -410,75 +493,99 @@ void PidProcessor::Finalize(){
 }
 
 void PidProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
-	(void) hismanager;
+	hismanager->RegisterPlot<TH1F>("PID_1" ,"DB3P0 Anode - FP1XP1 TDiff; TDiff (ns)",this->h1dsettings.at(1));
+	hismanager->RegisterPlot<TH1F>("PID_2" ,"DB3P0 Anode - FP1XP2 TDiff; TDiff (ns)",this->h1dsettings.at(2));
+	hismanager->RegisterPlot<TH1F>("PID_3" ,"DB3P1 Anode - FP1XP1 TDiff; TDiff (ns)",this->h1dsettings.at(3));
+	hismanager->RegisterPlot<TH1F>("PID_4" ,"DB3P1 Anode - FP1XP2 TDiff; TDiff (ns)",this->h1dsettings.at(4));
+	hismanager->RegisterPlot<TH1F>("PID_5" ,"DB3 Scint L - FP1XP1 TDiff; TDiff (ns)",this->h1dsettings.at(5));
+	hismanager->RegisterPlot<TH1F>("PID_6" ,"DB3 Scint L - FP1XP2 TDiff; TDiff (ns)",this->h1dsettings.at(6));
+	hismanager->RegisterPlot<TH1F>("PID_7" ,"DB3 Scint R - FP1XP1 TDiff; TDiff (ns)",this->h1dsettings.at(7));
+	hismanager->RegisterPlot<TH1F>("PID_8" ,"DB3 Scint R - FP1XP2 TDiff; TDiff (ns)",this->h1dsettings.at(8));
 
-	hismanager->RegisterPlot<TH1F>("PID_1" ,"DB3P0 Anode - FP1XP1 TDiff",	this->h1dsettings.at(1));
-	hismanager->RegisterPlot<TH1F>("PID_2" ,"DB3P0 Anode - FP1XP2 TDiff",	this->h1dsettings.at(2));
-	hismanager->RegisterPlot<TH1F>("PID_3" ,"DB3P1 Anode - FP1XP1 TDiff",	this->h1dsettings.at(3));
-	hismanager->RegisterPlot<TH1F>("PID_4" ,"DB3P1 Anode - FP1XP2 TDiff",	this->h1dsettings.at(4));
-	hismanager->RegisterPlot<TH1F>("PID_5" ,"DB3 Scint L - FP1XP1 TDiff",	this->h1dsettings.at(5));
-	hismanager->RegisterPlot<TH1F>("PID_6" ,"DB3 Scint L - FP1XP2 TDiff",	this->h1dsettings.at(6));
-	hismanager->RegisterPlot<TH1F>("PID_7" ,"DB3 Scint R - FP1XP1 TDiff",	this->h1dsettings.at(7));
-	hismanager->RegisterPlot<TH1F>("PID_8" ,"DB3 Scint R - FP1XP2 TDiff",	this->h1dsettings.at(8));
+	hismanager->RegisterPlot<TH2F>("PID_9" ,"Pin 1 Energy vs DB3P0A-FP1XP1; TDiff (ns); Energy (keV)",this->h2dsettings.at(9));
+	hismanager->RegisterPlot<TH2F>("PID_10","Pin 2 Energy vs DB3P0A-FP1XP1; TDiff (ns); Energy (keV)",this->h2dsettings.at(10));
+	hismanager->RegisterPlot<TH2F>("PID_11","Pin 3 Energy vs DB3P0A-FP1XP1; TDiff (ns); Energy (keV)",this->h2dsettings.at(11));
+	hismanager->RegisterPlot<TH2F>("PID_12","Pin 4 Energy vs DB3P0A-FP1XP1; TDiff (ns); Energy (keV)",this->h2dsettings.at(12));
+                                                             
+	hismanager->RegisterPlot<TH2F>("PID_13","Pin 1 Energy vs DB3P1A-FP1XP1; TDiff (ns); Energy (keV)",this->h2dsettings.at(13));
+	hismanager->RegisterPlot<TH2F>("PID_14","Pin 2 Energy vs DB3P1A-FP1XP1; TDiff (ns); Energy (keV)",this->h2dsettings.at(14));
+	hismanager->RegisterPlot<TH2F>("PID_15","Pin 3 Energy vs DB3P1A-FP1XP1; TDiff (ns); Energy (keV)",this->h2dsettings.at(15));
+	hismanager->RegisterPlot<TH2F>("PID_16","Pin 4 Energy vs DB3P1A-FP1XP1; TDiff (ns); Energy (keV)",this->h2dsettings.at(16));
 
-	hismanager->RegisterPlot<TH2F>("PID_9","DB3P0A-FP1XP1 vs Pin 1 Energy",	this->h2dsettings.at(9));
-	hismanager->RegisterPlot<TH2F>("PID_10","DB3P0A-FP1XP1 vs Pin 2 Energy",this->h2dsettings.at(10));
-	hismanager->RegisterPlot<TH2F>("PID_11","DB3P0A-FP1XP1 vs Pin 3 Energy",this->h2dsettings.at(11));
-	hismanager->RegisterPlot<TH2F>("PID_12","DB3P0A-FP1XP1 vs Pin 4 Energy",this->h2dsettings.at(12));
+	hismanager->RegisterPlot<TH2F>("PID_17","Pin 1 Energy vs DB3SL-FP1XP1; TDiff (ns); Energy (keV)",this->h2dsettings.at(17));
+	hismanager->RegisterPlot<TH2F>("PID_18","Pin 2 Energy vs DB3SL-FP1XP1; TDiff (ns); Energy (keV)",this->h2dsettings.at(18));
+	hismanager->RegisterPlot<TH2F>("PID_19","Pin 3 Energy vs DB3SL-FP1XP1; TDiff (ns); Energy (keV)",this->h2dsettings.at(19));
+	hismanager->RegisterPlot<TH2F>("PID_20","Pin 4 Energy vs DB3SL-FP1XP1; TDiff (ns); Energy (keV)",this->h2dsettings.at(20));
+                                                                 
+	hismanager->RegisterPlot<TH2F>("PID_21","Pin 1 Energy vs DB3SR-FP1XP1; TDiff (ns); Energy (keV)",this->h2dsettings.at(21));
+	hismanager->RegisterPlot<TH2F>("PID_22","Pin 2 Energy vs DB3SR-FP1XP1; TDiff (ns); Energy (keV)",this->h2dsettings.at(22));
+	hismanager->RegisterPlot<TH2F>("PID_23","Pin 3 Energy vs DB3SR-FP1XP1; TDiff (ns); Energy (keV)",this->h2dsettings.at(23));
+	hismanager->RegisterPlot<TH2F>("PID_24","Pin 4 Energy vs DB3SR-FP1XP1; TDiff (ns); Energy (keV)",this->h2dsettings.at(24));
 
-	hismanager->RegisterPlot<TH2F>("PID_13","DB3P1A-FP1XP1 vs Pin 1 Energy",this->h2dsettings.at(13));
-	hismanager->RegisterPlot<TH2F>("PID_14","DB3P1A-FP1XP1 vs Pin 2 Energy",this->h2dsettings.at(14));
-	hismanager->RegisterPlot<TH2F>("PID_15","DB3P1A-FP1XP1 vs Pin 3 Energy",this->h2dsettings.at(15));
-	hismanager->RegisterPlot<TH2F>("PID_16","DB3P1A-FP1XP1 vs Pin 4 Energy",this->h2dsettings.at(16));
-
-	hismanager->RegisterPlot<TH2F>("PID_17","DB3SL-FP1XP1 vs Pin 1 Energy",	this->h2dsettings.at(17));
-	hismanager->RegisterPlot<TH2F>("PID_18","DB3SL-FP1XP1 vs Pin 2 Energy",	this->h2dsettings.at(18));
-	hismanager->RegisterPlot<TH2F>("PID_19","DB3SL-FP1XP1 vs Pin 3 Energy",	this->h2dsettings.at(19));
-	hismanager->RegisterPlot<TH2F>("PID_20","DB3SL-FP1XP1 vs Pin 4 Energy",	this->h2dsettings.at(20));
-
-	hismanager->RegisterPlot<TH2F>("PID_21","DB3SR-FP1XP1 vs Pin 1 Energy",	this->h2dsettings.at(21));
-	hismanager->RegisterPlot<TH2F>("PID_22","DB3SR-FP1XP1 vs Pin 2 Energy",	this->h2dsettings.at(22));
-	hismanager->RegisterPlot<TH2F>("PID_23","DB3SR-FP1XP1 vs Pin 3 Energy",	this->h2dsettings.at(23));
-	hismanager->RegisterPlot<TH2F>("PID_24","DB3SR-FP1XP1 vs Pin 4 Energy",	this->h2dsettings.at(24));
-
-	hismanager->RegisterPlot<TH2F>("PID_25","Pin 1 vs Pin 2 Energy",	this->h2dsettings.at(25));
-	hismanager->RegisterPlot<TH2F>("PID_26","Pin 1 vs Pin 3 Energy",	this->h2dsettings.at(26));
-	hismanager->RegisterPlot<TH2F>("PID_27","Pin 1 vs Pin 4 Energy",	this->h2dsettings.at(27));
+	hismanager->RegisterPlot<TH2F>("PID_25","Pin 2 vs Pin 1 Energy; Energy (keV); Energy (keV)",this->h2dsettings.at(25));
+	hismanager->RegisterPlot<TH2F>("PID_26","Pin 3 vs Pin 1 Energy; Energy (keV); Energy (keV)",this->h2dsettings.at(26));
+	hismanager->RegisterPlot<TH2F>("PID_27","Pin 4 vs Pin 1 Energy; Energy (keV); Energy (keV)",this->h2dsettings.at(27));
 
 	//FP2
+	hismanager->RegisterPlot<TH1F>("PID_101" ,"DB3P0 Anode - FP2XP1 TDiff; TDiff (ns)",this->h1dsettings.at(101));
+	hismanager->RegisterPlot<TH1F>("PID_102" ,"DB3P0 Anode - FP2XP2 TDiff; TDiff (ns)",this->h1dsettings.at(102));
+	hismanager->RegisterPlot<TH1F>("PID_103" ,"DB3P1 Anode - FP2XP1 TDiff; TDiff (ns)",this->h1dsettings.at(103));
+	hismanager->RegisterPlot<TH1F>("PID_104" ,"DB3P1 Anode - FP2XP2 TDiff; TDiff (ns)",this->h1dsettings.at(104));
+	hismanager->RegisterPlot<TH1F>("PID_105" ,"DB3 Scint L - FP2XP1 TDiff; TDiff (ns)",this->h1dsettings.at(105));
+	hismanager->RegisterPlot<TH1F>("PID_106" ,"DB3 Scint L - FP2XP2 TDiff; TDiff (ns)",this->h1dsettings.at(106));
+	hismanager->RegisterPlot<TH1F>("PID_107" ,"DB3 Scint R - FP2XP1 TDiff; TDiff (ns)",this->h1dsettings.at(107));
+	hismanager->RegisterPlot<TH1F>("PID_108" ,"DB3 Scint R - FP2XP2 TDiff; TDiff (ns)",this->h1dsettings.at(108));
 
-	hismanager->RegisterPlot<TH1F>("PID_101" ,"DB3P0 Anode - FP2XP1 TDiff",	this->h1dsettings.at(101));
-	hismanager->RegisterPlot<TH1F>("PID_102" ,"DB3P0 Anode - FP2XP2 TDiff",	this->h1dsettings.at(102));
-	hismanager->RegisterPlot<TH1F>("PID_103" ,"DB3P1 Anode - FP2XP1 TDiff",	this->h1dsettings.at(103));
-	hismanager->RegisterPlot<TH1F>("PID_104" ,"DB3P1 Anode - FP2XP2 TDiff",	this->h1dsettings.at(104));
-	hismanager->RegisterPlot<TH1F>("PID_105" ,"DB3 Scint L - FP2XP1 TDiff",	this->h1dsettings.at(105));
-	hismanager->RegisterPlot<TH1F>("PID_106" ,"DB3 Scint L - FP2XP2 TDiff",	this->h1dsettings.at(106));
-	hismanager->RegisterPlot<TH1F>("PID_107" ,"DB3 Scint R - FP2XP1 TDiff",	this->h1dsettings.at(107));
-	hismanager->RegisterPlot<TH1F>("PID_108" ,"DB3 Scint R - FP2XP2 TDiff",	this->h1dsettings.at(108));
+	hismanager->RegisterPlot<TH2F>("PID_109","Pin 1 Energy vs DB3P0A-FP2XP1; TDiff (ns); Energy (keV)",this->h2dsettings.at(109));
+	hismanager->RegisterPlot<TH2F>("PID_110","Pin 2 Energy vs DB3P0A-FP2XP1; TDiff (ns); Energy (keV)",this->h2dsettings.at(110));
+	hismanager->RegisterPlot<TH2F>("PID_111","Pin 3 Energy vs DB3P0A-FP2XP1; TDiff (ns); Energy (keV)",this->h2dsettings.at(111));
+	hismanager->RegisterPlot<TH2F>("PID_112","Pin 4 Energy vs DB3P0A-FP2XP1; TDiff (ns); Energy (keV)",this->h2dsettings.at(112));
+                                                                  
+	hismanager->RegisterPlot<TH2F>("PID_113","Pin 1 Energy vs DB3P1A-FP2XP1; TDiff (ns); Energy (keV)",this->h2dsettings.at(113));
+	hismanager->RegisterPlot<TH2F>("PID_114","Pin 2 Energy vs DB3P1A-FP2XP1; TDiff (ns); Energy (keV)",this->h2dsettings.at(114));
+	hismanager->RegisterPlot<TH2F>("PID_115","Pin 3 Energy vs DB3P1A-FP2XP1; TDiff (ns); Energy (keV)",this->h2dsettings.at(115));
+	hismanager->RegisterPlot<TH2F>("PID_116","Pin 4 Energy vs DB3P1A-FP2XP1; TDiff (ns); Energy (keV)",this->h2dsettings.at(116));
 
-	hismanager->RegisterPlot<TH2F>("PID_109","DB3P0A-FP2XP1 vs Pin 1 Energy",this->h2dsettings.at(109));
-	hismanager->RegisterPlot<TH2F>("PID_110","DB3P0A-FP2XP1 vs Pin 2 Energy",this->h2dsettings.at(110));
-	hismanager->RegisterPlot<TH2F>("PID_111","DB3P0A-FP2XP1 vs Pin 3 Energy",this->h2dsettings.at(111));
-	hismanager->RegisterPlot<TH2F>("PID_112","DB3P0A-FP2XP1 vs Pin 4 Energy",this->h2dsettings.at(112));
+	hismanager->RegisterPlot<TH2F>("PID_117","Pin 1 Energy vs DB3SL-FP2XP; TDiff (ns); Energy (keV)1",this->h2dsettings.at(117));
+	hismanager->RegisterPlot<TH2F>("PID_118","Pin 2 Energy vs DB3SL-FP2XP; TDiff (ns); Energy (keV)1",this->h2dsettings.at(118));
+	hismanager->RegisterPlot<TH2F>("PID_119","Pin 3 Energy vs DB3SL-FP2XP; TDiff (ns); Energy (keV)1",this->h2dsettings.at(119));
+	hismanager->RegisterPlot<TH2F>("PID_120","Pin 4 Energy vs DB3SL-FP2XP; TDiff (ns); Energy (keV)1",this->h2dsettings.at(120));
+                                                                  
+	hismanager->RegisterPlot<TH2F>("PID_121","Pin 1 Energy vs DB3SR-FP2XP; TDiff (ns); Energy (keV)1",this->h2dsettings.at(121));
+	hismanager->RegisterPlot<TH2F>("PID_122","Pin 2 Energy vs DB3SR-FP2XP; TDiff (ns); Energy (keV)1",this->h2dsettings.at(122));
+	hismanager->RegisterPlot<TH2F>("PID_123","Pin 3 Energy vs DB3SR-FP2XP; TDiff (ns); Energy (keV)1",this->h2dsettings.at(123));
+	hismanager->RegisterPlot<TH2F>("PID_124","Pin 4 Energy vs DB3SR-FP2XP; TDiff (ns); Energy (keV)1",this->h2dsettings.at(124));
 
-	hismanager->RegisterPlot<TH2F>("PID_113","DB3P1A-FP2XP1 vs Pin 1 Energy",this->h2dsettings.at(113));
-	hismanager->RegisterPlot<TH2F>("PID_114","DB3P1A-FP2XP1 vs Pin 2 Energy",this->h2dsettings.at(114));
-	hismanager->RegisterPlot<TH2F>("PID_115","DB3P1A-FP2XP1 vs Pin 3 Energy",this->h2dsettings.at(115));
-	hismanager->RegisterPlot<TH2F>("PID_116","DB3P1A-FP2XP1 vs Pin 4 Energy",this->h2dsettings.at(116));
+	hismanager->RegisterPlot<TH2F>("PID_125","Pin 2 vs Pin 1 Energy; Energy (keV); Energy (keV)",this->h2dsettings.at(125));
+	hismanager->RegisterPlot<TH2F>("PID_126","Pin 3 vs Pin 1 Energy; Energy (keV); Energy (keV)",this->h2dsettings.at(126));
+	hismanager->RegisterPlot<TH2F>("PID_127","Pin 4 vs Pin 1 Energy; Energy (keV); Energy (keV)",this->h2dsettings.at(127));
 
-	hismanager->RegisterPlot<TH2F>("PID_117","DB3SL-FP2XP1 vs Pin 1 Energy",this->h2dsettings.at(117));
-	hismanager->RegisterPlot<TH2F>("PID_118","DB3SL-FP2XP1 vs Pin 2 Energy",this->h2dsettings.at(118));
-	hismanager->RegisterPlot<TH2F>("PID_119","DB3SL-FP2XP1 vs Pin 3 Energy",this->h2dsettings.at(119));
-	hismanager->RegisterPlot<TH2F>("PID_120","DB3SL-FP2XP1 vs Pin 4 Energy",this->h2dsettings.at(120));
+	hismanager->RegisterPlot<TH1F>("PID_300","DB3 PPAC0 Left - Right; TDiff (ns)",this->h1dsettings.at(300));
+	hismanager->RegisterPlot<TH1F>("PID_301","DB3 PPAC0 Up - Down; TDiff (ns)",this->h1dsettings.at(301));
+	
+	hismanager->RegisterPlot<TH1F>("PID_310","DB3 PPAC1 Left - Right; TDiff (ns)",this->h1dsettings.at(310));
+	hismanager->RegisterPlot<TH1F>("PID_311","DB3 PPAC1 Up - Down; TDiff (ns)",this->h1dsettings.at(311));
 
-	hismanager->RegisterPlot<TH2F>("PID_121","DB3SR-FP2XP1 vs Pin 1 Energy",this->h2dsettings.at(121));
-	hismanager->RegisterPlot<TH2F>("PID_122","DB3SR-FP2XP1 vs Pin 2 Energy",this->h2dsettings.at(122));
-	hismanager->RegisterPlot<TH2F>("PID_123","DB3SR-FP2XP1 vs Pin 3 Energy",this->h2dsettings.at(123));
-	hismanager->RegisterPlot<TH2F>("PID_124","DB3SR-FP2XP1 vs Pin 4 Energy",this->h2dsettings.at(124));
+	hismanager->RegisterPlot<TH1F>("PID_400","DB4 PPAC0 Left - Right; TDiff (ns)",this->h1dsettings.at(400));
+	hismanager->RegisterPlot<TH1F>("PID_401","DB4 PPAC0 Up - Down; TDiff (ns)",this->h1dsettings.at(401));
+	
+	hismanager->RegisterPlot<TH1F>("PID_410","DB4 PPAC1 Left - Right; TDiff (ns)",this->h1dsettings.at(410));
+	hismanager->RegisterPlot<TH1F>("PID_411","DB4 PPAC1 Up - Down; TDiff (ns)",this->h1dsettings.at(411));
 
-	hismanager->RegisterPlot<TH2F>("PID_125","Pin 1 vs Pin 2 Energy",	this->h2dsettings.at(125));
-	hismanager->RegisterPlot<TH2F>("PID_126","Pin 1 vs Pin 3 Energy",	this->h2dsettings.at(126));
-	hismanager->RegisterPlot<TH2F>("PID_127","Pin 1 vs Pin 4 Energy",	this->h2dsettings.at(127));
+	hismanager->RegisterPlot<TH1F>("PID_500","DB5 PPAC0 Left - Right; TDiff (ns)",this->h1dsettings.at(500));
+	hismanager->RegisterPlot<TH1F>("PID_501","DB5 PPAC0 Up - Down; TDiff (ns)",this->h1dsettings.at(501));
+	
+	hismanager->RegisterPlot<TH1F>("PID_510","DB5 PPAC1 Left - Right; TDiff (ns)",this->h1dsettings.at(510));
+	hismanager->RegisterPlot<TH1F>("PID_511","DB5 PPAC1 Up - Down; TDiff (ns)",this->h1dsettings.at(511));
+
+	hismanager->RegisterPlot<TH2F>("PID_3000","DB3 PPAC0 Image; TDiff (ns); TDiff (ns)",this->h2dsettings.at(3000));
+	hismanager->RegisterPlot<TH2F>("PID_3010","DB3 PPAC1 Image; TDiff (ns); TDiff (ns)",this->h2dsettings.at(3010));
+
+	hismanager->RegisterPlot<TH2F>("PID_4000","DB4 PPAC0 Image; TDiff (ns); TDiff (ns)",this->h2dsettings.at(4000));
+	hismanager->RegisterPlot<TH2F>("PID_4010","DB4 PPAC1 Image; TDiff (ns); TDiff (ns)",this->h2dsettings.at(4010));
+
+	hismanager->RegisterPlot<TH2F>("PID_5000","DB5 PPAC0 Image; TDiff (ns); TDiff (ns)",this->h2dsettings.at(5000));
+	hismanager->RegisterPlot<TH2F>("PID_5010","DB5 PPAC1 Image; TDiff (ns); TDiff (ns)",this->h2dsettings.at(5010));
 
 	this->console->info("Finished Declaring Plots");
 }
@@ -547,4 +654,12 @@ double PidProcessor::GetFP2PinEnergy(size_t idx) const {
 
 const std::vector<std::string>& PidProcessor::GetIsotopeTags() const{
 	return this->isotopetags;
+}
+
+inline double PidProcessor::CalcPPACPosition(const double& a,const double& b){
+	if( a > 0.0 and b > 0.0 ){
+		return a - b;
+	}else{
+		return -999.0;
+	}
 }

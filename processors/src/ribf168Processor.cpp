@@ -85,7 +85,6 @@ ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf
 
 	if( this->HasVeto ){
 		this->VetoProc->PreProcess(eventhistory,hismanager,cutmanager);
-		this->CurrVeto = this->VetoProc->GetCurrEvt();
 	}
 
 	//if( this->HasPSPMT or this->HasRIKENIonChamber ){
@@ -117,13 +116,13 @@ ribf168Processor::ribf168Processor(const std::string& log) : Processor(log,"ribf
 		hismanager->Fill("RIBF168_2003",tof,this->CurrIonChamber.AverageEnergy);
 	}
 
-	if( this->HasRIKENIonChamber and this->HasVeto and this->HasRIKENPid ){
-		double tof = this->CurrVeto.MaxFrontCFDTimeStamp - this->CurrPid.F7AnalogCFDTimeStamp ;
-		hismanager->Fill("RIBF168_1004",tof);
-		hismanager->Fill("RIBF168_2004",tof,this->CurrIonChamber.AverageEnergy);
-		
-		this->Ions.push_back({this->CurrIonChamber.AverageEnergy,tof,this->CurrVeto.MaxFrontTimeStamp});
-	}
+	//if( this->HasRIKENIonChamber and this->HasVeto and this->HasRIKENPid ){
+	//	double tof = this->CurrVeto.MaxFrontCFDTimeStamp - this->CurrPid.F7AnalogCFDTimeStamp ;
+	//	hismanager->Fill("RIBF168_1004",tof);
+	//	hismanager->Fill("RIBF168_2004",tof,this->CurrIonChamber.AverageEnergy);
+	//	
+	//	this->Ions.push_back({this->CurrIonChamber.AverageEnergy,tof,this->CurrVeto.MaxFrontTimeStamp});
+	//}
 
 	Processor::EndProcess();
 	return true;
@@ -297,7 +296,6 @@ void ribf168Processor::Finalize(){
 	this->CurrIonChamber = this->RIKENIonizationChamberProc->GetCurrEvt();
 	this->CurrHagrid = this->HagridProc->GetCurrEvt();
 	this->CurrPid = this->RIKENPidProc->GetCurrEvt();
-	this->CurrVeto = this->VetoProc->GetCurrEvt();
 
 	this->console->info("{} has been finalized",this->ProcessorName);
 }

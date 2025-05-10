@@ -30,8 +30,27 @@ e21027Processor::e21027Processor(const std::string& log) : Processor(log,"e21027
 		this->AssociateType(type);
 	}
 
-	// this->h1dsettings = {
-	// };
+	this->h1dsettings = {
+		{2000,{65536,0,65536}},
+		{2010,{65536,0,65536}},
+		{2020,{65536,0,65536}},
+		{2030,{65536,0,65536}},
+		{2040,{65536,0,65536}},
+		{2015,{65536,0,65536}},
+		{2025,{65536,0,65536}},
+		{2035,{65536,0,65536}},
+		{2045,{65536,0,65536}},
+		
+		{2100,{65536,0,65536}},
+		{2110,{65536,0,65536}},
+		{2120,{65536,0,65536}},
+		{2130,{65536,0,65536}},
+		{2140,{65536,0,65536}},
+		{2115,{65536,0,65536}},
+		{2125,{65536,0,65536}},
+		{2135,{65536,0,65536}},
+		{2145,{65536,0,65536}}
+	};
 
 	this->h2dsettings = {
 
@@ -44,6 +63,12 @@ e21027Processor::e21027Processor(const std::string& log) : Processor(log,"e21027
 
 		//beta plots
 		{3650,{4096,0,4096,4096,0,4096}},
+		{3651,{4096,0,4096,4096,0,4096}},
+		{3652,{4096,0,4096,4096,0,4096}},
+		
+		{36508,{4096,0,65536,4096,0,65536}},
+		{36518,{4096,0,65536,4096,0,65536}},
+		{36528,{4096,0,65536,4096,0,65536}},
 		
 		{8000,{8192,0,16384,1024,0,16}},
 		{8001,{8192,0,16384,1024,0,16}},
@@ -54,6 +79,12 @@ e21027Processor::e21027Processor(const std::string& log) : Processor(log,"e21027
 
 		//ion plots
 		{3750,{4096,0,4096,4096,0,4096}},
+		{3751,{4096,0,4096,4096,0,4096}},
+		{3752,{4096,0,4096,4096,0,4096}},
+
+		{37508,{4096,0,65536,4096,0,65536}},
+		{37518,{4096,0,65536,4096,0,65536}},
+		{37528,{4096,0,65536,4096,0,65536}},
 
 		{8005,{8192,0,16384,1024,0,16}},
 		{8006,{8192,0,16384,1024,0,16}},
@@ -150,12 +181,35 @@ e21027Processor::e21027Processor(const std::string& log) : Processor(log,"e21027
 	auto hasbeta = summary->ContainsEventTag(this->beta);
 	auto hasgamma = summary->ContainsEventTag(this->gamma);
 	auto hasmuon = summary->ContainsEventTag("muon");
+	auto hasrit = summary->ContainsEventTag("rit");
 
 	if( not hasmuon ){
 		if( hasion ){
 			auto total = this->MtasProc->GetTotalEnergy(0);
+			auto ctotal = this->MtasProc->GetTotalEnergy(1);
+			auto itotal = this->MtasProc->GetTotalEnergy(2);
+			auto mtotal = this->MtasProc->GetTotalEnergy(3);
+			auto ototal = this->MtasProc->GetTotalEnergy(4);
 			auto dynode = this->ImplantProc->GetLowGainImage().dynode;
 			hismanager->Fill("EXP_3750",total,dynode);
+			hismanager->Fill("EXP_3751",ctotal,dynode);
+			hismanager->Fill("EXP_37508",total,dynode);
+			hismanager->Fill("EXP_37518",ctotal,dynode);
+			hismanager->Fill("EXP_2100",dynode+total);
+			hismanager->Fill("EXP_2110",dynode+ctotal);
+			hismanager->Fill("EXP_2120",dynode+itotal);
+			hismanager->Fill("EXP_2130",dynode+mtotal);
+			hismanager->Fill("EXP_2140",dynode+ototal);
+			for( size_t ii = 0; ii < 6; ++ii ){
+				hismanager->Fill("EXP_3752",this->MtasProc->GetCrystalEnergy(ii),dynode);
+				hismanager->Fill("EXP_37528",this->MtasProc->GetCrystalEnergy(ii),dynode);
+				
+				hismanager->Fill("EXP_2115",dynode+this->MtasProc->GetCrystalEnergy(ii));
+				hismanager->Fill("EXP_2125",dynode+this->MtasProc->GetCrystalEnergy(ii+6));
+				hismanager->Fill("EXP_2135",dynode+this->MtasProc->GetCrystalEnergy(ii+12));
+				hismanager->Fill("EXP_2145",dynode+this->MtasProc->GetCrystalEnergy(ii+18));
+			}
+
 			auto ionx = summary->GetEventObservable("ION_X").value();
 			auto iony = summary->GetEventObservable("ION_Y").value();
 			auto ionr = std::sqrt(ionx*ionx + iony*iony);
@@ -235,7 +289,30 @@ e21027Processor::e21027Processor(const std::string& log) : Processor(log,"e21027
 			this->MtasProc->FillBetaPlots(hismanager);
 			this->MtasProc->FillNoLogicBetaPlots(hismanager);
 			auto total = this->MtasProc->GetTotalEnergy(0);
+			auto ctotal = this->MtasProc->GetTotalEnergy(1);
+			auto itotal = this->MtasProc->GetTotalEnergy(2);
+			auto mtotal = this->MtasProc->GetTotalEnergy(3);
+			auto ototal = this->MtasProc->GetTotalEnergy(4);
 			auto dynode = this->ImplantProc->GetHighGainImage().dynode;
+			hismanager->Fill("EXP_3650",total,dynode);
+			hismanager->Fill("EXP_3651",ctotal,dynode);
+			hismanager->Fill("EXP_36508",total,dynode);
+			hismanager->Fill("EXP_36518",ctotal,dynode);
+			hismanager->Fill("EXP_2000",dynode+total);
+			hismanager->Fill("EXP_2010",dynode+ctotal);
+			hismanager->Fill("EXP_2020",dynode+itotal);
+			hismanager->Fill("EXP_2030",dynode+mtotal);
+			hismanager->Fill("EXP_2040",dynode+ototal);
+			for( size_t ii = 0; ii < 6; ++ii ){
+				hismanager->Fill("EXP_3652",this->MtasProc->GetCrystalEnergy(ii),dynode);
+				hismanager->Fill("EXP_36528",this->MtasProc->GetCrystalEnergy(ii),dynode);
+		
+				hismanager->Fill("EXP_2015",dynode+this->MtasProc->GetCrystalEnergy(ii));
+				hismanager->Fill("EXP_2025",dynode+this->MtasProc->GetCrystalEnergy(ii+6));
+				hismanager->Fill("EXP_2035",dynode+this->MtasProc->GetCrystalEnergy(ii+12));
+				hismanager->Fill("EXP_2045",dynode+this->MtasProc->GetCrystalEnergy(ii+18));
+			}
+
 			auto betax = summary->GetEventObservable("BETA_X").value();
 			auto betay = summary->GetEventObservable("BETA_Y").value();
 			auto betar = std::sqrt(betax*betax + betay*betay);
@@ -244,7 +321,6 @@ e21027Processor::e21027Processor(const std::string& log) : Processor(log,"e21027
 			hismanager->Fill("EXP_8001",dynode,betax);
 			hismanager->Fill("EXP_8002",dynode,betay);
 			hismanager->Fill("EXP_8003",betax,betay);
-			hismanager->Fill("EXP_3650",total,dynode);
 			for( size_t ii = 0; ii < this->MTAS_Total_Gates.size(); ++ii ){
 				if( this->MTAS_Total_Gates.at(ii).IsWithin(total) ){
 					std::string label = "EXP_900"+std::to_string(ii);
@@ -374,7 +450,39 @@ void e21027Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH2F>("EXP_10015","DB3SR-FP1XP1 vs Pin 4 Energy :: LG_Dynode Gated",	this->h2dsettings.at(10015));
 
 	hismanager->RegisterPlot<TH2F>("EXP_3650","High Gain Dynode vs MTAS Total; MTAS Total Energy (keV); Dynode Energy (keV);",this->h2dsettings.at(3650));
+	hismanager->RegisterPlot<TH2F>("EXP_3651","High Gain Dynode vs MTAS Center Sum; MTAS Center Energy (keV); Dynode Energy (keV);",this->h2dsettings.at(3651));
+	hismanager->RegisterPlot<TH2F>("EXP_3652","High Gain Dynode vs MTAS Center Individual; MTAS Center Crystal Energy (keV); Dynode Energy (keV);",this->h2dsettings.at(3652));
+	hismanager->RegisterPlot<TH2F>("EXP_36508","High Gain Dynode vs MTAS Total; MTAS Total Energy (8 keV/bin); Dynode Energy (8 keV/bin);",this->h2dsettings.at(36508));
+	hismanager->RegisterPlot<TH2F>("EXP_36518","High Gain Dynode vs MTAS Center Sum; MTAS Center Energy (8 keV/bin); Dynode Energy (8 keV/bin);",this->h2dsettings.at(36518));
+	hismanager->RegisterPlot<TH2F>("EXP_36528","High Gain Dynode vs MTAS Center Individual; MTAS Center Crystal Energy (8 keV/bin); Dynode Energy (8 keV/bin);",this->h2dsettings.at(36528));
+
+	hismanager->RegisterPlot<TH1F>("EXP_2000","High Gain Dynode + MTAS Total; Energy (keV)",this->h1dsettings.at(2000));
+	hismanager->RegisterPlot<TH1F>("EXP_2010","High Gain Dynode + MTAS Center Sum; Energy (keV)",this->h1dsettings.at(2010));
+	hismanager->RegisterPlot<TH1F>("EXP_2020","High Gain Dynode + MTAS Inner Sum; Energy (keV)",this->h1dsettings.at(2020));
+	hismanager->RegisterPlot<TH1F>("EXP_2030","High Gain Dynode + MTAS Middle Sum; Energy (keV)",this->h1dsettings.at(2030));
+	hismanager->RegisterPlot<TH1F>("EXP_2040","High Gain Dynode + MTAS Outer Sum; Energy (keV)",this->h1dsettings.at(2040));
+	hismanager->RegisterPlot<TH1F>("EXP_2015","High Gain Dynode + MTAS Center Ind.; Energy (keV)",this->h1dsettings.at(2015));
+	hismanager->RegisterPlot<TH1F>("EXP_2025","High Gain Dynode + MTAS Inner Ind.; Energy (keV)",this->h1dsettings.at(2025));
+	hismanager->RegisterPlot<TH1F>("EXP_2035","High Gain Dynode + MTAS Middle Ind.; Energy (keV)",this->h1dsettings.at(2035));
+	hismanager->RegisterPlot<TH1F>("EXP_2045","High Gain Dynode + MTAS Outer Ind.; Energy (keV)",this->h1dsettings.at(2045));
+
 	hismanager->RegisterPlot<TH2F>("EXP_3750","Low Gain Dynode vs MTAS Total; MTAS Total Energy (keV); Dynode Energy (keV);",this->h2dsettings.at(3750));
+	hismanager->RegisterPlot<TH2F>("EXP_3751","Low Gain Dynode vs MTAS Center Sum; MTAS Center Energy (keV); Dynode Energy (keV);",this->h2dsettings.at(3751));
+	hismanager->RegisterPlot<TH2F>("EXP_3752","Low Gain Dynode vs MTAS Center Individual; MTAS Center Crystal Energy (keV); Dynode Energy (keV);",this->h2dsettings.at(3752));
+	
+	hismanager->RegisterPlot<TH2F>("EXP_37508","Low Gain Dynode vs MTAS Total; MTAS Total Energy (8 keV/bin); Dynode Energy (8 keV/bin);",this->h2dsettings.at(37508));
+	hismanager->RegisterPlot<TH2F>("EXP_37518","Low Gain Dynode vs MTAS Center Sum; MTAS Center Energy (8 keV/bin); Dynode Energy (8 keV/bin);",this->h2dsettings.at(37518));
+	hismanager->RegisterPlot<TH2F>("EXP_37528","Low Gain Dynode vs MTAS Center Individual; MTAS Center Crystal Energy (8 keV/bin); Dynode Energy (8 keV/bin);",this->h2dsettings.at(37528));
+	
+	hismanager->RegisterPlot<TH1F>("EXP_2100","High Gain Dynode + MTAS Total; Energy (keV)",this->h1dsettings.at(2100));
+	hismanager->RegisterPlot<TH1F>("EXP_2110","High Gain Dynode + MTAS Center Sum; Energy (keV)",this->h1dsettings.at(2110));
+	hismanager->RegisterPlot<TH1F>("EXP_2120","High Gain Dynode + MTAS Inner Sum; Energy (keV)",this->h1dsettings.at(2120));
+	hismanager->RegisterPlot<TH1F>("EXP_2130","High Gain Dynode + MTAS Middle Sum; Energy (keV)",this->h1dsettings.at(2130));
+	hismanager->RegisterPlot<TH1F>("EXP_2140","High Gain Dynode + MTAS Outer Sum; Energy (keV)",this->h1dsettings.at(2140));
+	hismanager->RegisterPlot<TH1F>("EXP_2115","High Gain Dynode + MTAS Center Ind.; Energy (keV)",this->h1dsettings.at(2115));
+	hismanager->RegisterPlot<TH1F>("EXP_2125","High Gain Dynode + MTAS Inner Ind.; Energy (keV)",this->h1dsettings.at(2125));
+	hismanager->RegisterPlot<TH1F>("EXP_2135","High Gain Dynode + MTAS Middle Ind.; Energy (keV)",this->h1dsettings.at(2135));
+	hismanager->RegisterPlot<TH1F>("EXP_2145","High Gain Dynode + MTAS Outer Ind.; Energy (keV)",this->h1dsettings.at(2145));
 
 	hismanager->RegisterPlot<TH2F>("EXP_8000","Beta Radius vs Energy; Energy (keV); Radius (pixels)",this->h2dsettings.at(8000));
 	hismanager->RegisterPlot<TH2F>("EXP_8001","Beta X vs Energy; Energy (keV); X (pixels)",this->h2dsettings.at(8001));

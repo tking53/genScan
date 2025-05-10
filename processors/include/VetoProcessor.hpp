@@ -1,7 +1,9 @@
 #ifndef __VETO_PROCESSOR_HPP__
 #define __VETO_PROCESSOR_HPP__
 
+#include "Gates.hpp"
 #include "Processor.hpp"
+#include <vector>
 
 class VetoProcessor : public Processor{
 	public:
@@ -19,33 +21,11 @@ class VetoProcessor : public Processor{
 		virtual void RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>&) final;
 		virtual void CleanupTree() final;
 
-		struct EventInfo{
-			std::vector<double> FrontErg;
-			std::vector<double> FrontTimeStamp;
-			std::vector<double> FrontCFDTimeStamp;
-			std::vector<double> RearErg;
-			std::vector<double> RearTimeStamp;
-			std::vector<double> RearCFDTimeStamp;
-			double MaxFrontErg;
-			double MaxFrontTimeStamp;
-			double MaxFrontCFDTimeStamp;
-			double MaxRearErg;
-			double MaxRearTimeStamp;
-			double MaxRearCFDTimeStamp;
-			bool Pileup;
-			bool Saturate;
-			bool RealEvent;
-		};
-
-		EventInfo& GetCurrEvt();
-		EventInfo& GetPrevEvt();
+		const double& GetRIT() const;
+		const double& GetFIT() const;
 
 	private:
 		void Reset();
-
-		EventInfo NewEvt;
-		EventInfo CurrEvt;
-		EventInfo PrevEvt;
 
 		enum SUBTYPE{
 			FIT,
@@ -54,8 +34,11 @@ class VetoProcessor : public Processor{
 		};
 
 		SUBTYPE currsubtype;
-		std::vector<std::tuple<double,double,double>> HighestFit;
-		std::vector<std::tuple<double,double,double>> HighestRit;
+		double rit;
+		double fit;
+
+		std::vector<Gate<double>> FitReject;
+		std::vector<Gate<double>> RitReject;
 };
 
 #endif

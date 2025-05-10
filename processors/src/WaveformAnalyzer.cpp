@@ -11,7 +11,13 @@ WaveformAnalyzer::WaveformAnalyzer(const std::string& log) : Analyzer(log,"Wavef
 		{1012, {1024,0,1024.0,512,0,512.0}},
 		{1020, {1024,0,1024.0,512,0,512.0}},
 		{1021, {16384,0,16384.0,512,0,512.0}},
-		{1022, {16384,0,16384.0,512,0,512.0}}
+		{1022, {16384,0,16384.0,512,0,512.0}},
+		{1030, {16384,0.0,16384.0,512,0,512.0}},
+		{1031, {16384,0.0,16384.0,512,0,512.0}},
+		{1032, {16384,0.0,16384.0,512,0,512.0}},
+		{1033, {16384,-16.0,16.0,512,0,512.0}},
+		{1034, {16384,-16.0,16.0,512,0,512.0}},
+		{1035, {16384,-16.0,16.0,512,0,512.0}},
 	};
 
 	this->currsave = 0;
@@ -50,6 +56,19 @@ WaveformAnalyzer::~WaveformAnalyzer(){
 							auto begin = std::get<0>(s.second.FixedPSDBounds);
 							auto end = std::get<2>(s.second.FixedPSDBounds);
 							evt->CalcTraceFixedPSD(begin,mid,end);
+							auto psd = evt->GetTraceFixedPSD();
+							auto gcid = evt->GetGlobalChannelID();
+							auto head = std::get<0>(psd);
+							auto tail = std::get<1>(psd);
+							auto total = std::get<2>(psd);
+
+							hismanager->Fill("WAVE_1030",head,gcid);
+							hismanager->Fill("WAVE_1031",tail,gcid);
+							hismanager->Fill("WAVE_1032",total,gcid);
+							
+							hismanager->Fill("WAVE_1033",head/total,gcid);
+							hismanager->Fill("WAVE_1034",tail/total,gcid);
+							hismanager->Fill("WAVE_1035",head/tail,gcid);
 						}
 					}
 					auto pre = evt->GetTracePreTriggerBaseline();
@@ -215,6 +234,14 @@ void WaveformAnalyzer::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
 	hismanager->RegisterPlot<TH2F>("WAVE_1020","Max Trace Location; Trace position (arb.); Linearized Channel Number (arb.)",this->h2dsettings.at(1020));
 	hismanager->RegisterPlot<TH2F>("WAVE_1021","Max Trace Value; adc value (arb.); Linearized Channel Number (arb.)",this->h2dsettings.at(1021));
 	hismanager->RegisterPlot<TH2F>("WAVE_1022","Baseline Subtraced Max Trace Value; adc value (arb.); Linearized Channel Number (arb.)",this->h2dsettings.at(1022));
+
+	hismanager->RegisterPlot<TH2F>("WAVE_1030","Channel vs Early PSD Integral ; Integral (arb.); Linearized Channel Number (arb.)",this->h2dsettings.at(1030));
+	hismanager->RegisterPlot<TH2F>("WAVE_1031","Channel vs Late PSD Integral ; Integral (arb.); Linearized Channel Number (arb.)",this->h2dsettings.at(1031));
+	hismanager->RegisterPlot<TH2F>("WAVE_1032","Channel vs Total PSD Integral ; Integral (arb.); Linearized Channel Number (arb.)",this->h2dsettings.at(1032));
+
+	hismanager->RegisterPlot<TH2F>("WAVE_1033","Channel vs PSD (Tail/Total) ; PSD (arb.); Linearized Channel Number (arb.)",this->h2dsettings.at(1033));
+	hismanager->RegisterPlot<TH2F>("WAVE_1034","Channel vs PSD (Head/Total) ; PSD (arb.); Linearized Channel Number (arb.)",this->h2dsettings.at(1034));
+	hismanager->RegisterPlot<TH2F>("WAVE_1035","Channel vs PSD (Head/Tail) ; PSD (arb.); Linearized Channel Number (arb.)",this->h2dsettings.at(1035));
 }
 
 void WaveformAnalyzer::InsertAdditionalTypes(const std::string& typestring){

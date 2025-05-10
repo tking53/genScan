@@ -17,6 +17,8 @@ struct PPAC {
 	PidDet left = DEFAULT_PIDDET_STRUCT ;
 	PidDet right = DEFAULT_PIDDET_STRUCT ;
 	PidDet anode = DEFAULT_PIDDET_STRUCT ;
+	double xpos = -999.0;
+	double ypos = -999.0;
 };
 static const PPAC DEFAULT_PPAC_STRUCT;
 

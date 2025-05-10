@@ -1,35 +1,33 @@
 #include "VetoProcessor.hpp"
 #include "CutManager.hpp"
 #include "EventSummary.hpp"
+#include "Gates.hpp"
 #include "HistogramManager.hpp"
 #include <TTree.h>
 #include <stdexcept>
 
 VetoProcessor::VetoProcessor(const std::string& log) : Processor(log,"VetoProcessor",{"veto"}){
-	this->NewEvt = {
-		.FrontErg = std::vector<double>(2,0.0),
-		.FrontTimeStamp = std::vector<double>(2,0.0),
-		.FrontCFDTimeStamp = std::vector<double>(2,0.0),
-		.RearErg = std::vector<double>(2,0.0),
-		.RearTimeStamp = std::vector<double>(2,0.0),
-		.RearCFDTimeStamp = std::vector<double>(2,0.0),
-		.MaxFrontErg = 0.0,
-		.MaxFrontTimeStamp = 0.0,
-		.MaxFrontCFDTimeStamp = 0.0,
-		.MaxRearErg = 0.0,
-		.MaxRearTimeStamp = 0.0,
-		.MaxRearCFDTimeStamp = 0.0,
-		.Pileup = false,
-		.Saturate = false,
-		.RealEvent = false
+	this->h1dsettings = {
+		{1000,{65536,0,65536}},
+		{1010,{65536,0,65536}},
+		{2000,{65536,0,65536}},
+		{2010,{65536,0,65536}}
 	};
-	this->Reset();
+
+	this->h2dsettings = {
+		{3000,{4096,0,4096,4096,0,4096}},
+		{30008,{4096,0,4096,4096,0,4096}}
+	};
+
+	this->rit = 0.0;
+	this->fit = 0.0;
 	this->currsubtype = SUBTYPE::UNKNOWN;
 }
 
 [[maybe_unused]] bool VetoProcessor::PreProcess(EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	Processor::PreProcess();
-	eventhistory->GetCurrentEventSummary()->GetDetectorSummary(this->AllDefaultRegex["veto"],this->SummaryData);
+	auto summary = 	eventhistory->GetCurrentEventSummary();
+	summary->GetDetectorSummary(this->AllDefaultRegex["veto"],this->SummaryData);
 
 	for( const auto& evt : this->SummaryData ){
 		auto subtype = evt->GetSubType();
@@ -45,65 +43,40 @@ VetoProcessor::VetoProcessor(const std::string& log) : Processor(log,"VetoProces
 		if( detloc > 1 ){
 			throw std::runtime_error("xml has malformed group for a veto, only 0,1 are allowed");
 		}
-		this->CurrEvt.RealEvent = true;
 		
-		if( evt->GetPileup() or evt->GetSaturation() ){
-			//ignore the saturated channel, but keep everything else in this current event
-			if( evt->GetPileup() ){
-				this->CurrEvt.Pileup = true;
-			}
-			if( evt->GetSaturation() ){
-				this->CurrEvt.Saturate = true;
-			}
-			continue;
-		}
-
 		if( this->currsubtype == SUBTYPE::FIT ){
-			if( evt->GetEnergy() > std::get<0>(this->HighestFit[detloc]) ){
-				this->HighestFit[detloc] = std::make_tuple(evt->GetEnergy(),evt->GetTimeStamp(),evt->GetCFDTimeStamp());
+			if( evt->GetEnergy() > this->fit ){
+				this->fit = evt->GetEnergy();
 			}
+			hismanager->Fill("VETO_1010",evt->GetEnergy());
 		}else if( this->currsubtype == SUBTYPE::RIT ){
-			if( evt->GetEnergy() > std::get<0>(this->HighestRit[detloc]) ){
-				this->HighestRit[detloc] = std::make_tuple(evt->GetEnergy(),evt->GetTimeStamp(),evt->GetCFDTimeStamp());
+			if( evt->GetEnergy() > this->rit ){
+				this->rit = evt->GetEnergy();
 			}
+			hismanager->Fill("VETO_2010",evt->GetEnergy());
 		}else{
 			//no-op
 		}
 	}
-	
-	if( (not this->CurrEvt.Saturate) and (not this->CurrEvt.Pileup) ){
-		for( size_t ii = 0; ii < 2; ++ii ){
-			this->CurrEvt.FrontErg[ii] = std::get<0>(this->HighestFit[ii]);
-			this->CurrEvt.FrontTimeStamp[ii] = std::get<1>(this->HighestFit[ii]);
-			this->CurrEvt.FrontCFDTimeStamp[ii] = std::get<2>(this->HighestFit[ii]);
-			
-			this->CurrEvt.RearErg[ii] = std::get<0>(this->HighestRit[ii]);
-			this->CurrEvt.RearTimeStamp[ii] = std::get<1>(this->HighestRit[ii]);
-			this->CurrEvt.RearCFDTimeStamp[ii] = std::get<2>(this->HighestRit[ii]);
 
-			hismanager->Fill("VETO_1000",this->CurrEvt.FrontErg[ii],ii);
-			hismanager->Fill("VETO_2000",this->CurrEvt.RearErg[ii],ii);
-
-			if( this->CurrEvt.FrontErg[ii] > this->CurrEvt.MaxFrontErg ){
-				this->CurrEvt.MaxFrontErg = this->CurrEvt.FrontErg[ii];
-				this->CurrEvt.MaxFrontTimeStamp = this->CurrEvt.FrontTimeStamp[ii];
-				this->CurrEvt.MaxFrontCFDTimeStamp = this->CurrEvt.FrontCFDTimeStamp[ii];
-			}
-
-			if( this->CurrEvt.RearErg[ii] > this->CurrEvt.MaxRearErg ){
-				this->CurrEvt.MaxRearErg = this->CurrEvt.RearErg[ii];
-				this->CurrEvt.MaxRearTimeStamp = this->CurrEvt.RearTimeStamp[ii];
-				this->CurrEvt.MaxRearCFDTimeStamp = this->CurrEvt.RearCFDTimeStamp[ii];
-			}
-
-			for( size_t jj = 0; jj < 2; ++jj ){
-				hismanager->Fill("VETO_3000",this->CurrEvt.RearErg[jj],this->CurrEvt.FrontErg[ii]);
-			}
+	for( const auto& g : this->FitReject ){
+		if( g.IsWithin(this->fit) ){
+			summary->AddEventTag("fit");
+			break;
 		}
-		hismanager->Fill("VETO_1010",this->CurrEvt.MaxFrontErg);
-		hismanager->Fill("VETO_2010",this->CurrEvt.MaxRearErg);
-		hismanager->Fill("VETO_3010",this->CurrEvt.MaxRearErg,this->CurrEvt.MaxFrontErg);
 	}
+	
+	for( const auto& g : this->RitReject ){
+		if( g.IsWithin(this->rit) ){
+			summary->AddEventTag("rit");
+			break;
+		}
+	}
+	
+	hismanager->Fill("VETO_1000",this->fit);
+	hismanager->Fill("VETO_2000",this->rit);
+	hismanager->Fill("VETO_3000",this->rit,this->fit);
+	hismanager->Fill("VETO_30008",this->rit,this->fit);
 
 	Processor::EndProcess();
 	return true;
@@ -120,6 +93,21 @@ VetoProcessor::VetoProcessor(const std::string& log) : Processor(log,"VetoProces
 
 void VetoProcessor::Init(const pugi::xml_node& config){
 	this->console->info("Init called with pugi::xml_node");
+
+	for( pugi::xml_node gate = config.child("Gate"); gate; gate = gate.next_sibling("Gate") ){
+		std::string label = gate.attribute("label").as_string("");
+		if( label.compare("fit") == 0 ){
+			this->FitReject.push_back(Gate<double>(gate.attribute("lowerbound").as_double(-1.0),gate.attribute("upperbound").as_double(-1.0)));
+		}else if( label.compare("rit") == 0 ){
+			this->RitReject.push_back(Gate<double>(gate.attribute("lowerbound").as_double(-1.0),gate.attribute("upperbound").as_double(-1.0)));
+		}else{
+			this->console->error("Only accepted gates are label=\"rit\" or label=\"fit\", and these are the regions which will be tagged, multiple are allowed");
+			throw std::runtime_error("Unknown Gate Tag label");
+		}
+	}
+	
+	this->LoadHistogramSettings(config);
+	this->LoadCustomCuts(config);
 }
 		
 void VetoProcessor::Finalize(){
@@ -127,12 +115,15 @@ void VetoProcessor::Finalize(){
 }
 
 void VetoProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
-	hismanager->RegisterPlot<TH2F>("VETO_1000","Front Veto Singles; Energy (arb.); Position (arb.)",65536,0,65536,2,0,2);
-	hismanager->RegisterPlot<TH1F>("VETO_1010","Max Front Veto; Energy (arb.);",65536,0,65536);
-	hismanager->RegisterPlot<TH2F>("VETO_2000","Rear Veto Singles; Energy (arb.); Position (arb.)",65536,0,65536,2,0,2);
-	hismanager->RegisterPlot<TH1F>("VETO_2010","Max Rear Veto; Energy (arb.);",65536,0,65536);
-	hismanager->RegisterPlot<TH2F>("VETO_3000","Front Veto vs Rear Veto; Energy (arb.); Energy (arb.)",8192,0,65536,8192,0,65536);
-	hismanager->RegisterPlot<TH2F>("VETO_3010","Max Front Veto vs Max Rear Veto; Energy (arb.); Energy (arb.)",8192,0,65536,8192,0,65536);
+	hismanager->RegisterPlot<TH1F>("VETO_1000","Max Front Veto; Energy (arb.);",this->h1dsettings.at(1000));
+	hismanager->RegisterPlot<TH1F>("VETO_1010","Max Front Veto; Energy (arb.);",this->h1dsettings.at(1010));
+
+	hismanager->RegisterPlot<TH1F>("VETO_2000","Max Rear Veto; Energy (arb.);",this->h1dsettings.at(2000));
+	hismanager->RegisterPlot<TH1F>("VETO_2010","Max Rear Veto; Energy (arb.);",this->h1dsettings.at(2010));
+
+	hismanager->RegisterPlot<TH2F>("VETO_3000","Max Front Veto vs Max Rear Veto; Energy (arb.); Energy (arb.)",this->h2dsettings.at(3000));
+	hismanager->RegisterPlot<TH2F>("VETO_30008","Max Front Veto vs Max Rear Veto; Energy (arb.); Energy (arb.)",this->h2dsettings.at(30008));
+
 	this->console->info("Finished Declaring Plots");
 }
 
@@ -143,16 +134,14 @@ void VetoProcessor::CleanupTree(){
 }
 
 void VetoProcessor::Reset(){
-	this->HighestFit = {{0.0,0.0,0.0},{0.0,0.0,0.0}};
-	this->HighestRit = {{0.0,0.0,0.0},{0.0,0.0,0.0}};
-	this->PrevEvt = this->CurrEvt;
-	this->CurrEvt = this->NewEvt;
+	this->rit = 0.0;
+	this->fit = 0.0;
 }
 
-VetoProcessor::EventInfo& VetoProcessor::GetCurrEvt(){
-	return this->CurrEvt;
+const double& VetoProcessor::GetRIT() const{
+	return this->rit;
 }
 
-VetoProcessor::EventInfo& VetoProcessor::GetPrevEvt(){
-	return this->PrevEvt;
+const double& VetoProcessor::GetFIT() const{
+	return this->fit;
 }

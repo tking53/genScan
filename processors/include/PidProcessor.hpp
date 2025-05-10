@@ -35,6 +35,8 @@ class PidProcessor : public Processor{
 
 	private:
 
+		inline double CalcPPACPosition(const double&,const double&);
+
 		ProcessorStruct::DBOX db3;
 		ProcessorStruct::DBOX db4;
 		ProcessorStruct::DBOX db5;	
