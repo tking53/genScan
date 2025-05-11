@@ -25,11 +25,14 @@ class MtasImplantProcessor : public Processor{
 		const SIPMIMP::Image& GetLowGainImage() const;
 		const SIPMIMP::Image& GetHighGainImage() const;
 		const double& GetHighGainPSD() const;
+		const double& GetLowGainPSD() const;
 	
 		void Reset();
 	private:
 		std::pair<unsigned int,unsigned int> CalcXY(const unsigned int&) const;
-		void CalcPosition(const std::vector<double>&,std::pair<double,double>&,std::pair<unsigned int,unsigned int>&, double&);
+		void CalcPosition(const std::vector<double>&,SIPMIMP::Image&);
+		std::vector<size_t> get_sorted_indices(const std::vector<double>&);
+
 
 		enum IMPLANTSIPMTYPE{
 			HIGHGAINANODE,
@@ -62,6 +65,7 @@ class MtasImplantProcessor : public Processor{
 		short LowGainDynodeHits;
 		short LowGainAnodeHits;
 		SIPMIMP::Image lgImage;
+		double lgPSD;
 		std::vector<double> LowGainAnodes;
 		ProcessorStruct::MtasImplant LowGain;
 };

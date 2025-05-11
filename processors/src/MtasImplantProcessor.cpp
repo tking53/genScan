@@ -2,13 +2,14 @@
 #include "CutManager.hpp"
 #include "EventSummary.hpp"
 #include "HistogramManager.hpp"
+#include "ImageManipulation.hpp"
 #include <TTree.h>
 #include <stdexcept>
 
 MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(log,"MtasImplantProcessor",{"mtasimplant"}){
 
-	this->hgImage = { 0.0, 0.0, {0, 0}, {0.0, 0.0}, 0.0};
-	this->lgImage = { 0.0, 0.0, {0, 0}, {0.0, 0.0}, 0.0};
+	this->hgImage = { 0.0, 0.0, {0, 0}, {0, 0}, {0.0, 0.0}, {0.0, 0.0}, 0.0};
+	this->lgImage = { 0.0, 0.0, {0, 0}, {0, 0}, {0.0, 0.0}, {0.0, 0.0}, 0.0};
 
 	this->h1dsettings = {
 		{7005,{16384,0,16384}},
@@ -22,24 +23,53 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 		{7007,{4096,0,4096,4096,0,4096}},
 		{70078,{4096,0,32768,4096,0,32768}},
 
-		{7008,{16384,0,16384,1024,-1,1}},
-		{7009,{16384,0,16384,1024,-1,1}},
-
 		{7012,{10,0,10,10,0,10}},
 		{7013,{10,0,10,10,0,10}},
 		{7014,{1000,0,10,1000,0,10}},
 		{7015,{1000,0,10,1000,0,10}},
+		
+		{7016,{10,0,10,10,0,10}},
+		{7017,{10,0,10,10,0,10}},
+		{7018,{1000,-1,10,1000,-1,10}},
+		{7019,{1000,-1,10,1000,-1,10}},
 		
 		{7020,{4096,0,4096,4096,0,4096}},
 		{70208,{4096,0,32768,4096,0,32768}},
 		{7021,{4096,0,4096,4096,0,4096}},
 		{70218,{4096,0,32768,4096,0,32768}},
 
-		{7030,{10,0,10,4,0,4}},
+		{7030,{64,0,64,4,0,4}},
 		{7040,{10,0,10,64,0,64}},
 		{7043,{10,0,10,64,0,64}},
 		
-		{7050,{4096,0,65536,4096,0,64}}
+		{7050,{4096,0,65536,4096,0,64}},
+		{7051,{4096,0,65536,4096,0,64}},
+		
+		{7060,{1000,0,10,1000,-1,10}},
+		{7061,{1000,0,10,1000,-1,10}},
+		{7062,{4096,0,4096,1000,-1,10}},
+		{70628,{4096,0,65536,1000,-1,10}},
+		{7063,{4096,0,4096,1000,-1,10}},
+		{70638,{4096,0,65536,1000,-1,10}},
+		{7064,{4096,0,4096,1000,-1,10}},
+		{70648,{4096,0,65536,1000,-1,10}},
+		{7065,{4096,0,4096,1000,-1,10}},
+		{70658,{4096,0,65536,1000,-1,10}},
+		{7066,{64,0,64,1000,-1,10}},
+		{7067,{64,0,64,1000,-1,10}},
+		
+		{7070,{1000,0,10,1000,-1,10}},
+		{7071,{1000,0,10,1000,-1,10}},
+		{7072,{4096,0,4096,1000,-1,10}},
+		{70728,{4096,0,65536,1000,-1,10}},
+		{7073,{4096,0,4096,1000,-1,10}},
+		{70738,{4096,0,65536,1000,-1,10}},
+		{7074,{4096,0,4096,1000,-1,10}},
+		{70748,{4096,0,65536,1000,-1,10}},
+		{7075,{4096,0,4096,1000,-1,10}},
+		{70758,{4096,0,65536,1000,-1,10}},
+		{7076,{64,0,64,1000,-1,10}},
+		{7077,{64,0,64,1000,-1,10}}
 	};
 
 	this->lowgaintag = "lowgain";
@@ -48,6 +78,7 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 	this->HighGain = ProcessorStruct::DEFAULT_MTAS_IMPLANT_STRUCT;
 	this->hgPSD = 0.0;
 	this->LowGain = ProcessorStruct::DEFAULT_MTAS_IMPLANT_STRUCT;
+	this->lgPSD = 0.0;
 
 	this->YSOHGThreshold = 0.0;
 	this->YSOLGThreshold = 0.0;
@@ -109,8 +140,13 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 		}
 	}
 
-
-	this->CalcPosition(this->HighGainAnodes,this->hgImage.highResPosition,this->hgImage.lowResPosition, this->hgImage.anodesum);
+	this->CalcPosition(this->HighGainAnodes,this->hgImage);
+	if( this->HighGainAnodeHits > 1 ){
+		auto HGIndices = this->get_sorted_indices(this->HighGainAnodes);
+		this->hgImage.secondarylowResPosition = this->CalcXY(HGIndices[this->HighGainAnodeHits-1]);
+	}else{
+		this->hgImage.secondarylowResPosition = {-1,-1};
+	}
 	this->HighGain.highresx = this->hgImage.highResPosition.first;
 	this->HighGain.highresy = this->hgImage.highResPosition.second;
 	this->HighGain.lowresx = this->hgImage.lowResPosition.first;
@@ -121,11 +157,30 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 	hismanager->Fill("IMPLANT_7005",this->hgImage.dynode);
 	hismanager->Fill("IMPLANT_7012",this->hgImage.lowResPosition.first,this->hgImage.lowResPosition.second);
 	hismanager->Fill("IMPLANT_7014",this->hgImage.highResPosition.first,this->hgImage.highResPosition.second);
+	hismanager->Fill("IMPLANT_7016",this->hgImage.secondarylowResPosition.first,this->hgImage.secondarylowResPosition.second);
+	hismanager->Fill("IMPLANT_7018",this->hgImage.highResStdDev.first,this->hgImage.highResStdDev.second);
 	hismanager->Fill("IMPLANT_7050",this->hgImage.dynode,this->hgPSD);
-	//need to gen psd
-	//hismanager->Fill("IMPLANT_7008",this->hgImage.dynode,this->hgPSD);
+	
+	hismanager->Fill("IMPLANT_7060",this->hgImage.highResPosition.first,this->hgImage.highResStdDev.first);
+	hismanager->Fill("IMPLANT_7061",this->hgImage.highResPosition.second,this->hgImage.highResStdDev.second);
+	hismanager->Fill("IMPLANT_7062",this->hgImage.dynode,this->hgImage.highResStdDev.first);
+	hismanager->Fill("IMPLANT_70628",this->hgImage.dynode,this->hgImage.highResStdDev.first);
+	hismanager->Fill("IMPLANT_7063",this->hgImage.dynode,this->hgImage.highResStdDev.second);
+	hismanager->Fill("IMPLANT_70638",this->hgImage.dynode,this->hgImage.highResStdDev.second);
+	hismanager->Fill("IMPLANT_7064",this->hgImage.anodesum,this->hgImage.highResStdDev.first);
+	hismanager->Fill("IMPLANT_70648",this->hgImage.anodesum,this->hgImage.highResStdDev.first);
+	hismanager->Fill("IMPLANT_7065",this->hgImage.anodesum,this->hgImage.highResStdDev.second);
+	hismanager->Fill("IMPLANT_70658",this->hgImage.anodesum,this->hgImage.highResStdDev.second);
+	hismanager->Fill("IMPLANT_7066",this->HighGainAnodeHits,this->hgImage.highResStdDev.first);
+	hismanager->Fill("IMPLANT_7067",this->HighGainAnodeHits,this->hgImage.highResStdDev.second);
 
-	this->CalcPosition(this->LowGainAnodes,this->lgImage.highResPosition,this->lgImage.lowResPosition, this->lgImage.anodesum);
+	this->CalcPosition(this->LowGainAnodes,this->lgImage);
+	if( this->LowGainAnodeHits > 1 ){
+		auto LGIndices = this->get_sorted_indices(this->LowGainAnodes);
+		this->lgImage.secondarylowResPosition = this->CalcXY(LGIndices[1]);
+	}else{
+		this->lgImage.secondarylowResPosition = {-1,-1};
+	}
 	this->LowGain.highresx = this->lgImage.highResPosition.first;
 	this->LowGain.highresy = this->lgImage.highResPosition.second;
 	this->LowGain.lowresx = this->lgImage.lowResPosition.first;
@@ -136,8 +191,24 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 	hismanager->Fill("IMPLANT_7006",this->lgImage.dynode);
 	hismanager->Fill("IMPLANT_7013",this->lgImage.lowResPosition.first,this->lgImage.lowResPosition.second);
 	hismanager->Fill("IMPLANT_7015",this->lgImage.highResPosition.first,this->lgImage.highResPosition.second);
-	//need to gen psd
-	//hismanager->Fill("IMPLANT_7009",this->lgImage.dynode,this->lgPSD);
+	hismanager->Fill("IMPLANT_7017",this->lgImage.secondarylowResPosition.first,this->lgImage.secondarylowResPosition.second);
+	hismanager->Fill("IMPLANT_7019",this->lgImage.highResStdDev.first,this->lgImage.highResStdDev.second);
+	hismanager->Fill("IMPLANT_7051",this->lgImage.dynode,this->lgPSD);
+
+	hismanager->Fill("IMPLANT_7070",this->lgImage.highResPosition.first,this->lgImage.highResStdDev.first);
+	hismanager->Fill("IMPLANT_7071",this->lgImage.highResPosition.second,this->lgImage.highResStdDev.second);
+	hismanager->Fill("IMPLANT_7072",this->lgImage.dynode,this->lgImage.highResStdDev.first);
+	hismanager->Fill("IMPLANT_70728",this->lgImage.dynode,this->lgImage.highResStdDev.first);
+	hismanager->Fill("IMPLANT_7073",this->lgImage.dynode,this->lgImage.highResStdDev.second);
+	hismanager->Fill("IMPLANT_70738",this->lgImage.dynode,this->lgImage.highResStdDev.second);
+	hismanager->Fill("IMPLANT_7074",this->lgImage.anodesum,this->lgImage.highResStdDev.first);
+	hismanager->Fill("IMPLANT_70748",this->lgImage.anodesum,this->lgImage.highResStdDev.first);
+	hismanager->Fill("IMPLANT_7075",this->lgImage.anodesum,this->lgImage.highResStdDev.second);
+	hismanager->Fill("IMPLANT_70758",this->lgImage.anodesum,this->lgImage.highResStdDev.second);
+	hismanager->Fill("IMPLANT_7076",this->LowGainAnodeHits,this->lgImage.highResStdDev.first);
+	hismanager->Fill("IMPLANT_7077",this->LowGainAnodeHits,this->lgImage.highResStdDev.first);
+	hismanager->Fill("IMPLANT_7076",this->LowGainAnodeHits,this->lgImage.highResStdDev.first);
+	hismanager->Fill("IMPLANT_7077",this->LowGainAnodeHits,this->lgImage.highResStdDev.second);
 
 	hismanager->Fill("IMPLANT_7007",this->lgImage.dynode,this->hgImage.dynode);
 	hismanager->Fill("IMPLANT_70078",this->lgImage.dynode,this->hgImage.dynode);
@@ -218,13 +289,15 @@ void MtasImplantProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH2F>("IMPLANT_7007","High Gain dynode vs Low Gain dynode; Low Gain Dynode Energy (keV); High Gain Dynode Energy (keV);",this->h2dsettings.at(7007));
 	hismanager->RegisterPlot<TH2F>("IMPLANT_70078","High Gain dynode vs Low Gain dynode; Low Gain Dynode Energy (8 keV/bin); High Gain Dynode Energy (8 keV/bin);",this->h2dsettings.at(70078));
 
-	hismanager->RegisterPlot<TH2F>("IMPLANT_7008","High Gain Dynode PSD; Energy (keV); PSD (arb.)",this->h2dsettings.at(7008));
-	hismanager->RegisterPlot<TH2F>("IMPLANT_7009","Low Gain Dynode PSD; Energy (keV); PSD (arb.)",this->h2dsettings.at(7009));
-
-	hismanager->RegisterPlot<TH2F>("IMPLANT_7012","High Gain Pixel Position; X (pixels); Y (pixels)",this->h2dsettings.at(7012));
-	hismanager->RegisterPlot<TH2F>("IMPLANT_7013","Low Gain Pixel Position; X (pixels); Y (pixels)",this->h2dsettings.at(7013));
+	hismanager->RegisterPlot<TH2F>("IMPLANT_7012","Max High Gain Pixel Position; X (pixels); Y (pixels)",this->h2dsettings.at(7012));
+	hismanager->RegisterPlot<TH2F>("IMPLANT_7013","Max Low Gain Pixel Position; X (pixels); Y (pixels)",this->h2dsettings.at(7013));
 	hismanager->RegisterPlot<TH2F>("IMPLANT_7014","High Gain Position; X (pixels); Y (pixels)",this->h2dsettings.at(7014));
 	hismanager->RegisterPlot<TH2F>("IMPLANT_7015","Low Gain Position; X (pixels); Y (pixels)",this->h2dsettings.at(7015));
+	
+	hismanager->RegisterPlot<TH2F>("IMPLANT_7016","Secondary Max High Gain Pixel Position; X (pixels); Y (pixels)",this->h2dsettings.at(7016));
+	hismanager->RegisterPlot<TH2F>("IMPLANT_7017","Secondary Max Low Gain Pixel Position; X (pixels); Y (pixels)",this->h2dsettings.at(7017));
+	hismanager->RegisterPlot<TH2F>("IMPLANT_7018","High Gain StdDev; X (pixels); Y (pixels)",this->h2dsettings.at(7018));
+	hismanager->RegisterPlot<TH2F>("IMPLANT_7019","Low Gain StdDev; X (pixels); Y (pixels)",this->h2dsettings.at(7019));
 	
 	
 	hismanager->RegisterPlot<TH2F>("IMPLANT_7020","High Gain dynode vs High Gain Anode Sum; Anode Sum Energy (keV); Dynode Energy (keV);",this->h2dsettings.at(7020));
@@ -237,6 +310,33 @@ void MtasImplantProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH2F>("IMPLANT_7043","Individual Low Gain Anode Mults",this->h2dsettings.at(7043));
 	
 	hismanager->RegisterPlot<TH2F>("IMPLANT_7050","High Gain Dynode PSD (Head/Tail); Energy (keV); PSD (arb.)",this->h2dsettings.at(7050));
+	hismanager->RegisterPlot<TH2F>("IMPLANT_7051","Low Gain Dynode PSD (Head/Tail); Energy (keV); PSD (arb.)",this->h2dsettings.at(7051));
+
+	hismanager->RegisterPlot<TH2F>("IMPLANT_7060", "High Gain X StdDev. vs X Position; Pixel (arb.); Pixel (arb.)",this->h2dsettings.at(7060));
+	hismanager->RegisterPlot<TH2F>("IMPLANT_7061" ,"High Gain Y StdDev. vs Y Position; Pixel (arb.); Pixel (arb.)",this->h2dsettings.at(7061));
+	hismanager->RegisterPlot<TH2F>("IMPLANT_7062" ,"High Gain X StdDev. vs Dynode; Energy (keV); Pixel (arb.)",this->h2dsettings.at(7062));
+	hismanager->RegisterPlot<TH2F>("IMPLANT_70628","High Gain X StdDev. vs Dynode; Energy (keV); Pixel (arb.)",this->h2dsettings.at(70628));
+	hismanager->RegisterPlot<TH2F>("IMPLANT_7063" ,"High Gain Y StdDev. vs Dynode; Energy (keV); Pixel (arb.)",this->h2dsettings.at(7063));
+	hismanager->RegisterPlot<TH2F>("IMPLANT_70638","High Gain Y StdDev. vs Dynode; Energy (keV); Pixel (arb.)",this->h2dsettings.at(70638));
+	hismanager->RegisterPlot<TH2F>("IMPLANT_7064" ,"High Gain X StdDev. vs Anode Sum; Energy (keV); Pixel (arb.)",this->h2dsettings.at(7064));
+	hismanager->RegisterPlot<TH2F>("IMPLANT_70648","High Gain X StdDev. vs Anode Sum; Energy (keV); Pixel (arb.)",this->h2dsettings.at(70648));
+	hismanager->RegisterPlot<TH2F>("IMPLANT_7065" ,"High Gain Y StdDev. vs Anode Sum; Energy (keV); Pixel (arb.)",this->h2dsettings.at(7065));
+	hismanager->RegisterPlot<TH2F>("IMPLANT_70658","High Gain Y StdDev. vs Anode Sum; Energy (keV); Pixel (arb.)",this->h2dsettings.at(70658));
+	hismanager->RegisterPlot<TH2F>("IMPLANT_7066" ,"High Gain X StdDev. vs Anode Mult.; Mult. (arb.); Pixel (arb.)",this->h2dsettings.at(7066));
+	hismanager->RegisterPlot<TH2F>("IMPLANT_7067" ,"High Gain Y StdDev. vs Anode Mult.; Mult. (arb.); Pixel (arb.)",this->h2dsettings.at(7067));
+
+	hismanager->RegisterPlot<TH2F>("IMPLANT_7070" ,"Low Gain X StdDev. vs X Position; Pixel (arb.); Pixel (arb.)",this->h2dsettings.at(7070));
+	hismanager->RegisterPlot<TH2F>("IMPLANT_7071" ,"Low Gain Y StdDev. vs Y Position; Pixel (arb.); Pixel (arb.)",this->h2dsettings.at(7071));
+	hismanager->RegisterPlot<TH2F>("IMPLANT_7072" ,"Low Gain X StdDev. vs Dynode; Energy (keV); Pixel (arb.)",this->h2dsettings.at(7072));
+	hismanager->RegisterPlot<TH2F>("IMPLANT_70728","Low Gain X StdDev. vs Dynode; Energy (keV); Pixel (arb.)",this->h2dsettings.at(70728));
+	hismanager->RegisterPlot<TH2F>("IMPLANT_7073" ,"Low Gain Y StdDev. vs Dynode; Energy (keV); Pixel (arb.)",this->h2dsettings.at(7073));
+	hismanager->RegisterPlot<TH2F>("IMPLANT_70738","Low Gain Y StdDev. vs Dynode; Energy (keV); Pixel (arb.)",this->h2dsettings.at(70738));
+	hismanager->RegisterPlot<TH2F>("IMPLANT_7074" ,"Low Gain X StdDev. vs Anode Sum; Energy (keV); Pixel (arb.)",this->h2dsettings.at(7074));
+	hismanager->RegisterPlot<TH2F>("IMPLANT_70748","Low Gain X StdDev. vs Anode Sum; Energy (keV); Pixel (arb.)",this->h2dsettings.at(70748));
+	hismanager->RegisterPlot<TH2F>("IMPLANT_7075" ,"Low Gain Y StdDev. vs Anode Sum; Energy (keV); Pixel (arb.)",this->h2dsettings.at(7075));
+	hismanager->RegisterPlot<TH2F>("IMPLANT_70758","Low Gain Y StdDev. vs Anode Sum; Energy (keV); Pixel (arb.)",this->h2dsettings.at(70758));
+	hismanager->RegisterPlot<TH2F>("IMPLANT_7076" ,"Low Gain X StdDev. vs Anode Mult.; Mult. (arb.); Pixel (arb.)",this->h2dsettings.at(7076));
+	hismanager->RegisterPlot<TH2F>("IMPLANT_7077" ,"Low Gain Y StdDev. vs Anode Mult.; Mult. (arb.); Pixel (arb.)",this->h2dsettings.at(7077));
 
 	this->console->info("Finished Declaring Plots");
 }
@@ -261,7 +361,9 @@ void MtasImplantProcessor::Reset(){
 	this->hgImage.ResetAnode();
 	this->hgImage.ResetDynode();
 	this->hgImage.ResetHighResPosition();
+	this->hgImage.ResetHighResStdDev();
 	this->hgImage.ResetLowResPosition();
+	this->hgImage.ResetSecondaryLowResPosition();
 	this->hgPSD = 0.0;
 	
 	this->LowGainAnodeHitMap = std::vector<short>(64,0);
@@ -271,32 +373,44 @@ void MtasImplantProcessor::Reset(){
 	this->lgImage.ResetAnode();
 	this->lgImage.ResetDynode();
 	this->lgImage.ResetHighResPosition();
+	this->lgImage.ResetHighResStdDev();
 	this->lgImage.ResetLowResPosition();
+	this->lgImage.ResetSecondaryLowResPosition();
+	this->lgPSD = 0.0;
 }
 		
 std::pair<unsigned int,unsigned int> MtasImplantProcessor::CalcXY(const unsigned int& idx) const{
 	return std::make_pair(idx%8,8-idx/8);
 }
 
-void MtasImplantProcessor::CalcPosition(const std::vector<double>& ergs,std::pair<double,double>& highres,std::pair<unsigned int,unsigned int>& lowres, double& anodeSum){
+void MtasImplantProcessor::CalcPosition(const std::vector<double>& ergs,SIPMIMP::Image& img){
 	double max_erg = ergs.front();
 	double esum = 0.0;
 	unsigned int idx = 0;
 	double xtmp = 0.0;
+	double xtmp2 = 0.0;
 	double ytmp = 0.0;
+	double ytmp2 = 0.0;
 	for( const auto& e : ergs ){
 		auto pixel = this->CalcXY(idx);
 		if( e > max_erg ){
 			max_erg = e;
-			lowres = pixel;
+			img.lowResPosition = pixel;
 		}
 		esum += e;
 		xtmp += e*pixel.first;
+		xtmp2 += e*pixel.first*pixel.first;
 		ytmp += e*pixel.second;
+		ytmp2 += e*pixel.second*pixel.second;
 		++idx;
 	}
-	anodeSum = esum;
-	highres = std::make_pair(xtmp/esum,ytmp/esum);
+	img.anodesum = esum;
+	img.highResPosition = std::make_pair(xtmp/esum,ytmp/esum);
+	std::pair<double,double> pos = std::make_pair(xtmp/esum,ytmp/esum);
+	std::pair<double,double> possqr = std::make_pair(xtmp2/esum,ytmp2/esum);
+	double xdev = (std::sqrt(possqr.first) > pos.first) ? std::sqrt(possqr.first - pos.first*pos.first) : -std::sqrt(possqr.first - pos.first*pos.first);
+	double ydev = (std::sqrt(possqr.second) > pos.second) ? std::sqrt(possqr.second - pos.second*pos.second) : -std::sqrt(possqr.second - pos.second*pos.second);
+	img.highResStdDev = std::make_pair(xdev,ydev);
 }
 
 const SIPMIMP::Image& MtasImplantProcessor::GetLowGainImage() const{
@@ -309,4 +423,18 @@ const SIPMIMP::Image& MtasImplantProcessor::GetHighGainImage() const{
 
 const double& MtasImplantProcessor::GetHighGainPSD() const{
 	return this->hgPSD;
+}
+
+const double& MtasImplantProcessor::GetLowGainPSD() const{
+	return this->lgPSD;
+}
+
+std::vector<size_t> MtasImplantProcessor::get_sorted_indices(const std::vector<double>& values) {
+	// Create a vector of indices
+	std::vector<size_t> indices(values.size());
+	std::iota(indices.begin(), indices.end(), 0);
+
+	// Sort the indices based on the values
+	std::sort(indices.begin(), indices.end(),[&](size_t i1, size_t i2) { return values[i1] > values[i2]; });
+	return indices;
 }
