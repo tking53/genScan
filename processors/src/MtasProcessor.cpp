@@ -890,6 +890,9 @@ void MtasProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	//declare the beta gated and not-beta histograms, but we don't fill them until parent processor has told which we are
 	this->DeclareBetaPlots(hismanager);
 	this->DeclareAntiBetaPlots(hismanager);
+	if( this->logictimeplots ){
+		this->DeclareNoLogicPlots(hismanager);
+	}
 
 	this->console->info("Finished Declaring Plots");
 }
