@@ -148,7 +148,7 @@ class MtasProcessor : public Processor{
 		double currevttime;
 
 		bool diagnosticplots;
-		bool nologictimeplots;
+		bool logictimeplots;
 
 		std::vector<std::unique_ptr<Correction::ExpoPosCorrection>> PosCorrectionMap;
 

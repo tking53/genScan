@@ -21,7 +21,7 @@
 			<Processor name="VetoProcessor" >
 				<Gate label="rit" lowerbound="30000.0" upperbound="65535.0" />
 			</Processor>
-			<Processor name="MtasProcessor" >
+			<Processor name="MtasProcessor" logic="true" >
 				<Histogram id="3100" nbinsx="65536" xhigh="65536" />
 				<Histogram id="3110" nbinsx="65536" xhigh="65536" />
 				<Histogram id="3120" nbinsx="65536" xhigh="65536" />

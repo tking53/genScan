@@ -198,7 +198,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 	this->Outer = std::vector<double>(12,0.0);
 
 	this->diagnosticplots = false;
-	this->nologictimeplots = false;
+	this->logictimeplots = false;
 
 	this->RawCenter = std::vector<double>(12,0.0);
 	this->RawInner = std::vector<double>(12,0.0);
@@ -571,7 +571,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 			}
 		}
 
-		if( this->nologictimeplots ){
+		if( this->logictimeplots ){
 			hismanager->Fill("MTAS_4200",this->TotalEnergy[0],this->currevttime);
 			hismanager->Fill("MTAS_4201",this->TotalEnergy[0],this->currevttime/60.0);
 			hismanager->Fill("MTAS_4202",this->TotalEnergy[0],this->currevttime/(60.0*60.0));
@@ -775,7 +775,7 @@ void MtasProcessor::Init(const pugi::xml_node& config){
 	}
 
 	this->diagnosticplots = config.attribute("diagnostic").as_bool(false);
-	this->nologictimeplots = config.attribute("nologic").as_bool(false);
+	this->logictimeplots = config.attribute("logic").as_bool(false);
 	this->UseOldCenter = config.attribute("oldcenter").as_bool(false);
 
 	this->LoadHistogramSettings(config);
@@ -1531,7 +1531,7 @@ void MtasProcessor::FillBetaPlots(PLOTS::PlotRegistry* hismanager){
 }
 
 void MtasProcessor::FillNoLogicBetaPlots(PLOTS::PlotRegistry* hismanager){
-	if( (not this->AnySaturate) and (not this->AnyPileup) and this->nologictimeplots ){
+	if( (not this->AnySaturate) and (not this->AnyPileup) and this->logictimeplots ){
 		hismanager->Fill("MTAS_4300",this->TotalEnergy[0],this->currevttime);
 		hismanager->Fill("MTAS_4301",this->TotalEnergy[0],this->currevttime/60.0);
 		hismanager->Fill("MTAS_4302",this->TotalEnergy[0],this->currevttime/(60.0*60.0));
@@ -1729,7 +1729,7 @@ void MtasProcessor::FillNonBetaPlots(PLOTS::PlotRegistry* hismanager){
 }
 
 void MtasProcessor::FillNoLogicNonBetaPlots(PLOTS::PlotRegistry* hismanager){
-	if( (not this->AnySaturate) and (not this->AnyPileup) and this->nologictimeplots ){
+	if( (not this->AnySaturate) and (not this->AnyPileup) and this->logictimeplots ){
 		hismanager->Fill("MTAS_4100",this->TotalEnergy[0],this->currevttime);
 		hismanager->Fill("MTAS_4101",this->TotalEnergy[0],this->currevttime/60.0);
 		hismanager->Fill("MTAS_4102",this->TotalEnergy[0],this->currevttime/(60.0*60.0));
