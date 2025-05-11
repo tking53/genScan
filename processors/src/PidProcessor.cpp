@@ -436,6 +436,7 @@ PidProcessor::PidProcessor(const std::string& log) : Processor(log,"PidProcessor
 		if( this->PIDPLOT == 21 ){
 			if( cutmanager->IsWithin(kv.second,fp1Tofs[6],fp1.pin[0].energy) ){
 				summary->AddEventTag(kv.first);
+				++(this->isotopecount[kv.first]);
 			}
 		}else{
 			this->console->error("No PID used");
@@ -485,6 +486,7 @@ void PidProcessor::Init(const pugi::xml_node& config){
 
 	for( const auto& kv : this->isotopes ){
 		this->isotopetags.push_back(kv.first);
+		this->isotopecount[kv.first] = 0;
 	}
 }
 		
@@ -662,4 +664,8 @@ inline double PidProcessor::CalcPPACPosition(const double& a,const double& b){
 	}else{
 		return -999.0;
 	}
+}
+
+const int& PidProcessor::GetNumIsotopes(const std::string& id) const{
+	return this->isotopecount.at(id);
 }

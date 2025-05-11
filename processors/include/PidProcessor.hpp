@@ -32,6 +32,7 @@ class PidProcessor : public Processor{
 		double GetFP2PinEnergy(size_t) const;
 
 		const std::vector<std::string>& GetIsotopeTags() const;
+		const int& GetNumIsotopes(const std::string&) const;
 
 	private:
 
@@ -84,6 +85,7 @@ class PidProcessor : public Processor{
 		std::vector<double> fp2Tofs ;
 
 		std::map<std::string,std::string> isotopes;
+		std::map<std::string,int> isotopecount;
 		std::vector<std::string> isotopetags;
 
 		int PIDPLOT;

@@ -9,12 +9,13 @@
 
 #include "Gates.hpp"
 
+#include <map>
 #include <vector>
 
 class e21027Processor : public Processor{
 	public:
 		e21027Processor(const std::string&);
-		virtual ~e21027Processor() = default;
+		virtual ~e21027Processor();
 		[[maybe_unused]] virtual bool PreProcess(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*) final;
 		[[maybe_unused]] virtual bool Process(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*) final;
 		[[maybe_unused]] virtual bool PostProcess(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*) final;
@@ -34,12 +35,18 @@ class e21027Processor : public Processor{
 		bool HasPID;
 		bool HasVeto;
 
+		bool FoundFirst;
+		double FirstTime;
+		double LastTime;
+
 		std::string implant;
 		std::string beta;
 		std::string gamma;
 		std::string unknown;
 
 		std::vector<std::string> isotopetags;
+		std::map<std::string,int> implant_isotopes;
+		std::map<std::string,int> rit_vetoed_isotopes;
 		std::unique_ptr<boost::circular_buffer<std::pair<unsigned long long,unsigned long long>>> ion_beta_limits;
 
 		std::vector<Gate<double>> MTAS_Total_Gates;

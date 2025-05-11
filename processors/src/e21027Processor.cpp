@@ -115,7 +115,32 @@ e21027Processor::e21027Processor(const std::string& log) : Processor(log,"e21027
 		{10003,{2000,-1000,2000,16000,0,16000}},
 		{10007,{2000,-1000,2000,16000,0,16000}},
 		{10011,{2000,-1000,2000,16000,0,16000}},
-		{10015,{2000,-1000,2000,16000,0,16000}}
+		{10015,{2000,-1000,2000,16000,0,16000}},
+		
+		//pin 1
+		{11000,{2000,-1000,2000,16000,0,16000}},
+		{11004,{2000,-1000,2000,16000,0,16000}},
+		{11008,{2000,-1000,2000,16000,0,16000}},
+		{11012,{2000,-1000,2000,16000,0,16000}},
+
+		//pin 2
+		{11001,{2000,-1000,2000,16000,0,16000}},
+		{11005,{2000,-1000,2000,16000,0,16000}},
+		{11009,{2000,-1000,2000,16000,0,16000}},
+		{11013,{2000,-1000,2000,16000,0,16000}},
+
+		//pin 3
+		{11002,{2000,-1000,2000,16000,0,16000}},
+		{11006,{2000,-1000,2000,16000,0,16000}},
+		{11010,{2000,-1000,2000,16000,0,16000}},
+		{11014,{2000,-1000,2000,16000,0,16000}},
+
+		//pin 4
+		{11003,{2000,-1000,2000,16000,0,16000}},
+		{11007,{2000,-1000,2000,16000,0,16000}},
+		{11011,{2000,-1000,2000,16000,0,16000}},
+		{11015,{2000,-1000,2000,16000,0,16000}}
+
 	};
 
 	this->beta = "beta";
@@ -129,6 +154,10 @@ e21027Processor::e21027Processor(const std::string& log) : Processor(log,"e21027
 
 	this->ion_beta_limits = std::unique_ptr<boost::circular_buffer<std::pair<unsigned long long,unsigned long long>>>(nullptr);
 
+	this->FoundFirst = false;
+	this->FirstTime = 0.0;
+	this->LastTime = 0.0;
+
 	this->Reset();
 }
 
@@ -139,6 +168,11 @@ e21027Processor::e21027Processor(const std::string& log) : Processor(log,"e21027
 	}
 
 	auto summary = eventhistory->GetCurrentEventSummary();
+	if( not this->FoundFirst ){
+		this->FoundFirst = true;
+		this->FirstTime = 1.0e-9*(summary->GetRawEvents().front().GetTimeStamp());
+	}
+	this->LastTime = 1.0e-9*(summary->GetRawEvents().front().GetTimeStamp());
 	auto types = summary->GetKnownTypes();
 
 	this->HasMTAS = (types.find("mtas") != types.end());
@@ -185,66 +219,89 @@ e21027Processor::e21027Processor(const std::string& log) : Processor(log,"e21027
 
 	if( not hasmuon ){
 		if( hasion ){
-			auto total = this->MtasProc->GetTotalEnergy(0);
-			auto ctotal = this->MtasProc->GetTotalEnergy(1);
-			auto itotal = this->MtasProc->GetTotalEnergy(2);
-			auto mtotal = this->MtasProc->GetTotalEnergy(3);
-			auto ototal = this->MtasProc->GetTotalEnergy(4);
-			auto dynode = this->ImplantProc->GetLowGainImage().dynode;
-			hismanager->Fill("EXP_3750",total,dynode);
-			hismanager->Fill("EXP_3751",ctotal,dynode);
-			hismanager->Fill("EXP_37508",total,dynode);
-			hismanager->Fill("EXP_37518",ctotal,dynode);
-			hismanager->Fill("EXP_2100",dynode+total);
-			hismanager->Fill("EXP_2110",dynode+ctotal);
-			hismanager->Fill("EXP_2120",dynode+itotal);
-			hismanager->Fill("EXP_2130",dynode+mtotal);
-			hismanager->Fill("EXP_2140",dynode+ototal);
-			for( size_t ii = 0; ii < 6; ++ii ){
-				hismanager->Fill("EXP_3752",this->MtasProc->GetCrystalEnergy(ii),dynode);
-				hismanager->Fill("EXP_37528",this->MtasProc->GetCrystalEnergy(ii),dynode);
-				
-				hismanager->Fill("EXP_2115",dynode+this->MtasProc->GetCrystalEnergy(ii));
-				hismanager->Fill("EXP_2125",dynode+this->MtasProc->GetCrystalEnergy(ii+6));
-				hismanager->Fill("EXP_2135",dynode+this->MtasProc->GetCrystalEnergy(ii+12));
-				hismanager->Fill("EXP_2145",dynode+this->MtasProc->GetCrystalEnergy(ii+18));
-			}
-
-			auto ionx = summary->GetEventObservable("ION_X").value();
-			auto iony = summary->GetEventObservable("ION_Y").value();
-			auto ionr = std::sqrt(ionx*ionx + iony*iony);
-			hismanager->Fill("EXP_8005",dynode,ionr);
-			hismanager->Fill("EXP_8006",dynode,ionx);
-			hismanager->Fill("EXP_8007",dynode,iony);
-			hismanager->Fill("EXP_8008",ionx,iony);
 			for (size_t iPins = 0 ; iPins < this->PidProc->GetNumFP1Pins(); ++iPins){
 				hismanager->Fill("EXP_" + std::to_string(10000 +iPins ), this->PidProc->GetFP1Tof(0),this->PidProc->GetFP1PinEnergy(iPins));
 				hismanager->Fill("EXP_" + std::to_string(10004 +iPins ), this->PidProc->GetFP1Tof(2),this->PidProc->GetFP1PinEnergy(iPins));
 				hismanager->Fill("EXP_" + std::to_string(10008 +iPins ), this->PidProc->GetFP1Tof(4),this->PidProc->GetFP1PinEnergy(iPins));
 				hismanager->Fill("EXP_" + std::to_string(10012 +iPins ), this->PidProc->GetFP1Tof(6),this->PidProc->GetFP1PinEnergy(iPins));
 			}
+
 			for( size_t ii = 0; ii < this->isotopetags.size(); ++ii ){
 				if( summary->ContainsEventTag(this->isotopetags.at(ii)) ){
-					std::string title = "EXP_600"+std::to_string(ii);
-					hismanager->Fill(title,ionx,iony);
+					++(this->implant_isotopes[this->isotopetags[ii]]);
 				}
 			}
-			////found new ion, need to add it to the limit list
-			////and then correlate it with all known betas
-			//auto ion_idx = static_cast<unsigned long long>(summary->GetEventObservable("Event_idx").value());
-			////use the boost::circular_buffer to queue the things
-			//this->ion_beta_limits->push_front({ion_idx,0});
-			////search through the summaries previous and we'll grab their idx
-			//for( size_t ii = 1; ii < eventhistory->GetMaxHistorySize(); ++ii ){
-			//	auto prevsummary = eventhistory->GetPreviousEventSummary(ii);
-			//	auto preveventidx = static_cast<unsigned long long>(prevsummary->GetEventObservable("Event_idx").value());
-			//	auto isprevbeta = prevsummary->ContainsEventTag(this->beta);
-			//	if( isprevbeta ){
-			//		this->ion_beta_limits->at(0).second = std::max(this->ion_beta_limits->at(0).second,preveventidx);
-			//		//determine which tdiff plot to fill
-			//		//these are all the negative time portions of the tdiff
-			//	}
-			//}
+
+			if( not hasrit ){
+				for (size_t iPins = 0 ; iPins < this->PidProc->GetNumFP1Pins(); ++iPins){
+					hismanager->Fill("EXP_" + std::to_string(11000 +iPins ), this->PidProc->GetFP1Tof(0),this->PidProc->GetFP1PinEnergy(iPins));
+					hismanager->Fill("EXP_" + std::to_string(11004 +iPins ), this->PidProc->GetFP1Tof(2),this->PidProc->GetFP1PinEnergy(iPins));
+					hismanager->Fill("EXP_" + std::to_string(11008 +iPins ), this->PidProc->GetFP1Tof(4),this->PidProc->GetFP1PinEnergy(iPins));
+					hismanager->Fill("EXP_" + std::to_string(11012 +iPins ), this->PidProc->GetFP1Tof(6),this->PidProc->GetFP1PinEnergy(iPins));
+				}
+
+				for( size_t ii = 0; ii < this->isotopetags.size(); ++ii ){
+					if( summary->ContainsEventTag(this->isotopetags.at(ii)) ){
+						++(this->rit_vetoed_isotopes[this->isotopetags[ii]]);
+					}
+				}
+
+
+				auto total = this->MtasProc->GetTotalEnergy(0);
+				auto ctotal = this->MtasProc->GetTotalEnergy(1);
+				auto itotal = this->MtasProc->GetTotalEnergy(2);
+				auto mtotal = this->MtasProc->GetTotalEnergy(3);
+				auto ototal = this->MtasProc->GetTotalEnergy(4);
+				auto dynode = this->ImplantProc->GetLowGainImage().dynode;
+				hismanager->Fill("EXP_3750",total,dynode);
+				hismanager->Fill("EXP_3751",ctotal,dynode);
+				hismanager->Fill("EXP_37508",total,dynode);
+				hismanager->Fill("EXP_37518",ctotal,dynode);
+				hismanager->Fill("EXP_2100",dynode+total);
+				hismanager->Fill("EXP_2110",dynode+ctotal);
+				hismanager->Fill("EXP_2120",dynode+itotal);
+				hismanager->Fill("EXP_2130",dynode+mtotal);
+				hismanager->Fill("EXP_2140",dynode+ototal);
+				for( size_t ii = 0; ii < 6; ++ii ){
+					hismanager->Fill("EXP_3752",this->MtasProc->GetCrystalEnergy(ii),dynode);
+					hismanager->Fill("EXP_37528",this->MtasProc->GetCrystalEnergy(ii),dynode);
+
+					hismanager->Fill("EXP_2115",dynode+this->MtasProc->GetCrystalEnergy(ii));
+					hismanager->Fill("EXP_2125",dynode+this->MtasProc->GetCrystalEnergy(ii+6));
+					hismanager->Fill("EXP_2135",dynode+this->MtasProc->GetCrystalEnergy(ii+12));
+					hismanager->Fill("EXP_2145",dynode+this->MtasProc->GetCrystalEnergy(ii+18));
+				}
+
+				auto ionx = summary->GetEventObservable("ION_X").value();
+				auto iony = summary->GetEventObservable("ION_Y").value();
+				auto ionr = std::sqrt(ionx*ionx + iony*iony);
+				hismanager->Fill("EXP_8005",dynode,ionr);
+				hismanager->Fill("EXP_8006",dynode,ionx);
+				hismanager->Fill("EXP_8007",dynode,iony);
+				hismanager->Fill("EXP_8008",ionx,iony);
+				for( size_t ii = 0; ii < this->isotopetags.size(); ++ii ){
+					if( summary->ContainsEventTag(this->isotopetags.at(ii)) ){
+						std::string title = "EXP_600"+std::to_string(ii);
+						hismanager->Fill(title,ionx,iony);
+					}
+				}
+				////found new ion, need to add it to the limit list
+				////and then correlate it with all known betas
+				//auto ion_idx = static_cast<unsigned long long>(summary->GetEventObservable("Event_idx").value());
+				////use the boost::circular_buffer to queue the things
+				//this->ion_beta_limits->push_front({ion_idx,0});
+				////search through the summaries previous and we'll grab their idx
+				//for( size_t ii = 1; ii < eventhistory->GetMaxHistorySize(); ++ii ){
+				//	auto prevsummary = eventhistory->GetPreviousEventSummary(ii);
+				//	auto preveventidx = static_cast<unsigned long long>(prevsummary->GetEventObservable("Event_idx").value());
+				//	auto isprevbeta = prevsummary->ContainsEventTag(this->beta);
+				//	if( isprevbeta ){
+				//		this->ion_beta_limits->at(0).second = std::max(this->ion_beta_limits->at(0).second,preveventidx);
+				//		//determine which tdiff plot to fill
+				//		//these are all the negative time portions of the tdiff
+				//	}
+				//}
+			}
 		}
 
 		if( numhist > 1){
@@ -429,25 +486,47 @@ void e21027Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	this->PidProc->DeclarePlots(hismanager);
 	this->VetoProc->DeclarePlots(hismanager);
 
-	hismanager->RegisterPlot<TH2F>("EXP_10000","DB3P0A-FP1XP1 vs Pin 1 Energy :: LG_Dynode Gated",	this->h2dsettings.at(10000));
-	hismanager->RegisterPlot<TH2F>("EXP_10001","DB3P0A-FP1XP1 vs Pin 2 Energy :: LG_Dynode Gated",	this->h2dsettings.at(10001));
-	hismanager->RegisterPlot<TH2F>("EXP_10002","DB3P0A-FP1XP1 vs Pin 3 Energy :: LG_Dynode Gated",	this->h2dsettings.at(10002));
-	hismanager->RegisterPlot<TH2F>("EXP_10003","DB3P0A-FP1XP1 vs Pin 4 Energy :: LG_Dynode Gated",	this->h2dsettings.at(10003));
+	hismanager->RegisterPlot<TH2F>("EXP_10000","Pin 1 Energy vs DB3P0A-FP1XP1 Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->h2dsettings.at(10000));
+	hismanager->RegisterPlot<TH2F>("EXP_10001","Pin 2 Energy vs DB3P0A-FP1XP1 Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->h2dsettings.at(10001));
+	hismanager->RegisterPlot<TH2F>("EXP_10002","Pin 3 Energy vs DB3P0A-FP1XP1 Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->h2dsettings.at(10002));
+	hismanager->RegisterPlot<TH2F>("EXP_10003","Pin 4 Energy vs DB3P0A-FP1XP1 Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->h2dsettings.at(10003));
+                                                                    
+	hismanager->RegisterPlot<TH2F>("EXP_10004","Pin 1 Energy vs DB3P1A-FP1XP1 Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->h2dsettings.at(10004));
+	hismanager->RegisterPlot<TH2F>("EXP_10005","Pin 2 Energy vs DB3P1A-FP1XP1 Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->h2dsettings.at(10005));
+	hismanager->RegisterPlot<TH2F>("EXP_10006","Pin 3 Energy vs DB3P1A-FP1XP1 Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->h2dsettings.at(10006));
+	hismanager->RegisterPlot<TH2F>("EXP_10007","Pin 4 Energy vs DB3P1A-FP1XP1 Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->h2dsettings.at(10007));
 
-	hismanager->RegisterPlot<TH2F>("EXP_10004","DB3P1A-FP1XP1 vs Pin 1 Energy :: LG_Dynode Gated",	this->h2dsettings.at(10004));
-	hismanager->RegisterPlot<TH2F>("EXP_10005","DB3P1A-FP1XP1 vs Pin 2 Energy :: LG_Dynode Gated",	this->h2dsettings.at(10005));
-	hismanager->RegisterPlot<TH2F>("EXP_10006","DB3P1A-FP1XP1 vs Pin 3 Energy :: LG_Dynode Gated",	this->h2dsettings.at(10006));
-	hismanager->RegisterPlot<TH2F>("EXP_10007","DB3P1A-FP1XP1 vs Pin 4 Energy :: LG_Dynode Gated",	this->h2dsettings.at(10007));
+	hismanager->RegisterPlot<TH2F>("EXP_10008","Pin 1 Energy vs DB3SL-FP1XP1  Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->h2dsettings.at(10008));
+	hismanager->RegisterPlot<TH2F>("EXP_10009","Pin 2 Energy vs DB3SL-FP1XP1  Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->h2dsettings.at(10009));
+	hismanager->RegisterPlot<TH2F>("EXP_10010","Pin 3 Energy vs DB3SL-FP1XP1  Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->h2dsettings.at(10010));
+	hismanager->RegisterPlot<TH2F>("EXP_10011","Pin 4 Energy vs DB3SL-FP1XP1  Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->h2dsettings.at(10011));
+                                                                    
+	hismanager->RegisterPlot<TH2F>("EXP_10012","Pin 1 Energy vs DB3SR-FP1XP1  Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->h2dsettings.at(10012));
+	hismanager->RegisterPlot<TH2F>("EXP_10013","Pin 2 Energy vs DB3SR-FP1XP1  Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->h2dsettings.at(10013));
+	hismanager->RegisterPlot<TH2F>("EXP_10014","Pin 3 Energy vs DB3SR-FP1XP1  Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->h2dsettings.at(10014));
+	hismanager->RegisterPlot<TH2F>("EXP_10015","Pin 4 Energy vs DB3SR-FP1XP1  Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->h2dsettings.at(10015));
 
-	hismanager->RegisterPlot<TH2F>("EXP_10008","DB3SL-FP1XP1 vs Pin 1 Energy :: LG_Dynode Gated",	this->h2dsettings.at(10008));
-	hismanager->RegisterPlot<TH2F>("EXP_10009","DB3SL-FP1XP1 vs Pin 2 Energy :: LG_Dynode Gated",	this->h2dsettings.at(10009));
-	hismanager->RegisterPlot<TH2F>("EXP_10010","DB3SL-FP1XP1 vs Pin 3 Energy :: LG_Dynode Gated",	this->h2dsettings.at(10010));
-	hismanager->RegisterPlot<TH2F>("EXP_10011","DB3SL-FP1XP1 vs Pin 4 Energy :: LG_Dynode Gated",	this->h2dsettings.at(10011));
+	hismanager->RegisterPlot<TH2F>("EXP_11000","Pin 1 Energy vs DB3P0A-FP1XP1 Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->h2dsettings.at(11000));
+	hismanager->RegisterPlot<TH2F>("EXP_11001","Pin 2 Energy vs DB3P0A-FP1XP1 Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->h2dsettings.at(11001));
+	hismanager->RegisterPlot<TH2F>("EXP_11002","Pin 3 Energy vs DB3P0A-FP1XP1 Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->h2dsettings.at(11002));
+	hismanager->RegisterPlot<TH2F>("EXP_11003","Pin 4 Energy vs DB3P0A-FP1XP1 Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->h2dsettings.at(11003));
+                                                                    
+	hismanager->RegisterPlot<TH2F>("EXP_11004","Pin 1 Energy vs DB3P1A-FP1XP1 Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->h2dsettings.at(11004));
+	hismanager->RegisterPlot<TH2F>("EXP_11005","Pin 2 Energy vs DB3P1A-FP1XP1 Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->h2dsettings.at(11005));
+	hismanager->RegisterPlot<TH2F>("EXP_11006","Pin 3 Energy vs DB3P1A-FP1XP1 Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->h2dsettings.at(11006));
+	hismanager->RegisterPlot<TH2F>("EXP_11007","Pin 4 Energy vs DB3P1A-FP1XP1 Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->h2dsettings.at(11007));
 
-	hismanager->RegisterPlot<TH2F>("EXP_10012","DB3SR-FP1XP1 vs Pin 1 Energy :: LG_Dynode Gated",	this->h2dsettings.at(10012));
-	hismanager->RegisterPlot<TH2F>("EXP_10013","DB3SR-FP1XP1 vs Pin 2 Energy :: LG_Dynode Gated",	this->h2dsettings.at(10013));
-	hismanager->RegisterPlot<TH2F>("EXP_10014","DB3SR-FP1XP1 vs Pin 3 Energy :: LG_Dynode Gated",	this->h2dsettings.at(10014));
-	hismanager->RegisterPlot<TH2F>("EXP_10015","DB3SR-FP1XP1 vs Pin 4 Energy :: LG_Dynode Gated",	this->h2dsettings.at(10015));
+	hismanager->RegisterPlot<TH2F>("EXP_11008","Pin 1 Energy vs DB3SL-FP1XP1  Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->h2dsettings.at(11008));
+	hismanager->RegisterPlot<TH2F>("EXP_11009","Pin 2 Energy vs DB3SL-FP1XP1  Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->h2dsettings.at(11009));
+	hismanager->RegisterPlot<TH2F>("EXP_11010","Pin 3 Energy vs DB3SL-FP1XP1  Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->h2dsettings.at(11010));
+	hismanager->RegisterPlot<TH2F>("EXP_11011","Pin 4 Energy vs DB3SL-FP1XP1  Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->h2dsettings.at(11011));
+                                                                    
+	hismanager->RegisterPlot<TH2F>("EXP_11012","Pin 1 Energy vs DB3SR-FP1XP1  Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->h2dsettings.at(11012));
+	hismanager->RegisterPlot<TH2F>("EXP_11013","Pin 2 Energy vs DB3SR-FP1XP1  Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->h2dsettings.at(11013));
+	hismanager->RegisterPlot<TH2F>("EXP_11014","Pin 3 Energy vs DB3SR-FP1XP1  Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->h2dsettings.at(11014));
+	hismanager->RegisterPlot<TH2F>("EXP_11015","Pin 4 Energy vs DB3SR-FP1XP1  Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->h2dsettings.at(11015));
+
+
 
 	hismanager->RegisterPlot<TH2F>("EXP_3650","High Gain Dynode vs MTAS Total; MTAS Total Energy (keV); Dynode Energy (keV);",this->h2dsettings.at(3650));
 	hismanager->RegisterPlot<TH2F>("EXP_3651","High Gain Dynode vs MTAS Center Sum; MTAS Center Energy (keV); Dynode Energy (keV);",this->h2dsettings.at(3651));
@@ -517,6 +596,8 @@ void e21027Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 
 	for( const auto& t : this->isotopetags ){
 		this->console->info("Found Isotope Tag : {}",t);
+		this->implant_isotopes[t] = 0;
+		this->rit_vetoed_isotopes[t] = 0;
 	}
 
 	this->console->info("Finished Declaring Plots");
@@ -544,4 +625,31 @@ void e21027Processor::RegisterCuts(CUTS::CutRegistry* cutmanager){
 	this->ImplantProc->RegisterCuts(cutmanager);
 	this->PidProc->RegisterCuts(cutmanager);
 	this->VetoProc->RegisterCuts(cutmanager);
+}
+
+e21027Processor::~e21027Processor(){
+	auto tdiff = this->LastTime - this->FirstTime;
+	auto cumulative_total = 0;
+	auto cumulative_implant = 0;
+	auto cumulative_rit_veto = 0;
+	for( const auto& t : this->isotopetags ){
+		auto total = this->PidProc->GetNumIsotopes(t);
+		cumulative_total += total;
+		auto total_rate = static_cast<double>(total)/tdiff;
+
+		auto implant = this->implant_isotopes[t];
+		cumulative_implant += implant;
+		double implant_eff = static_cast<double>(implant)/static_cast<double>(total);
+		auto implant_rate = static_cast<double>(implant)/tdiff;
+
+		auto rit_veto = this->rit_vetoed_isotopes[t];
+		cumulative_rit_veto += rit_veto;
+		double rit_veto_eff = static_cast<double>(rit_veto)/static_cast<double>(total);
+		auto rit_veto_rate = static_cast<double>(rit_veto)/tdiff;
+
+		this->console->info("{} Counts : Total/Implant/RitVeto  : {}/{}/{} ",t,total,implant,rit_veto);
+	        this->console->info("{} Efficiency : Implant/RitVeto : {:.4f}/{:.4f}",t,implant_eff,rit_veto_eff);
+	        this->console->info("{} Rate (pps) : Total/Implant/RitVeto : {:.4f}/{:.4f}/{:.4f}",t,total_rate,implant_rate,rit_veto_rate);
+	        this->console->info("{} Rate (pph) : Total/Implant/RitVeto : {:.4f}/{:.4f}/{:.4f}",t,total_rate*60,implant_rate*60,rit_veto_rate*60);
+	}
 }
