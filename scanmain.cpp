@@ -105,7 +105,7 @@ int main(int argc, char *argv[]) {
 		exit(EXIT_FAILURE);
 	}    
 
-	const int upper_limit = 1000;
+	const int upper_limit = 100000;
 	
 	if( FileNames.size() == 0 ){
 		spdlog::error("No input files provided");

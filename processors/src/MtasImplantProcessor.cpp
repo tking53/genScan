@@ -232,6 +232,8 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 		summary->AddEventTag("ion");
 		summary->AddEventObservable("ION_X",this->lgImage.highResPosition.first);
 		summary->AddEventObservable("ION_Y",this->lgImage.highResPosition.second);
+		summary->AddEventObservable("ION_Energy",this->lgImage.DynodeTimeStamp);
+		summary->AddEventObservable("ION_TS",this->lgImage.DynodeTimeStamp);
 	}
 
 	if( this->hgImage.dynode > this->IsBetaThresh.first and this->hgImage.dynode < this->IsBetaThresh.second ){
@@ -239,6 +241,7 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 		summary->AddEventObservable("BETA_X",this->hgImage.highResPosition.first);
 		summary->AddEventObservable("BETA_Y",this->hgImage.highResPosition.second);
 		summary->AddEventObservable("BETA_Energy",this->hgImage.dynode);
+		summary->AddEventObservable("BETA_TS",this->hgImage.DynodeTimeStamp);
 	}
 
 	Processor::EndProcess();

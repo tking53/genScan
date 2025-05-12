@@ -52,7 +52,7 @@
 				<Histogram id="3335" nbinsx="65536" xhigh="65536" />
 				<Histogram id="3345" nbinsx="65536" xhigh="65536" />
 			</Processor>
-			<Processor name="MtasImplantProcessor" beta_thresh_low="400.0" beta_thresh_high="15000.0" ion_thresh_low="15000.0" ion_thresh_high="45000.0">
+			<Processor name="MtasImplantProcessor" beta_thresh_low="400.0" beta_thresh_high="10000.0" ion_thresh_low="15000.0" ion_thresh_high="45000.0">
 				<Histogram id="7005" nbinsx="65536" xlow="0" xhigh="65536" />
 				<Histogram id="70208" ylow="0" yhigh="65536" />
 			</Processor>
