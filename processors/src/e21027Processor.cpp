@@ -7,6 +7,7 @@
 #include <cmath>
 #include <stdexcept>
 #include <string>
+#include <thread>
 
 e21027Processor::e21027Processor(const std::string& log) : Processor(log,"e21027Processor",{}){
 	this->MtasProc = std::make_shared<MtasProcessor>(log);
@@ -179,6 +180,8 @@ e21027Processor::e21027Processor(const std::string& log) : Processor(log,"e21027
 	this->FoundFirst = false;
 	this->FirstTime = 0.0;
 	this->LastTime = 0.0;
+
+	this->NThreads = std::thread::hardware_concurrency()/2;
 
 	this->Reset();
 }
@@ -753,7 +756,7 @@ void e21027Processor::AddBetaToCorrelation(EventHistoryManager* eventhistory,PLO
 			const auto prevsummary = eventhistory->GetPreviousEventSummary(ii);
 			const auto preveventidx = static_cast<unsigned long long>(prevsummary->GetEventObservable("Event_idx").value());
 			const auto isprevion = prevsummary->ContainsEventTag(this->implant);
-			const auto isprevrit = summary->ContainsEventTag("rit");
+			const auto isprevrit = prevsummary->ContainsEventTag("rit");
 			if( isprevion and not isprevrit ){
 				const auto ion_erg = prevsummary->GetEventObservable("ION_Energy").value();
 				const auto ion_ts = prevsummary->GetEventObservable("ION_TS").value();

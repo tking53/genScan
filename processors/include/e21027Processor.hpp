@@ -10,6 +10,7 @@
 #include "Gates.hpp"
 
 #include <map>
+#include <thread>
 #include <vector>
 
 class e21027Processor : public Processor{
@@ -33,12 +34,20 @@ class e21027Processor : public Processor{
 		void AddBetaToCorrelation(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
 		void DoIsomerCorrelation(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
 
+		//internal thread helper, should not be called directly if someone composes from here
+		//void IonCorrelationHelper(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
+		//void BetaCorrelationHelper(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
+		//void IsomerCorrelationHelper(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
+
 	private:
 		void Reset();
 		bool HasMTAS;
 		bool HasSIPM;
 		bool HasPID;
 		bool HasVeto;
+
+		unsigned int NThreads;
+		std::vector<std::thread> Workers;
 
 		bool FoundFirst;
 		double FirstTime;
