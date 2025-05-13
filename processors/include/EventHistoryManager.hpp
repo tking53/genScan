@@ -61,6 +61,9 @@ class EventHistoryManager{
 
 		size_t GetMaxHistoryID() const;
 		size_t GetMaxHistorySize() const;
+
+		void SetVeryFirstTime(double);
+		double GetVeryFirstTime() const;
 		
 	private:
 		std::string LogName;
@@ -78,6 +81,7 @@ class EventHistoryManager{
 		unsigned long long UIDCacheMisses;
 		unsigned long long CacheHits;
 		unsigned long long CacheMisses;
+		double FirstTime;
 
 };
 

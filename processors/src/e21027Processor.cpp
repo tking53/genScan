@@ -237,24 +237,25 @@ e21027Processor::e21027Processor(const std::string& log) : Processor(log,"e21027
 	const auto hasbeta = summary->ContainsEventTag(this->beta);
 	const auto hasgamma = summary->ContainsEventTag(this->gamma);
 	const auto hasmuon = summary->ContainsEventTag("muon");
-	const auto hasrit = summary->ContainsEventTag("rit");
+	//const auto hasrit = summary->ContainsEventTag("rit");
 
 	if( not hasmuon ){
 		//do I need to reject when it's both ion and beta????
 		//need to make the below a work item and multithread????
 		//need to add locking and mutex to hismanager
-		if( hasion ){
+		if( hasion and not hasbeta ){
 			this->AddIonToCorrelation(eventhistory,hismanager,cutmanager);
 		}
 
-		if( numhist > 1){
-			this->DoIsomerCorrelation(eventhistory,hismanager,cutmanager);
-		}
+		//this function is incredibly slow on real beta-ion data, but why?
+		//if( numhist > 1){
+		//	this->DoIsomerCorrelation(eventhistory,hismanager,cutmanager);
+		//}
 
 		//do I need to reject when it's both ion and beta????
 		//need to make the below a work item and multithread????
 		//need to add locking and mutex to hismanager
-		if( hasbeta ){
+		if( hasbeta and not hasion ){
 			this->AddBetaToCorrelation(eventhistory,hismanager,cutmanager);
 		}else{
 			//these have ions and actual background from the room
@@ -568,9 +569,9 @@ e21027Processor::~e21027Processor(){
 
 
 void e21027Processor::AddIonToCorrelation(EventHistoryManager* eventhistory,PLOTS::PlotRegistry* hismanager,CUTS::CutRegistry* cutmanager){
-	const auto numhist = eventhistory->GetMaxHistoryID();
-	const auto summary = eventhistory->GetCurrentEventSummary();
-	const auto hasrit = summary->ContainsEventTag("rit");
+	auto numhist = eventhistory->GetMaxHistoryID();
+	auto summary = eventhistory->GetCurrentEventSummary();
+	auto hasrit = summary->ContainsEventTag("rit");
 
 	for (size_t iPins = 0 ; iPins < this->PidProc->GetNumFP1Pins(); ++iPins){
 		hismanager->Fill("EXP_" + std::to_string(10000 +iPins ), this->PidProc->GetFP1Tof(0),this->PidProc->GetFP1PinEnergy(iPins));
@@ -600,12 +601,12 @@ void e21027Processor::AddIonToCorrelation(EventHistoryManager* eventhistory,PLOT
 		}
 
 
-		const auto total = this->MtasProc->GetTotalEnergy(0);
-		const auto ctotal = this->MtasProc->GetTotalEnergy(1);
-		const auto itotal = this->MtasProc->GetTotalEnergy(2);
-		const auto mtotal = this->MtasProc->GetTotalEnergy(3);
-		const auto ototal = this->MtasProc->GetTotalEnergy(4);
-		const auto dynode = this->ImplantProc->GetLowGainImage().dynode;
+		auto total = this->MtasProc->GetTotalEnergy(0);
+		auto ctotal = this->MtasProc->GetTotalEnergy(1);
+		auto itotal = this->MtasProc->GetTotalEnergy(2);
+		auto mtotal = this->MtasProc->GetTotalEnergy(3);
+		auto ototal = this->MtasProc->GetTotalEnergy(4);
+		auto dynode = this->ImplantProc->GetLowGainImage().dynode;
 		hismanager->Fill("ION_3750",total,dynode);
 		hismanager->Fill("ION_3751",ctotal,dynode);
 		hismanager->Fill("ION_37508",total,dynode);
@@ -625,9 +626,9 @@ void e21027Processor::AddIonToCorrelation(EventHistoryManager* eventhistory,PLOT
 			hismanager->Fill("ION_2145",dynode+this->MtasProc->GetCrystalEnergy(ii+18));
 		}
 
-		const auto ionx = summary->GetEventObservable("ION_X").value();
-		const auto iony = summary->GetEventObservable("ION_Y").value();
-		const auto ionr = std::sqrt(ionx*ionx + iony*iony);
+		auto ionx = summary->GetEventObservable("ION_X").value();
+		auto iony = summary->GetEventObservable("ION_Y").value();
+		auto ionr = std::sqrt(ionx*ionx + iony*iony);
 		hismanager->Fill("ION_8005",dynode,ionr);
 		hismanager->Fill("ION_8006",dynode,ionx);
 		hismanager->Fill("ION_8007",dynode,iony);
@@ -640,80 +641,47 @@ void e21027Processor::AddIonToCorrelation(EventHistoryManager* eventhistory,PLOT
 		}
 		////found new ion, need to add it to the limit list
 		////and then correlate it with all known betas
-		const auto ion_idx = static_cast<unsigned long long>(summary->GetEventObservable("Event_idx").value());
-		const auto ion_ts = summary->GetEventObservable("ION_TS").value();
+		//const auto ion_idx = static_cast<unsigned long long>(summary->GetEventObservable("Event_idx").value());
+		auto ion_ts = summary->GetEventObservable("ION_TS").value();
 		//use the boost::circular_buffer to queue the things
 		//search through the summaries previous and we'll grab their idx
 		if( numhist > 1 ){
-			for( size_t ii = 1; ii < eventhistory->GetMaxHistoryID(); ++ii ){
-				const auto prevsummary = eventhistory->GetPreviousEventSummary(ii);
-				const auto preveventidx = static_cast<unsigned long long>(prevsummary->GetEventObservable("Event_idx").value());
-				const auto isprevbeta = prevsummary->ContainsEventTag(this->beta);
-				if( isprevbeta ){
-					const auto beta_erg = prevsummary->GetEventObservable("BETA_Energy").value();
-					const auto beta_ts = prevsummary->GetEventObservable("BETA_TS").value();
-					const auto beta_ion_tdiff_s = 1.0e-9*(beta_ts - ion_ts);
-					const auto betax = prevsummary->GetEventObservable("BETA_X").value();
-					const auto betay = prevsummary->GetEventObservable("BETA_Y").value();
-					const auto xdiff = ionx - betax;
-					const auto ydiff = iony - betay;
-					const auto beta_ion_radius = std::sqrt(xdiff*xdiff + ydiff*ydiff);
-					//determine which tdiff plot to fill
-					//these are all the negative time portions of the tdiff
-					for( size_t jj = 0; jj < this->isotopetags.size(); ++jj ){
-						if( summary->ContainsEventTag(this->isotopetags[jj]) ){
-							std::string label = "DECAY_4000"+std::to_string(jj);
-							hismanager->Fill(label,beta_ion_tdiff_s*1.0e6);
+			//if( numhist <= 1000 ){
+				this->IonCorrelationHelper(eventhistory,hismanager,cutmanager,1,numhist,summary,dynode,ion_ts,ionx,iony);
+			//}else{
+			//	//have a shit load, need to split into parallel operations
+			//	//over NThread workers
+			//	std::vector<std::thread> Workers;
+			//	for( size_t n = 0; n < this->NThreads; ++ n ){
+			//		//0 : 0 - min(numhist/NThreads,numhist)
+			//		//1 : numhist/NThreads + 1 - min(2*numhist/NThreads,numhist)
+			//		//.... 
+			//		//n : n*numhist/NThreads + 1 - min((n+1)*numhist/NThreads,numhist)
+			//		size_t startidx = n*(numhist/NThreads);
+			//		size_t stopidx = std::min((n+1)*(numhist/NThreads),numhist);
+			//		//likely need a mutex put into the histogram filling
+			//		Workers.push_back(std::thread(&e21027Processor::IonCorrelationHelper,this,eventhistory,hismanager,cutmanager,startidx,stopidx,summary,dynode,ion_ts,ionx,iony));
+			//	}
+			//	for( auto&& w : Workers ){
+			//		w.join();
+			//	}
 
-							label = "DECAY_4001"+std::to_string(jj);
-							hismanager->Fill(label,beta_ion_tdiff_s*1.0e3);
-
-							label = "DECAY_4002"+std::to_string(jj);
-							hismanager->Fill(label,beta_ion_tdiff_s);
-
-							label = "DECAY_4003"+std::to_string(jj);
-							hismanager->Fill(label,beta_ion_tdiff_s/60.0);
-
-							label = "DECAY_8000"+std::to_string(jj);
-							hismanager->Fill(label,beta_ion_radius);
-
-							label = "DECAY_5000"+std::to_string(jj);
-							hismanager->Fill(label,beta_ion_radius,beta_ion_tdiff_s*1.0e6);
-
-							label = "DECAY_5001"+std::to_string(jj);
-							hismanager->Fill(label,beta_ion_radius,beta_ion_tdiff_s*1.0e3);
-
-							label = "DECAY_5002"+std::to_string(jj);
-							hismanager->Fill(label,beta_ion_radius,beta_ion_tdiff_s);
-
-							label = "DECAY_5003"+std::to_string(jj);
-							hismanager->Fill(label,beta_ion_radius,beta_ion_tdiff_s/60.0);
-
-							//dynode contains the ion in this case
-							label = "DECAY_7001"+std::to_string(jj);
-							hismanager->Fill(label,dynode,beta_ion_radius);
-
-							label = "DECAY_7000"+std::to_string(jj);
-							hismanager->Fill(label,beta_erg,beta_ion_radius);
-						}
-					}
-				}
-			}
+			//}
 		}
 	}
 }
 
 void e21027Processor::AddBetaToCorrelation(EventHistoryManager* eventhistory,PLOTS::PlotRegistry* hismanager,CUTS::CutRegistry* cutmanager){
-	const auto summary = eventhistory->GetCurrentEventSummary();
-	const auto numhist = eventhistory->GetMaxHistoryID();
+	auto summary = eventhistory->GetCurrentEventSummary();
+	auto numhist = eventhistory->GetMaxHistoryID();
 	this->MtasProc->FillBetaPlots(hismanager);
 	this->MtasProc->FillNoLogicBetaPlots(hismanager);
-	const auto total = this->MtasProc->GetTotalEnergy(0);
-	const auto ctotal = this->MtasProc->GetTotalEnergy(1);
-	const auto itotal = this->MtasProc->GetTotalEnergy(2);
-	const auto mtotal = this->MtasProc->GetTotalEnergy(3);
-	const auto ototal = this->MtasProc->GetTotalEnergy(4);
-	const auto dynode = this->ImplantProc->GetHighGainImage().dynode;
+	auto total = this->MtasProc->GetTotalEnergy(0);
+	auto ctotal = this->MtasProc->GetTotalEnergy(1);
+	auto itotal = this->MtasProc->GetTotalEnergy(2);
+	auto mtotal = this->MtasProc->GetTotalEnergy(3);
+	auto ototal = this->MtasProc->GetTotalEnergy(4);
+	auto dynode = this->ImplantProc->GetHighGainImage().dynode;
 	hismanager->Fill("BETA_3650",total,dynode);
 	hismanager->Fill("BETA_3651",ctotal,dynode);
 	hismanager->Fill("BETA_36508",total,dynode);
@@ -733,9 +701,9 @@ void e21027Processor::AddBetaToCorrelation(EventHistoryManager* eventhistory,PLO
 		hismanager->Fill("BETA_2045",dynode+this->MtasProc->GetCrystalEnergy(ii+18));
 	}
 
-	const auto betax = summary->GetEventObservable("BETA_X").value();
-	const auto betay = summary->GetEventObservable("BETA_Y").value();
-	const auto betar = std::sqrt(betax*betax + betay*betay);
+	auto betax = summary->GetEventObservable("BETA_X").value();
+	auto betay = summary->GetEventObservable("BETA_Y").value();
+	auto betar = std::sqrt(betax*betax + betay*betay);
 	//this->console->info("X:{}, Y:{}, R:{}",betax,betay,betar); 
 	hismanager->Fill("BETA_8000",dynode,betar);
 	hismanager->Fill("BETA_8001",dynode,betax);
@@ -749,65 +717,29 @@ void e21027Processor::AddBetaToCorrelation(EventHistoryManager* eventhistory,PLO
 	}
 	//found new beta, need to go through the known ion list and correlate it with us
 	//and update their secondary
-	const auto beta_idx = static_cast<unsigned long long>(summary->GetEventObservable("Event_idx").value());
 	const auto beta_ts = summary->GetEventObservable("BETA_TS").value();
 	if( numhist > 1 ){
-		for( size_t ii = 1; ii < eventhistory->GetMaxHistoryID(); ++ii ){
-			const auto prevsummary = eventhistory->GetPreviousEventSummary(ii);
-			const auto preveventidx = static_cast<unsigned long long>(prevsummary->GetEventObservable("Event_idx").value());
-			const auto isprevion = prevsummary->ContainsEventTag(this->implant);
-			const auto isprevrit = prevsummary->ContainsEventTag("rit");
-			if( isprevion and not isprevrit ){
-				const auto ion_erg = prevsummary->GetEventObservable("ION_Energy").value();
-				const auto ion_ts = prevsummary->GetEventObservable("ION_TS").value();
-				const auto beta_ion_tdiff_s = 1.0e-9*(beta_ts - ion_ts);
-				const auto ionx = prevsummary->GetEventObservable("ION_X").value();
-				const auto iony = prevsummary->GetEventObservable("ION_Y").value();
-				const auto xdiff = ionx - betax;
-				const auto ydiff = iony - betay;
-				const auto beta_ion_radius = std::sqrt(xdiff*xdiff + ydiff*ydiff);
-				//determine which tdiff plot to fill
-				//these are all the negative time portions of the tdiff
-				for( size_t jj = 0; jj < this->isotopetags.size(); ++jj ){
-					if( prevsummary->ContainsEventTag(this->isotopetags[jj]) ){
-						std::string label = "DECAY_4000"+std::to_string(jj);
-						hismanager->Fill(label,beta_ion_tdiff_s*1.0e6);
-
-						label = "DECAY_4001"+std::to_string(jj);
-						hismanager->Fill(label,beta_ion_tdiff_s*1.0e3);
-
-						label = "DECAY_4002"+std::to_string(jj);
-						hismanager->Fill(label,beta_ion_tdiff_s);
-
-						label = "DECAY_4003"+std::to_string(jj);
-						hismanager->Fill(label,beta_ion_tdiff_s/60.0);
-
-						label = "DECAY_8000"+std::to_string(jj);
-						hismanager->Fill(label,beta_ion_radius);
-
-						label = "DECAY_5000"+std::to_string(jj);
-						hismanager->Fill(label,beta_ion_radius,beta_ion_tdiff_s*1.0e6);
-
-						label = "DECAY_5001"+std::to_string(jj);
-						hismanager->Fill(label,beta_ion_radius,beta_ion_tdiff_s*1.0e3);
-
-						label = "DECAY_5002"+std::to_string(jj);
-						hismanager->Fill(label,beta_ion_radius,beta_ion_tdiff_s);
-
-						label = "DECAY_5003"+std::to_string(jj);
-						hismanager->Fill(label,beta_ion_radius,beta_ion_tdiff_s/60.0);
-
-						//dynode contains the beta in this case
-						label = "DECAY_7000"+std::to_string(jj);
-						hismanager->Fill(label,dynode,beta_ion_radius);
-
-						label = "DECAY_7001"+std::to_string(jj);
-						hismanager->Fill(label,ion_erg,beta_ion_radius);
-
-					}
-				}
-			}
-		}
+		//if( numhist <= 1000 ){
+		      this->BetaCorrelationHelper(eventhistory,hismanager,cutmanager,1,numhist,dynode,beta_ts,betax,betay);
+		//}else{
+		//      //have a shit load, need to split into parallel operations
+		//      //over NThread workers
+		//      //give each thread numhist/NThread tasks? or batch out 1k to each?
+		//      std::vector<std::thread> Workers;
+		//      for( size_t n = 0; n < this->NThreads; ++ n ){
+		//	      //0 : 0 - min(numhist/NThreads,numhist)
+		//	      //1 : numhist/NThreads + 1 - min(2*numhist/NThreads,numhist)
+		//	      //.... 
+		//	      //n : n*numhist/NThreads + 1 - min((n+1)*numhist/NThreads,numhist)
+		//	      size_t startidx = n*(numhist/NThreads);
+		//	      size_t stopidx = std::min((n+1)*(numhist/NThreads),numhist);
+		//	      //likely need a mutex put into the histogram filling
+		//	      Workers.push_back(std::thread(&e21027Processor::BetaCorrelationHelper,this,eventhistory,hismanager,cutmanager,startidx,stopidx,dynode,beta_ts,betax,betay));
+		//      }
+		//      for( auto&& w : Workers ){
+		//	      w.join();
+		//      }
+		//}
 	}
 }
 
@@ -828,8 +760,8 @@ void e21027Processor::DoIsomerCorrelation(EventHistoryManager* eventhistory,PLOT
 		}
 		const auto prevbeta = prevsummary->ContainsEventTag(this->beta);
 		const auto prevgamma = prevsummary->ContainsEventTag(this->gamma);
-		const auto isomer_tdiff = summary->GetRawEvents().front().GetTimeStamp() - prevsummary->GetRawEvents().front().GetTimeStamp();
 		if( not hasbeta and hasgamma and prevbeta ){
+			const auto isomer_tdiff = summary->GetRawEvents().front().GetTimeStamp() - prevsummary->GetRawEvents().front().GetTimeStamp();
 			hismanager->Fill("ISOMER_3700",erg,isomer_tdiff);
 			hismanager->Fill("ISOMER_3701",erg,isomer_tdiff*1.0e-3);
 			break;
@@ -843,11 +775,11 @@ void e21027Processor::DoIsomerCorrelation(EventHistoryManager* eventhistory,PLOT
 		}
 		const auto prevbeta = prevsummary->ContainsEventTag(this->beta);
 		const auto prevgamma = prevsummary->ContainsEventTag(this->gamma);
-		const auto isomer_tdiff = summary->GetRawEvents().front().GetTimeStamp() - prevsummary->GetRawEvents().front().GetTimeStamp();
 
 		//this looks for a gamma decay into a delayed beta
 		//i.e. beam isomer, but need mtas energy for this old event
 		if( hasbeta and not prevbeta and prevgamma ){
+			const auto isomer_tdiff = summary->GetRawEvents().front().GetTimeStamp() - prevsummary->GetRawEvents().front().GetTimeStamp();
 			const auto olderg = prevsummary->GetEventObservable("MTAS_Total").value();
 			hismanager->Fill("ISOMER_3800",olderg,isomer_tdiff);
 			hismanager->Fill("ISOMER_3801",olderg,isomer_tdiff*1.0e-3);
@@ -855,3 +787,123 @@ void e21027Processor::DoIsomerCorrelation(EventHistoryManager* eventhistory,PLOT
 		}
 	}
 }
+
+void e21027Processor::IonCorrelationHelper(EventHistoryManager* eventhistory,PLOTS::PlotRegistry* hismanager,CUTS::CutRegistry* cutmanager,size_t startidx,size_t stopidx,const EventSummary* summary,double dynode,double ion_ts,double ionx,double iony){
+	for( size_t ii = startidx; ii < stopidx; ++ii ){
+		const auto prevsummary = eventhistory->GetPreviousEventSummary(ii);
+		//const auto preveventidx = static_cast<unsigned long long>(prevsummary->GetEventObservable("Event_idx").value());
+		const auto isprevbeta = prevsummary->ContainsEventTag(this->beta);
+		if( isprevbeta ){
+			const auto beta_erg = prevsummary->GetEventObservable("BETA_Energy").value();
+			const auto beta_ts = prevsummary->GetEventObservable("BETA_TS").value();
+			const auto beta_ion_tdiff_s = 1.0e-9*(beta_ts - ion_ts);
+			const auto betax = prevsummary->GetEventObservable("BETA_X").value();
+			const auto betay = prevsummary->GetEventObservable("BETA_Y").value();
+			const auto xdiff = ionx - betax;
+			const auto ydiff = iony - betay;
+			const auto beta_ion_radius = std::sqrt(xdiff*xdiff + ydiff*ydiff);
+			//determine which tdiff plot to fill
+			//these are all the negative time portions of the tdiff
+			for( size_t jj = 0; jj < this->isotopetags.size(); ++jj ){
+				if( summary->ContainsEventTag(this->isotopetags[jj]) ){
+					std::string label = "DECAY_4000"+std::to_string(jj);
+					hismanager->Fill(label,beta_ion_tdiff_s*1.0e6);
+
+					label = "DECAY_4001"+std::to_string(jj);
+					hismanager->Fill(label,beta_ion_tdiff_s*1.0e3);
+
+					label = "DECAY_4002"+std::to_string(jj);
+					hismanager->Fill(label,beta_ion_tdiff_s);
+
+					label = "DECAY_4003"+std::to_string(jj);
+					hismanager->Fill(label,beta_ion_tdiff_s/60.0);
+
+					label = "DECAY_8000"+std::to_string(jj);
+					hismanager->Fill(label,beta_ion_radius);
+
+					label = "DECAY_5000"+std::to_string(jj);
+					hismanager->Fill(label,beta_ion_radius,beta_ion_tdiff_s*1.0e6);
+
+					label = "DECAY_5001"+std::to_string(jj);
+					hismanager->Fill(label,beta_ion_radius,beta_ion_tdiff_s*1.0e3);
+
+					label = "DECAY_5002"+std::to_string(jj);
+					hismanager->Fill(label,beta_ion_radius,beta_ion_tdiff_s);
+
+					label = "DECAY_5003"+std::to_string(jj);
+					hismanager->Fill(label,beta_ion_radius,beta_ion_tdiff_s/60.0);
+
+					//dynode contains the ion in this case
+					label = "DECAY_7001"+std::to_string(jj);
+					hismanager->Fill(label,dynode,beta_ion_radius);
+
+					label = "DECAY_7000"+std::to_string(jj);
+					hismanager->Fill(label,beta_erg,beta_ion_radius);
+				}
+			}
+		}
+	}
+
+}
+
+void e21027Processor::BetaCorrelationHelper(EventHistoryManager* eventhistory,PLOTS::PlotRegistry* hismanager,CUTS::CutRegistry* cutmanager,size_t beginidx,size_t stopidx,double dynode,double beta_ts,double betax,double betay){
+	for( size_t ii = beginidx; ii < stopidx; ++ii ){
+		const auto prevsummary = eventhistory->GetPreviousEventSummary(ii);
+		//const auto preveventidx = static_cast<unsigned long long>(prevsummary->GetEventObservable("Event_idx").value());
+		const auto isprevion = prevsummary->ContainsEventTag(this->implant);
+		const auto isprevrit = prevsummary->ContainsEventTag("rit");
+		if( isprevion and not isprevrit ){
+			const auto ion_erg = prevsummary->GetEventObservable("ION_Energy").value();
+			const auto ion_ts = prevsummary->GetEventObservable("ION_TS").value();
+			const auto beta_ion_tdiff_s = 1.0e-9*(beta_ts - ion_ts);
+			const auto ionx = prevsummary->GetEventObservable("ION_X").value();
+			const auto iony = prevsummary->GetEventObservable("ION_Y").value();
+			const auto xdiff = ionx - betax;
+			const auto ydiff = iony - betay;
+			const auto beta_ion_radius = std::sqrt(xdiff*xdiff + ydiff*ydiff);
+			//determine which tdiff plot to fill
+			//these are all the negative time portions of the tdiff
+			for( size_t jj = 0; jj < this->isotopetags.size(); ++jj ){
+				if( prevsummary->ContainsEventTag(this->isotopetags[jj]) ){
+					std::string label = "DECAY_4000"+std::to_string(jj);
+					hismanager->Fill(label,beta_ion_tdiff_s*1.0e6);
+
+					label = "DECAY_4001"+std::to_string(jj);
+					hismanager->Fill(label,beta_ion_tdiff_s*1.0e3);
+
+					label = "DECAY_4002"+std::to_string(jj);
+					hismanager->Fill(label,beta_ion_tdiff_s);
+
+					label = "DECAY_4003"+std::to_string(jj);
+					hismanager->Fill(label,beta_ion_tdiff_s/60.0);
+
+					label = "DECAY_8000"+std::to_string(jj);
+					hismanager->Fill(label,beta_ion_radius);
+
+					label = "DECAY_5000"+std::to_string(jj);
+					hismanager->Fill(label,beta_ion_radius,beta_ion_tdiff_s*1.0e6);
+
+					label = "DECAY_5001"+std::to_string(jj);
+					hismanager->Fill(label,beta_ion_radius,beta_ion_tdiff_s*1.0e3);
+
+					label = "DECAY_5002"+std::to_string(jj);
+					hismanager->Fill(label,beta_ion_radius,beta_ion_tdiff_s);
+
+					label = "DECAY_5003"+std::to_string(jj);
+					hismanager->Fill(label,beta_ion_radius,beta_ion_tdiff_s/60.0);
+
+					//dynode contains the beta in this case
+					label = "DECAY_7000"+std::to_string(jj);
+					hismanager->Fill(label,dynode,beta_ion_radius);
+
+					label = "DECAY_7001"+std::to_string(jj);
+					hismanager->Fill(label,ion_erg,beta_ion_radius);
+
+				}
+			}
+		}
+	}
+}
+
+//void e21027Processor::IsomerCorrelationHelper(EventHistoryManager* eventhistory,PLOTS::PlotRegistry* hismanager,CUTS::CutRegistry* cutmanager){
+//}

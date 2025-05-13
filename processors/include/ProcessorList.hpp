@@ -70,6 +70,7 @@ class ProcessorList{
 		std::uniform_real_distribution<double> randNum;
 		double FirstTimeStamp;
 		unsigned long long EventStamp;
+		std::vector<std::string> QDCHisNames;
 };
 
 #endif

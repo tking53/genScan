@@ -43,6 +43,7 @@ ProcessorList::ProcessorList(const std::string& log){
 	this->randNum = std::uniform_real_distribution<double>(0.0,1.0);
 	this->FirstTimeStamp = -1;
 	this->EventStamp = 0;
+	this->QDCHisNames = {"QDC_0","QDC_1","QDC_2","QDC_3","QDC_4","QDC_5","QDC_6","QDC_7"};
 }
 
 void ProcessorList::PreAnalyze(EventHistoryManager* History,PLOTS::PlotRegistry* HistogramManager,CUTS::CutRegistry* CutManager){
@@ -236,7 +237,6 @@ void ProcessorList::ThreshAndCal(boost::container::devector<PhysicsData>& RawEve
 
 void ProcessorList::ProcessRaw(EventHistoryManager* History,PLOTS::PlotRegistry* HistogramManager){
 	auto RawEvents = History->GetCurrentEventSummary()->GetRawEvents();
-
 	auto evtsize = RawEvents.size();
 	double deltats = 0.0;
 	double historyts = 0.0;
@@ -248,6 +248,11 @@ void ProcessorList::ProcessRaw(EventHistoryManager* History,PLOTS::PlotRegistry*
 		deltats = RawEvents.back().GetTimeStamp()-RawEvents.front().GetTimeStamp();
 	}
 	auto evtcnt = History->GetEventCount();
+	//got the first event ever in the scan, use it for all offsets
+	if( evtcnt == 1 ){
+		History->SetVeryFirstTime(RawEvents.front().GetTimeStamp());
+	}
+
 	if(evtcnt > 1 ){
 		auto OldEvents = History->GetOldestEventSummary()->GetRawEvents();
 		historyts = RawEvents.front().GetTimeStamp() - OldEvents.front().GetTimeStamp();
@@ -285,6 +290,10 @@ void ProcessorList::ProcessRaw(EventHistoryManager* History,PLOTS::PlotRegistry*
 			HistogramManager->Fill("Total_Saturate",gBoardID,evt.GetChannel());
 		}
 		HistogramManager->Fill("Total_Hits",gBoardID,evt.GetChannel());
+		auto qdcs = evt.GetQDCSums();
+		for( size_t ii = 0; ii < qdcs.size(); ++ii ){
+			HistogramManager->Fill(this->QDCHisNames[ii],qdcs[ii],gChanID);
+		}
 	}
 }
 

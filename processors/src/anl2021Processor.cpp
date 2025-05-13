@@ -249,10 +249,10 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 					}
 					auto prevbeta = prevsummary->ContainsEventTag(this->beta);
 					auto prevgamma = prevsummary->ContainsEventTag(this->gamma);
-					auto isomer_tdiff = summary->GetRawEvents().front().GetTimeStamp() - prevsummary->GetRawEvents().front().GetTimeStamp();
 					//this looks for a beta decay into a delayed level
 					//like 137Cs
 					if( not hasbeta and hasgamma and prevbeta ){
+						auto isomer_tdiff = summary->GetRawEvents().front().GetTimeStamp() - prevsummary->GetRawEvents().front().GetTimeStamp();
 						hismanager->Fill("ISOMER_3700",erg,isomer_tdiff);
 						hismanager->Fill("ISOMER_3701",erg,isomer_tdiff*1.0e-3);
 						break;
@@ -266,11 +266,11 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 					}
 					auto prevbeta = prevsummary->ContainsEventTag(this->beta);
 					auto prevgamma = prevsummary->ContainsEventTag(this->gamma);
-					auto isomer_tdiff = summary->GetRawEvents().front().GetTimeStamp() - prevsummary->GetRawEvents().front().GetTimeStamp();
 
 					//this looks for a gamma decay into a delayed beta
 					//i.e. beam isomer, but need mtas energy for this old event
 					if( hasbeta and not prevbeta and prevgamma ){
+						auto isomer_tdiff = summary->GetRawEvents().front().GetTimeStamp() - prevsummary->GetRawEvents().front().GetTimeStamp();
 						auto olderg = prevsummary->GetEventObservable("MTAS_Total").value();
 						hismanager->Fill("ISOMER_3800",olderg,isomer_tdiff);
 						hismanager->Fill("ISOMER_3801",olderg,isomer_tdiff*1.0e-3);

@@ -1,6 +1,7 @@
 #ifndef __E21027_PROCESSOR_HPP__
 #define __E21027_PROCESSOR_HPP__
 
+#include "EventSummary.hpp"
 #include "Processor.hpp"
 #include "MtasProcessor.hpp"
 #include "MtasImplantProcessor.hpp"
@@ -35,8 +36,8 @@ class e21027Processor : public Processor{
 		void DoIsomerCorrelation(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
 
 		//internal thread helper, should not be called directly if someone composes from here
-		//void IonCorrelationHelper(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
-		//void BetaCorrelationHelper(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
+		void IonCorrelationHelper(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*,size_t,size_t,const EventSummary*,double,double,double,double);
+		void BetaCorrelationHelper(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*,size_t,size_t,double,double,double,double);
 		//void IsomerCorrelationHelper(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
 
 	private:
@@ -47,7 +48,6 @@ class e21027Processor : public Processor{
 		bool HasVeto;
 
 		unsigned int NThreads;
-		std::vector<std::thread> Workers;
 
 		bool FoundFirst;
 		double FirstTime;

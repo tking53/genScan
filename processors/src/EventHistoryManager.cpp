@@ -96,3 +96,11 @@ size_t EventHistoryManager::GetMaxHistorySize() const{
 size_t EventHistoryManager::GetMaxHistoryID() const{
 	return this->CurrHistorySize;
 }
+
+void EventHistoryManager::SetVeryFirstTime(double ts){
+	this->FirstTime = ts;
+}
+
+double EventHistoryManager::GetVeryFirstTime() const{
+	return this->FirstTime;
+}

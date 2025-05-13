@@ -224,6 +224,14 @@ namespace PLOTS{
 				RegisterPlot<TH1F>("Event_Delta","Time Between Beginning of Consecutive Events; Time (ns);",100000,0,100000);
 				RegisterPlot<TH1F>("Event_Spacing","Time Between End and Beginning of Consecutive Events; Time (ns);",100000,0,100000);
 				RegisterPlot<TH2F>("Trace_Size","Trace Size vs Channel; Channel (arb.); EventTrace Size (arb.);",numchannels,0,numchannels,500,0,500);
+				RegisterPlot<TH2F>("QDC_0","Channel vs QDC 0; QDC (arb.); Channel (arb.);",ergsize,0,32*ergsize,numchannels,0,numchannels);
+				RegisterPlot<TH2F>("QDC_1","Channel vs QDC 1; QDC (arb.); Channel (arb.);",ergsize,0,32*ergsize,numchannels,0,numchannels);
+				RegisterPlot<TH2F>("QDC_2","Channel vs QDC 2; QDC (arb.); Channel (arb.);",ergsize,0,32*ergsize,numchannels,0,numchannels);
+				RegisterPlot<TH2F>("QDC_3","Channel vs QDC 3; QDC (arb.); Channel (arb.);",ergsize,0,32*ergsize,numchannels,0,numchannels);
+				RegisterPlot<TH2F>("QDC_4","Channel vs QDC 4; QDC (arb.); Channel (arb.);",ergsize,0,32*ergsize,numchannels,0,numchannels);
+				RegisterPlot<TH2F>("QDC_5","Channel vs QDC 5; QDC (arb.); Channel (arb.);",ergsize,0,32*ergsize,numchannels,0,numchannels);
+				RegisterPlot<TH2F>("QDC_6","Channel vs QDC 6; QDC (arb.); Channel (arb.);",ergsize,0,32*ergsize,numchannels,0,numchannels);
+				RegisterPlot<TH2F>("QDC_7","Channel vs QDC 7; QDC (arb.); Channel (arb.);",ergsize,0,32*ergsize,numchannels,0,numchannels);
 			}
 
 			template<typename T>

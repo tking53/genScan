@@ -5,6 +5,7 @@
 #include <TTree.h>
 #include <limits>
 #include <stdexcept>
+#include <string>
 
 PidProcessor::PidProcessor(const std::string& log) : Processor(log,"PidProcessor",{"pid"}){
 	
@@ -50,7 +51,12 @@ PidProcessor::PidProcessor(const std::string& log) : Processor(log,"PidProcessor
 		
 		//DB5 PPAC1
 		{510, {2000,-1000,1000}},
-		{511, {2000,-1000,1000}}
+		{511, {2000,-1000,1000}},
+
+		//rate of each ion
+		{9000, {65536,0,65536}},
+		{9001, {2048,0,2048}},
+		{9002, {256,0,256}}
 	};
 
 	this->h2dsettings = {
@@ -431,16 +437,29 @@ PidProcessor::PidProcessor(const std::string& log) : Processor(log,"PidProcessor
 	hismanager->Fill("PID_5010",db5.ppac1.xpos,db5.ppac1.ypos);
 
 	//in here tell it if what cut we made it in
+	size_t isotopeidx = 0;
 	for( const auto& kv : this->isotopes ){
 		//hismanager->Fill("PID_21", fp1Tofs[6], fp1.pin.at(0).energy);
 		if( this->PIDPLOT == 21 ){
 			if( cutmanager->IsWithin(kv.second,fp1Tofs[6],fp1.pin[0].energy) ){
 				summary->AddEventTag(kv.first);
 				++(this->isotopecount[kv.first]);
+				//tdiff in seconds
+				auto tdiff = 1.0e-9*(summary->GetRawEvents().front().GetTimeStamp() - eventhistory->GetVeryFirstTime());
+
+				std::string label = "PID_9000"+std::to_string(isotopeidx);
+				hismanager->Fill(label,tdiff);
+				
+				label = "PID_9001"+std::to_string(isotopeidx);
+				hismanager->Fill(label,tdiff/60.0);
+
+				label = "PID_9002"+std::to_string(isotopeidx);
+				hismanager->Fill(label,tdiff/3600.0);
 			}
 		}else{
 			this->console->error("No PID used");
 		}
+		++isotopeidx;
 	}
 
 
@@ -484,6 +503,7 @@ void PidProcessor::Init(const pugi::xml_node& config){
 		this->console->info("Found Isotope : {} associated with Cut {} using file {}",tagname,cutname,filename);
 	}
 
+	//guarantee that the vector is in the same traversal order as the map
 	for( const auto& kv : this->isotopes ){
 		this->isotopetags.push_back(kv.first);
 		this->isotopecount[kv.first] = 0;
@@ -588,6 +608,20 @@ void PidProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 
 	hismanager->RegisterPlot<TH2F>("PID_5000","DB5 PPAC0 Image; TDiff (ns); TDiff (ns)",this->h2dsettings.at(5000));
 	hismanager->RegisterPlot<TH2F>("PID_5010","DB5 PPAC1 Image; TDiff (ns); TDiff (ns)",this->h2dsettings.at(5010));
+
+	for( size_t ii = 0; ii < this->isotopetags.size(); ++ii ){
+		std::string label = "PID_9000"+std::to_string(ii);
+		std::string title = "Rate of Isotope "+this->isotopetags.at(ii)+" ; Time (s); counts/s";
+		hismanager->RegisterPlot<TH1F>(label,title,this->h1dsettings.at(9000));
+		
+		label = "PID_9001"+std::to_string(ii);
+		title = "Rate of Isotope "+this->isotopetags.at(ii)+" ; Time (min); counts/min";
+		hismanager->RegisterPlot<TH1F>(label,title,this->h1dsettings.at(9001));
+		
+		label = "PID_9002"+std::to_string(ii);
+		title = "Rate of Isotope "+this->isotopetags.at(ii)+" ; Time (hr); counts/hr";
+		hismanager->RegisterPlot<TH1F>(label,title,this->h1dsettings.at(9002));
+	}
 
 	this->console->info("Finished Declaring Plots");
 }
