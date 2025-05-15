@@ -61,7 +61,10 @@ e21027Processor::e21027Processor(const std::string& log) : Processor(log,"e21027
 		{4003,{16384,-2,2}},
 
 		//DECAY radii
-		{8000,{1024,0,10}}
+		{8000,{1024,0,10}},
+
+		//POS & NEG
+		{3300,{65536,0,65536}}
 
 	};
 
@@ -493,6 +496,14 @@ void e21027Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 		label = "DECAY_7001"+std::to_string(ii);
 		title = "Beta - Ion Radius vs Ion Energy Gated on "+this->isotopetags.at(ii)+"; Energy (keV); Radius (arb.)";
 		hismanager->RegisterPlot<TH2F>(label,title,this->h2dsettings.at(7001));
+
+		label = "POS_3300"+std::to_string(ii);
+		title = "Beta - Ion Positive Times MTAS Total Energy Gated on "+this->isotopetags.at(ii)+"; Energy (keV)";
+		hismanager->RegisterPlot<TH1F>(label,title,this->h1dsettings.at(3300));
+
+		label = "NEG_3300"+std::to_string(ii);
+		title = "Beta - Ion Negative Times MTAS Total Energy Gated on "+this->isotopetags.at(ii)+"; Energy (keV)";
+		hismanager->RegisterPlot<TH1F>(label,title,this->h1dsettings.at(3300));
 	}
 	//this->isotopetags = this->PidProc->GetIsotopeTags();
 
@@ -720,7 +731,7 @@ void e21027Processor::AddBetaToCorrelation(EventHistoryManager* eventhistory,PLO
 	const auto beta_ts = summary->GetEventObservable("BETA_TS").value();
 	if( numhist > 1 ){
 		//if( numhist <= 1000 ){
-		      this->BetaCorrelationHelper(eventhistory,hismanager,cutmanager,1,numhist,dynode,beta_ts,betax,betay);
+		      this->BetaCorrelationHelper(eventhistory,hismanager,cutmanager,1,numhist,dynode,beta_ts,betax,betay,total);
 		//}else{
 		//      //have a shit load, need to split into parallel operations
 		//      //over NThread workers
@@ -793,7 +804,9 @@ void e21027Processor::IonCorrelationHelper(EventHistoryManager* eventhistory,PLO
 		const auto prevsummary = eventhistory->GetPreviousEventSummary(ii);
 		//const auto preveventidx = static_cast<unsigned long long>(prevsummary->GetEventObservable("Event_idx").value());
 		const auto isprevbeta = prevsummary->ContainsEventTag(this->beta);
-		if( isprevbeta ){
+		const auto isprevmuon = prevsummary->ContainsEventTag("muon");
+		const auto isprevion = prevsummary->ContainsEventTag(this->implant);
+		if( isprevbeta and not isprevmuon and not isprevion ){
 			const auto beta_erg = prevsummary->GetEventObservable("BETA_Energy").value();
 			const auto beta_ts = prevsummary->GetEventObservable("BETA_TS").value();
 			const auto beta_ion_tdiff_s = 1.0e-9*(beta_ts - ion_ts);
@@ -802,6 +815,7 @@ void e21027Processor::IonCorrelationHelper(EventHistoryManager* eventhistory,PLO
 			const auto xdiff = ionx - betax;
 			const auto ydiff = iony - betay;
 			const auto beta_ion_radius = std::sqrt(xdiff*xdiff + ydiff*ydiff);
+			const auto total = prevsummary->GetEventObservable("MTAS_Total").value_or(0.0);
 			//determine which tdiff plot to fill
 			//these are all the negative time portions of the tdiff
 			for( size_t jj = 0; jj < this->isotopetags.size(); ++jj ){
@@ -839,20 +853,24 @@ void e21027Processor::IonCorrelationHelper(EventHistoryManager* eventhistory,PLO
 
 					label = "DECAY_7000"+std::to_string(jj);
 					hismanager->Fill(label,beta_erg,beta_ion_radius);
+
+					label = "NEG_3300"+std::to_string(jj);
+					hismanager->Fill(label,total);
 				}
 			}
 		}
 	}
-
 }
 
-void e21027Processor::BetaCorrelationHelper(EventHistoryManager* eventhistory,PLOTS::PlotRegistry* hismanager,CUTS::CutRegistry* cutmanager,size_t beginidx,size_t stopidx,double dynode,double beta_ts,double betax,double betay){
+void e21027Processor::BetaCorrelationHelper(EventHistoryManager* eventhistory,PLOTS::PlotRegistry* hismanager,CUTS::CutRegistry* cutmanager,size_t beginidx,size_t stopidx,double dynode,double beta_ts,double betax,double betay,double total){
 	for( size_t ii = beginidx; ii < stopidx; ++ii ){
 		const auto prevsummary = eventhistory->GetPreviousEventSummary(ii);
 		//const auto preveventidx = static_cast<unsigned long long>(prevsummary->GetEventObservable("Event_idx").value());
 		const auto isprevion = prevsummary->ContainsEventTag(this->implant);
+		const auto isprevbeta = prevsummary->ContainsEventTag(this->beta);
 		const auto isprevrit = prevsummary->ContainsEventTag("rit");
-		if( isprevion and not isprevrit ){
+		const auto isprevmuon = prevsummary->ContainsEventTag("muon");
+		if( isprevion and not isprevrit and not isprevbeta and not isprevmuon ){
 			const auto ion_erg = prevsummary->GetEventObservable("ION_Energy").value();
 			const auto ion_ts = prevsummary->GetEventObservable("ION_TS").value();
 			const auto beta_ion_tdiff_s = 1.0e-9*(beta_ts - ion_ts);
@@ -899,6 +917,8 @@ void e21027Processor::BetaCorrelationHelper(EventHistoryManager* eventhistory,PL
 					label = "DECAY_7001"+std::to_string(jj);
 					hismanager->Fill(label,ion_erg,beta_ion_radius);
 
+					label = "POS_3300"+std::to_string(jj);
+					hismanager->Fill(label,total);
 				}
 			}
 		}

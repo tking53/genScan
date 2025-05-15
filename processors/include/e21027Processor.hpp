@@ -37,7 +37,7 @@ class e21027Processor : public Processor{
 
 		//internal thread helper, should not be called directly if someone composes from here
 		void IonCorrelationHelper(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*,size_t,size_t,const EventSummary*,double,double,double,double);
-		void BetaCorrelationHelper(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*,size_t,size_t,double,double,double,double);
+		void BetaCorrelationHelper(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*,size_t,size_t,double,double,double,double,double);
 		//void IsomerCorrelationHelper(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
 
 	private:
