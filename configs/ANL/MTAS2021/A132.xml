@@ -13,7 +13,7 @@
 			<EarlyCycle lowerbound="20.0" upperbound="120.0" />
 			<MidCycle lowerbound="60.0" upperbound="100.0" />
 			<LateCycle lowerbound="120.0" upperbound="140.0" />
-			<Processor name="MtasProcessor" oldcenter="true"/>
+			<Processor name="MtasProcessor" oldcenter="true" diagnostic="true" logic="true"/>
 			<Processor name="MtasTapeProcessor" />
 			<Processor name="MtasSSDProcessor" />
 			<Processor name="SimpleHPGeProcessor" number="2" />
