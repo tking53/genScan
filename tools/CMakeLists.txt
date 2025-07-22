@@ -38,14 +38,19 @@ add_executable(GenUIDRegexTest src/uidregexchecker.cpp)
 target_link_libraries(GenUIDRegexTest PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES})
 list(APPEND EXE_LIST GenUIDRegexTest)
 
-#find_package(OpenCL REQUIRED)
-#if( OpenCL_FOUND )
-#	message(STATUS "Found OpenCL Include : ${OpenCL_INCLUDE_DIRS} Lib : ${OpenCL_LIBRARIES}")
-#endif()
-#add_executable(GenDeviceInfo src/deviceinfo.cpp)
-#target_link_libraries(GenDeviceInfo PRIVATE OpenCL::OpenCL yaml-cpp::yaml-cpp )
-#target_include_directories(GenDeviceInfo PUBLIC ${OpenCL_INCLUDE_DIRS})
-#list(APPEND EXE_LIST GenDeviceInfo)
+#separate out things that are not necessary for running experiments
+#tools hidden behind this option will be purely analysis based such as 
+#bayesian deconvolution, and things to verify OpenCL
+if(GS_ALL_TOOLS)
+	find_package(OpenCL REQUIRED)
+	if( OpenCL_FOUND )
+		message(STATUS "Found OpenCL Include : ${OpenCL_INCLUDE_DIRS} Lib : ${OpenCL_LIBRARIES}")
+	endif()
+	add_executable(GenDeviceInfo src/deviceinfo.cpp)
+	target_link_libraries(GenDeviceInfo PRIVATE OpenCL::OpenCL yaml-cpp::yaml-cpp )
+	target_include_directories(GenDeviceInfo PUBLIC ${OpenCL_INCLUDE_DIRS})
+	list(APPEND EXE_LIST GenDeviceInfo)
+endif()
 
 #add_executable(GenPeakLocator src/locatepeaksmain.cpp)
 #target_link_libraries(GenPeakLocator PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES})
