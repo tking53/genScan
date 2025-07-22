@@ -11,4 +11,4 @@ target_link_libraries(GenScanFitters Eigen3::Eigen)
 target_include_directories(GenScanFitters PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_PREFIX})
-install(TARGETS GenScanFitters DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+install(TARGETS GenScanFitters DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})

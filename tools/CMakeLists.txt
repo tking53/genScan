@@ -19,11 +19,11 @@ target_link_libraries(GenTraceFit PRIVATE Eigen3::Eigen pugixml GenScanFitters G
 list(APPEND EXE_LIST GenTraceFit)
 
 add_executable(GenPeakFit src/peakfittermain.cpp)
-target_link_libraries(GenPeakFit PRIVATE Eigen3::Eigen GenScanFitters GenScanUtility ${ROOT_LIBRARIES} yaml-cpp)
+target_link_libraries(GenPeakFit PRIVATE Eigen3::Eigen GenScanFitters GenScanUtility ${ROOT_LIBRARIES} yaml-cpp::yaml-cpp)
 list(APPEND EXE_LIST GenPeakFit)
 
 add_executable(GenCalRipper src/calibrationrippermain.cpp)
-target_link_libraries(GenCalRipper PRIVATE pugixml GenScanFitters GenScanUtility ${ROOT_LIBRARIES} yaml-cpp)
+target_link_libraries(GenCalRipper PRIVATE pugixml GenScanFitters GenScanUtility ${ROOT_LIBRARIES} yaml-cpp::yaml-cpp)
 list(APPEND EXE_LIST GenCalRipper)
 
 add_executable(GenTrapFilter src/trapfiltermain.cpp)
@@ -37,6 +37,15 @@ list(APPEND EXE_LIST GenCMapRegexTest)
 add_executable(GenUIDRegexTest src/uidregexchecker.cpp)
 target_link_libraries(GenUIDRegexTest PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES})
 list(APPEND EXE_LIST GenUIDRegexTest)
+
+find_package(OpenCL REQUIRED)
+if( OpenCL_FOUND )
+	message(STATUS "Found OpenCL Include : ${OpenCL_INCLUDE_DIRS} Lib : ${OpenCL_LIBRARIES}")
+endif()
+add_executable(GenDeviceInfo src/deviceinfo.cpp)
+target_link_libraries(GenDeviceInfo PRIVATE OpenCL::OpenCL yaml-cpp::yaml-cpp )
+target_include_directories(GenDeviceInfo PUBLIC ${OpenCL_INCLUDE_DIRS})
+list(APPEND EXE_LIST GenDeviceInfo)
 
 #add_executable(GenPeakLocator src/locatepeaksmain.cpp)
 #target_link_libraries(GenPeakLocator PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES})
@@ -65,8 +74,8 @@ if( USE_SYSTEM_BOOST )
 else()
 	foreach( EXE IN LISTS EXE_LIST )
 		target_link_libraries(${EXE} PRIVATE 
-			${BOOST_EXTERNAL_INSTALL_LOCATION}/lib/libboost_container.a
-			${BOOST_EXTERNAL_INSTALL_LOCATION}/lib/libboost_program_options.a
+			${BOOST_EXTERNAL_INSTALL_LOCATION}/${CMAKE_INSTALL_LIBDIR}/libboost_container.a
+			${BOOST_EXTERNAL_INSTALL_LOCATION}/${CMAKE_INSTALL_LIBDIR}/libboost_program_options.a
 			)
 	endforeach()
 endif()

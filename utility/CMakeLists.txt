@@ -10,4 +10,4 @@ add_library(GenScanUtility ${src_files})
 target_include_directories(GenScanUtility PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_PREFIX})
-install(TARGETS GenScanUtility DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+install(TARGETS GenScanUtility DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})
