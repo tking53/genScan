@@ -390,7 +390,7 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 			//this is the nose implant plastic, was either 2x1 or 2x2
 			//this is the logic that makes PSPMT_1902 show up, use it here too
 			auto hgimage = this->ImplantProc->GetHighGainImage();
-			if( hgimage.numanodes == this->NumImplantAnodes ){
+			if( hgimage.anodesum > this->ImplantThreshold ){
 				for( auto ii = 0; ii < this->HPGeProc->GetNumCrystals(); ++ii ){
 					hismanager->Fill("IRRAD_2300",this->HPGeProc->GetEnergy(ii),ii);
 				}
@@ -470,7 +470,6 @@ void anl2021Processor::Init(const pugi::xml_node& config){
 
 	this->SiliconThreshold = config.attribute("siliconthresh").as_double(0.0);
 	this->ImplantThreshold = config.attribute("implantthresh").as_double(0.0);
-	this->NumImplantAnodes = config.attribute("numimplantanodes").as_int(4);
 	//need to load in early and late time gate for generating duplicates of 3350 3351 since they're not easy to make without a shitload of memory
 	auto earlygate = config.child("EarlyCycle");
 	if( earlygate ){

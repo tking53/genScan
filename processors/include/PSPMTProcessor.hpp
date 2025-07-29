@@ -40,6 +40,9 @@ class PSPMTProcessor : public Processor{
 		void Reset();
 		void CalculatePosition(PSPMT::Image&,double,double,double,bool,PSPMTProcessor::IMAGEMETHOD&);
 		void FillRootStruct(ProcessorStruct::PSPMT&, const PSPMT::Image&, const PSPMT::Image&);
+
+		int NumRequiredHighAnodes;
+		int NumRequiredLowAnodes;
 		
 		int AmpDynodeHits;
 		int DynodeLowHits;

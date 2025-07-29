@@ -6,6 +6,36 @@
 #include <stdexcept>
 
 PSPMTProcessor::PSPMTProcessor(const std::string& log) : Processor(log,"PSPMTProcessor",{"pspmt"}){
+
+	this->h1dsettings = {
+		{2001 , {65536,0,65536}},
+		{2002 , {65536,0,65536}}
+	};
+
+	this->h2dsettings = {
+		{1901 , {1024,0,1,1024,0,1}},
+		{1902 , {1024,0,1,1024,0,1}},
+		{1903 , {1024,0,1,1024,0,1}},
+		{1904 , {1024,0,1,1024,0,1}},
+		
+		{2101 , {8192,0,65536,8192,0,65536}},
+		{2102 , {8192,0,65536,8192,0,65536}},
+		
+		{2201 , {16384,0,65536,4,0,4}},
+		{2202 , {16384,0,65536,4,0,4}},
+		
+		{2211 , {16384,0,65536,16,0,16}},
+		{2212 , {16384,0,65536,16,0,16}},
+		
+		{2301 , {8192,0,65536,8192,0,4*65536}},
+		{2302 , {8192,0,65536,8192,0,4*65536}},
+		{2303 , {8192,0,65536,8192,0,4*65536}},
+		{2304 , {8192,0,65536,8192,0,4*65536}}
+	};
+	
+	this->NumRequiredHighAnodes = 4;
+	this->NumRequiredLowAnodes = 4;
+	
 	this->hgImage = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, { -10.0, -10.0 }, 0.0};
 	this->lgImage = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, { -10.0, -10.0 }, 0.0};
 	this->hgImageQdc = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, { -10.0, -10.0 }, 0.0};
@@ -184,7 +214,9 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log) : Processor(log,"PSPMTPro
 		}
 	}
 
-	if( this->lgImage.numanodes == 4 ){
+	this->lgImage.anodesum = this->lgImage.xa+this->lgImage.ya+this->lgImage.xb+this->lgImage.yb;
+	hismanager->Fill("PSPMT_2211",this->lgImage.anodesum,this->lgImage.numanodes);
+	if( this->lgImage.numanodes == this->NumRequiredLowAnodes ){
 		this->CalculatePosition(this->lgImage,0.0,0.0,0.0,false,this->CurrMethod);
 		this->CalculatePosition(this->lgImageQdc,0.0,0.0,0.0,false,this->CurrMethod);
 		hismanager->Fill("PSPMT_1901",this->lgImage.position.first,this->lgImage.position.second);
@@ -206,7 +238,10 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log) : Processor(log,"PSPMTPro
 		FillRootStruct(this->lowgain, this->lgImage, this->lgImageQdc);
 	}
 		
-	if( this->hgImage.numanodes == 4 ){
+	this->hgImage.anodesum = this->hgImage.xa+this->hgImage.ya+this->hgImage.xb+this->hgImage.yb;
+	hismanager->Fill("PSPMT_2212",this->hgImage.anodesum,this->hgImage.numanodes);
+	//this->console->info("num anodes : {}",this->hgImage.numanodes);
+	if( this->hgImage.numanodes == this->NumRequiredHighAnodes ){
 		this->CalculatePosition(this->hgImage,0.0,0.0,0.0,false,this->CurrMethod);
 		this->CalculatePosition(this->hgImageQdc,0.0,0.0,0.0,false,this->CurrMethod);
 		hismanager->Fill("PSPMT_1902",this->hgImage.position.first,this->hgImage.position.second);
@@ -252,6 +287,18 @@ void PSPMTProcessor::Init(const pugi::xml_node& config){
 		this->console->error("Unknown image calculation method: {} not corners or sides",methodname);
 		throw std::runtime_error("invalid xml config");
 	}
+
+	pugi::xml_node hg = config.child("HighGain");
+	if( hg ){
+		this->console->info("Found HighGain tag for PSPMTProcessor");
+		this->NumRequiredHighAnodes = hg.attribute("numanodes").as_int(4);
+	}
+
+	pugi::xml_node lg = config.child("LowGain");
+	if( lg ){
+		this->console->info("Found LowGain tag for PSPMTProcessor");
+		this->NumRequiredLowAnodes = lg.attribute("numanodes").as_int(4);
+	}
 }
 		
 void PSPMTProcessor::Finalize(){
@@ -259,24 +306,27 @@ void PSPMTProcessor::Finalize(){
 }
 
 void PSPMTProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
-	hismanager->RegisterPlot<TH2F>("PSPMT_1901","Low Gain Image; Position (arb.); Position (arb.)",1024,0,1,1024,0,1);
-	hismanager->RegisterPlot<TH2F>("PSPMT_1902","High Gain Image; Position (arb.); Position (arb.)",1024,0,1,1024,0,1);
-	hismanager->RegisterPlot<TH2F>("PSPMT_1903","Low Gain QDC::Image; Position (arb.); Position (arb.)",1024,0,1,1024,0,1);
-	hismanager->RegisterPlot<TH2F>("PSPMT_1904","High Gain QDC::Image; Position (arb.); Position (arb.)",1024,0,1,1024,0,1);
+	hismanager->RegisterPlot<TH2F>("PSPMT_1901","Low Gain Image; Position (arb.); Position (arb.)",this->h2dsettings.at(1901));
+	hismanager->RegisterPlot<TH2F>("PSPMT_1902","High Gain Image; Position (arb.); Position (arb.)",this->h2dsettings.at(1902));
+	hismanager->RegisterPlot<TH2F>("PSPMT_1903","Low Gain QDC::Image; Position (arb.); Position (arb.)",this->h2dsettings.at(1903));
+	hismanager->RegisterPlot<TH2F>("PSPMT_1904","High Gain QDC::Image; Position (arb.); Position (arb.)",this->h2dsettings.at(1904));
 
-	hismanager->RegisterPlot<TH1F>("PSPMT_2001","Low Gain Dynode; Energy (arb.)",65536,0,65536);
-	hismanager->RegisterPlot<TH1F>("PSPMT_2002","High Gain Dynode; Energy (arb.)",65536,0,65536);
+	hismanager->RegisterPlot<TH1F>("PSPMT_2001","Low Gain Dynode; Energy (arb.)",this->h1dsettings.at(2001));
+	hismanager->RegisterPlot<TH1F>("PSPMT_2002","High Gain Dynode; Energy (arb.)",this->h1dsettings.at(2002));
 	
-	hismanager->RegisterPlot<TH2F>("PSPMT_2101","Low Gain Anodes vs Low Gain Dynode; Energy (arb.)",8192,0,65536,8192,0,65536);
-	hismanager->RegisterPlot<TH2F>("PSPMT_2102","High Gain Anodes vs High Gain Dynode; Energy (arb.)",8192,0,65536,8192,0,65536);
+	hismanager->RegisterPlot<TH2F>("PSPMT_2101","Low Gain Anodes vs Low Gain Dynode; Energy (arb.)",this->h2dsettings.at(2101));
+	hismanager->RegisterPlot<TH2F>("PSPMT_2102","High Gain Anodes vs High Gain Dynode; Energy (arb.)",this->h2dsettings.at(2102));
 
-	hismanager->RegisterPlot<TH2F>("PSPMT_2201","Inividual Low Gain Anode; Energy (arb.); Position (arb.)",16384,0,65536,4,0,4);
-	hismanager->RegisterPlot<TH2F>("PSPMT_2202","Inividual High Gain Anode; Energy (arb.); Position (arb.)",16384,0,65536,4,0,4);
+	hismanager->RegisterPlot<TH2F>("PSPMT_2201","Inividual Low Gain Anode; Energy (arb.); Position (arb.)",this->h2dsettings.at(2201));
+	hismanager->RegisterPlot<TH2F>("PSPMT_2202","Inividual High Gain Anode; Energy (arb.); Position (arb.)",this->h2dsettings.at(2201));
+		
+	hismanager->RegisterPlot<TH2F>("PSPMT_2211","Low Gain Num Anodes vs AnodeSum; Energy (arb.); Mult. (arb.)",this->h2dsettings.at(2211));
+	hismanager->RegisterPlot<TH2F>("PSPMT_2212","High Gain Num Anodes vs AnodeSum; Energy (arb.); Mult. (arb.)",this->h2dsettings.at(2212));
 	
-	hismanager->RegisterPlot<TH2F>("PSPMT_2301","Low Gain Anodesum vs Low Gain Dynode; Energy (arb.)",8192,0,65536,8192,0,4*65536);
-	hismanager->RegisterPlot<TH2F>("PSPMT_2302","High Gain Anodesum vs High Gain Dynode; Energy (arb.)",8192,0,65536,8192,0,4*65536);
-	hismanager->RegisterPlot<TH2F>("PSPMT_2303","Low Gain QDC::Anodesum vs Low Gain QDC::Dynode; Energy (arb.)",8192,0,65536,8192,0,4*65536);
-	hismanager->RegisterPlot<TH2F>("PSPMT_2304","High Gain QDC::Anodesum vs High Gain QDC::Dynode; Energy (arb.)",8192,0,65536,8192,0,4*65536);
+	hismanager->RegisterPlot<TH2F>("PSPMT_2301","Low Gain Anodesum vs Low Gain Dynode; Energy (arb.)",this->h2dsettings.at(2301));
+	hismanager->RegisterPlot<TH2F>("PSPMT_2302","High Gain Anodesum vs High Gain Dynode; Energy (arb.)",this->h2dsettings.at(2302));
+	hismanager->RegisterPlot<TH2F>("PSPMT_2303","Low Gain QDC::Anodesum vs Low Gain QDC::Dynode; Energy (arb.)",this->h2dsettings.at(2303));
+	hismanager->RegisterPlot<TH2F>("PSPMT_2304","High Gain QDC::Anodesum vs High Gain QDC::Dynode; Energy (arb.)",this->h2dsettings.at(2304));
 	this->console->info("Finished Declaring Plots");
 }
 
@@ -324,7 +374,6 @@ void PSPMTProcessor::Reset(){
 void PSPMTProcessor::CalculatePosition(PSPMT::Image& img,double rotation,double xcenter,double ycenter,bool xflip,PSPMTProcessor::IMAGEMETHOD& method){
 	double x = 0.0;
 	double y = 0.0;
-	img.anodesum = img.xa+img.ya+img.xb+img.yb;
 	
 	if( method == PSPMTProcessor::IMAGEMETHOD::CORNERS ){
 		if( xflip ){
