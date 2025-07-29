@@ -50,6 +50,10 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 	};
 
 	this->h2dsettings = {
+		{2100,{8192,0,8192,4,0,4}},
+		{2200,{8192,0,8192,4,0,4}},
+		{2300,{8192,0,8192,4,0,4}},
+
 		{3160,{8192,0,8192,512,0,512}},
 		{3161,{8192,0,8192,512,0,512}},
 		{3162,{8192,0,8192,512,0,512}},
@@ -377,6 +381,23 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 					hismanager->Fill("BKG_3100",this->MtasProc->GetTotalEnergy(0));
 				}
 			}
+		}else if( TapeProc->GetCurrentCycleState() == TAPE::IRRADIATION ){
+			//add in HPGe monitor
+			for( auto ii = 0; ii < this->HPGeProc->GetNumCrystals(); ++ii ){
+				hismanager->Fill("IRRAD_2200",this->HPGeProc->GetEnergy(ii),ii);
+			}
+			
+			auto lgimage = this->ImplantProc->GetLowGainImage();
+			//this is the logic that makes PSPMT_1901 show up, use it here too
+			if( lgimage.numanodes == 4 ){
+				for( auto ii = 0; ii < this->HPGeProc->GetNumCrystals(); ++ii ){
+					hismanager->Fill("IRRAD_2300",this->HPGeProc->GetEnergy(ii),ii);
+				}
+			}else{
+				for( auto ii = 0; ii < this->HPGeProc->GetNumCrystals(); ++ii ){
+					hismanager->Fill("IRRAD_2100",this->HPGeProc->GetEnergy(ii),ii);
+				}
+			}
 		}else{
 			//no-op
 			//these are when we're in move or irradiate which we probably should check irradiate
@@ -511,6 +532,10 @@ void anl2021Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH1F>("BKG_3100","Mtas Background Cycle Gated anti-#beta Gated; Energy (keV)",this->h1dsettings.at(3100));
 	hismanager->RegisterPlot<TH1F>("BKG_3200","Mtas Background Cycle Gated; Energy (keV)",this->h1dsettings.at(3200));
 	hismanager->RegisterPlot<TH1F>("BKG_3300","Mtas Background Cycle Gated #beta Gated; Energy (keV)",this->h1dsettings.at(3300));
+
+	hismanager->RegisterPlot<TH2F>("IRRAD_2100","HPGe Irradiation Cycle Gated anti-#beta Gated; Energy (keV); Crystal Number (arb.)",this->h2dsettings.at(2100));
+	hismanager->RegisterPlot<TH2F>("IRRAD_2200","HPGe Irradiation Cycle Gated; Energy (keV); Crystal Number (arb.)",this->h2dsettings.at(2200));
+	hismanager->RegisterPlot<TH2F>("IRRAD_2300","HPGe Irradiation Cycle Gated #beta Gated; Energy (keV); Crystal Number (arb.)",this->h2dsettings.at(2300));
 	
 	//Prev    | Curr    | His 
 	//beta    | no-beta | 370X   
