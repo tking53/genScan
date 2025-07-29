@@ -37,6 +37,8 @@ class anl2021Processor : public Processor{
 		double SiliconThreshold;
 		double ImplantThreshold;
 
+		int NumImplantAnodes;
+
 		Gate<double> EarlyCycle;
 		Gate<double> MidCycle;
 		Gate<double> LateCycle;

@@ -387,9 +387,10 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 				hismanager->Fill("IRRAD_2200",this->HPGeProc->GetEnergy(ii),ii);
 			}
 			
-			auto lgimage = this->ImplantProc->GetLowGainImage();
-			//this is the logic that makes PSPMT_1901 show up, use it here too
-			if( lgimage.numanodes == 4 ){
+			//this is the nose implant plastic, was either 2x1 or 2x2
+			//this is the logic that makes PSPMT_1902 show up, use it here too
+			auto hgimage = this->ImplantProc->GetHighGainImage();
+			if( hgimage.numanodes == this->NumImplantAnodes ){
 				for( auto ii = 0; ii < this->HPGeProc->GetNumCrystals(); ++ii ){
 					hismanager->Fill("IRRAD_2300",this->HPGeProc->GetEnergy(ii),ii);
 				}
@@ -398,6 +399,9 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 					hismanager->Fill("IRRAD_2100",this->HPGeProc->GetEnergy(ii),ii);
 				}
 			}
+			
+			//this is the diagnostic cross implant plastic, was always a 2x2
+			//auto lgimage = this->ImplantProc->GetLowGainImage();
 		}else{
 			//no-op
 			//these are when we're in move or irradiate which we probably should check irradiate
@@ -466,6 +470,7 @@ void anl2021Processor::Init(const pugi::xml_node& config){
 
 	this->SiliconThreshold = config.attribute("siliconthresh").as_double(0.0);
 	this->ImplantThreshold = config.attribute("implantthresh").as_double(0.0);
+	this->NumImplantAnodes = config.attribute("numimplantanodes").as_int(4);
 	//need to load in early and late time gate for generating duplicates of 3350 3351 since they're not easy to make without a shitload of memory
 	auto earlygate = config.child("EarlyCycle");
 	if( earlygate ){
