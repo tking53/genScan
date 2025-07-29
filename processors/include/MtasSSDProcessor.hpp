@@ -26,12 +26,19 @@ class MtasSSDProcessor : public Processor{
 
 		double GetBottomEnergy(int) const;
 
+		const double& GetFirstFireTime() const;
+		const double& GetLastFireTime() const;
+
 	private:
 
 		void Reset();
 
 		double MaxErg;
 		double Maxidx;
+
+		std::vector<double> TimeStamps;
+		double FirstTime;
+		double LastTime;
 
 		std::vector<int> TopSiHits;
 		std::vector<double> TopSi;

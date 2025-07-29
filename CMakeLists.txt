@@ -26,8 +26,8 @@ if(COMPILER_SUPPORTS_WCXX20_ATTRIBUTE_EXTENSIONS)
 	endif()
 endif()
 
-#Use rpath on Mac OS
-set(CMAKE_MACOSX_RPATH TRUE)
+#Use rpath on Mac OS, this may not be needed, if something breaks come here and comment out
+#set(CMAKE_MACOSX_RPATH TRUE)
 
 if (CMAKE_COMPILER_IS_GNUCXX)
 	#Make compiler messages nice with colored tags.

@@ -19,6 +19,9 @@ MtasSSDProcessor::MtasSSDProcessor(const std::string& log) : Processor(log,"Mtas
 	
 	this->Maxidx = -1;
 	this->MaxErg = 0.0;
+	
+	this->FirstTime = -1.0;
+	this->LastTime = -1.0;
 
 	this->TopSiHits = std::vector<int>(7,0);
 	this->TopSi = std::vector<double>(7,0.0);
@@ -52,16 +55,23 @@ MtasSSDProcessor::MtasSSDProcessor(const std::string& log) : Processor(log,"Mtas
 			++(this->TopSiHits[group]);
 			if( erg > this->TopSi[group] ){
 				this->TopSi[group] = erg;
+				this->TimeStamps.push_back(evt->GetTimeStamp());
 			}
 		}else if( IsBottom ){
 			++(this->BottomSiHits[group]);
 			if( erg > this->BottomSi[group] ){
 				this->BottomSi[group] = erg;
+				this->TimeStamps.push_back(evt->GetTimeStamp());
 			}
 		}else{
 			this->console->error("evt : {}, has neither top or bottom subtype",*evt);
 			throw std::runtime_error("misconfigured xml");
 		}
+	}
+
+	if( this->TimeStamps.size() > 0 ){
+		this->FirstTime = *(std::min_element(this->TimeStamps.begin(),this->TimeStamps.end()));
+		this->LastTime = *(std::max_element(this->TimeStamps.begin(),this->TimeStamps.end()));
 	}
 
 	hismanager->Fill("SILICON_1000",this->MaxErg);
@@ -116,6 +126,8 @@ void MtasSSDProcessor::Reset(){
 	this->Maxidx = -1;
 	this->MaxErg = 0.0;
 
+	this->TimeStamps.clear();
+
 	for( int ii = 0; ii < 7; ++ii ){
 		this->TopSiHits[ii] = 0;
 		this->BottomSiHits[ii] = 0;
@@ -134,4 +146,12 @@ double MtasSSDProcessor::GetTopEnergy(int idx) const{
 
 double MtasSSDProcessor::GetBottomEnergy(int idx) const{
 	return this->BottomSi[idx];
+}
+
+const double& MtasSSDProcessor::GetFirstFireTime() const{
+	return this->FirstTime;
+}
+
+const double& MtasSSDProcessor::GetLastFireTime() const{
+	return this->LastTime;
 }
