@@ -13,6 +13,37 @@
 			<EarlyCycle lowerbound="20.0" upperbound="120.0" />
 			<MidCycle lowerbound="60.0" upperbound="100.0" />
 			<LateCycle lowerbound="120.0" upperbound="140.0" />
+
+			<Histogram id="3500" yhigh="3000" nbinsy="300" />
+			<Histogram id="3501" yhigh="200" />
+			<Histogram id="3502" yhigh="3000" nbinsy="300" />
+			<Histogram id="3503" yhigh="200" />
+			<Histogram id="3504" yhigh="3000" nbinsy="300" />
+			<Histogram id="3505" yhigh="200" />
+			
+			<Histogram id="3600" yhigh="3000" nbinsy="300" />
+			<Histogram id="3601" yhigh="200" />
+			<Histogram id="3602" yhigh="3000" nbinsy="300" />
+			<Histogram id="3603" yhigh="200" />
+			<Histogram id="3604" yhigh="3000" nbinsy="300" />
+			<Histogram id="3605" yhigh="200" />
+			
+			<Histogram id="3700" yhigh="3000" nbinsy="300" />
+			<Histogram id="3701" yhigh="200" />
+			<Histogram id="3702" yhigh="3000" nbinsy="300" />
+			<Histogram id="3703" yhigh="200" />
+			<Histogram id="3704" yhigh="3000" nbinsy="300" />
+			<Histogram id="3705" yhigh="200" />
+
+			<Histogram id="3800" yhigh="3000" nbinsy="300" />
+			<Histogram id="3801" yhigh="200" />
+			<Histogram id="3802" yhigh="3000" nbinsy="300" />
+			<Histogram id="3803" yhigh="200" />
+			<Histogram id="3804" yhigh="3000" nbinsy="300" />
+			<Histogram id="3805" yhigh="200" />
+			
+			<Histogram id="3900" nbinsy="100" />
+
 			<Processor name="MtasProcessor" oldcenter="true" diagnostic="true" logic="true"/>
 			<Processor name="MtasTapeProcessor" />
 			<Processor name="MtasSSDProcessor" />
@@ -23,152 +54,152 @@
 	<Map>
 		<Crate number="0">
 			<Module number="0" Revision="D" Frequency="100" Firmware="R32777" TraceDelay="120">
-				<Channel number="0" type="mtas" subtype="center" group="0" tags="front">
+				<Channel number="0" type="mtas" subtype="center" group="1" tags="front">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="1" type="mtas" subtype="center" group="0" tags="back">
+				<Channel number="1" type="mtas" subtype="center" group="1" tags="back">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="2" type="mtas" subtype="center" group="1" tags="front">
+				<Channel number="2" type="mtas" subtype="center" group="2" tags="front">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="3" type="mtas" subtype="center" group="1" tags="back">
+				<Channel number="3" type="mtas" subtype="center" group="2" tags="back">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="4" type="mtas" subtype="center" group="2" tags="front">
+				<Channel number="4" type="mtas" subtype="center" group="3" tags="front">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="5" type="mtas" subtype="center" group="2" tags="back">
+				<Channel number="5" type="mtas" subtype="center" group="3" tags="back">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="6" type="mtas" subtype="center" group="3" tags="front">
+				<Channel number="6" type="mtas" subtype="center" group="4" tags="front">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="7" type="mtas" subtype="center" group="3" tags="back">
+				<Channel number="7" type="mtas" subtype="center" group="4" tags="back">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="8" type="mtas" subtype="center" group="4" tags="front">
+				<Channel number="8" type="mtas" subtype="center" group="5" tags="front">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="9" type="mtas" subtype="center" group="4" tags="back">
+				<Channel number="9" type="mtas" subtype="center" group="5" tags="back">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="10" type="mtas" subtype="center" group="5" tags="front">
+				<Channel number="10" type="mtas" subtype="center" group="6" tags="front">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="11" type="mtas" subtype="center" group="5" tags="back">
+				<Channel number="11" type="mtas" subtype="center" group="6" tags="back">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="12" type="mtas" subtype="inner" group="0" tags="front">
+				<Channel number="12" type="mtas" subtype="inner" group="1" tags="front">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="13" type="mtas" subtype="inner" group="0" tags="back">
+				<Channel number="13" type="mtas" subtype="inner" group="1" tags="back">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="14" type="mtas" subtype="inner" group="1" tags="front">
+				<Channel number="14" type="mtas" subtype="inner" group="2" tags="front">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="15" type="mtas" subtype="inner" group="1" tags="back">
+				<Channel number="15" type="mtas" subtype="inner" group="2" tags="back">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 			</Module>
 			<Module number="1" Revision="D" Frequency="100" Firmware="R32777" TraceDelay="120">
-				<Channel number="0" type="mtas" subtype="inner" group="2" tags="front">
+				<Channel number="0" type="mtas" subtype="inner" group="3" tags="front">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="1" type="mtas" subtype="inner" group="2" tags="back">
+				<Channel number="1" type="mtas" subtype="inner" group="3" tags="back">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="2" type="mtas" subtype="inner" group="3" tags="front">
+				<Channel number="2" type="mtas" subtype="inner" group="4" tags="front">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="3" type="mtas" subtype="inner" group="3" tags="back">
+				<Channel number="3" type="mtas" subtype="inner" group="4" tags="back">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="4" type="mtas" subtype="inner" group="4" tags="front">
+				<Channel number="4" type="mtas" subtype="inner" group="5" tags="front">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="5" type="mtas" subtype="inner" group="4" tags="back">
+				<Channel number="5" type="mtas" subtype="inner" group="5" tags="back">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="6" type="mtas" subtype="inner" group="5" tags="front">
+				<Channel number="6" type="mtas" subtype="inner" group="6" tags="front">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="7" type="mtas" subtype="inner" group="5" tags="back">
+				<Channel number="7" type="mtas" subtype="inner" group="6" tags="back">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="8" type="mtas" subtype="middle" group="0" tags="front">
+				<Channel number="8" type="mtas" subtype="middle" group="1" tags="front">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="9" type="mtas" subtype="middle" group="0" tags="back">
+				<Channel number="9" type="mtas" subtype="middle" group="1" tags="back">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="10" type="mtas" subtype="middle" group="1" tags="front">
+				<Channel number="10" type="mtas" subtype="middle" group="2" tags="front">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="11" type="mtas" subtype="middle" group="1" tags="back">
+				<Channel number="11" type="mtas" subtype="middle" group="2" tags="back">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="12" type="mtas" subtype="middle" group="2" tags="front">
+				<Channel number="12" type="mtas" subtype="middle" group="3" tags="front">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="13" type="mtas" subtype="middle" group="2" tags="back">
+				<Channel number="13" type="mtas" subtype="middle" group="3" tags="back">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="14" type="mtas" subtype="middle" group="3" tags="front">
+				<Channel number="14" type="mtas" subtype="middle" group="4" tags="front">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="15" type="mtas" subtype="middle" group="3" tags="back">
+				<Channel number="15" type="mtas" subtype="middle" group="4" tags="back">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 			</Module>
 			<Module number="2" Revision="D" Frequency="100" Firmware="R32777" TraceDelay="120">
-				<Channel number="0" type="mtas" subtype="middle" group="4" tags="front">
+				<Channel number="0" type="mtas" subtype="middle" group="5" tags="front">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="1" type="mtas" subtype="middle" group="4" tags="back">
+				<Channel number="1" type="mtas" subtype="middle" group="5" tags="back">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="2" type="mtas" subtype="middle" group="5" tags="front">
+				<Channel number="2" type="mtas" subtype="middle" group="6" tags="front">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="3" type="mtas" subtype="middle" group="5" tags="back">
+				<Channel number="3" type="mtas" subtype="middle" group="6" tags="back">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="4" type="mtas" subtype="outer" group="0" tags="front">
+				<Channel number="4" type="mtas" subtype="outer" group="1" tags="front">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="5" type="mtas" subtype="outer" group="0" tags="back">
+				<Channel number="5" type="mtas" subtype="outer" group="1" tags="back">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="6" type="mtas" subtype="outer" group="1" tags="front">
+				<Channel number="6" type="mtas" subtype="outer" group="2" tags="front">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="7" type="mtas" subtype="outer" group="1" tags="back">
+				<Channel number="7" type="mtas" subtype="outer" group="2" tags="back">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="8" type="mtas" subtype="outer" group="2" tags="front">
+				<Channel number="8" type="mtas" subtype="outer" group="3" tags="front">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="9" type="mtas" subtype="outer" group="2" tags="back">
+				<Channel number="9" type="mtas" subtype="outer" group="3" tags="back">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="10" type="mtas" subtype="outer" group="3" tags="front">
+				<Channel number="10" type="mtas" subtype="outer" group="4" tags="front">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="11" type="mtas" subtype="outer" group="3" tags="back">
+				<Channel number="11" type="mtas" subtype="outer" group="4" tags="back">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="12" type="mtas" subtype="outer" group="4" tags="front">
+				<Channel number="12" type="mtas" subtype="outer" group="5" tags="front">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="13" type="mtas" subtype="outer" group="4" tags="back">
+				<Channel number="13" type="mtas" subtype="outer" group="5" tags="back">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="14" type="mtas" subtype="outer" group="5" tags="front">
+				<Channel number="14" type="mtas" subtype="outer" group="6" tags="front">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="15" type="mtas" subtype="outer" group="5" tags="back">
+				<Channel number="15" type="mtas" subtype="outer" group="6" tags="back">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 			</Module>
