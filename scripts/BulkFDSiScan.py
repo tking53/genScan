@@ -4,6 +4,7 @@ import subprocess
 import threading
 import argparse
 import os
+import re
 
 def run_genscan(semaphore,exe,input,output,config,root,port,limit,crate,board,channel):
     with semaphore:
@@ -47,7 +48,7 @@ if __name__ == "__main__":
             for file in files:
                 if file.endswith('.evt'):
                     currfilelist.append(root+'/'+file)
-            currfilelist.sort()
+            currfilelist = sorted(currfilelist,key=lambda x: int(x.split('-')[2].split('.')[0]))
             filelists.append(currfilelist)
         outputs.append(os.path.normpath(args.outputdir)+'/bulkscan_'+os.path.basename(os.path.normpath(d)))
 
