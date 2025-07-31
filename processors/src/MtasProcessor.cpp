@@ -28,6 +28,11 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		{ 3140, {16384,0,16384} },
 		{ 3145, {16384,0,16384} },
 
+		//rate
+		{ 3170, {65536,0,65536} },
+		{ 3171, {65536,0,65536} },
+		{ 3172, {65536,0,65536} },
+
 		{ 3200, {16384,0,16384} },
 		{ 3210, {16384,0,16384} },
 		{ 3215, {16384,0,16384} },
@@ -38,6 +43,11 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		{ 3240, {16384,0,16384} },
 		{ 3245, {16384,0,16384} },
 
+		//rate
+		{ 3270, {65536,0,65536} },
+		{ 3271, {65536,0,65536} },
+		{ 3272, {65536,0,65536} },
+
 		{ 3300, {16384,0,16384} },
 		{ 3310, {16384,0,16384} },
 		{ 3315, {16384,0,16384} },
@@ -46,7 +56,12 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		{ 3330, {16384,0,16384} },
 		{ 3335, {16384,0,16384} },
 		{ 3340, {16384,0,16384} },
-		{ 3345, {16384,0,16384} }
+		{ 3345, {16384,0,16384} },
+
+		//rate
+		{ 3370, {65536,0,65536} },
+		{ 3371, {65536,0,65536} },
+		{ 3372, {65536,0,65536} }
 	};
 
 	this->h2dsettings = {
@@ -501,6 +516,9 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 	this->TotalDataVec[4].timestamp = this->FirstTime;
 
 	if( (not this->AnySaturate) and (not this->AnyPileup) ){
+		hismanager->Fill("MTAS_3270",this->currevttime);
+		hismanager->Fill("MTAS_3271",this->currevttime/60.0);
+		hismanager->Fill("MTAS_3272",this->currevttime/(60.0*60.0));
 		for( int ii = 0; ii < 6; ++ii ){
 			auto currhx = this->HexagonShapes[ii].center;
 			if( this->CenterHits[2*ii] ){
@@ -839,6 +857,10 @@ void MtasProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	}
 
 	//MTAS diagnostic plots, always want these no matter what
+	hismanager->RegisterPlot<TH1F>("MTAS_3270","Mtas Total Scalar Rate (s); Time (s)",this->h1dsettings.at(3270));
+	hismanager->RegisterPlot<TH1F>("MTAS_3271","Mtas Total Scalar Rate (min); Time (min)",this->h1dsettings.at(3271));
+	hismanager->RegisterPlot<TH1F>("MTAS_3272","Mtas Total Scalar Rate (hr); Time (hr)",this->h1dsettings.at(3272));
+
 	hismanager->RegisterPlot<TH1F>("MTAS_3200","Mtas Total; Energy (keV)",this->h1dsettings.at(3200));
 	hismanager->RegisterPlot<TH2F>("MTAS_3201","Sum F+B; Energy (keV); F+B Pair (arb.)",this->h2dsettings.at(3201));
 
@@ -981,6 +1003,10 @@ void MtasProcessor::DeclareNoLogicAntiBetaPlots(PLOTS::PlotRegistry* hismanager)
 
 void MtasProcessor::DeclareBetaPlots(PLOTS::PlotRegistry* hismanager){
 	//beta event
+	hismanager->RegisterPlot<TH1F>("MTAS_3370","Mtas Total Scalar Rate #beta-gated (s); Time (s)",this->h1dsettings.at(3370));
+	hismanager->RegisterPlot<TH1F>("MTAS_3371","Mtas Total Scalar Rate #beta-gated (min); Time (min)",this->h1dsettings.at(3371));
+	hismanager->RegisterPlot<TH1F>("MTAS_3372","Mtas Total Scalar Rate #beta-gated (hr); Time (hr)",this->h1dsettings.at(3372));
+
 	hismanager->RegisterPlot<TH1F>("MTAS_3300","Mtas Total #beta-gated; Energy (keV)",this->h1dsettings.at(3300));
 	hismanager->RegisterPlot<TH2F>("MTAS_3301","Sum F+B; Energy (keV); F+B Pair (arb.)",this->h2dsettings.at(3301));
 	
@@ -1045,6 +1071,10 @@ void MtasProcessor::DeclareBetaPlots(PLOTS::PlotRegistry* hismanager){
 
 void MtasProcessor::DeclareAntiBetaPlots(PLOTS::PlotRegistry* hismanager){
 	//not beta event
+	hismanager->RegisterPlot<TH1F>("MTAS_3170","Mtas Total Scalar Rate anti-#beta-gated (s); Time (s)",this->h1dsettings.at(3170));
+	hismanager->RegisterPlot<TH1F>("MTAS_3171","Mtas Total Scalar Rate anti-#beta-gated (min); Time (min)",this->h1dsettings.at(3171));
+	hismanager->RegisterPlot<TH1F>("MTAS_3172","Mtas Total Scalar Rate anti-#beta-gated (hr); Time (hr)",this->h1dsettings.at(3172));
+
 	hismanager->RegisterPlot<TH1F>("MTAS_3100","Mtas Total anti-#beta-gated; Energy (keV)",this->h1dsettings.at(3100));
 	hismanager->RegisterPlot<TH2F>("MTAS_3101","Sum F+B; Energy (keV); F+B Pair (arb.)",this->h2dsettings.at(3101));
 	
@@ -1395,6 +1425,9 @@ void MtasProcessor::GenerateHexagonShapes(){
 
 void MtasProcessor::FillBetaPlots(PLOTS::PlotRegistry* hismanager){
 	if( (not this->AnySaturate) and (not this->AnyPileup) ){
+		hismanager->Fill("MTAS_3370",this->currevttime);
+		hismanager->Fill("MTAS_3371",this->currevttime/60.0);
+		hismanager->Fill("MTAS_3372",this->currevttime/(60.0*60.0));
 		for( int ii = 0; ii < 6; ++ii ){
 			auto currhx = this->HexagonShapes[ii].center;
 			if( this->CenterHits[2*ii] ){
@@ -1591,6 +1624,9 @@ void MtasProcessor::FillNoLogicBetaPlots(PLOTS::PlotRegistry* hismanager){
 
 void MtasProcessor::FillNonBetaPlots(PLOTS::PlotRegistry* hismanager){
 	if( (not this->AnySaturate) and (not this->AnyPileup) ){
+		hismanager->Fill("MTAS_3170",this->currevttime);
+		hismanager->Fill("MTAS_3171",this->currevttime/60.0);
+		hismanager->Fill("MTAS_3172",this->currevttime/(60.0*60.0));
 		for( int ii = 0; ii < 6; ++ii ){
 			auto currhx = this->HexagonShapes[ii].center;
 			if( this->CenterHits[2*ii] ){
