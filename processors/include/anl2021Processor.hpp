@@ -40,6 +40,8 @@ class anl2021Processor : public Processor{
 		Gate<double> EarlyCycle;
 		Gate<double> MidCycle;
 		Gate<double> LateCycle;
+		
+		std::vector<BoxGate<double>> ISOMER_3701_Gates;
 
 		std::string implant;
 		std::string beta;

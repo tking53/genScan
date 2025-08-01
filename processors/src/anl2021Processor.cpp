@@ -46,7 +46,10 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 
 		{3200,{16384,0,16384}},
 
-		{3300,{16384,0,16384}}
+		{3300,{16384,0,16384}},
+		
+		{3730,{16384,0,16384}}
+
 	};
 
 	this->h2dsettings = {
@@ -287,9 +290,17 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 							auto isomer_tdiff = summary->GetRawEvents().front().GetTimeStamp() - prevsummary->GetRawEvents().front().GetTimeStamp();
 							hismanager->Fill("ISOMER_3700",erg,isomer_tdiff);
 							hismanager->Fill("ISOMER_3701",erg,isomer_tdiff*1.0e-3);
+
 							auto olderg = prevsummary->GetEventObservable("MTAS_Total").value_or(0.0);
 							hismanager->Fill("ISOMER_3702",olderg,isomer_tdiff);
 							hismanager->Fill("ISOMER_3703",olderg,isomer_tdiff*1.0e-3);
+							//trying to find how we got into this level
+							for( size_t ii = 0; ii < this->ISOMER_3701_Gates.size(); ++ii ){
+								if( this->ISOMER_3701_Gates.at(ii).IsWithin(erg,isomer_tdiff*1.0e-3) ){
+									std::string label = "ISOMER_373"+std::to_string(ii);
+									hismanager->Fill(label,olderg);
+								}
+							}
 
 							hismanager->Fill("ISOMER_3704",erg+olderg,isomer_tdiff);
 							hismanager->Fill("ISOMER_3705",erg+olderg,isomer_tdiff*1.0e-3);
@@ -492,6 +503,17 @@ void anl2021Processor::Init(const pugi::xml_node& config){
 		this->LateCycle = Gate<double>(0.0,0.0);
 	}
 
+	for( pugi::xml_node boxgate = config.child("BoxGate"); boxgate; boxgate = boxgate.next_sibling("Gate") ){
+		std::string label = boxgate.attribute("label").as_string("");
+		if( label.compare("ISOMER_3701") == 0 ){
+			auto xlow = boxgate.attribute("xlowerbound").as_double(0.0);
+			auto xhigh = boxgate.attribute("xupperbound").as_double(16384.0);
+			auto ylow = boxgate.attribute("ylowerbound").as_double(0.0);
+			auto yhigh = boxgate.attribute("yupperbound").as_double(16384.0);
+			this->ISOMER_3701_Gates.push_back(BoxGate<double>(xlow,xhigh,ylow,yhigh));
+		}
+	}
+
 	if( not this->HasMTAS ){
 		throw std::runtime_error("missing MtasProcessor in anl2021Processor");
 	}
@@ -566,6 +588,15 @@ void anl2021Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH2F>("ISOMER_3703","Mtas prev-#beta curr-no-#beta Measure Cycle Gated; Prev Energy (keV); Time (us)",this->h2dsettings.at(3703));
 	hismanager->RegisterPlot<TH2F>("ISOMER_3704","Mtas prev-#beta curr-no-#beta Measure Cycle Gated; Curr+Prev Energy (keV); Time (ns)",this->h2dsettings.at(3704));
 	hismanager->RegisterPlot<TH2F>("ISOMER_3705","Mtas prev-#beta curr-no-#beta Measure Cycle Gated; Curr+Prev Energy (keV); Time (us)",this->h2dsettings.at(3705));
+	for( size_t ii = 0; ii < this->ISOMER_3701_Gates.size(); ++ii ){
+		std::string label = "ISOMER_373"+std::to_string(ii);
+		std::string title = "Mtas prev-#beta curr-no-#beta Measure Cycle Gated Curr Total Energy Gated [";
+		title += std::to_string(this->ISOMER_3701_Gates.at(ii).GetLowerXBound())+","+std::to_string(this->ISOMER_3701_Gates.at(ii).GetUpperXBound());
+		title += "] Time Gated [";
+		title += std::to_string(this->ISOMER_3701_Gates.at(ii).GetLowerYBound())+","+std::to_string(this->ISOMER_3701_Gates.at(ii).GetUpperYBound());
+		title += "]; Prev. Energy (keV);";
+		hismanager->RegisterPlot<TH1F>(label,title,this->h1dsettings.at(3730));
+	}
 
 	hismanager->RegisterPlot<TH2F>("ISOMER_3800","Mtas prev-no-#beta curr-#beta Measure Cycle Gated; Curr Energy (keV); Time (ns)",this->h2dsettings.at(3800));
 	hismanager->RegisterPlot<TH2F>("ISOMER_3801","Mtas prev-no-#beta curr-#beta Measure Cycle Gated; Curr Energy (keV); Time (us)",this->h2dsettings.at(3801));
