@@ -66,6 +66,8 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 
 	this->h2dsettings = {
 		{3101, {16384,0.0,16384,24,0,24}},
+		{3102, {16384,0.0,16384,48,0,48}},
+		{3103, {16384,0.0,16384,48,0,48}},
 		{3150, {4096,0.0,4096.0,4096,0.0,4096.0}},
 		{3151, {4096,0.0,4096.0,4096,0.0,4096.0}},
 		{3152, {4096,0.0,4096.0,4096,0.0,4096.0}},
@@ -87,6 +89,8 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		{31578, {2048,0.0,16384.0,2048,0.0,16384.0}},
 
 		{3201, {16384,0.0,16384,24,0,24}},
+		{3202, {16384,0.0,16384,48,0,48}},
+		{3203, {16384,0.0,16384,48,0,48}},
 		{3250, {4096,0.0,4096.0,4096,0.0,4096.0}},
 		{3251, {4096,0.0,4096.0,4096,0.0,4096.0}},
 		{3252, {4096,0.0,4096.0,4096,0.0,4096.0}},
@@ -108,6 +112,8 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		{32578, {2048,0.0,16384.0,2048,0.0,16384.0}},
 
 		{3301, {16384,0.0,16384,24,0,24}},
+		{3302, {16384,0.0,16384,48,0,48}},
+		{3303, {16384,0.0,16384,48,0,48}},
 		{3350, {4096,0.0,4096.0,4096,0.0,4096.0}},
 		{3351, {4096,0.0,4096.0,4096,0.0,4096.0}},
 		{3352, {4096,0.0,4096.0,4096,0.0,4096.0}},
@@ -637,6 +643,16 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		for( int ii = 0; ii < 24; ++ii ){
 			hismanager->Fill("MTAS_3201",this->CrystalEnergy[ii],ii);
 		}
+		for( int ii = 0; ii < 12; ++ii ){
+			hismanager->Fill("MTAS_3202",this->RawCenter[ii],ii);
+			hismanager->Fill("MTAS_3203",this->Center[ii],ii);
+			hismanager->Fill("MTAS_3202",this->RawInner[ii],ii+12);
+			hismanager->Fill("MTAS_3203",this->Inner[ii],ii+12);
+			hismanager->Fill("MTAS_3202",this->RawMiddle[ii],ii+24);
+			hismanager->Fill("MTAS_3203",this->Middle[ii],ii+24);
+			hismanager->Fill("MTAS_3202",this->RawOuter[ii],ii+36);
+			hismanager->Fill("MTAS_3203",this->Outer[ii],ii+36);
+		}
 
 		for( int ii = 0; ii < 6; ++ii ){
 			std::string id = std::to_string(ii);
@@ -863,6 +879,8 @@ void MtasProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 
 	hismanager->RegisterPlot<TH1F>("MTAS_3200","Mtas Total; Energy (keV)",this->h1dsettings.at(3200));
 	hismanager->RegisterPlot<TH2F>("MTAS_3201","Sum F+B; Energy (keV); F+B Pair (arb.)",this->h2dsettings.at(3201));
+	hismanager->RegisterPlot<TH2F>("MTAS_3202","Raw Individual PMT; Channel (arb.); PMT Number (arb.)",this->h2dsettings.at(3202));
+	hismanager->RegisterPlot<TH2F>("MTAS_3203","Cal Individual PMT; Energy (keV); PMT Number (arb.)",this->h2dsettings.at(3203));
 
 	hismanager->RegisterPlot<TH1F>("MTAS_3210","Mtas Center Sum; Energy (keV)",this->h1dsettings.at(3210));
 	hismanager->RegisterPlot<TH1F>("MTAS_3215","Mtas Center Stack; Energy (keV)",this->h1dsettings.at(3215));
@@ -1008,7 +1026,9 @@ void MtasProcessor::DeclareBetaPlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH1F>("MTAS_3372","Mtas Total Scalar Rate #beta-gated (hr); Time (hr)",this->h1dsettings.at(3372));
 
 	hismanager->RegisterPlot<TH1F>("MTAS_3300","Mtas Total #beta-gated; Energy (keV)",this->h1dsettings.at(3300));
-	hismanager->RegisterPlot<TH2F>("MTAS_3301","Sum F+B; Energy (keV); F+B Pair (arb.)",this->h2dsettings.at(3301));
+	hismanager->RegisterPlot<TH2F>("MTAS_3301","Sum F+B #beta-gated; Energy (keV); F+B Pair (arb.)",this->h2dsettings.at(3301));
+	hismanager->RegisterPlot<TH2F>("MTAS_3302","Individual PMT #beta-gated; Channel (arb.); PMT Number (arb.)",this->h2dsettings.at(3302));
+	hismanager->RegisterPlot<TH2F>("MTAS_3303","Individual PMT #beta-gated; Energy (keV); PMT Number (arb.)",this->h2dsettings.at(3303));
 	
 	hismanager->RegisterPlot<TH1F>("MTAS_3310","Mtas Center Sum #beta-gated; Energy (keV)",this->h1dsettings.at(3310));
 	hismanager->RegisterPlot<TH1F>("MTAS_3315","Mtas Center Stack #beta-gated; Energy (keV)",this->h1dsettings.at(3315));
@@ -1076,7 +1096,9 @@ void MtasProcessor::DeclareAntiBetaPlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH1F>("MTAS_3172","Mtas Total Scalar Rate anti-#beta-gated (hr); Time (hr)",this->h1dsettings.at(3172));
 
 	hismanager->RegisterPlot<TH1F>("MTAS_3100","Mtas Total anti-#beta-gated; Energy (keV)",this->h1dsettings.at(3100));
-	hismanager->RegisterPlot<TH2F>("MTAS_3101","Sum F+B; Energy (keV); F+B Pair (arb.)",this->h2dsettings.at(3101));
+	hismanager->RegisterPlot<TH2F>("MTAS_3101","Sum F+B anti-#beta-gated; Energy (keV); F+B Pair (arb.)",this->h2dsettings.at(3101));
+	hismanager->RegisterPlot<TH2F>("MTAS_3102","Individual PMT anti-#beta-gated; Channel (arb.); PMT Number (arb.)",this->h2dsettings.at(3102));
+	hismanager->RegisterPlot<TH2F>("MTAS_3103","Individual PMT anti-#beta-gated; Energy (keV); PMT Number (arb.)",this->h2dsettings.at(3103));
 	
 	hismanager->RegisterPlot<TH1F>("MTAS_3110","Mtas Center Sum anti-#beta-gated; Energy (keV)",this->h1dsettings.at(3110));
 	hismanager->RegisterPlot<TH1F>("MTAS_3115","Mtas Center Stack anti-#beta-gated; Energy (keV)",this->h1dsettings.at(3115));
@@ -1520,7 +1542,16 @@ void MtasProcessor::FillBetaPlots(PLOTS::PlotRegistry* hismanager){
 		for( int ii = 0; ii < 24; ++ii ){
 			hismanager->Fill("MTAS_3301",this->CrystalEnergy[ii],ii);
 		}
-
+		for( int ii = 0; ii < 12; ++ii ){
+			hismanager->Fill("MTAS_3302",this->RawCenter[ii],ii);
+			hismanager->Fill("MTAS_3303",this->Center[ii],ii);
+			hismanager->Fill("MTAS_3302",this->RawInner[ii],ii+12);
+			hismanager->Fill("MTAS_3303",this->Inner[ii],ii+12);
+			hismanager->Fill("MTAS_3302",this->RawMiddle[ii],ii+24);
+			hismanager->Fill("MTAS_3303",this->Middle[ii],ii+24);
+			hismanager->Fill("MTAS_3302",this->RawOuter[ii],ii+36);
+			hismanager->Fill("MTAS_3303",this->Outer[ii],ii+36);
+		}
 		for( int ii = 0; ii < 6; ++ii ){
 			std::string id = std::to_string(ii);
 
@@ -1720,7 +1751,16 @@ void MtasProcessor::FillNonBetaPlots(PLOTS::PlotRegistry* hismanager){
 		for( int ii = 0; ii < 24; ++ii ){
 			hismanager->Fill("MTAS_3101",this->CrystalEnergy[ii],ii);
 		}
-
+		for( int ii = 0; ii < 12; ++ii ){
+			hismanager->Fill("MTAS_3102",this->RawCenter[ii],ii);
+			hismanager->Fill("MTAS_3103",this->Center[ii],ii);
+			hismanager->Fill("MTAS_3102",this->RawInner[ii],ii+12);
+			hismanager->Fill("MTAS_3103",this->Inner[ii],ii+12);
+			hismanager->Fill("MTAS_3102",this->RawMiddle[ii],ii+24);
+			hismanager->Fill("MTAS_3103",this->Middle[ii],ii+24);
+			hismanager->Fill("MTAS_3102",this->RawOuter[ii],ii+36);
+			hismanager->Fill("MTAS_3103",this->Outer[ii],ii+36);
+		}
 		for( int ii = 0; ii < 6; ++ii ){
 			std::string id = std::to_string(ii);
 
