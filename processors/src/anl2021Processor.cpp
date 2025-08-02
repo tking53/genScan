@@ -503,7 +503,7 @@ void anl2021Processor::Init(const pugi::xml_node& config){
 		this->LateCycle = Gate<double>(0.0,0.0);
 	}
 
-	for( pugi::xml_node boxgate = config.child("BoxGate"); boxgate; boxgate = boxgate.next_sibling("Gate") ){
+	for( pugi::xml_node boxgate = config.child("BoxGate"); boxgate; boxgate = boxgate.next_sibling("BoxGate") ){
 		std::string label = boxgate.attribute("label").as_string("");
 		if( label.compare("ISOMER_3701") == 0 ){
 			auto xlow = boxgate.attribute("xlowerbound").as_double(0.0);
