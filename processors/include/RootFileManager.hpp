@@ -26,6 +26,7 @@ class RootFileManager{
 			this->outputfilename = this->outputprefix+".root";
 			this->OutputFile = new TFile(this->outputfilename.c_str(),"RECREATE");
 			this->OutputTreesToFile = enabletrees;
+			this->filltime = 0;
 		}
 
 		~RootFileManager(){
