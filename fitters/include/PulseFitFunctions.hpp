@@ -16,6 +16,7 @@ namespace PulseFit{
 	double GaussNLinBkg(double*,double*);
 	double GaussErf(double*,double*);
 	double GaussNErfBkg(double*,double*);
+	double Erf(double*,double*);
 	double TailingGaussN(double*,double*);
 	double SingleTailingGaussN(double*,double*);
 	double DoubleTailingGaussN(double*,double*);

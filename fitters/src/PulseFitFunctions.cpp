@@ -60,6 +60,18 @@ namespace PulseFit{
 		return gaussn + ce + bkg;
 	}
 	
+	double Erf(double* x,double* par){
+		//have to calc by hand because we can't transform the params to work without causing memory issues
+		double arg = 0.0;
+		double norm = par[3];
+		if( par[2] != 0 ){
+			arg = (x[0] - par[1])/par[2];
+			norm = par[3]/(par[2]*TMath::Sqrt(TMath::Pi()));
+		}
+		double ce = norm*(TMath::Erfc(arg));
+		return ce;
+	}
+
 	double SingleTailingGaussN(double* x,double* par){
 		double A = par[0];
 		double mu = par[1];

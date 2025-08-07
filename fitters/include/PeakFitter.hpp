@@ -48,6 +48,8 @@ struct PeakFitter{
 			this->InitDoubleTailingGaussNFit();
 		}else if( mode == 4 ){
 			this->InitSingleTailingGaussNLinBkgFit();
+		}else if( mode == 5 ){
+			this->InitErfFit();
 		}else{
 			throw std::runtime_error("Unknown peak fitting mode");
 		}
@@ -337,6 +339,53 @@ struct PeakFitter{
 
 				this->components.at(1)->SetParameters(this->Results["BkgOffset"],this->Results["BkgSlope"]);
 				this->fithist->GetListOfFunctions()->Add(this->components.at(1));
+
+				TLine* gauss_centroid = new TLine(this->Results["Mean"],0,
+						this->Results["Mean"],0.75*(this->fithist->GetBinContent(this->fithist->FindBin(this->Results["Mean"]))));
+				gauss_centroid->SetLineColor(kAzure);
+				this->fithist->GetListOfFunctions()->Add(gauss_centroid);
+			}
+		}
+	}
+
+	void InitErfFit(){
+		this->fithist->SetLineColor(kBlack);
+
+		this->fitfunc = new TF1("Erf",&PulseFit::Erf,FitRange.first,FitRange.second,3);
+		this->fitfunc->SetLineColor(kRed);
+		this->components = {
+		};
+		
+		auto minbin = this->fithist->FindBin(this->FitRange.first);
+		auto maxbin = this->fithist->FindBin(this->FitRange.second);
+
+		double width = this->FitRange.second - this->FitRange.first;
+		double offset = (this->FitRange.second + this->FitRange.first)/2.0;
+		double area = this->fithist->GetBinContent(this->fithist->FindBin(offset));
+
+		this->keys = {{"Area",{0,area}},{"Mean",{1,offset}},{"Sigma",{2,width}}};
+		AssignFitParNames();
+		VerifyFixedValues();
+		VerifyBoundedValues();
+		if( this->fvalues.find("Mean") == this->fvalues.end() and this->bvalues.find("Mean") == this->bvalues.end() ){
+			this->bvalues["Mean"] = this->FitRange; 
+		}
+
+		auto integral = this->fithist->Integral(minbin,maxbin);
+
+		FixAndBoundParameters();
+
+		if( integral > 0.0 ){
+			std::string option = "0SQ";
+			if( this->loglikelihood ){
+				option+="L";
+			}
+			TFitResultPtr fitresult = this->fithist->Fit(this->fitfunc,option.c_str(),"",FitRange.first,FitRange.second);
+
+			if( not fitresult->IsEmpty() ){
+				AssignFitValuesErrors(fitresult);
+				AssignFitFuncParams();
+				this->fithist->GetListOfFunctions()->Add(this->fitfunc);
 
 				TLine* gauss_centroid = new TLine(this->Results["Mean"],0,
 						this->Results["Mean"],0.75*(this->fithist->GetBinContent(this->fithist->FindBin(this->Results["Mean"]))));
