@@ -7,9 +7,13 @@
 #include <string>
 
 MtasTapeProcessor::MtasTapeProcessor(const std::string& log) : Processor(log,"MtasTapeProcessor",{"tape"}){
+	this->h1dsettings = {
+		{2000,{1024,0,1024}},
+		{3000,{16384,0,16384}}
+	};
 
 	this->h2dsettings = {
-		{1000,{1024,0,1024,16,0,16}}
+		{1000,{1024,0,1024,1024,0,1024}}
 	};
 
 	this->CycleStartTime = 0.0;
@@ -155,6 +159,8 @@ MtasTapeProcessor::MtasTapeProcessor(const std::string& log) : Processor(log,"Mt
 	auto logictime = this->SummaryData.front()->GetTimeStamp()*1.0e9;
 	logictime -= this->CycleStartTime;
 	hismanager->WeightedFill("TAPE_1000",logictime,this->CycleCount,this->logicSignalValue);
+	hismanager->Fill("TAPE_2000",this->CycleCount);
+	hismanager->Fill("TAPE_3000",this->logicSignalValue);
 	
 	Processor::EndProcess();
 	return true;
@@ -183,6 +189,9 @@ void MtasTapeProcessor::Finalize(){
 void MtasTapeProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	//MtasTape diagnostic plots, always want these no matter what
 	hismanager->RegisterPlot<TH2F>("TAPE_1000","Cycle Number vs Logic Signals; Logic Value (arb.); Cycle Number (arb.)",this->h2dsettings.at(1000));
+
+	hismanager->RegisterPlot<TH1F>("TAPE_2000","Cycle Number ; Cycle Number (arb.)",this->h1dsettings.at(2000));
+	hismanager->RegisterPlot<TH1F>("TAPE_3000","Logic Signals; Logic Value (arb.)",this->h1dsettings.at(3000));
 	this->console->info("Finished Declaring Plots");
 }
 
