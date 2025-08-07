@@ -23,6 +23,7 @@ RootDevProcessor::RootDevProcessor(const std::string& log) : Processor(log,"Root
 			this->CurrData.timeSansCfd = evt->GetRawTimeStamp();
 			this->CurrData.time = evt->GetTimeStamp();
 			this->CurrData.cfdForcedBit = evt->GetCFDForcedBit();
+			this->CurrData.cfdSourceBit = evt->GetCFDSourceBit();
 			this->CurrData.cfdFraction = evt->GetCFDFraction();
 			this->CurrData.detNum = evt->GetLocation();
 			this->CurrData.type = evt->GetType();
