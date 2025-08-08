@@ -309,14 +309,14 @@ PidProcessor::PidProcessor(const std::string& log) : Processor(log,"PidProcessor
 		}
 	};
 
-	fp1Tofs[0] = db3.ppac0.anode.time - fp1.xplas.at(0).time ;
-	fp1Tofs[1] = db3.ppac0.anode.time - fp1.xplas.at(1).time ;
-	fp1Tofs[2] = db3.ppac1.anode.time - fp1.xplas.at(0).time ;
-	fp1Tofs[3] = db3.ppac1.anode.time - fp1.xplas.at(1).time ;
-	fp1Tofs[4] = db3.scint.left.time  - fp1.xplas.at(0).time ;
-	fp1Tofs[5] = db3.scint.left.time  - fp1.xplas.at(1).time ;
-	fp1Tofs[6] = db3.scint.right.time - fp1.xplas.at(0).time ;
-	fp1Tofs[7] = db3.scint.right.time - fp1.xplas.at(1).time ;
+	this->fp1Tofs[0] = (db3.ppac0.anode.time - fp1.xplas.at(0).time) + this->fp1TofShifts[0];
+	this->fp1Tofs[1] = (db3.ppac0.anode.time - fp1.xplas.at(1).time) + this->fp1TofShifts[1];
+	this->fp1Tofs[2] = (db3.ppac1.anode.time - fp1.xplas.at(0).time) + this->fp1TofShifts[2];
+	this->fp1Tofs[3] = (db3.ppac1.anode.time - fp1.xplas.at(1).time) + this->fp1TofShifts[3];
+	this->fp1Tofs[4] = (db3.scint.left.time  - fp1.xplas.at(0).time) + this->fp1TofShifts[4];
+	this->fp1Tofs[5] = (db3.scint.left.time  - fp1.xplas.at(1).time) + this->fp1TofShifts[5];
+	this->fp1Tofs[6] = (db3.scint.right.time - fp1.xplas.at(0).time) + this->fp1TofShifts[6];
+	this->fp1Tofs[7] = (db3.scint.right.time - fp1.xplas.at(1).time) + this->fp1TofShifts[7];
 
 	db3.ppac0.xpos = this->CalcPPACPosition(db3.ppac0.left.time,db3.ppac0.right.time);
 	db3.ppac0.ypos = this->CalcPPACPosition(db3.ppac0.up.time  ,db3.ppac0.down.time);
@@ -336,14 +336,14 @@ PidProcessor::PidProcessor(const std::string& log) : Processor(log,"PidProcessor
 	db5.ppac1.xpos = this->CalcPPACPosition(db5.ppac1.left.time,db5.ppac1.right.time);
 	db5.ppac1.ypos = this->CalcPPACPosition(db5.ppac1.up.time  ,db5.ppac1.down.time);
 
-	fp2Tofs[0] = db3.ppac0.anode.time - fp2.xplas.at(0).time ;
-	fp2Tofs[1] = db3.ppac0.anode.time - fp2.xplas.at(1).time ;
-	fp2Tofs[2] = db3.ppac1.anode.time - fp2.xplas.at(0).time ;
-	fp2Tofs[3] = db3.ppac1.anode.time - fp2.xplas.at(1).time ;
-	fp2Tofs[4] = db3.scint.left.time  - fp2.xplas.at(0).time ;
-	fp2Tofs[5] = db3.scint.left.time  - fp2.xplas.at(1).time ;
-	fp2Tofs[6] = db3.scint.right.time - fp2.xplas.at(0).time ;
-	fp2Tofs[7] = db3.scint.right.time - fp2.xplas.at(1).time ;
+	this->fp2Tofs[0] = (db3.ppac0.anode.time - fp2.xplas.at(0).time) + this->fp2TofShifts[0];
+	this->fp2Tofs[1] = (db3.ppac0.anode.time - fp2.xplas.at(1).time) + this->fp2TofShifts[1];
+	this->fp2Tofs[2] = (db3.ppac1.anode.time - fp2.xplas.at(0).time) + this->fp2TofShifts[2];
+	this->fp2Tofs[3] = (db3.ppac1.anode.time - fp2.xplas.at(1).time) + this->fp2TofShifts[3];
+	this->fp2Tofs[4] = (db3.scint.left.time  - fp2.xplas.at(0).time) + this->fp2TofShifts[4];
+	this->fp2Tofs[5] = (db3.scint.left.time  - fp2.xplas.at(1).time) + this->fp2TofShifts[5];
+	this->fp2Tofs[6] = (db3.scint.right.time - fp2.xplas.at(0).time) + this->fp2TofShifts[6];
+	this->fp2Tofs[7] = (db3.scint.right.time - fp2.xplas.at(1).time) + this->fp2TofShifts[7];
 
 	hismanager->Fill("PID_1", fp1Tofs.at(0));
 	hismanager->Fill("PID_2", fp1Tofs.at(1));
@@ -482,6 +482,27 @@ void PidProcessor::Init(const pugi::xml_node& config){
 	this->LoadHistogramSettings(config);
 
 	this->PIDPLOT = config.attribute("PIDPlot").as_int(-1);
+
+	this->fp1TofShifts = std::vector<double>(this->fp1Tofs.size(),0.0);
+	this->fp2TofShifts = std::vector<double>(this->fp2Tofs.size(),0.0);
+	for( pugi::xml_node tofshift = config.child("TofShift"); tofshift; tofshift = tofshift.next_sibling("TofShift")){
+		std::string label = tofshift.attribute("label").as_string("");
+		if( label.empty() ){
+			throw std::runtime_error("tofshift qualified, but no label given");
+		}else{
+			for( pugi::xml_node shift = tofshift.child("Shift"); shift; shift = shift.next_sibling("Shift") ){
+				int id = shift.attribute("id").as_int(-1);
+				double deltat = shift.attribute("delta").as_double(0.0);
+				if( label.compare("fp1") == 0 ){
+					this->fp1TofShifts.at(id) = deltat;
+				}else if( label.compare("fp2") == 0 ){
+					this->fp2TofShifts.at(id) = deltat;
+				}else{
+					throw std::runtime_error("unknown label, should be either fp1 or fp2");
+				}
+			}
+		}
+	}	
 
 	for( pugi::xml_node isotope = config.child("Isotope"); isotope; isotope = isotope.next_sibling("Isotope") ){
 		std::string tagname = isotope.attribute("name").as_string("");

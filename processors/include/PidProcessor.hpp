@@ -81,8 +81,11 @@ class PidProcessor : public Processor{
 		DETSUBTYPE currDETSUBTYPE;
 		BOXID currBOXID;
 
-		std::vector<double> fp1Tofs ;
-		std::vector<double> fp2Tofs ;
+		std::vector<double> fp1Tofs;
+		std::vector<double> fp2Tofs;
+
+		std::vector<double> fp1TofShifts;
+		std::vector<double> fp2TofShifts;
 
 		std::map<std::string,std::string> isotopes;
 		std::map<std::string,int> isotopecount;
