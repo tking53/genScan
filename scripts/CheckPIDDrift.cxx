@@ -6,15 +6,16 @@
 #include "TFile.h"
 #include "TH1.h"
 
-TH1* FetchHis(const std::string& file,const std::string& his){
+TH1* FetchHis(const std::string& file,const std::string& his,double lb,double ub){
 	TFile* f = TFile::Open(file.c_str(),"READ");
 	TH1* h = dynamic_cast<TH1*>(f->Get(his.c_str()));
+	h->GetXaxis()->SetRangeUser(lb,ub);
 	h->SetDirectory(0);
 	return h;
 }
 
 //PID_7 is what we usually want to deal with
-void CheckPIDDrift(const std::string& txtfile,const std::string& hisname){
+void CheckPIDDrift(const std::string& txtfile,const std::string& hisname,double lb,double ub){
 	//txtfile is a text file containing the files in order they're to be compared
 	//hisname is the name of the histogram to fetch and compare between them
 
@@ -30,8 +31,8 @@ void CheckPIDDrift(const std::string& txtfile,const std::string& hisname){
 	std::vector<double> meanserror;
 	std::ofstream diff("PIDDelta.dat");
 	for( size_t ii = 1; ii < files.size(); ++ii ){
-		auto h1 = FetchHis(files.at(ii-1),hisname);	
-		auto h2 = FetchHis(files.at(ii),hisname);
+		auto h1 = FetchHis(files.at(ii-1),hisname,lb,ub);	
+		auto h2 = FetchHis(files.at(ii),hisname,lb,ub);
 
 		means.push_back(h1->GetMean());
 		meanserror.push_back(h1->GetMeanError());
@@ -40,7 +41,7 @@ void CheckPIDDrift(const std::string& txtfile,const std::string& hisname){
 		diff << files.at(ii) << " " << files.at(ii-1) << " " << meandiff << std::endl;
 	}
 	diff.close();
-	auto f = FetchHis(files.back(),hisname);
+	auto f = FetchHis(files.back(),hisname,lb,ub);
 	means.push_back(f->GetMean());
 	meanserror.push_back(f->GetMeanError());
 
@@ -54,7 +55,7 @@ void CheckPIDDrift(const std::string& txtfile,const std::string& hisname){
 	}
 	output.close();
 
-	std::ofstream dump("PIDDrift.dat")
+	std::ofstream dump("PIDDrift.dat");
 	for( size_t ii = 0; ii < files.size(); ++ii ){
 		dump << files.at(ii) << " " << means.at(ii) << " " << meanserror.at(ii) << std::endl;
 	}
