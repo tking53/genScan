@@ -26,6 +26,14 @@ add_executable(GenCalRipper src/calibrationrippermain.cpp)
 target_link_libraries(GenCalRipper PRIVATE pugixml GenScanFitters GenScanUtility ${ROOT_LIBRARIES} yaml-cpp::yaml-cpp)
 list(APPEND EXE_LIST GenCalRipper)
 
+add_executable(GenTofShifter src/tofshiftermain.cpp)
+target_link_libraries(GenTofShifter PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES} yaml-cpp::yaml-cpp)
+list(APPEND EXE_LIST GenTofShifter)
+
+add_executable(GenProcessorDump src/dumpprocessormain.cpp)
+target_link_libraries(GenProcessorDump PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES} )
+list(APPEND EXE_LIST GenProcessorDump)
+
 add_executable(GenTrapFilter src/trapfiltermain.cpp)
 target_link_libraries(GenTrapFilter PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES})
 list(APPEND EXE_LIST GenTrapFilter)
