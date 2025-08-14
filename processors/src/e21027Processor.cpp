@@ -121,53 +121,53 @@ e21027Processor::e21027Processor(const std::string& log) : Processor(log,"e21027
 
 		{6000,{1024,0,10,1024,0,10}},
 
-		//EXP pin 1
-		{10000,{2000,-1000,2000,16000,0,16000}},
-		{10004,{2000,-1000,2000,16000,0,16000}},
-		{10008,{2000,-1000,2000,16000,0,16000}},
-		{10012,{2000,-1000,2000,16000,0,16000}},
+		////EXP pin 1
+		//{10000,{2000,-1000,2000,16000,0,16000}},
+		//{10004,{2000,-1000,2000,16000,0,16000}},
+		//{10008,{2000,-1000,2000,16000,0,16000}},
+		//{10012,{2000,-1000,2000,16000,0,16000}},
 
-		//EXP pin 2
-		{10001,{2000,-1000,2000,16000,0,16000}},
-		{10005,{2000,-1000,2000,16000,0,16000}},
-		{10009,{2000,-1000,2000,16000,0,16000}},
-		{10013,{2000,-1000,2000,16000,0,16000}},
+		////EXP pin 2
+		//{10001,{2000,-1000,2000,16000,0,16000}},
+		//{10005,{2000,-1000,2000,16000,0,16000}},
+		//{10009,{2000,-1000,2000,16000,0,16000}},
+		//{10013,{2000,-1000,2000,16000,0,16000}},
 
-		//EXP pin 3
-		{10002,{2000,-1000,2000,16000,0,16000}},
-		{10006,{2000,-1000,2000,16000,0,16000}},
-		{10010,{2000,-1000,2000,16000,0,16000}},
-		{10014,{2000,-1000,2000,16000,0,16000}},
+		////EXP pin 3
+		//{10002,{2000,-1000,2000,16000,0,16000}},
+		//{10006,{2000,-1000,2000,16000,0,16000}},
+		//{10010,{2000,-1000,2000,16000,0,16000}},
+		//{10014,{2000,-1000,2000,16000,0,16000}},
 
-		//EXP pin 4
-		{10003,{2000,-1000,2000,16000,0,16000}},
-		{10007,{2000,-1000,2000,16000,0,16000}},
-		{10011,{2000,-1000,2000,16000,0,16000}},
-		{10015,{2000,-1000,2000,16000,0,16000}},
+		////EXP pin 4
+		//{10003,{2000,-1000,2000,16000,0,16000}},
+		//{10007,{2000,-1000,2000,16000,0,16000}},
+		//{10011,{2000,-1000,2000,16000,0,16000}},
+		//{10015,{2000,-1000,2000,16000,0,16000}},
 
-		//EXP pin 1
-		{11000,{2000,-1000,2000,16000,0,16000}},
-		{11004,{2000,-1000,2000,16000,0,16000}},
-		{11008,{2000,-1000,2000,16000,0,16000}},
-		{11012,{2000,-1000,2000,16000,0,16000}},
+		////EXP pin 1
+		//{11000,{2000,-1000,2000,16000,0,16000}},
+		//{11004,{2000,-1000,2000,16000,0,16000}},
+		//{11008,{2000,-1000,2000,16000,0,16000}},
+		//{11012,{2000,-1000,2000,16000,0,16000}},
 
-		//EXP pin 2
-		{11001,{2000,-1000,2000,16000,0,16000}},
-		{11005,{2000,-1000,2000,16000,0,16000}},
-		{11009,{2000,-1000,2000,16000,0,16000}},
-		{11013,{2000,-1000,2000,16000,0,16000}},
+		////EXP pin 2
+		//{11001,{2000,-1000,2000,16000,0,16000}},
+		//{11005,{2000,-1000,2000,16000,0,16000}},
+		//{11009,{2000,-1000,2000,16000,0,16000}},
+		//{11013,{2000,-1000,2000,16000,0,16000}},
 
-		//EXP pin 3
-		{11002,{2000,-1000,2000,16000,0,16000}},
-		{11006,{2000,-1000,2000,16000,0,16000}},
-		{11010,{2000,-1000,2000,16000,0,16000}},
-		{11014,{2000,-1000,2000,16000,0,16000}},
+		////EXP pin 3
+		//{11002,{2000,-1000,2000,16000,0,16000}},
+		//{11006,{2000,-1000,2000,16000,0,16000}},
+		//{11010,{2000,-1000,2000,16000,0,16000}},
+		//{11014,{2000,-1000,2000,16000,0,16000}},
 
-		//EXP pin 4
-		{11003,{2000,-1000,2000,16000,0,16000}},
-		{11007,{2000,-1000,2000,16000,0,16000}},
-		{11011,{2000,-1000,2000,16000,0,16000}},
-		{11015,{2000,-1000,2000,16000,0,16000}}
+		////EXP pin 4
+		//{11003,{2000,-1000,2000,16000,0,16000}},
+		//{11007,{2000,-1000,2000,16000,0,16000}},
+		//{11011,{2000,-1000,2000,16000,0,16000}},
+		//{11015,{2000,-1000,2000,16000,0,16000}}
 
 	};
 
@@ -357,45 +357,45 @@ void e21027Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	this->PidProc->DeclarePlots(hismanager);
 	this->VetoProc->DeclarePlots(hismanager);
 
-	hismanager->RegisterPlot<TH2F>("EXP_10000","Pin 1 Energy vs DB3P0A-FP1XP1 Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->h2dsettings.at(10000));
-	hismanager->RegisterPlot<TH2F>("EXP_10001","Pin 2 Energy vs DB3P0A-FP1XP1 Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->h2dsettings.at(10001));
-	hismanager->RegisterPlot<TH2F>("EXP_10002","Pin 3 Energy vs DB3P0A-FP1XP1 Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->h2dsettings.at(10002));
-	hismanager->RegisterPlot<TH2F>("EXP_10003","Pin 4 Energy vs DB3P0A-FP1XP1 Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->h2dsettings.at(10003));
+	hismanager->RegisterPlot<TH2F>("EXP_10000","Pin 1 Energy vs DB3P0A-FP1XP1 Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->PidProc->Get2DSetting(9));
+	hismanager->RegisterPlot<TH2F>("EXP_10001","Pin 2 Energy vs DB3P0A-FP1XP1 Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->PidProc->Get2DSetting(10));
+	hismanager->RegisterPlot<TH2F>("EXP_10002","Pin 3 Energy vs DB3P0A-FP1XP1 Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->PidProc->Get2DSetting(11));
+	hismanager->RegisterPlot<TH2F>("EXP_10003","Pin 4 Energy vs DB3P0A-FP1XP1 Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->PidProc->Get2DSetting(12));
 
-	hismanager->RegisterPlot<TH2F>("EXP_10004","Pin 1 Energy vs DB3P1A-FP1XP1 Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->h2dsettings.at(10004));
-	hismanager->RegisterPlot<TH2F>("EXP_10005","Pin 2 Energy vs DB3P1A-FP1XP1 Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->h2dsettings.at(10005));
-	hismanager->RegisterPlot<TH2F>("EXP_10006","Pin 3 Energy vs DB3P1A-FP1XP1 Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->h2dsettings.at(10006));
-	hismanager->RegisterPlot<TH2F>("EXP_10007","Pin 4 Energy vs DB3P1A-FP1XP1 Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->h2dsettings.at(10007));
+	hismanager->RegisterPlot<TH2F>("EXP_10004","Pin 1 Energy vs DB3P1A-FP1XP1 Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->PidProc->Get2DSetting(13));
+	hismanager->RegisterPlot<TH2F>("EXP_10005","Pin 2 Energy vs DB3P1A-FP1XP1 Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->PidProc->Get2DSetting(14));
+	hismanager->RegisterPlot<TH2F>("EXP_10006","Pin 3 Energy vs DB3P1A-FP1XP1 Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->PidProc->Get2DSetting(15));
+	hismanager->RegisterPlot<TH2F>("EXP_10007","Pin 4 Energy vs DB3P1A-FP1XP1 Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->PidProc->Get2DSetting(16));
 
-	hismanager->RegisterPlot<TH2F>("EXP_10008","Pin 1 Energy vs DB3SL-FP1XP1  Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->h2dsettings.at(10008));
-	hismanager->RegisterPlot<TH2F>("EXP_10009","Pin 2 Energy vs DB3SL-FP1XP1  Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->h2dsettings.at(10009));
-	hismanager->RegisterPlot<TH2F>("EXP_10010","Pin 3 Energy vs DB3SL-FP1XP1  Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->h2dsettings.at(10010));
-	hismanager->RegisterPlot<TH2F>("EXP_10011","Pin 4 Energy vs DB3SL-FP1XP1  Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->h2dsettings.at(10011));
+	hismanager->RegisterPlot<TH2F>("EXP_10008","Pin 1 Energy vs DB3SL-FP1XP1  Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->PidProc->Get2DSetting(17));
+	hismanager->RegisterPlot<TH2F>("EXP_10009","Pin 2 Energy vs DB3SL-FP1XP1  Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->PidProc->Get2DSetting(18));
+	hismanager->RegisterPlot<TH2F>("EXP_10010","Pin 3 Energy vs DB3SL-FP1XP1  Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->PidProc->Get2DSetting(19));
+	hismanager->RegisterPlot<TH2F>("EXP_10011","Pin 4 Energy vs DB3SL-FP1XP1  Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->PidProc->Get2DSetting(20));
 
-	hismanager->RegisterPlot<TH2F>("EXP_10012","Pin 1 Energy vs DB3SR-FP1XP1  Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->h2dsettings.at(10012));
-	hismanager->RegisterPlot<TH2F>("EXP_10013","Pin 2 Energy vs DB3SR-FP1XP1  Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->h2dsettings.at(10013));
-	hismanager->RegisterPlot<TH2F>("EXP_10014","Pin 3 Energy vs DB3SR-FP1XP1  Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->h2dsettings.at(10014));
-	hismanager->RegisterPlot<TH2F>("EXP_10015","Pin 4 Energy vs DB3SR-FP1XP1  Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->h2dsettings.at(10015));
+	hismanager->RegisterPlot<TH2F>("EXP_10012","Pin 1 Energy vs DB3SR-FP1XP1  Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->PidProc->Get2DSetting(21));
+	hismanager->RegisterPlot<TH2F>("EXP_10013","Pin 2 Energy vs DB3SR-FP1XP1  Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->PidProc->Get2DSetting(22));
+	hismanager->RegisterPlot<TH2F>("EXP_10014","Pin 3 Energy vs DB3SR-FP1XP1  Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->PidProc->Get2DSetting(23));
+	hismanager->RegisterPlot<TH2F>("EXP_10015","Pin 4 Energy vs DB3SR-FP1XP1  Low Gain Dynode Gated; TDiff (ns); Energy (keV)",this->PidProc->Get2DSetting(24));
 
-	hismanager->RegisterPlot<TH2F>("EXP_11000","Pin 1 Energy vs DB3P0A-FP1XP1 Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->h2dsettings.at(11000));
-	hismanager->RegisterPlot<TH2F>("EXP_11001","Pin 2 Energy vs DB3P0A-FP1XP1 Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->h2dsettings.at(11001));
-	hismanager->RegisterPlot<TH2F>("EXP_11002","Pin 3 Energy vs DB3P0A-FP1XP1 Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->h2dsettings.at(11002));
-	hismanager->RegisterPlot<TH2F>("EXP_11003","Pin 4 Energy vs DB3P0A-FP1XP1 Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->h2dsettings.at(11003));
+	hismanager->RegisterPlot<TH2F>("EXP_11000","Pin 1 Energy vs DB3P0A-FP1XP1 Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->PidProc->Get2DSetting(9));
+	hismanager->RegisterPlot<TH2F>("EXP_11001","Pin 2 Energy vs DB3P0A-FP1XP1 Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->PidProc->Get2DSetting(10));
+	hismanager->RegisterPlot<TH2F>("EXP_11002","Pin 3 Energy vs DB3P0A-FP1XP1 Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->PidProc->Get2DSetting(11));
+	hismanager->RegisterPlot<TH2F>("EXP_11003","Pin 4 Energy vs DB3P0A-FP1XP1 Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->PidProc->Get2DSetting(12));
 
-	hismanager->RegisterPlot<TH2F>("EXP_11004","Pin 1 Energy vs DB3P1A-FP1XP1 Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->h2dsettings.at(11004));
-	hismanager->RegisterPlot<TH2F>("EXP_11005","Pin 2 Energy vs DB3P1A-FP1XP1 Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->h2dsettings.at(11005));
-	hismanager->RegisterPlot<TH2F>("EXP_11006","Pin 3 Energy vs DB3P1A-FP1XP1 Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->h2dsettings.at(11006));
-	hismanager->RegisterPlot<TH2F>("EXP_11007","Pin 4 Energy vs DB3P1A-FP1XP1 Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->h2dsettings.at(11007));
+	hismanager->RegisterPlot<TH2F>("EXP_11004","Pin 1 Energy vs DB3P1A-FP1XP1 Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->PidProc->Get2DSetting(13));
+	hismanager->RegisterPlot<TH2F>("EXP_11005","Pin 2 Energy vs DB3P1A-FP1XP1 Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->PidProc->Get2DSetting(14));
+	hismanager->RegisterPlot<TH2F>("EXP_11006","Pin 3 Energy vs DB3P1A-FP1XP1 Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->PidProc->Get2DSetting(15));
+	hismanager->RegisterPlot<TH2F>("EXP_11007","Pin 4 Energy vs DB3P1A-FP1XP1 Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->PidProc->Get2DSetting(16));
 
-	hismanager->RegisterPlot<TH2F>("EXP_11008","Pin 1 Energy vs DB3SL-FP1XP1  Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->h2dsettings.at(11008));
-	hismanager->RegisterPlot<TH2F>("EXP_11009","Pin 2 Energy vs DB3SL-FP1XP1  Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->h2dsettings.at(11009));
-	hismanager->RegisterPlot<TH2F>("EXP_11010","Pin 3 Energy vs DB3SL-FP1XP1  Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->h2dsettings.at(11010));
-	hismanager->RegisterPlot<TH2F>("EXP_11011","Pin 4 Energy vs DB3SL-FP1XP1  Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->h2dsettings.at(11011));
+	hismanager->RegisterPlot<TH2F>("EXP_11008","Pin 1 Energy vs DB3SL-FP1XP1  Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->PidProc->Get2DSetting(17));
+	hismanager->RegisterPlot<TH2F>("EXP_11009","Pin 2 Energy vs DB3SL-FP1XP1  Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->PidProc->Get2DSetting(18));
+	hismanager->RegisterPlot<TH2F>("EXP_11010","Pin 3 Energy vs DB3SL-FP1XP1  Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->PidProc->Get2DSetting(19));
+	hismanager->RegisterPlot<TH2F>("EXP_11011","Pin 4 Energy vs DB3SL-FP1XP1  Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->PidProc->Get2DSetting(20));
 
-	hismanager->RegisterPlot<TH2F>("EXP_11012","Pin 1 Energy vs DB3SR-FP1XP1  Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->h2dsettings.at(11012));
-	hismanager->RegisterPlot<TH2F>("EXP_11013","Pin 2 Energy vs DB3SR-FP1XP1  Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->h2dsettings.at(11013));
-	hismanager->RegisterPlot<TH2F>("EXP_11014","Pin 3 Energy vs DB3SR-FP1XP1  Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->h2dsettings.at(11014));
-	hismanager->RegisterPlot<TH2F>("EXP_11015","Pin 4 Energy vs DB3SR-FP1XP1  Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->h2dsettings.at(11015));
+	hismanager->RegisterPlot<TH2F>("EXP_11012","Pin 1 Energy vs DB3SR-FP1XP1  Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->PidProc->Get2DSetting(21));
+	hismanager->RegisterPlot<TH2F>("EXP_11013","Pin 2 Energy vs DB3SR-FP1XP1  Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->PidProc->Get2DSetting(22));
+	hismanager->RegisterPlot<TH2F>("EXP_11014","Pin 3 Energy vs DB3SR-FP1XP1  Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->PidProc->Get2DSetting(23));
+	hismanager->RegisterPlot<TH2F>("EXP_11015","Pin 4 Energy vs DB3SR-FP1XP1  Low Gain Dynode Gated Rear Ion Vetoed; TDiff (ns); Energy (keV)",this->PidProc->Get2DSetting(24));
 
 
 

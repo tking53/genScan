@@ -232,3 +232,11 @@ void Processor::LoadCustomCuts(const pugi::xml_node& config){
 		this->console->info("Found Cut {} : {}",id,file);
 	}
 }
+
+[[nodiscard]] PLOTS::HisHelper1D Processor::Get1DSetting(int idx) const{
+	return this->h1dsettings.at(idx);
+}
+
+[[nodiscard]] PLOTS::HisHelper2D Processor::Get2DSetting(int idx) const{
+	return this->h2dsettings.at(idx);
+}
