@@ -50,6 +50,8 @@ class MtasTapeProcessor : public Processor{
 
 		int logicSignalValue;
 
+		int CycleRoll;
+
 		std::string tapemove;
 		std::string measure;
 		std::string background;

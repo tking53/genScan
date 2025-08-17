@@ -100,6 +100,14 @@ namespace PulseFit{
 		return SingleTailingGaussN(x,par) + SingleTailingGaussN(x,par+4);
 	}
 
+	double SimpleHalfLife(double* x,double* par){
+		double arg = 0.0;
+		if( TMath::Abs(par[1]) > 0.0 ){
+			arg = -(TMath::Log(2.0)/par[1])*x[0];
+		}
+		return par[0]*TMath::Exp(arg);
+	}
+
 	double Pulse(double* x,double* par){
 		double amp = par[0];
 		double t0 = par[1];
