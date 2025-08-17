@@ -65,6 +65,9 @@ class Processor : public std::enable_shared_from_this<Processor> {
 		
 		[[nodiscard]] virtual std::set<std::string> GetKnownTypes() const final;
 		
+		[[nodiscard]] virtual PLOTS::HisHelper1D Get1DSetting(int) const final;
+		[[nodiscard]] virtual PLOTS::HisHelper2D Get2DSetting(int) const final;
+		
 	protected:
 		virtual void LoadHistogramSettings(const pugi::xml_node&) final;
 		
