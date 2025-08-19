@@ -30,6 +30,10 @@ add_executable(GenTofShifter src/tofshiftermain.cpp)
 target_link_libraries(GenTofShifter PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES} yaml-cpp::yaml-cpp)
 list(APPEND EXE_LIST GenTofShifter)
 
+add_executable(GenKMeansCluster src/kmeansclustermain.cpp)
+target_link_libraries(GenKMeansCluster PRIVATE GenScanUtility GenScanProcessors)
+list(APPEND EXE_LIST GenKMeansCluster)
+
 add_executable(GenProcessorDump src/dumpprocessormain.cpp)
 target_link_libraries(GenProcessorDump PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES} )
 list(APPEND EXE_LIST GenProcessorDump)
