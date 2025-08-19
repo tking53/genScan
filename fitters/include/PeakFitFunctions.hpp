@@ -3,7 +3,8 @@
 
 namespace PeakFit{
 	
-	//technically peaks, need to move out
+	//ROOT
+	//1D
 	double GaussN(double*,double*);
 	double GaussNLinBkg(double*,double*);
 	double GaussErf(double*,double*);
@@ -15,6 +16,9 @@ namespace PeakFit{
 	double SingleTailingGaussNLinBkg(double*,double*);
 	double SimpleHalfLife(double*,double*);
 
+	//ROOT
+	//2D
+	double BiGauss(double*,double*);
 
 }
 

@@ -1,4 +1,5 @@
 #include <TNamed.h>
+#include <cstdlib>
 #include <fstream>
 #include <map>
 #include <ostream>
@@ -30,11 +31,25 @@
 #include "StringManipFunctions.hpp"
 #include "PeakFitter.hpp"
 
-YAML::Emitter& operator << (YAML::Emitter& out, const PeakFitter* pf) {
+YAML::Emitter& operator << (YAML::Emitter& out, const PeakFitter1D* pf) {
 	out <<  YAML::BeginMap << YAML::Key << "HisName" << YAML::Value << pf->fithist->GetName() 
 			       << YAML::Key << "Range" << YAML::BeginMap 
-			       		<< YAML::Key << "Low" << YAML::Value << pf->FitRange.first
-			       		<< YAML::Key << "High" << YAML::Value << pf->FitRange.second << YAML::EndMap
+			       		<< YAML::Key << "XLow" << YAML::Value << pf->XFitRange.first
+			       		<< YAML::Key << "XHigh" << YAML::Value << pf->XFitRange.second << YAML::EndMap
+			       << YAML::Key << "Values" << YAML::Value << pf->Results 
+			       << YAML::Key << "Errors" << YAML::Value << pf->Errors 
+			       << YAML::Key << "ReducedChi2" << YAML::Value << pf->Results.at("Chi2")/pf->Errors.at("NDF") 
+	     << YAML::EndMap;
+	return out;
+}
+
+YAML::Emitter& operator << (YAML::Emitter& out, const PeakFitter2D* pf) {
+	out <<  YAML::BeginMap << YAML::Key << "HisName" << YAML::Value << pf->fithist->GetName() 
+			       << YAML::Key << "Range" << YAML::BeginMap 
+			       		<< YAML::Key << "XLow" << YAML::Value << pf->XFitRange.first
+			       		<< YAML::Key << "XHigh" << YAML::Value << pf->XFitRange.second 
+			       		<< YAML::Key << "YLow" << YAML::Value << pf->YFitRange.first
+			       		<< YAML::Key << "YHigh" << YAML::Value << pf->YFitRange.second << YAML::EndMap
 			       << YAML::Key << "Values" << YAML::Value << pf->Results 
 			       << YAML::Key << "Errors" << YAML::Value << pf->Errors 
 			       << YAML::Key << "ReducedChi2" << YAML::Value << pf->Results.at("Chi2")/pf->Errors.at("NDF") 
@@ -128,8 +143,8 @@ int main(int argc, char *argv[]) {
 	std::vector<std::string> boundedparams;
 	std::vector<std::string> fixedparams;
 	std::vector<std::string> gates;
-	double xlow;
-	double xhigh;
+	std::vector<double> low;
+	std::vector<double> high;
 	bool quiet;
 	bool chi2;
 	bool storechi2;
@@ -138,14 +153,15 @@ int main(int argc, char *argv[]) {
 	std::map<std::string,std::pair<double,double>> boundedvalues; 
 	std::vector<std::pair<double,double>> gatevalues;
 
-	std::string FittingMessage = "peak fitting mode";
+	std::string FittingMessage = "peak fitting mode (0-999): 1D fits, 1000+: 2D fits ";
        	FittingMessage += "\n0->GaussN+LinBkg";
        	FittingMessage += "\n1->GaussN+CompBkg+LinBkg";
        	FittingMessage += "\n2->SingleTailGaussN";
        	FittingMessage += "\n3->DoubleTailGaussN";
        	FittingMessage += "\n4->SingleTailGaussN+LinBkg";
-       	FittingMessage += "\n5->Comp";
-       	FittingMessage += "\n5->Simple Half Life";
+       	FittingMessage += "\n5->Compton Edge (Erfc model)";
+       	FittingMessage += "\n6->Simple Half Life + ConstBkg";
+       	FittingMessage += "\n1000->2D fit of bigaussian_pdf";
 
 	boost::program_options::options_description cmdline_options("Generic Options");
 	cmdline_options.add_options()
@@ -154,8 +170,8 @@ int main(int argc, char *argv[]) {
 		("gate,g",boost::program_options::value<std::vector<std::string>>(&gates)->multitoken(),"values to gate within in 2d histogram")
 		("boundparameter,b",boost::program_options::value<std::vector<std::string>>(&boundedparams)->multitoken(),"parameter to bound name:low:high")
 		("fixparameter,f",boost::program_options::value<std::vector<std::string>>(&fixedparams)->multitoken(),"parameter to bound name:value")
-		("lowerbound,l",boost::program_options::value<double>(&xlow),"lower bound to perform fit")
-		("upperbound,u",boost::program_options::value<double>(&xhigh),"upper bound to perform fit")
+		("lowerbound,l",boost::program_options::value<std::vector<double>>(&low)->multitoken(),"lower bound to perform fit, if 1 provided then is XLow, if 2 provided then Xlow, Ylow")
+		("upperbound,u",boost::program_options::value<std::vector<double>>(&high)->multitoken(),"upper bound to perform fit, if 1 provided then Xhigh, if 2 then Xhigh,Yhigh")
 		("inputfile,i",boost::program_options::value<std::string>(&inputfile),"file to get the histogram from")
 		("outputprefix,o",boost::program_options::value<std::string>(&outputprefix)->default_value("GenPeakFitterResults"),"file to output to fit info to")
 		("numdimension,n",boost::program_options::value<int>(&dimensionality)->default_value(1),"dimensionality of histogram (1,2)")
@@ -190,9 +206,40 @@ int main(int argc, char *argv[]) {
 			spdlog::error("missing upperbound");
 			exit(EXIT_FAILURE);
 		}	
-		if( dimensionality == 2 and numproj < 1 and numgates < 1){
-			spdlog::error("dimensionality is 2, but no projections or gates given");
+		if( dimensionality == 2 and numproj < 1 and numgates < 1 and mode < 1000){
+			spdlog::error("dimensionality is 2, but no projections or gates given, and not fitting a 2D dataset");
 			exit(EXIT_FAILURE);
+		}
+
+		if( mode < 1000 ){
+			if( low.size() != 1 ){
+				spdlog::error("did not provide 1 lowerbound for fitting 1D function");
+				exit(EXIT_FAILURE);
+			}
+			if( high.size() != 1 ){
+				spdlog::error("did not provide 1 upperbound for fitting 1D function");
+				exit(EXIT_FAILURE);
+			}
+		}else{
+			if( low.size() != 2 ){
+				spdlog::error("did not provide 2 lowerbound for fitting 2D function");
+				exit(EXIT_FAILURE);
+			}
+			if( high.size() != 2 ){
+				spdlog::error("did not provide 2 upperbound for fitting 2D function");
+				exit(EXIT_FAILURE);
+			}
+		}
+		for( size_t ii = 0; ii < low.size(); ++ii ){
+			if( high[ii] < low[ii] ){
+				if( ii == 0 ){
+					spdlog::error("upper xbound less than lower xbound");
+					exit(EXIT_FAILURE);
+				}else{
+					spdlog::error("upper ybound less than lower ybound");
+					exit(EXIT_FAILURE);
+				}
+			}
 		}
 
 		if( not vm.count("data") ){
@@ -222,43 +269,50 @@ int main(int argc, char *argv[]) {
 	try{
 		auto rfile = new TFile(inputfile.c_str(),"READ");
 		auto mainhis = rfile->Get(hisname.c_str()); 
-		std::vector<PeakFitter*> pfs;
+		std::vector<PeakFitter1D*> pfs1d;
+		std::vector<PeakFitter2D*> pfs2d;
 		if( mainhis != nullptr ){
 			auto histype = std::string(mainhis->ClassName());
 			boost::regex re2d("TH2");
 			boost::regex re1d("TH1");
 			TH1* histofit;
 			if( boost::regex_search(histype, re2d) ){
-				for( const auto& idx : indices ){
-					auto name = std::string(mainhis->GetName())+"_proj_"+axis+std::to_string(idx);
-					if( axis.compare("x") == 0 ){
-						histofit = dynamic_cast<TH2*>(mainhis)->ProjectionX(name.c_str(),idx,idx);
-					}else{
-						histofit = dynamic_cast<TH2*>(mainhis)->ProjectionY(name.c_str(),idx,idx);
-					}	
-					histofit->SetDirectory(0);
-					pfs.push_back(new PeakFitter(xlow,xhigh,chi2,mode,histofit,fixedvalues,boundedvalues));
-				}
-				int idx = 0;
-				for( const auto& g : gatevalues ){
-					auto name = std::string(mainhis->GetName())+"_gate_"+axis+std::to_string(idx);
-					if( axis.compare("x") == 0 ){
-						auto minbin = dynamic_cast<TH2*>(mainhis)->GetYaxis()->FindBin(g.first);
-						auto maxbin = dynamic_cast<TH2*>(mainhis)->GetYaxis()->FindBin(g.second);
-						histofit = dynamic_cast<TH2*>(mainhis)->ProjectionY(name.c_str(),minbin,maxbin);
-					}else{
-						auto minbin = dynamic_cast<TH2*>(mainhis)->GetXaxis()->FindBin(g.first);
-						auto maxbin = dynamic_cast<TH2*>(mainhis)->GetXaxis()->FindBin(g.second);
-						histofit = dynamic_cast<TH2*>(mainhis)->ProjectionX(name.c_str(),minbin,maxbin);
+				if( mode < 1000 ){
+					for( const auto& idx : indices ){
+						auto name = std::string(mainhis->GetName())+"_proj_"+axis+std::to_string(idx);
+						if( axis.compare("x") == 0 ){
+							histofit = dynamic_cast<TH2*>(mainhis)->ProjectionX(name.c_str(),idx,idx);
+						}else{
+							histofit = dynamic_cast<TH2*>(mainhis)->ProjectionY(name.c_str(),idx,idx);
+						}	
+						histofit->SetDirectory(0);
+						pfs1d.push_back(new PeakFitter1D(low[0],high[0],chi2,mode,histofit,fixedvalues,boundedvalues));
 					}
-					histofit->SetDirectory(0);
-					pfs.push_back(new PeakFitter(xlow,xhigh,chi2,mode,histofit,fixedvalues,boundedvalues));
-					++idx;
+					int idx = 0;
+					for( const auto& g : gatevalues ){
+						auto name = std::string(mainhis->GetName())+"_gate_"+axis+std::to_string(idx);
+						if( axis.compare("x") == 0 ){
+							auto minbin = dynamic_cast<TH2*>(mainhis)->GetYaxis()->FindBin(g.first);
+							auto maxbin = dynamic_cast<TH2*>(mainhis)->GetYaxis()->FindBin(g.second);
+							histofit = dynamic_cast<TH2*>(mainhis)->ProjectionY(name.c_str(),minbin,maxbin);
+						}else{
+							auto minbin = dynamic_cast<TH2*>(mainhis)->GetXaxis()->FindBin(g.first);
+							auto maxbin = dynamic_cast<TH2*>(mainhis)->GetXaxis()->FindBin(g.second);
+							histofit = dynamic_cast<TH2*>(mainhis)->ProjectionX(name.c_str(),minbin,maxbin);
+						}
+						histofit->SetDirectory(0);
+						pfs1d.push_back(new PeakFitter1D(low[0],high[0],chi2,mode,histofit,fixedvalues,boundedvalues));
+						++idx;
+					}
+				}else{
+					TH2* histofit2d = dynamic_cast<TH2*>(mainhis); 
+					histofit2d->SetDirectory(0);
+					pfs2d.push_back(new PeakFitter2D(low[0],high[0],low[1],high[1],chi2,mode,histofit2d,fixedvalues,boundedvalues));
 				}
 			}else if( boost::regex_search(histype,re1d) ){
 				histofit = dynamic_cast<TH1*>(mainhis);
 				histofit->SetDirectory(0);
-				pfs.push_back(new PeakFitter(xlow,xhigh,chi2,mode,histofit,fixedvalues,boundedvalues));
+				pfs1d.push_back(new PeakFitter1D(low[0],high[0],chi2,mode,histofit,fixedvalues,boundedvalues));
 			}else{
 				throw std::runtime_error("not passed a TH1 or TH2 histogram");
 			}
@@ -268,8 +322,15 @@ int main(int argc, char *argv[]) {
 			rfile->Close();
 			auto outputfile = outputprefix+".root";
 			auto ofile = new TFile(outputfile.c_str(),"RECREATE");
-			for( const auto& f : pfs ){
-				f->WriteHistogram(storechi2);
+			if( pfs1d.size() > 0 ){
+				for( const auto& f : pfs1d ){
+					f->WriteHistogram(storechi2);
+				}
+			}
+			if( pfs2d.size() > 0 ){
+				for( const auto& f : pfs2d ){
+					f->WriteHistogram(storechi2);
+				}
 			}
 			ofile->Close();
 			YAML::Emitter  doc;
@@ -286,7 +347,12 @@ int main(int argc, char *argv[]) {
 				doc << YAML::Key << "MAX_CHANNELS_PER_BOARD" << YAML::Value << MaxChannelsPerBoard->GetTitle();
 			}
 			doc << YAML::Key << "FitResults";
-			doc << pfs;
+			if( pfs1d.size() > 0 ){
+				doc << pfs1d;
+			}
+			if( pfs2d.size() > 0 ){
+				doc << pfs2d;
+			}
 			doc << YAML::EndMap;
 
 			std::ofstream yfile(outputprefix+"Report.yaml");

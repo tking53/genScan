@@ -9,7 +9,9 @@
 
 #include "Rtypes.h"
 #include "TF1.h"
+#include "TF2.h"
 #include "TH1.h"
+#include "TH2.h"
 #include "TList.h"
 #include "TFitResult.h"
 #include "TFitResultPtr.h"
@@ -19,21 +21,230 @@
 #include "PeakFitFunctions.hpp"
 
 struct PeakFitter{
-	std::pair<double,double> FitRange;
 	bool loglikelihood;
-	TH1* fithist;
 	std::map<std::string,double> fvalues;
 	std::map<std::string,std::pair<double,double>> bvalues;
-	TF1* fitfunc;
-	std::vector<TF1*> components;
 	std::map<std::string,std::pair<int,double>> keys;
 	std::map<std::string,double> Results;
 	std::map<std::string,double> Errors;
 
+	PeakFitter(bool chi2,const std::map<std::string,double>& fixedvalues,const std::map<std::string,std::pair<double,double>>& boundedvalues) 
+		: loglikelihood(!chi2),fvalues(fixedvalues),bvalues(boundedvalues)
+	{
+	}
+	
+	virtual ~PeakFitter() = default;
 
-	PeakFitter(double l,double u,bool chi2,int mode,TH1* hist,
+	PeakFitter(const PeakFitter&) = default;
+	PeakFitter(PeakFitter&&) = default;
+	PeakFitter& operator=(const PeakFitter&) = default;
+	PeakFitter& operator=(PeakFitter&&) = default;
+
+	virtual void FixAndBoundParameters(){
+	}
+	
+	virtual void VerifyBoundedValues() final{
+		for( const auto& kv : this->bvalues ){
+			if( this->keys.find(kv.first) == this->keys.end() ){
+				throw std::runtime_error("Unknown parameter name "+kv.first);
+			}
+			if( kv.second.second < kv.second.first ){
+				throw std::runtime_error("Bounded parameter has lowerbound higher than upperbound");
+			}
+		}
+	}
+
+	virtual void VerifyFixedValues() final{
+		for( const auto& kv : this->fvalues ){
+			if( this->keys.find(kv.first) == this->keys.end() ){
+				throw std::runtime_error("Unknown parameter name "+kv.first);
+			}
+		}
+	}
+
+	virtual void AssignFitFuncParams(){
+	}
+
+	virtual std::pair<double,double> operator [](const std::string& key) const final{
+		return {this->Results.at(key),this->Errors.at(key)};
+	}
+	
+	template<typename OStream>
+	friend OStream& operator<<(OStream& os, const PeakFitter& fitinfo) {
+		for( const auto& kv : fitinfo.keys ){
+			os << kv.first << " : " << fitinfo.Results.at(kv.first) << " +- " << fitinfo.Errors.at(kv.first) << " \t ";
+		}
+		os << "Chi2/NDF : " << fitinfo.Results.at("Chi2") << "/" << fitinfo.Errors.at("NDF");
+		return os;
+	}
+
+};
+
+struct PeakFitter2D : public PeakFitter{
+	std::pair<double,double> XFitRange;
+	std::pair<double,double> YFitRange;
+	TH2* fithist;
+	TF2* fitfunc;
+	std::vector<TF2*> components;
+
+	PeakFitter2D(double xl,double xu,double yl,double yu,bool chi2,int mode,TH2* hist,
 			const std::map<std::string,double>& fixedvalues,const std::map<std::string,std::pair<double,double>>& boundedvalues) 
-		: FitRange(l,u), loglikelihood(!chi2),fithist(hist),fvalues(fixedvalues),bvalues(boundedvalues){
+		: XFitRange(xl,xu), YFitRange(yl,yu), fithist(hist), PeakFitter(chi2,fixedvalues,boundedvalues){
+		for( const auto& kv : fvalues ){
+			if( bvalues.find(kv.first) != bvalues.end() ){
+				throw std::runtime_error("Parameter is both fixed and bounded");
+			}
+		}
+		if( mode == 1000){
+			this->InitBiGaussFit();
+		}else{
+			throw std::runtime_error("Unknown peak fitting mode");
+		}
+	}
+
+	void InitBiGaussFit(){
+		this->fitfunc = new TF2("BiGauss",&PeakFit::BiGauss,XFitRange.first,XFitRange.second,YFitRange.first,YFitRange.second,6);
+		this->components = {
+		};
+
+		double xwidth = this->XFitRange.second - this->XFitRange.first;
+		double ywidth = this->YFitRange.second - this->YFitRange.first;
+		double xoffset = (this->XFitRange.second + this->XFitRange.first)/2.0;
+		double yoffset = (this->YFitRange.second + this->YFitRange.first)/2.0;
+		double xlow = this->fithist->GetXaxis()->FindBin(this->XFitRange.first);
+		double xhigh = this->fithist->GetXaxis()->FindBin(this->XFitRange.second);
+		double ylow = this->fithist->GetYaxis()->FindBin(this->YFitRange.first);
+		double yhigh = this->fithist->GetYaxis()->FindBin(this->YFitRange.second);
+		double area = this->fithist->Integral(xlow,xhigh,ylow,yhigh);
+		double corr = 0.0;
+
+		this->keys = { {"Area",{0,area}},{"XMean",{1,xoffset}},{"XSigma",{2,xwidth}},{"YMean",{3,yoffset}},{"YSigma",{4,ywidth}},{"Correlation",{5,corr}}};
+		AssignFitParNames();
+		VerifyFixedValues();
+		VerifyBoundedValues();
+		if( this->fvalues.find("XMean") == this->fvalues.end() and this->bvalues.find("XMean") == this->bvalues.end() ){
+			this->bvalues["XMean"] = this->XFitRange; 
+		}
+		if( this->fvalues.find("YMean") == this->fvalues.end() and this->bvalues.find("YMean") == this->bvalues.end() ){
+			this->bvalues["YMean"] = this->YFitRange; 
+		}
+		if( this->fvalues.find("Correlation") == this->fvalues.end() and this->bvalues.find("Correlation") == this->bvalues.end() ){
+			this->bvalues["Correlation"] = {-1.0,1.0}; 
+		}
+
+		FixAndBoundParameters();
+
+		if( area > 0.0 ){
+			std::string option = "R0SQ";
+			if( this->loglikelihood ){
+				option+="L";
+			}
+			//need to include the range
+			TFitResultPtr fitresult = this->fithist->Fit(this->fitfunc,option.c_str());
+
+			if( not fitresult->IsEmpty() ){
+				AssignFitValuesErrors(fitresult);
+				AssignFitFuncParams();
+				this->fithist->GetListOfFunctions()->Add(this->fitfunc);
+			}
+		}
+	}
+
+	virtual void FixAndBoundParameters() final{
+		for( const auto& kv : this->keys ){
+			auto fres = this->fvalues.find(kv.first);
+			auto bres = this->bvalues.find(kv.first);
+			if( fres != this->fvalues.end() ){
+				this->fitfunc->SetParameter(kv.second.first,fres->second);
+				this->fitfunc->FixParameter(kv.second.first,fres->second);
+			}else if( bres != this->bvalues.end() ){
+				auto middle = (bres->second.first+bres->second.second)/2.0;
+				this->fitfunc->SetParameter(kv.second.first,middle);
+				this->fitfunc->SetParLimits(kv.second.first,bres->second.first,bres->second.second);
+			}else{
+				this->fitfunc->SetParameter(kv.second.first,kv.second.second);
+			}
+		}
+	}
+
+	virtual void AssignFitFuncParams() final{
+		for( const auto& kv : this->keys ){
+			this->fitfunc->SetParameter(kv.second.first,this->Results[kv.first]);
+		}
+		this->fithist->GetListOfFunctions()->Clear();
+	}
+
+	void AssignFitValuesErrors(const TFitResultPtr& fitresult){
+		for( const auto& kv : this->keys ){
+			this->Results[kv.first] = fitresult->Parameter(kv.second.first);
+			this->Errors[kv.first] = fitresult->ParError(kv.second.first);
+		}
+		this->Results["Chi2"] = fitresult->Chi2();
+		this->Errors["NDF"] = fitresult->Ndf();
+	}
+
+	virtual void AssignFitParNames() final{
+		for( const auto& kv : this->keys ){
+			this->fitfunc->SetParName(kv.second.first,kv.first.c_str());
+		}
+	}
+
+	virtual void WriteHistogram(bool storechi2) final{
+		this->fithist->Write(0,2,0);
+		if( storechi2 ){
+			auto name = std::string(this->fithist->GetName());
+			name += "_chi2";
+			TH2* residual = dynamic_cast<TH2*>(this->fithist->Clone(name.c_str()));
+			residual->Reset("ICEMS");
+			residual->SetZTitle("#sigma");
+			
+			name += "_distribution";
+			TH1* chi2dist = new TH1F(name.c_str(),"Chi2 Distribution; #sigma; counts",1000,-10,10);
+			chi2dist->GetXaxis()->CenterTitle();
+			chi2dist->GetYaxis()->CenterTitle();
+
+			int minxbin = this->fithist->GetXaxis()->FindBin(this->XFitRange.first);
+			int maxxbin = this->fithist->GetXaxis()->FindBin(this->XFitRange.second);
+			int minybin = this->fithist->GetYaxis()->FindBin(this->YFitRange.first);
+			int maxybin = this->fithist->GetYaxis()->FindBin(this->YFitRange.second);
+			for( int ii = minxbin; ii <= maxxbin; ++ii ){
+				for( int jj = minybin; jj < maxybin; ++jj ){
+					double xcentroid = this->fithist->GetXaxis()->GetBinCenter(ii);
+					double ycentroid = this->fithist->GetYaxis()->GetBinCenter(jj);
+					auto fitval = this->fitfunc->Eval(xcentroid,ycentroid);
+					auto hisval = this->fithist->GetBinContent(ii,jj);
+					auto hiserr = this->fithist->GetBinError(ii,jj);
+					auto uncert = hiserr;
+					auto binchi2 = (fitval - hisval)*(fitval - hisval)/uncert/uncert;
+					if( hisval > 0.0 ){
+						if( (fitval - hisval) > 0.0 ){
+							residual->SetBinContent(ii,jj,TMath::Sqrt(binchi2));
+							chi2dist->Fill(TMath::Sqrt(binchi2));
+						}else{
+							residual->SetBinContent(ii,jj,-TMath::Sqrt(binchi2));
+							chi2dist->Fill(-TMath::Sqrt(binchi2));
+						}
+						residual->SetBinError(ii,jj,0);
+					}
+				}
+			}
+			residual->Write(0,2,0);
+			chi2dist->Write(0,2,0);
+		}
+	}
+
+
+};
+
+struct PeakFitter1D : public PeakFitter{
+	std::pair<double,double> XFitRange;
+	TH1* fithist;
+	TF1* fitfunc;
+	std::vector<TF1*> components;
+
+	PeakFitter1D(double l,double u,bool chi2,int mode,TH1* hist,
+			const std::map<std::string,double>& fixedvalues,const std::map<std::string,std::pair<double,double>>& boundedvalues) 
+		: XFitRange(l,u),fithist(hist),PeakFitter(chi2,fixedvalues,boundedvalues){
 		for( const auto& kv : fvalues ){
 			if( bvalues.find(kv.first) != bvalues.end() ){
 				throw std::runtime_error("Parameter is both fixed and bounded");
@@ -56,22 +267,24 @@ struct PeakFitter{
 		}
 	}
 
+
+	
 	void InitGaussNLinBkgFit(){
 		this->fithist->SetLineColor(kBlack);
 
-		this->fitfunc = new TF1("GaussNLinBkg",&PeakFit::GaussNLinBkg,FitRange.first,FitRange.second,5);
+		this->fitfunc = new TF1("GaussNLinBkg",&PeakFit::GaussNLinBkg,XFitRange.first,XFitRange.second,5);
 		this->fitfunc->SetLineColor(kRed);
 		this->components = {
-			new TF1("GaussN",&PeakFit::GaussN,FitRange.first,FitRange.second,3),
-			new TF1("LinBkg",&CommonFit::Linear,FitRange.first,FitRange.second,2)
+			new TF1("GaussN",&PeakFit::GaussN,XFitRange.first,XFitRange.second,3),
+			new TF1("LinBkg",&CommonFit::Linear,XFitRange.first,XFitRange.second,2)
 		};
 		this->components.at(0)->SetLineColor(kMagenta);
 		this->components.at(1)->SetLineColor(kGreen);
 
 		double bkg_offset = 0;
 		double bkg_slope = 0;
-		double width = this->FitRange.second - this->FitRange.first;
-		double offset = (this->FitRange.second + this->FitRange.first)/2.0;
+		double width = this->XFitRange.second - this->XFitRange.first;
+		double offset = (this->XFitRange.second + this->XFitRange.first)/2.0;
 		double area = this->fithist->GetBinContent(this->fithist->FindBin(offset));
 
 		this->keys = { {"Area",{0,area}},{"Mean",{1,offset}},{"Sigma",{2,width}},{"BkgOffset",{3,bkg_offset}},{"BkgSlope",{4,bkg_slope}}};
@@ -79,11 +292,11 @@ struct PeakFitter{
 		VerifyFixedValues();
 		VerifyBoundedValues();
 		if( this->fvalues.find("Mean") == this->fvalues.end() and this->bvalues.find("Mean") == this->bvalues.end() ){
-			this->bvalues["Mean"] = this->FitRange; 
+			this->bvalues["Mean"] = this->XFitRange; 
 		}
 
-		auto minbin = this->fithist->FindBin(this->FitRange.first);
-		auto maxbin = this->fithist->FindBin(this->FitRange.second);
+		auto minbin = this->fithist->FindBin(this->XFitRange.first);
+		auto maxbin = this->fithist->FindBin(this->XFitRange.second);
 		auto integral = this->fithist->Integral(minbin,maxbin);
 
 		FixAndBoundParameters();
@@ -93,7 +306,7 @@ struct PeakFitter{
 			if( this->loglikelihood ){
 				option+="L";
 			}
-			TFitResultPtr fitresult = this->fithist->Fit(this->fitfunc,option.c_str(),"",FitRange.first,FitRange.second);
+			TFitResultPtr fitresult = this->fithist->Fit(this->fitfunc,option.c_str(),"",XFitRange.first,XFitRange.second);
 
 			if( not fitresult->IsEmpty() ){
 				AssignFitValuesErrors(fitresult);
@@ -116,12 +329,12 @@ struct PeakFitter{
 	void InitGaussNErfBkgFit(){
 		this->fithist->SetLineColor(kBlack);
 
-		this->fitfunc = new TF1("GaussNErfBkg",&PeakFit::GaussNErfBkg,FitRange.first,FitRange.second,6);
+		this->fitfunc = new TF1("GaussNErfBkg",&PeakFit::GaussNErfBkg,XFitRange.first,XFitRange.second,6);
 		this->fitfunc->SetLineColor(kRed);
 		this->components = {
-			new TF1("GaussN",&PeakFit::GaussN,FitRange.first,FitRange.second,3),
-			new TF1("ErfBkg",&PeakFit::GaussErf,FitRange.first,FitRange.second,3),
-			new TF1("LinBkg",&CommonFit::Quad,FitRange.first,FitRange.second,3)
+			new TF1("GaussN",&PeakFit::GaussN,XFitRange.first,XFitRange.second,3),
+			new TF1("ErfBkg",&PeakFit::GaussErf,XFitRange.first,XFitRange.second,3),
+			new TF1("LinBkg",&CommonFit::Quad,XFitRange.first,XFitRange.second,3)
 		};
 		this->components.at(0)->SetLineColor(kMagenta);
 		this->components.at(1)->SetLineColor(kGreen);
@@ -129,8 +342,8 @@ struct PeakFitter{
 
 		double cbkg = 0;
 		double sbkg = 0;
-		double width = this->FitRange.second - this->FitRange.first;
-		double offset = (this->FitRange.second + this->FitRange.first)/2.0;
+		double width = this->XFitRange.second - this->XFitRange.first;
+		double offset = (this->XFitRange.second + this->XFitRange.first)/2.0;
 		double area = this->fithist->GetBinContent(this->fithist->FindBin(offset));
 		double ca = area;
 
@@ -139,11 +352,11 @@ struct PeakFitter{
 		VerifyFixedValues();
 		VerifyBoundedValues();
 		if( this->fvalues.find("Mean") == this->fvalues.end() and this->bvalues.find("Mean") == this->bvalues.end() ){
-			this->bvalues["Mean"] = this->FitRange; 
+			this->bvalues["Mean"] = this->XFitRange; 
 		}
 
-		auto minbin = this->fithist->FindBin(this->FitRange.first);
-		auto maxbin = this->fithist->FindBin(this->FitRange.second);
+		auto minbin = this->fithist->FindBin(this->XFitRange.first);
+		auto maxbin = this->fithist->FindBin(this->XFitRange.second);
 		auto integral = this->fithist->Integral(minbin,maxbin);
 
 		FixAndBoundParameters();
@@ -153,7 +366,7 @@ struct PeakFitter{
 			if( this->loglikelihood ){
 				option+="L";
 			}
-			TFitResultPtr fitresult = this->fithist->Fit(this->fitfunc,option.c_str(),"",FitRange.first,FitRange.second);
+			TFitResultPtr fitresult = this->fithist->Fit(this->fitfunc,option.c_str(),"",XFitRange.first,XFitRange.second);
 
 			if( not fitresult->IsEmpty() ){
 				AssignFitValuesErrors(fitresult);
@@ -178,16 +391,16 @@ struct PeakFitter{
 	void InitSingleTailingGaussNFit(){
 		this->fithist->SetLineColor(kBlack);
 
-		this->fitfunc = new TF1("SingleTailingGaussN",&PeakFit::SingleTailingGaussN,FitRange.first,FitRange.second,4);
+		this->fitfunc = new TF1("SingleTailingGaussN",&PeakFit::SingleTailingGaussN,XFitRange.first,XFitRange.second,4);
 		this->fitfunc->SetLineColor(kRed);
 		this->components = {
 		};
 		
-		auto minbin = this->fithist->FindBin(this->FitRange.first);
-		auto maxbin = this->fithist->FindBin(this->FitRange.second);
+		auto minbin = this->fithist->FindBin(this->XFitRange.first);
+		auto maxbin = this->fithist->FindBin(this->XFitRange.second);
 
-		double width = this->FitRange.second - this->FitRange.first;
-		double offset = (this->FitRange.second + this->FitRange.first)/2.0;
+		double width = this->XFitRange.second - this->XFitRange.first;
+		double offset = (this->XFitRange.second + this->XFitRange.first)/2.0;
 		double area = this->fithist->GetBinContent(this->fithist->FindBin(offset));
 		double tau = this->fithist->GetBinContent(maxbin) - this->fithist->GetBinContent(minbin);
 
@@ -196,7 +409,7 @@ struct PeakFitter{
 		VerifyFixedValues();
 		VerifyBoundedValues();
 		if( this->fvalues.find("Mean") == this->fvalues.end() and this->bvalues.find("Mean") == this->bvalues.end() ){
-			this->bvalues["Mean"] = this->FitRange; 
+			this->bvalues["Mean"] = this->XFitRange; 
 		}
 
 		auto integral = this->fithist->Integral(minbin,maxbin);
@@ -208,7 +421,7 @@ struct PeakFitter{
 			if( this->loglikelihood ){
 				option+="L";
 			}
-			TFitResultPtr fitresult = this->fithist->Fit(this->fitfunc,option.c_str(),"",FitRange.first,FitRange.second);
+			TFitResultPtr fitresult = this->fithist->Fit(this->fitfunc,option.c_str(),"",XFitRange.first,XFitRange.second);
 
 			if( not fitresult->IsEmpty() ){
 				AssignFitValuesErrors(fitresult);
@@ -226,20 +439,20 @@ struct PeakFitter{
 	void InitDoubleTailingGaussNFit(){
 		this->fithist->SetLineColor(kBlack);
 
-		this->fitfunc = new TF1("DoubleTailingGaussN",&PeakFit::DoubleTailingGaussN,FitRange.first,FitRange.second,8);
+		this->fitfunc = new TF1("DoubleTailingGaussN",&PeakFit::DoubleTailingGaussN,XFitRange.first,XFitRange.second,8);
 		this->fitfunc->SetLineColor(kRed);
 		this->components = {
-			new TF1("TailingGaussN1",&PeakFit::SingleTailingGaussN,FitRange.first,FitRange.second,4),
-			new TF1("TailingGaussN2",&PeakFit::SingleTailingGaussN,FitRange.first,FitRange.second,4)
+			new TF1("TailingGaussN1",&PeakFit::SingleTailingGaussN,XFitRange.first,XFitRange.second,4),
+			new TF1("TailingGaussN2",&PeakFit::SingleTailingGaussN,XFitRange.first,XFitRange.second,4)
 		};
 		this->components.at(0)->SetLineColor(kMagenta);
 		this->components.at(1)->SetLineColor(kGreen);
 		
-		auto minbin = this->fithist->FindBin(this->FitRange.first);
-		auto maxbin = this->fithist->FindBin(this->FitRange.second);
+		auto minbin = this->fithist->FindBin(this->XFitRange.first);
+		auto maxbin = this->fithist->FindBin(this->XFitRange.second);
 
-		double width = this->FitRange.second - this->FitRange.first;
-		double offset = (this->FitRange.second + this->FitRange.first)/2.0;
+		double width = this->XFitRange.second - this->XFitRange.first;
+		double offset = (this->XFitRange.second + this->XFitRange.first)/2.0;
 		double area = this->fithist->GetBinContent(this->fithist->FindBin(offset));
 		double tau = this->fithist->GetBinContent(maxbin) - this->fithist->GetBinContent(minbin);
 
@@ -248,10 +461,10 @@ struct PeakFitter{
 		VerifyFixedValues();
 		VerifyBoundedValues();
 		if( this->fvalues.find("Mean1") == this->fvalues.end() and this->bvalues.find("Mean1") == this->bvalues.end() ){
-			this->bvalues["Mean1"] = this->FitRange; 
+			this->bvalues["Mean1"] = this->XFitRange; 
 		}
 		if( this->fvalues.find("Mean2") == this->fvalues.end() and this->bvalues.find("Mean2") == this->bvalues.end() ){
-			this->bvalues["Mean2"] = this->FitRange; 
+			this->bvalues["Mean2"] = this->XFitRange; 
 		}
 
 		auto integral = this->fithist->Integral(minbin,maxbin);
@@ -263,7 +476,7 @@ struct PeakFitter{
 			if( this->loglikelihood ){
 				option+="L";
 			}
-			TFitResultPtr fitresult = this->fithist->Fit(this->fitfunc,option.c_str(),"",FitRange.first,FitRange.second);
+			TFitResultPtr fitresult = this->fithist->Fit(this->fitfunc,option.c_str(),"",XFitRange.first,XFitRange.second);
 
 			if( not fitresult->IsEmpty() ){
 				AssignFitValuesErrors(fitresult);
@@ -292,20 +505,20 @@ struct PeakFitter{
 	void InitSingleTailingGaussNLinBkgFit(){
 		this->fithist->SetLineColor(kBlack);
 
-		this->fitfunc = new TF1("SingleTailingGaussNLinBkg",&PeakFit::SingleTailingGaussNLinBkg,FitRange.first,FitRange.second,6);
+		this->fitfunc = new TF1("SingleTailingGaussNLinBkg",&PeakFit::SingleTailingGaussNLinBkg,XFitRange.first,XFitRange.second,6);
 		this->fitfunc->SetLineColor(kRed);
 		this->components = {
-			new TF1("TailingGaussN1",&PeakFit::SingleTailingGaussN,FitRange.first,FitRange.second,4),
-			new TF1("LinBkg",&CommonFit::Linear,FitRange.first,FitRange.second,2)
+			new TF1("TailingGaussN1",&PeakFit::SingleTailingGaussN,XFitRange.first,XFitRange.second,4),
+			new TF1("LinBkg",&CommonFit::Linear,XFitRange.first,XFitRange.second,2)
 		};
 		this->components.at(0)->SetLineColor(kMagenta);
 		this->components.at(1)->SetLineColor(kGreen);
 		
-		auto minbin = this->fithist->FindBin(this->FitRange.first);
-		auto maxbin = this->fithist->FindBin(this->FitRange.second);
+		auto minbin = this->fithist->FindBin(this->XFitRange.first);
+		auto maxbin = this->fithist->FindBin(this->XFitRange.second);
 
-		double width = this->FitRange.second - this->FitRange.first;
-		double offset = (this->FitRange.second + this->FitRange.first)/2.0;
+		double width = this->XFitRange.second - this->XFitRange.first;
+		double offset = (this->XFitRange.second + this->XFitRange.first)/2.0;
 		double area = this->fithist->GetBinContent(this->fithist->FindBin(offset));
 		double tau = this->fithist->GetBinContent(maxbin) - this->fithist->GetBinContent(minbin);
 		double bkgoffset = 0.0;
@@ -316,7 +529,7 @@ struct PeakFitter{
 		VerifyFixedValues();
 		VerifyBoundedValues();
 		if( this->fvalues.find("Mean") == this->fvalues.end() and this->bvalues.find("Mean") == this->bvalues.end() ){
-			this->bvalues["Mean"] = this->FitRange; 
+			this->bvalues["Mean"] = this->XFitRange; 
 		}
 
 		auto integral = this->fithist->Integral(minbin,maxbin);
@@ -328,7 +541,7 @@ struct PeakFitter{
 			if( this->loglikelihood ){
 				option+="L";
 			}
-			TFitResultPtr fitresult = this->fithist->Fit(this->fitfunc,option.c_str(),"",FitRange.first,FitRange.second);
+			TFitResultPtr fitresult = this->fithist->Fit(this->fitfunc,option.c_str(),"",XFitRange.first,XFitRange.second);
 
 			if( not fitresult->IsEmpty() ){
 				AssignFitValuesErrors(fitresult);
@@ -352,16 +565,16 @@ struct PeakFitter{
 	void InitErfFit(){
 		this->fithist->SetLineColor(kBlack);
 
-		this->fitfunc = new TF1("Erf",&PeakFit::Erf,FitRange.first,FitRange.second,3);
+		this->fitfunc = new TF1("Erf",&PeakFit::Erf,XFitRange.first,XFitRange.second,3);
 		this->fitfunc->SetLineColor(kRed);
 		this->components = {
 		};
 		
-		auto minbin = this->fithist->FindBin(this->FitRange.first);
-		auto maxbin = this->fithist->FindBin(this->FitRange.second);
+		auto minbin = this->fithist->FindBin(this->XFitRange.first);
+		auto maxbin = this->fithist->FindBin(this->XFitRange.second);
 
-		double width = this->FitRange.second - this->FitRange.first;
-		double offset = (this->FitRange.second + this->FitRange.first)/2.0;
+		double width = this->XFitRange.second - this->XFitRange.first;
+		double offset = (this->XFitRange.second + this->XFitRange.first)/2.0;
 		double area = this->fithist->GetBinContent(this->fithist->FindBin(offset));
 
 		this->keys = {{"Area",{0,area}},{"Mean",{1,offset}},{"Sigma",{2,width}}};
@@ -369,7 +582,7 @@ struct PeakFitter{
 		VerifyFixedValues();
 		VerifyBoundedValues();
 		if( this->fvalues.find("Mean") == this->fvalues.end() and this->bvalues.find("Mean") == this->bvalues.end() ){
-			this->bvalues["Mean"] = this->FitRange; 
+			this->bvalues["Mean"] = this->XFitRange; 
 		}
 
 		auto integral = this->fithist->Integral(minbin,maxbin);
@@ -381,7 +594,7 @@ struct PeakFitter{
 			if( this->loglikelihood ){
 				option+="L";
 			}
-			TFitResultPtr fitresult = this->fithist->Fit(this->fitfunc,option.c_str(),"",FitRange.first,FitRange.second);
+			TFitResultPtr fitresult = this->fithist->Fit(this->fitfunc,option.c_str(),"",XFitRange.first,XFitRange.second);
 
 			if( not fitresult->IsEmpty() ){
 				AssignFitValuesErrors(fitresult);
@@ -396,7 +609,7 @@ struct PeakFitter{
 		}
 	}
 
-	void FixAndBoundParameters(){
+	virtual void FixAndBoundParameters() final{
 		for( const auto& kv : this->keys ){
 			auto fres = this->fvalues.find(kv.first);
 			auto bres = this->bvalues.find(kv.first);
@@ -413,26 +626,7 @@ struct PeakFitter{
 		}
 	}
 
-	void VerifyFixedValues(){
-		for( const auto& kv : this->fvalues ){
-			if( this->keys.find(kv.first) == this->keys.end() ){
-				throw std::runtime_error("Unknown parameter name "+kv.first);
-			}
-		}
-	}
-
-	void VerifyBoundedValues(){
-		for( const auto& kv : this->bvalues ){
-			if( this->keys.find(kv.first) == this->keys.end() ){
-				throw std::runtime_error("Unknown parameter name "+kv.first);
-			}
-			if( kv.second.second < kv.second.first ){
-				throw std::runtime_error("Bounded parameter has lowerbound higher than upperbound");
-			}
-		}
-	}
-
-	void AssignFitFuncParams(){
+	virtual void AssignFitFuncParams() final{
 		for( const auto& kv : this->keys ){
 			this->fitfunc->SetParameter(kv.second.first,this->Results[kv.first]);
 		}
@@ -448,13 +642,13 @@ struct PeakFitter{
 		this->Errors["NDF"] = fitresult->Ndf();
 	}
 
-	void AssignFitParNames(){
+	virtual void AssignFitParNames() final{
 		for( const auto& kv : this->keys ){
 			this->fitfunc->SetParName(kv.second.first,kv.first.c_str());
 		}
 	}
 
-	void WriteHistogram(bool storechi2){
+	virtual void WriteHistogram(bool storechi2) final{
 		this->fithist->Write(0,2,0);
 		if( storechi2 ){
 			auto name = std::string(this->fithist->GetName());
@@ -469,8 +663,8 @@ struct PeakFitter{
 			chi2dist->GetXaxis()->CenterTitle();
 			chi2dist->GetYaxis()->CenterTitle();
 
-			int minbin = this->fithist->FindBin(this->FitRange.first);
-			int maxbin = this->fithist->FindBin(this->FitRange.second);
+			int minbin = this->fithist->FindBin(this->XFitRange.first);
+			int maxbin = this->fithist->FindBin(this->XFitRange.second);
 			for( int ii = minbin; ii <= maxbin; ++ii ){
 				double centroid = this->fithist->GetBinCenter(ii);
 				auto fitval = this->fitfunc->Eval(centroid);
@@ -494,25 +688,6 @@ struct PeakFitter{
 		}
 	}
 
-	template<typename OStream>
-	friend OStream& operator<<(OStream& os, const PeakFitter& fitinfo) {
-		for( const auto& kv : fitinfo.keys ){
-			os << kv.first << " : " << fitinfo.Results.at(kv.first) << " +- " << fitinfo.Errors.at(kv.first) << " \t ";
-		}
-		os << "Chi2/NDF : " << fitinfo.Results.at("Chi2") << "/" << fitinfo.Errors.at("NDF");
-		return os;
-	}
-
-	std::pair<double,double> operator [](const std::string& key) const{
-		return {this->Results.at(key),this->Errors.at(key)};
-	}
-	
-	virtual ~PeakFitter() = default;
-
-	PeakFitter(const PeakFitter&) = default;
-	PeakFitter(PeakFitter&&) = default;
-	PeakFitter& operator=(const PeakFitter&) = default;
-	PeakFitter& operator=(PeakFitter&&) = default;
 };
 
 #endif

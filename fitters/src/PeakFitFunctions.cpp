@@ -94,4 +94,22 @@ namespace PeakFit{
 		}
 		return par[0]*TMath::Exp(arg);
 	}
+
+	double BiGauss(double* x,double* par){
+		double xval = x[0];
+		double yval = x[1];
+
+		double Amp = par[0];
+		double XCentroid = par[1];
+		double XSigma = par[2];
+		double YCentroid = par[3];
+		double YSigma = par[4];
+		double Corr = par[5];
+
+		double u = (xval - XCentroid)/XSigma;
+		double v = (yval - YCentroid)/YSigma;
+		double c = 1.0 - Corr*Corr;
+		double z = u*u - 2.0*Corr*u*v + v*v;
+		return Amp*TMath::Exp(-z/(2.0*c));
+	}
 }
