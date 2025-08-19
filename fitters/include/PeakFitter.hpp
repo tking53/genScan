@@ -15,7 +15,8 @@
 #include "TFitResultPtr.h"
 #include "TLine.h"
 
-#include "PulseFitFunctions.hpp"
+#include "CommonFitFunctions.hpp"
+#include "PeakFitFunctions.hpp"
 
 struct PeakFitter{
 	std::pair<double,double> FitRange;
@@ -58,11 +59,11 @@ struct PeakFitter{
 	void InitGaussNLinBkgFit(){
 		this->fithist->SetLineColor(kBlack);
 
-		this->fitfunc = new TF1("GaussNLinBkg",&PulseFit::GaussNLinBkg,FitRange.first,FitRange.second,5);
+		this->fitfunc = new TF1("GaussNLinBkg",&PeakFit::GaussNLinBkg,FitRange.first,FitRange.second,5);
 		this->fitfunc->SetLineColor(kRed);
 		this->components = {
-			new TF1("GaussN",&PulseFit::GaussN,FitRange.first,FitRange.second,3),
-			new TF1("LinBkg",&PulseFit::Linear,FitRange.first,FitRange.second,2)
+			new TF1("GaussN",&PeakFit::GaussN,FitRange.first,FitRange.second,3),
+			new TF1("LinBkg",&CommonFit::Linear,FitRange.first,FitRange.second,2)
 		};
 		this->components.at(0)->SetLineColor(kMagenta);
 		this->components.at(1)->SetLineColor(kGreen);
@@ -115,12 +116,12 @@ struct PeakFitter{
 	void InitGaussNErfBkgFit(){
 		this->fithist->SetLineColor(kBlack);
 
-		this->fitfunc = new TF1("GaussNErfBkg",&PulseFit::GaussNErfBkg,FitRange.first,FitRange.second,6);
+		this->fitfunc = new TF1("GaussNErfBkg",&PeakFit::GaussNErfBkg,FitRange.first,FitRange.second,6);
 		this->fitfunc->SetLineColor(kRed);
 		this->components = {
-			new TF1("GaussN",&PulseFit::GaussN,FitRange.first,FitRange.second,3),
-			new TF1("ErfBkg",&PulseFit::GaussErf,FitRange.first,FitRange.second,3),
-			new TF1("LinBkg",&PulseFit::Quad,FitRange.first,FitRange.second,3)
+			new TF1("GaussN",&PeakFit::GaussN,FitRange.first,FitRange.second,3),
+			new TF1("ErfBkg",&PeakFit::GaussErf,FitRange.first,FitRange.second,3),
+			new TF1("LinBkg",&CommonFit::Quad,FitRange.first,FitRange.second,3)
 		};
 		this->components.at(0)->SetLineColor(kMagenta);
 		this->components.at(1)->SetLineColor(kGreen);
@@ -177,7 +178,7 @@ struct PeakFitter{
 	void InitSingleTailingGaussNFit(){
 		this->fithist->SetLineColor(kBlack);
 
-		this->fitfunc = new TF1("SingleTailingGaussN",&PulseFit::SingleTailingGaussN,FitRange.first,FitRange.second,4);
+		this->fitfunc = new TF1("SingleTailingGaussN",&PeakFit::SingleTailingGaussN,FitRange.first,FitRange.second,4);
 		this->fitfunc->SetLineColor(kRed);
 		this->components = {
 		};
@@ -225,11 +226,11 @@ struct PeakFitter{
 	void InitDoubleTailingGaussNFit(){
 		this->fithist->SetLineColor(kBlack);
 
-		this->fitfunc = new TF1("DoubleTailingGaussN",&PulseFit::DoubleTailingGaussN,FitRange.first,FitRange.second,8);
+		this->fitfunc = new TF1("DoubleTailingGaussN",&PeakFit::DoubleTailingGaussN,FitRange.first,FitRange.second,8);
 		this->fitfunc->SetLineColor(kRed);
 		this->components = {
-			new TF1("TailingGaussN1",&PulseFit::SingleTailingGaussN,FitRange.first,FitRange.second,4),
-			new TF1("TailingGaussN2",&PulseFit::SingleTailingGaussN,FitRange.first,FitRange.second,4)
+			new TF1("TailingGaussN1",&PeakFit::SingleTailingGaussN,FitRange.first,FitRange.second,4),
+			new TF1("TailingGaussN2",&PeakFit::SingleTailingGaussN,FitRange.first,FitRange.second,4)
 		};
 		this->components.at(0)->SetLineColor(kMagenta);
 		this->components.at(1)->SetLineColor(kGreen);
@@ -291,11 +292,11 @@ struct PeakFitter{
 	void InitSingleTailingGaussNLinBkgFit(){
 		this->fithist->SetLineColor(kBlack);
 
-		this->fitfunc = new TF1("SingleTailingGaussNLinBkg",&PulseFit::SingleTailingGaussNLinBkg,FitRange.first,FitRange.second,6);
+		this->fitfunc = new TF1("SingleTailingGaussNLinBkg",&PeakFit::SingleTailingGaussNLinBkg,FitRange.first,FitRange.second,6);
 		this->fitfunc->SetLineColor(kRed);
 		this->components = {
-			new TF1("TailingGaussN1",&PulseFit::SingleTailingGaussN,FitRange.first,FitRange.second,4),
-			new TF1("LinBkg",&PulseFit::Linear,FitRange.first,FitRange.second,2)
+			new TF1("TailingGaussN1",&PeakFit::SingleTailingGaussN,FitRange.first,FitRange.second,4),
+			new TF1("LinBkg",&CommonFit::Linear,FitRange.first,FitRange.second,2)
 		};
 		this->components.at(0)->SetLineColor(kMagenta);
 		this->components.at(1)->SetLineColor(kGreen);
@@ -351,7 +352,7 @@ struct PeakFitter{
 	void InitErfFit(){
 		this->fithist->SetLineColor(kBlack);
 
-		this->fitfunc = new TF1("Erf",&PulseFit::Erf,FitRange.first,FitRange.second,3);
+		this->fitfunc = new TF1("Erf",&PeakFit::Erf,FitRange.first,FitRange.second,3);
 		this->fitfunc->SetLineColor(kRed);
 		this->components = {
 		};
