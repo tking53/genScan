@@ -2,12 +2,11 @@
 #define __PEAK_FITTER_HPP__
 
 #include <stdexcept>
+#include <string>
 #include <vector>
 #include <utility>
 #include <map>
-#include <set>
 
-#include "Rtypes.h"
 #include "TF1.h"
 #include "TF2.h"
 #include "TH1.h"
@@ -16,6 +15,13 @@
 #include "TFitResult.h"
 #include "TFitResultPtr.h"
 #include "TLine.h"
+#include "TCutG.h"
+#include "TArrow.h"
+#include <TMath.h>
+#include <TPad.h>
+#include <TMatrixDSym.h>
+#include <TMatrixDSymEigen.h>
+#include <TVectorD.h>
 
 #include "CommonFitFunctions.hpp"
 #include "PeakFitFunctions.hpp"
@@ -146,8 +152,43 @@ struct PeakFitter2D : public PeakFitter{
 				AssignFitValuesErrors(fitresult);
 				AssignFitFuncParams();
 				this->fithist->GetListOfFunctions()->Add(this->fitfunc);
+
+				this->AddUncertaintyEllipse();
 			}
 		}
+	}
+
+	void AddUncertaintyEllipse(int sigma = 3,int npoints=100){
+		//need to generate the ellipses using the 2x2 matrix and eigen vectors and values
+		TMatrixDSym* errormat = new TMatrixDSym(2);
+		(*errormat)(0,0) = (this->Results["XSigma"]*this->Results["XSigma"]);
+		(*errormat)(1,1) = (this->Results["YSigma"]*this->Results["YSigma"]);
+		(*errormat)(0,1) = (this->Results["Correlation"]*this->Results["XSigma"]*this->Results["YSigma"]);
+		(*errormat)(1,0) = (this->Results["Correlation"]*this->Results["XSigma"]*this->Results["YSigma"]);
+		TVectorD eigenvals;
+		TMatrixD eigenvec = errormat->EigenVectors(eigenvals);
+
+		//TArrow* MajorAxis = new TArrow(this->Results["XMean"],this->Results["YMean"],this->Results["XMean"] + eigenvec[0][0]*TMath::Sqrt(eigenvals[0]),this->Results["YMean"] + eigenvec[1][0]*TMath::Sqrt(eigenvals[0]),0.015,"|->");
+		//MajorAxis->SetLineColor(kBlack);
+		//this->fithist->GetListOfFunctions()->Add(MajorAxis);
+
+		////this one is the x-axis because the time is "compressed" compared to the energy axis
+		//TArrow* MinorAxis = new TArrow(this->Results["XMean"],this->Results["YMean"],this->Results["XMean"] + eigenvec[0][1]*TMath::Sqrt(eigenvals[1]),this->Results["YMean"] + eigenvec[1][1]*TMath::Sqrt(eigenvals[1]),0.015,"|->");
+		//MinorAxis->SetLineColor(kBlack);
+		//this->fithist->GetListOfFunctions()->Add(MinorAxis);
+
+		std::string name = "Sigma"+std::to_string(sigma);
+		TCutG* unc = new TCutG(name.c_str(),npoints);
+		for( int ii = 0; ii < npoints; ++ii ){
+			auto t = TMath::TwoPi()*static_cast<double>(ii)/static_cast<double>(npoints-1);
+			//this performs the affine transformation from a circle onto an arbitrary ellipse
+			auto x = this->Results["XMean"] + sigma*(eigenvec[0][0]*TMath::Sqrt(eigenvals[0]))*TMath::Cos(t) + sigma*(eigenvec[0][1]*TMath::Sqrt(eigenvals[1]))*TMath::Sin(t);
+			auto y = this->Results["YMean"] + sigma*(eigenvec[1][0]*TMath::Sqrt(eigenvals[0]))*TMath::Cos(t) + sigma*(eigenvec[1][1]*TMath::Sqrt(eigenvals[1]))*TMath::Sin(t);
+			unc->SetPoint(ii,x,y);
+		}
+		unc->SetLineWidth(4);
+		unc->SetLineColor(kBlack);
+		this->fithist->GetListOfFunctions()->Add(unc);
 	}
 
 	virtual void FixAndBoundParameters() final{
