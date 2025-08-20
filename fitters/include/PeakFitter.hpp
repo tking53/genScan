@@ -158,7 +158,9 @@ struct PeakFitter2D : public PeakFitter{
 		}
 	}
 
-	void AddUncertaintyEllipse(int sigma = 3,int npoints=100){
+	//need to make these parameters that get passed in from command line
+	//we only need a 15-sided polygon to have a decent approximation of the ellipse
+	void AddUncertaintyEllipse(int sigma = 3,int npoints=15){
 		//need to generate the ellipses using the 2x2 matrix and eigen vectors and values
 		TMatrixDSym* errormat = new TMatrixDSym(2);
 		(*errormat)(0,0) = (this->Results["XSigma"]*this->Results["XSigma"]);
