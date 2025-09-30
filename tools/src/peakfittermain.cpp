@@ -152,6 +152,8 @@ int main(int argc, char *argv[]) {
 	std::map<std::string,double> fixedvalues; 
 	std::map<std::string,std::pair<double,double>> boundedvalues; 
 	std::vector<std::pair<double,double>> gatevalues;
+	double ellipse;
+	int npoints;
 
 	std::string FittingMessage = "peak fitting mode (0-999): 1D fits, 1000+: 2D fits ";
        	FittingMessage += "\n0->GaussN+LinBkg";
@@ -165,22 +167,24 @@ int main(int argc, char *argv[]) {
 
 	boost::program_options::options_description cmdline_options("Generic Options");
 	cmdline_options.add_options()
-		("help,h", "produce help message")
-		("projectionindices,p",boost::program_options::value<std::vector<int>>(&indices)->multitoken(),"indices to project on if 2d histogram")
-		("gate,g",boost::program_options::value<std::vector<std::string>>(&gates)->multitoken(),"values to gate within in 2d histogram")
-		("boundparameter,b",boost::program_options::value<std::vector<std::string>>(&boundedparams)->multitoken(),"parameter to bound name:low:high")
-		("fixparameter,f",boost::program_options::value<std::vector<std::string>>(&fixedparams)->multitoken(),"parameter to bound name:value")
-		("lowerbound,l",boost::program_options::value<std::vector<double>>(&low)->multitoken(),"lower bound to perform fit, if 1 provided then is XLow, if 2 provided then Xlow, Ylow")
-		("upperbound,u",boost::program_options::value<std::vector<double>>(&high)->multitoken(),"upper bound to perform fit, if 1 provided then Xhigh, if 2 then Xhigh,Yhigh")
-		("inputfile,i",boost::program_options::value<std::string>(&inputfile),"file to get the histogram from")
-		("outputprefix,o",boost::program_options::value<std::string>(&outputprefix)->default_value("GenPeakFitterResults"),"file to output to fit info to")
-		("numdimension,n",boost::program_options::value<int>(&dimensionality)->default_value(1),"dimensionality of histogram (1,2)")
-		("mode,m",boost::program_options::value<int>(&mode)->default_value(0),FittingMessage.c_str())
 		("axis,a",boost::program_options::value<std::string>(&axis)->default_value("x"),"axis to project onto (x,y,X,Y) if 2D")
-		("data,d",boost::program_options::value<std::string>(&hisname),"histogram to manipulate")
-		("quiet,q",boost::program_options::value<bool>(&quiet)->default_value(false),"quiet output")
+		("boundparameter,b",boost::program_options::value<std::vector<std::string>>(&boundedparams)->multitoken(),"parameter to bound name:low:high")
 		("chi2,c",boost::program_options::value<bool>(&chi2)->default_value(true),"chi2 fit, or loglikelihood")
+		("data,d",boost::program_options::value<std::string>(&hisname),"histogram to manipulate")
+		("ellipse,e",boost::program_options::value<double>(&ellipse)->default_value(3.0),"uncertainty ellipse size")
+		("fixparameter,f",boost::program_options::value<std::vector<std::string>>(&fixedparams)->multitoken(),"parameter to bound name:value")
+		("gate,g",boost::program_options::value<std::vector<std::string>>(&gates)->multitoken(),"values to gate within in 2d histogram")
+		("help,h", "produce help message")
+		("inputfile,i",boost::program_options::value<std::string>(&inputfile),"file to get the histogram from")
+		("lowerbound,l",boost::program_options::value<std::vector<double>>(&low)->multitoken(),"lower bound to perform fit, if 1 provided then is XLow, if 2 provided then Xlow, Ylow")
+		("mode,m",boost::program_options::value<int>(&mode)->default_value(0),FittingMessage.c_str())
+		("numdimension,n",boost::program_options::value<int>(&dimensionality)->default_value(1),"dimensionality of histogram (1,2)")
+		("outputprefix,o",boost::program_options::value<std::string>(&outputprefix)->default_value("GenPeakFitterResults"),"file to output to fit info to")
+		("projectionindices,p",boost::program_options::value<std::vector<int>>(&indices)->multitoken(),"indices to project on if 2d histogram")
+		("quiet,q",boost::program_options::value<bool>(&quiet)->default_value(false),"quiet output")
 		("storechi2,s",boost::program_options::value<bool>(&storechi2)->default_value(true),"store chi2 plot")
+		("tpoints,t",boost::program_options::value<int>(&npoints)->default_value(15),"npoints in the uncertainty ellipse tcut")
+		("upperbound,u",boost::program_options::value<std::vector<double>>(&high)->multitoken(),"upper bound to perform fit, if 1 provided then Xhigh, if 2 then Xhigh,Yhigh")
 		;
 
 
@@ -307,7 +311,7 @@ int main(int argc, char *argv[]) {
 				}else{
 					TH2* histofit2d = dynamic_cast<TH2*>(mainhis); 
 					histofit2d->SetDirectory(0);
-					pfs2d.push_back(new PeakFitter2D(low[0],high[0],low[1],high[1],chi2,mode,histofit2d,fixedvalues,boundedvalues));
+					pfs2d.push_back(new PeakFitter2D(low[0],high[0],low[1],high[1],chi2,mode,histofit2d,fixedvalues,boundedvalues,ellipse,npoints));
 				}
 			}else if( boost::regex_search(histype,re1d) ){
 				histofit = dynamic_cast<TH1*>(mainhis);
@@ -337,6 +341,8 @@ int main(int argc, char *argv[]) {
 			doc << YAML::BeginMap;
 			doc << YAML::Key << "InputFile" << YAML::Value << inputfile;
 			doc << YAML::Key << "InputHistogram" << YAML::Value << hisname;
+			doc << YAML::Key << "Ellipse" << YAML::Value << ellipse;
+			doc << YAML::Key << "NPoints" << YAML::Value << npoints;
 			if( MaxCrates != nullptr ){
 				doc << YAML::Key << "MAX_CRATES" << YAML::Value << MaxCrates->GetTitle();
 			}

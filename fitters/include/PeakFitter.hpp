@@ -94,7 +94,7 @@ struct PeakFitter2D : public PeakFitter{
 	std::vector<TF2*> components;
 
 	PeakFitter2D(double xl,double xu,double yl,double yu,bool chi2,int mode,TH2* hist,
-			const std::map<std::string,double>& fixedvalues,const std::map<std::string,std::pair<double,double>>& boundedvalues) 
+			const std::map<std::string,double>& fixedvalues,const std::map<std::string,std::pair<double,double>>& boundedvalues,double ellipse,int npts) 
 		: XFitRange(xl,xu), YFitRange(yl,yu), fithist(hist), PeakFitter(chi2,fixedvalues,boundedvalues){
 		for( const auto& kv : fvalues ){
 			if( bvalues.find(kv.first) != bvalues.end() ){
@@ -102,13 +102,13 @@ struct PeakFitter2D : public PeakFitter{
 			}
 		}
 		if( mode == 1000){
-			this->InitBiGaussFit();
+			this->InitBiGaussFit(ellipse,npts);
 		}else{
 			throw std::runtime_error("Unknown peak fitting mode");
 		}
 	}
 
-	void InitBiGaussFit(){
+	void InitBiGaussFit(double ellipse,int npts){
 		this->fitfunc = new TF2("BiGauss",&PeakFit::BiGauss,XFitRange.first,XFitRange.second,YFitRange.first,YFitRange.second,6);
 		this->components = {
 		};
@@ -153,14 +153,14 @@ struct PeakFitter2D : public PeakFitter{
 				AssignFitFuncParams();
 				this->fithist->GetListOfFunctions()->Add(this->fitfunc);
 
-				this->AddUncertaintyEllipse();
+				this->AddUncertaintyEllipse(ellipse,npts);
 			}
 		}
 	}
 
 	//need to make these parameters that get passed in from command line
 	//we only need a 15-sided polygon to have a decent approximation of the ellipse
-	void AddUncertaintyEllipse(int sigma = 3,int npoints=15){
+	void AddUncertaintyEllipse(double sigma = 3,int npoints=15){
 		//need to generate the ellipses using the 2x2 matrix and eigen vectors and values
 		TMatrixDSym* errormat = new TMatrixDSym(2);
 		(*errormat)(0,0) = (this->Results["XSigma"]*this->Results["XSigma"]);
@@ -179,7 +179,7 @@ struct PeakFitter2D : public PeakFitter{
 		//MinorAxis->SetLineColor(kBlack);
 		//this->fithist->GetListOfFunctions()->Add(MinorAxis);
 
-		std::string name = "Sigma"+std::to_string(sigma);
+		std::string name = "Sigma";
 		TCutG* unc = new TCutG(name.c_str(),npoints);
 		for( int ii = 0; ii < npoints; ++ii ){
 			auto t = TMath::TwoPi()*static_cast<double>(ii)/static_cast<double>(npoints-1);
