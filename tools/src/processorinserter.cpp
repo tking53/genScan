@@ -7,20 +7,12 @@
 #include <memory>
 #include <optional>
 #include <ostream>
-#include <spdlog/fmt/fmt.h>
 #include <sstream>
 #include <tuple>
 #include <utility>
 #include <stdexcept>
 #include <string>
 #include <vector>
-
-#include <spdlog/common.h>
-#include <spdlog/spdlog.h>
-#include <spdlog/cfg/env.h>
-#include <spdlog/fmt/ostr.h>
-#include <spdlog/sinks/basic_file_sink.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
 
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>
@@ -98,7 +90,7 @@ bool ValidateIsotopeTags(const std::map<std::string,isotopetag>& itags){
 
 	for( const auto& i : itags ){
 		do{
-			spdlog::info("Is this tag valid '<Isotope name=\"{}\" cutid=\"{}\" filename=\"{}\" />' ? (y/Y,n/N,c/C)",i.first,std::get<0>(i.second),std::get<1>(i.second));
+			//spdlog::info("Is this tag valid '<Isotope name=\"{}\" cutid=\"{}\" filename=\"{}\" />' ? (y/Y,n/N,c/C)",i.first,std::get<0>(i.second),std::get<1>(i.second));
 			AskUser(InputOk,IsValid,Continue);
 		}while(not InputOk);
 
@@ -128,7 +120,7 @@ bool ValidateCutTags(const std::map<std::string,cuttag>& ctags){
 
 	for( const auto& i : ctags ){
 		do{
-			spdlog::info("Is this tag valid '<Cut name=\"{}\" filename=\"{}\" />' ? (y/Y,n/N,c/C)",i.first,std::get<0>(i.second));
+			//spdlog::info("Is this tag valid '<Cut name=\"{}\" filename=\"{}\" />' ? (y/Y,n/N,c/C)",i.first,std::get<0>(i.second));
 			AskUser(InputOk,IsValid,Continue);
 		}while(not InputOk);
 
@@ -143,7 +135,7 @@ void ParseGates(const std::vector<std::string>& args,std::map<std::string,gateta
 	for( const auto& s : args ){
 		std::vector<std::string> strs;
 		boost::split(strs,s,boost::is_any_of(":"));
-		spdlog::info("{}",strs.size());
+		//spdlog::info("{}",strs.size());
 		if( strs.size() == 3 ){
 			double lb = 0.0;
 			double ub = 0.0;
@@ -171,7 +163,7 @@ bool ValidateGateTags(const std::map<std::string,gatetag>& gtags){
 
 	for( const auto& i : gtags ){
 		do{
-			spdlog::info("Is this tag valid '<Gate name=\"{}\" lowerbound=\"{}\" upperbound=\"{}\" />' ? (y/Y,n/N,c/C)",i.first,std::get<0>(i.second),std::get<1>(i.second));
+			//spdlog::info("Is this tag valid '<Gate name=\"{}\" lowerbound=\"{}\" upperbound=\"{}\" />' ? (y/Y,n/N,c/C)",i.first,std::get<0>(i.second),std::get<1>(i.second));
 			AskUser(InputOk,IsValid,Continue);
 		}while(not InputOk);
 
@@ -186,7 +178,7 @@ void ParseBoxes(const std::vector<std::string>& args,std::map<std::string,boxtag
 	for( const auto& s : args ){
 		std::vector<std::string> strs;
 		boost::split(strs,s,boost::is_any_of(":"));
-		spdlog::info("{}",strs.size());
+		//spdlog::info("{}",strs.size());
 		if( strs.size() == 5 ){
 			double xlb = 0.0;
 			double xub = 0.0;
@@ -226,7 +218,7 @@ bool ValidateBoxTags(const std::map<std::string,boxtag>& btags){
 
 	for( const auto& i : btags ){
 		do{
-			spdlog::info("Is this tag valid '<BoxGate name=\"{}\" xlowerbound=\"{}\" xupperbound=\"{}\" ylowerbound=\"{}\" yupperbound=\"{}\" />' ? (y/Y,n/N,c/C)",i.first,std::get<0>(i.second),std::get<1>(i.second),std::get<2>(i.second),std::get<3>(i.second));
+			//spdlog::info("Is this tag valid '<BoxGate name=\"{}\" xlowerbound=\"{}\" xupperbound=\"{}\" ylowerbound=\"{}\" yupperbound=\"{}\" />' ? (y/Y,n/N,c/C)",i.first,std::get<0>(i.second),std::get<1>(i.second),std::get<2>(i.second),std::get<3>(i.second));
 			AskUser(InputOk,IsValid,Continue);
 		}while(not InputOk);
 
@@ -290,25 +282,25 @@ bool ValidateH1DTags(const std::map<int,h1dtag>& htags){
 			j += ((std::get<2>(i.second).has_value()) ? 8 : 0);
 			switch( j ){
 				case 2:
-					spdlog::info("Is this tag valid '<Histogram id=\"{}\" nbinsx=\"{}\" />' ? (y/Y,n/N,c/C)",id,nbinsx);
+					//spdlog::info("Is this tag valid '<Histogram id=\"{}\" nbinsx=\"{}\" />' ? (y/Y,n/N,c/C)",id,nbinsx);
 					break;
 				case 4:
-					spdlog::info("Is this tag valid '<Histogram id=\"{}\" xlow=\"{}\" />' ? (y/Y,n/N,c/C)",id,xlow);
+					//spdlog::info("Is this tag valid '<Histogram id=\"{}\" xlow=\"{}\" />' ? (y/Y,n/N,c/C)",id,xlow);
 					break;
 				case 6:
-					spdlog::info("Is this tag valid '<Histogram id=\"{}\" nbinsx=\"{}\" xlow=\"{}\" />' ? (y/Y,n/N,c/C)",id,nbinsx,xlow);
+					//spdlog::info("Is this tag valid '<Histogram id=\"{}\" nbinsx=\"{}\" xlow=\"{}\" />' ? (y/Y,n/N,c/C)",id,nbinsx,xlow);
 					break;
 				case 8:
-					spdlog::info("Is this tag valid '<Histogram id=\"{}\" xhigh=\"{}\" />' ? (y/Y,n/N,c/C)",id,xhigh);
+					//spdlog::info("Is this tag valid '<Histogram id=\"{}\" xhigh=\"{}\" />' ? (y/Y,n/N,c/C)",id,xhigh);
 					break;
 				case 10:
-					spdlog::info("Is this tag valid '<Histogram id=\"{}\" nbinsx=\"{}\" xhigh=\"{}\" />' ? (y/Y,n/N,c/C)",id,nbinsx,xhigh);
+					//spdlog::info("Is this tag valid '<Histogram id=\"{}\" nbinsx=\"{}\" xhigh=\"{}\" />' ? (y/Y,n/N,c/C)",id,nbinsx,xhigh);
 					break;
 				case 12:
-					spdlog::info("Is this tag valid '<Histogram id=\"{}\" xlow=\"{}\" xhigh=\"{}\" />' ? (y/Y,n/N,c/C)",id,xlow,xhigh);
+					//spdlog::info("Is this tag valid '<Histogram id=\"{}\" xlow=\"{}\" xhigh=\"{}\" />' ? (y/Y,n/N,c/C)",id,xlow,xhigh);
 					break;
 				case 14:
-					spdlog::info("Is this tag valid '<Histogram id=\"{}\" nbinsx=\"{}\" xlow=\"{}\" xhigh=\"{}\" />' ? (y/Y,n/N,c/C)",id,nbinsx,xlow,xhigh);
+					//spdlog::info("Is this tag valid '<Histogram id=\"{}\" nbinsx=\"{}\" xlow=\"{}\" xhigh=\"{}\" />' ? (y/Y,n/N,c/C)",id,nbinsx,xlow,xhigh);
 					break;
 				default:
 					throw std::runtime_error("Invalid Histogram tag generation, only ID provided");
@@ -423,187 +415,187 @@ bool ValidateH2DTags(const std::map<int,h2dtag>& htags){
 			q += "/>' ? (y/Y,n/N,c/C)";
 			switch( j ){
 				case 2:
-					spdlog::info(q,id,nbinsx);
+					//spdlog::info(q,id,nbinsx);
 					break;
 				case 4:
-					spdlog::info(q,id,xlow);
+					//spdlog::info(q,id,xlow);
 					break;
 				case 6:
-					spdlog::info(q,id,nbinsx,xlow);
+					//spdlog::info(q,id,nbinsx,xlow);
 					break;
 				case 8:
-					spdlog::info(q,id,xhigh);
+					//spdlog::info(q,id,xhigh);
 					break;
 				case 10:
-					spdlog::info(q,id,nbinsx,xhigh);
+					//spdlog::info(q,id,nbinsx,xhigh);
 					break;
 				case 12:
-					spdlog::info(q,id,xlow,xhigh);
+					//spdlog::info(q,id,xlow,xhigh);
 					break;
 				case 14:
-					spdlog::info(q,id,nbinsx,xlow,xhigh);
+					//spdlog::info(q,id,nbinsx,xlow,xhigh);
 					break;
 				case 16:
-					spdlog::info(q,id,nbinsy);
+					//spdlog::info(q,id,nbinsy);
 					break;
 				case 18:
-					spdlog::info(q,id,nbinsx,nbinsy);
+					//spdlog::info(q,id,nbinsx,nbinsy);
 					break;
 				case 20:
-					spdlog::info(q,id,xlow,nbinsy);
+					//spdlog::info(q,id,xlow,nbinsy);
 					break;
 				case 22:
-					spdlog::info(q,id,nbinsx,xlow,nbinsy);
+					//spdlog::info(q,id,nbinsx,xlow,nbinsy);
 					break;
 				case 24:
-					spdlog::info(q,id,xhigh,nbinsy);
+					//spdlog::info(q,id,xhigh,nbinsy);
 					break;
 				case 26:
-					spdlog::info(q,id,nbinsx,xhigh,nbinsy);
+					//spdlog::info(q,id,nbinsx,xhigh,nbinsy);
 					break;
 				case 28:
-					spdlog::info(q,id,xlow,xhigh,nbinsy);
+					//spdlog::info(q,id,xlow,xhigh,nbinsy);
 					break;
 				case 30:
-					spdlog::info(q,id,nbinsx,xlow,xhigh,nbinsy);
+					//spdlog::info(q,id,nbinsx,xlow,xhigh,nbinsy);
 					break;
 				case 32:
-					spdlog::info(q,id,ylow);
+					//spdlog::info(q,id,ylow);
 					break;
 				case 34:
-					spdlog::info(q,id,nbinsx,ylow);
+					//spdlog::info(q,id,nbinsx,ylow);
 					break;
 				case 36:
-					spdlog::info(q,id,xlow,ylow);
+					//spdlog::info(q,id,xlow,ylow);
 					break;
 				case 38:
-					spdlog::info(q,id,nbinsx,xlow,ylow);
+					//spdlog::info(q,id,nbinsx,xlow,ylow);
 					break;
 				case 40:
-					spdlog::info(q,id,xhigh,ylow);
+					//spdlog::info(q,id,xhigh,ylow);
 					break;
 				case 42:
-					spdlog::info(q,id,nbinsx,xhigh,ylow);
+					//spdlog::info(q,id,nbinsx,xhigh,ylow);
 					break;
 				case 44:
-					spdlog::info(q,id,xlow,xhigh,ylow);
+					//spdlog::info(q,id,xlow,xhigh,ylow);
 					break;
 				case 46:
-					spdlog::info(q,id,nbinsx,xlow,xhigh,ylow);
+					//spdlog::info(q,id,nbinsx,xlow,xhigh,ylow);
 					break;
 				case 48:
-					spdlog::info(q,id,nbinsy,ylow);
+					//spdlog::info(q,id,nbinsy,ylow);
 					break;
 				case 50:
-					spdlog::info(q,id,nbinsx,nbinsy,ylow);
+					//spdlog::info(q,id,nbinsx,nbinsy,ylow);
 					break;
 				case 52:
-					spdlog::info(q,id,xlow,nbinsy,ylow);
+					//spdlog::info(q,id,xlow,nbinsy,ylow);
 					break;
 				case 54:
-					spdlog::info(q,id,nbinsx,xlow,nbinsy,ylow);
+					//spdlog::info(q,id,nbinsx,xlow,nbinsy,ylow);
 					break;
 				case 56:
-					spdlog::info(q,id,xhigh,nbinsy,ylow);
+					//spdlog::info(q,id,xhigh,nbinsy,ylow);
 					break;
 				case 58:
-					spdlog::info(q,id,nbinsx,xhigh,nbinsy,ylow);
+					//spdlog::info(q,id,nbinsx,xhigh,nbinsy,ylow);
 					break;
 				case 62:
-					spdlog::info(q,id,xlow,xhigh,nbinsy,ylow);
+					//spdlog::info(q,id,xlow,xhigh,nbinsy,ylow);
 					break;
 				case 64:
-					spdlog::info(q,id,yhigh);
+					//spdlog::info(q,id,yhigh);
 					break;
 				case 66:
-					spdlog::info(q,id,nbinsx,yhigh);
+					//spdlog::info(q,id,nbinsx,yhigh);
 					break;
 				case 68:
-					spdlog::info(q,id,xlow,yhigh);
+					//spdlog::info(q,id,xlow,yhigh);
 					break;
 				case 70:
-					spdlog::info(q,id,nbinsx,xlow,yhigh);
+					//spdlog::info(q,id,nbinsx,xlow,yhigh);
 					break;
 				case 72:
-					spdlog::info(q,id,xhigh,yhigh);
+					//spdlog::info(q,id,xhigh,yhigh);
 					break;
 				case 74:
-					spdlog::info(q,id,nbinsx,xhigh,yhigh);
+					//spdlog::info(q,id,nbinsx,xhigh,yhigh);
 					break;
 				case 76:
-					spdlog::info(q,id,xlow,xhigh,yhigh);
+					//spdlog::info(q,id,xlow,xhigh,yhigh);
 					break;
 				case 78:
-					spdlog::info(q,id,nbinsx,xlow,xhigh,yhigh);
+					//spdlog::info(q,id,nbinsx,xlow,xhigh,yhigh);
 					break;
 				case 80:
-					spdlog::info(q,id,nbinsy,yhigh);
+					//spdlog::info(q,id,nbinsy,yhigh);
 					break;
 				case 82:
-					spdlog::info(q,id,nbinsx,nbinsy,yhigh);
+					//spdlog::info(q,id,nbinsx,nbinsy,yhigh);
 					break;
 				case 84:
-					spdlog::info(q,id,xlow,nbinsy,yhigh);
+					//spdlog::info(q,id,xlow,nbinsy,yhigh);
 					break;
 				case 86:
-					spdlog::info(q,id,nbinsx,xlow,nbinsy,yhigh);
+					//spdlog::info(q,id,nbinsx,xlow,nbinsy,yhigh);
 					break;
 				case 88:
-					spdlog::info(q,id,xhigh,nbinsy,yhigh);
+					//spdlog::info(q,id,xhigh,nbinsy,yhigh);
 					break;
 				case 90:
-					spdlog::info(q,id,nbinsx,xhigh,nbinsy,yhigh);
+					//spdlog::info(q,id,nbinsx,xhigh,nbinsy,yhigh);
 					break;
 				case 92:
-					spdlog::info(q,id,xlow,xhigh,nbinsy,yhigh);
+					//spdlog::info(q,id,xlow,xhigh,nbinsy,yhigh);
 					break;
 				case 94:
-					spdlog::info(q,id,nbinsx,xlow,xhigh,nbinsy,yhigh);
+					//spdlog::info(q,id,nbinsx,xlow,xhigh,nbinsy,yhigh);
 					break;
 				case 96:
-					spdlog::info(q,id,ylow,yhigh);
+					//spdlog::info(q,id,ylow,yhigh);
 					break;
 				case 98:
-					spdlog::info(q,id,nbinsx,ylow,yhigh);
+					//spdlog::info(q,id,nbinsx,ylow,yhigh);
 					break;
 				case 100:
-					spdlog::info(q,id,xlow,ylow,yhigh);
+					//spdlog::info(q,id,xlow,ylow,yhigh);
 					break;
 				case 102:
-					spdlog::info(q,id,nbinsx,xlow,ylow,yhigh);
+					//spdlog::info(q,id,nbinsx,xlow,ylow,yhigh);
 					break;
 				case 104:
-					spdlog::info(q,id,xhigh,ylow,yhigh);
+					//spdlog::info(q,id,xhigh,ylow,yhigh);
 					break;
 				case 106:
-					spdlog::info(q,id,nbinsx,xhigh,ylow,yhigh);
+					//spdlog::info(q,id,nbinsx,xhigh,ylow,yhigh);
 					break;
 				case 108:
-					spdlog::info(q,id,xlow,xhigh,ylow,yhigh);
+					//spdlog::info(q,id,xlow,xhigh,ylow,yhigh);
 					break;
 				case 110:
-					spdlog::info(q,id,nbinsx,xlow,xhigh,ylow,yhigh);
+					//spdlog::info(q,id,nbinsx,xlow,xhigh,ylow,yhigh);
 					break;
 				case 112:
-					spdlog::info(q,id,nbinsy,ylow,yhigh);
+					//spdlog::info(q,id,nbinsy,ylow,yhigh);
 					break;
 				case 114:
-					spdlog::info(q,id,nbinsx,nbinsy,ylow,yhigh);
+					//spdlog::info(q,id,nbinsx,nbinsy,ylow,yhigh);
 					break;
 				case 116:
-					spdlog::info(q,id,xlow,nbinsy,ylow,yhigh);
+					//spdlog::info(q,id,xlow,nbinsy,ylow,yhigh);
 					break;
 				case 118:
-					spdlog::info(q,id,nbinsx,xlow,nbinsy,ylow,yhigh);
+					//spdlog::info(q,id,nbinsx,xlow,nbinsy,ylow,yhigh);
 					break;
 				case 120:
-					spdlog::info(q,id,xhigh,nbinsy,ylow,yhigh);
+					//spdlog::info(q,id,xhigh,nbinsy,ylow,yhigh);
 					break;
 				case 122:
-					spdlog::info(q,id,nbinsx,xhigh,nbinsy,ylow,yhigh);
+					//spdlog::info(q,id,nbinsx,xhigh,nbinsy,ylow,yhigh);
 					break;
 				case 124:
-					spdlog::info(q,id,xlow,xhigh,nbinsy,ylow,yhigh);
+					//spdlog::info(q,id,xlow,xhigh,nbinsy,ylow,yhigh);
 					break;
 				default:
 					throw std::runtime_error("Invalid Histogram tag generation, only ID provided");
@@ -655,14 +647,14 @@ int main(int argc, char *argv[]) {
 		store(boost::program_options::command_line_parser(argc, argv).options(cmdline_options).positional(p).run(), vm);
 		notify(vm);
 		if( vm.count("help") or argc <= 2 ){
-			spdlog::info(cmdline_options);
+			//spdlog::info(cmdline_options);
 			exit(EXIT_SUCCESS);
 		}
 
 		if( files.size() < 1 ){
 			throw std::runtime_error("No input files given, see usage.");
 		}else{
-			spdlog::info("Provided {} config files to modify",files.size());
+			//spdlog::info("Provided {} config files to modify",files.size());
 		}
 
 		std::map<std::string,int> fcount;
@@ -680,7 +672,7 @@ int main(int argc, char *argv[]) {
 				}
 			}else{
 				fcount[f] += 1;
-				spdlog::warn("Found duplicate file : {}, has been input {} times so far. Not modifying it multiple times.",f,fcount[f]);
+				//spdlog::warn("Found duplicate file : {}, has been input {} times so far. Not modifying it multiple times.",f,fcount[f]);
 			}
 			std::filesystem::path p(f);
 			if( not std::filesystem::exists(p) ){
@@ -696,7 +688,7 @@ int main(int argc, char *argv[]) {
 		//split apart the strings and then show to the user and ask if they're valid before overwriting the input file
 		std::map<std::string,isotopetag> itags;
 		if( isotopes.size() > 0 ){
-			spdlog::info("Found {} isotope tags to generate for {} processor",isotopes.size(),procname);
+			//spdlog::info("Found {} isotope tags to generate for {} processor",isotopes.size(),procname);
 			ParseIsotopes(isotopes,itags);
 			if( validate ){
 				IsValid &= ValidateIsotopeTags(itags);
@@ -708,7 +700,7 @@ int main(int argc, char *argv[]) {
 		
 		std::map<std::string,cuttag> ctags;
 		if( cuts.size() > 0 ){
-			spdlog::info("Found {} cut tags to generate for {} processor",cuts.size(),procname);
+			//spdlog::info("Found {} cut tags to generate for {} processor",cuts.size(),procname);
 			ParseCuts(cuts,ctags);
 			if( validate ){
 				IsValid &= ValidateCutTags(ctags);
@@ -720,7 +712,7 @@ int main(int argc, char *argv[]) {
 
 		std::map<std::string,gatetag> gtags;
 		if( gates.size() > 0 ){
-			spdlog::info("Found {} gate tags to generate for {} processor",gates.size(),procname);
+			//spdlog::info("Found {} gate tags to generate for {} processor",gates.size(),procname);
 			ParseGates(gates,gtags);
 			if( validate ){
 				IsValid &= ValidateGateTags(gtags);
@@ -732,7 +724,7 @@ int main(int argc, char *argv[]) {
 
 		std::map<std::string,boxtag> btags;
 		if( boxes.size() > 0 ){
-			spdlog::info("Found {} box tags to generate for {} processor",boxes.size(),procname);
+			//spdlog::info("Found {} box tags to generate for {} processor",boxes.size(),procname);
 			ParseBoxes(boxes,btags);
 			if( validate ){
 				IsValid &= ValidateBoxTags(btags);
@@ -744,7 +736,7 @@ int main(int argc, char *argv[]) {
 
 		std::map<int,h1dtag> h1tags;
 		if( h1d.size() > 0 ){
-			spdlog::info("Found {} h1d tags to generate for {} processor",h1d.size(),procname);
+			//spdlog::info("Found {} h1d tags to generate for {} processor",h1d.size(),procname);
 			ParseH1D(h1d,h1tags);
 			if( validate ){
 				IsValid &= ValidateH1DTags(h1tags);
@@ -756,7 +748,7 @@ int main(int argc, char *argv[]) {
 
 		std::map<int,h2dtag> h2tags;
 		if( h2d.size() > 0 ){
-			spdlog::info("Found {} h2d tags to generate for {} processor",h2d.size(),procname);
+			//spdlog::info("Found {} h2d tags to generate for {} processor",h2d.size(),procname);
 			ParseH2D(h2d,h2tags);
 			if( validate ){
 				IsValid &= ValidateH2DTags(h2tags);
@@ -963,12 +955,12 @@ int main(int argc, char *argv[]) {
 				currfilename.replace_extension(".inserted.xml");
 				inputconfig.save_file(currfilename.c_str());
 			}else{
-				spdlog::warn("config {} does not have processor named {}, skipping over it",f,procname);
+				//spdlog::warn("config {} does not have processor named {}, skipping over it",f,procname);
 			}
 		}
 
 	}catch( std::exception& e){
-		spdlog::error(e.what());
+		//spdlog::error(e.what());
 		exit(EXIT_FAILURE);
 	}    
 }

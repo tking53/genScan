@@ -31,7 +31,7 @@ target_link_libraries(GenTofShifter PRIVATE pugixml GenScanUtility ${ROOT_LIBRAR
 list(APPEND EXE_LIST GenTofShifter)
 
 add_executable(GenProcessorInserter src/processorinserter.cpp)
-target_link_libraries(GenProcessorInserter PRIVATE pugixml)
+target_link_libraries(GenProcessorInserter PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES})
 list(APPEND EXE_LIST GenProcessorInserter)
 
 add_executable(GenKMeansCluster src/kmeansclustermain.cpp)
