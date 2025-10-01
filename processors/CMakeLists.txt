@@ -22,6 +22,13 @@ list(APPEND PROCESSOR_STRUCT_LIBS MtasStruct)
 list(APPEND PROCESSOR_STRUCT_PCM ${CMAKE_CURRENT_BINARY_DIR}/libMtasStruct_root_rdict.pcm)
 list(APPEND PROCESSOR_STRUCT_RMAP ${CMAKE_CURRENT_BINARY_DIR}/libMtasStruct_root.rootmap)
 
+ROOT_GENERATE_DICTIONARY(VetoStruct_root VetoStruct.hpp LINKDEF include/VetoStructLinkDef.hpp )
+add_library(VetoStruct SHARED VetoStruct_root.cxx VetoStruct_root)
+target_link_libraries(VetoStruct ${ROOT_LIBRARIES})
+list(APPEND PROCESSOR_STRUCT_LIBS VetoStruct)
+list(APPEND PROCESSOR_STRUCT_PCM ${CMAKE_CURRENT_BINARY_DIR}/libVetoStruct_root_rdict.pcm)
+list(APPEND PROCESSOR_STRUCT_RMAP ${CMAKE_CURRENT_BINARY_DIR}/libVetoStruct_root.rootmap)
+
 ROOT_GENERATE_DICTIONARY(MtasImplantStruct_root MtasImplantStruct.hpp LINKDEF include/MtasImplantStructLinkDef.hpp )
 add_library(MtasImplantStruct SHARED MtasImplantStruct_root.cxx MtasImplantStruct_root)
 target_link_libraries(MtasImplantStruct ${ROOT_LIBRARIES})

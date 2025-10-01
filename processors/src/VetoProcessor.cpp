@@ -3,6 +3,7 @@
 #include "EventSummary.hpp"
 #include "Gates.hpp"
 #include "HistogramManager.hpp"
+#include "VetoStruct.hpp"
 #include <TTree.h>
 #include <stdexcept>
 
@@ -22,6 +23,9 @@ VetoProcessor::VetoProcessor(const std::string& log) : Processor(log,"VetoProces
 	this->rit = 0.0;
 	this->fit = 0.0;
 	this->currsubtype = SUBTYPE::UNKNOWN;
+
+	this->rit_root = ProcessorStruct::DEFAULT_VETO_STRUCT;
+	this->fit_root = ProcessorStruct::DEFAULT_VETO_STRUCT;
 }
 
 [[maybe_unused]] bool VetoProcessor::PreProcess(EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
@@ -128,9 +132,15 @@ void VetoProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 }
 
 void VetoProcessor::RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>& outputtrees){
+	this->OutputTree = new TTree("Veto","Veto Processor output");
+	this->OutputTree->Branch("fit",&fit_root);
+	this->OutputTree->Branch("rit",&rit_root);
+	outputtrees[this->ProcessorName] = this->OutputTree;
 }
 
 void VetoProcessor::CleanupTree(){
+	this->rit_root = ProcessorStruct::DEFAULT_VETO_STRUCT;
+	this->fit_root = ProcessorStruct::DEFAULT_VETO_STRUCT;
 }
 
 void VetoProcessor::Reset(){

@@ -655,8 +655,27 @@ void PidProcessor::RegisterTree([[maybe_unused]] std::unordered_map<std::string,
 	this->OutputTree->Branch("db5",&(db5));
 	this->OutputTree->Branch("fp1",&(fp1));
 	this->OutputTree->Branch("fp2",&(fp2));
+	this->OutputTree->Branch("fp1Tof_0",&(fp1Tofs.at(0)));
+	this->OutputTree->Branch("fp1Tof_1",&(fp1Tofs.at(1)));
+	this->OutputTree->Branch("fp1Tof_2",&(fp1Tofs.at(2)));
+	this->OutputTree->Branch("fp1Tof_3",&(fp1Tofs.at(3)));
+	this->OutputTree->Branch("fp1Tof_4",&(fp1Tofs.at(4)));
+	this->OutputTree->Branch("fp1Tof_5",&(fp1Tofs.at(5)));
+	this->OutputTree->Branch("fp1Tof_6",&(fp1Tofs.at(6)));
+	this->OutputTree->Branch("fp1Tof_7",&(fp1Tofs.at(7)));
+	this->OutputTree->Branch("fp1Tof_8",&(fp1Tofs.at(8)));
+	this->OutputTree->Branch("fp1Tof_9",&(fp1Tofs.at(9)));
+	this->OutputTree->Branch("fp2Tof_0",&(fp2Tofs.at(0)));
+	this->OutputTree->Branch("fp2Tof_1",&(fp2Tofs.at(1)));
+	this->OutputTree->Branch("fp2Tof_2",&(fp2Tofs.at(2)));
+	this->OutputTree->Branch("fp2Tof_3",&(fp2Tofs.at(3)));
+	this->OutputTree->Branch("fp2Tof_4",&(fp2Tofs.at(4)));
+	this->OutputTree->Branch("fp2Tof_5",&(fp2Tofs.at(5)));
+	this->OutputTree->Branch("fp2Tof_6",&(fp2Tofs.at(6)));
+	this->OutputTree->Branch("fp2Tof_7",&(fp2Tofs.at(7)));
+	this->OutputTree->Branch("fp2Tof_8",&(fp2Tofs.at(8)));
+	this->OutputTree->Branch("fp2Tof_9",&(fp2Tofs.at(9)));
 	outputtrees[this->ProcessorName] = this->OutputTree;
-
 }
 
 void PidProcessor::CleanupTree(){
@@ -666,15 +685,15 @@ void PidProcessor::CleanupTree(){
 	this->db5 = ProcessorStruct::DEFAULT_DBOX_STRUCT;
 	this->fp1 = ProcessorStruct::DEFAULT_FP_STRUCT;
 	this->fp2 = ProcessorStruct::DEFAULT_FP_STRUCT;
-}
-
-void PidProcessor::Reset(){
 	for ( auto& iter: fp1Tofs){
 		iter = std::numeric_limits<double>::max();
 	}
 	for ( auto& iter: fp2Tofs){
 		iter = std::numeric_limits<double>::max();
 	}
+}
+
+void PidProcessor::Reset(){
 }
 
 

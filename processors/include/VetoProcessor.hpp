@@ -3,6 +3,7 @@
 
 #include "Gates.hpp"
 #include "Processor.hpp"
+#include "VetoStruct.hpp"
 #include <vector>
 
 class VetoProcessor : public Processor{
@@ -39,6 +40,10 @@ class VetoProcessor : public Processor{
 
 		std::vector<Gate<double>> FitReject;
 		std::vector<Gate<double>> RitReject;
+
+		ProcessorStruct::Veto fit_root;
+		ProcessorStruct::Veto rit_root;
+		
 };
 
 #endif
