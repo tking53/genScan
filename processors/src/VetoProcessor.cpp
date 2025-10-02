@@ -51,17 +51,26 @@ VetoProcessor::VetoProcessor(const std::string& log) : Processor(log,"VetoProces
 		if( this->currsubtype == SUBTYPE::FIT ){
 			if( evt->GetEnergy() > this->fit ){
 				this->fit = evt->GetEnergy();
+				this->fit_root.energy = evt->GetEnergy();
+				this->fit_root.pileup = evt->GetPileup();
+				this->fit_root.saturate = evt->GetSaturation();
+				this->fit_root.timestamp = evt->GetTimeStamp();
 			}
 			hismanager->Fill("VETO_1010",evt->GetEnergy());
 		}else if( this->currsubtype == SUBTYPE::RIT ){
 			if( evt->GetEnergy() > this->rit ){
 				this->rit = evt->GetEnergy();
+				this->rit_root.energy = evt->GetEnergy();
+				this->rit_root.pileup = evt->GetPileup();
+				this->rit_root.saturate = evt->GetSaturation();
+				this->rit_root.timestamp = evt->GetTimeStamp();
 			}
 			hismanager->Fill("VETO_2010",evt->GetEnergy());
 		}else{
 			//no-op
 		}
 	}
+
 
 	for( const auto& g : this->FitReject ){
 		if( g.IsWithin(this->fit) ){
