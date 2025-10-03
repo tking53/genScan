@@ -63,30 +63,7 @@ int main(int argc, char *argv[]) {
 	boost::program_options::positional_options_description p;
 	p.add("inputfile", -1);
 
-	const std::string logname = "genmerger";
-	const std::string logfilename = (outputprefix)+".log";
-	const std::string errfilename = (outputprefix)+".err";
-	const std::string dbgfilename = (outputprefix)+".dbg";
 
-	spdlog::set_level(spdlog::level::debug);
-	std::shared_ptr<spdlog::sinks::basic_file_sink_mt> LogFileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(logfilename,true);
-	LogFileSink->set_level(spdlog::level::info);
-
-	std::shared_ptr<spdlog::sinks::basic_file_sink_mt> ErrorFileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(errfilename,true);
-	ErrorFileSink->set_level(spdlog::level::err);
-
-	std::shared_ptr<spdlog::sinks::basic_file_sink_mt> DebugFileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(dbgfilename,true);
-	DebugFileSink->set_level(spdlog::level::debug);
-
-	std::shared_ptr<spdlog::sinks::stdout_color_sink_mt> LogFileConsole = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-	LogFileConsole->set_level(spdlog::level::info);
-
-	std::vector<spdlog::sink_ptr> sinks {DebugFileSink,LogFileSink,ErrorFileSink,LogFileConsole};
-	auto console = std::make_shared<spdlog::logger>(logname,sinks.begin(),sinks.end());
-	spdlog::initialize_logger(console);
-	console->flush_on(spdlog::level::info);
-	
-	console->info("Beginning running");
 
 	try{
 		boost::program_options::variables_map vm;
@@ -96,6 +73,32 @@ int main(int argc, char *argv[]) {
 			spdlog::info(cmdline_options);
 			exit(EXIT_SUCCESS);
 		}
+
+
+		const std::string logname = "genmerger";
+		const std::string logfilename = (outputprefix)+".log";
+		const std::string errfilename = (outputprefix)+".err";
+		const std::string dbgfilename = (outputprefix)+".dbg";
+
+		spdlog::set_level(spdlog::level::debug);
+		std::shared_ptr<spdlog::sinks::basic_file_sink_mt> LogFileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(logfilename,true);
+		LogFileSink->set_level(spdlog::level::info);
+
+		std::shared_ptr<spdlog::sinks::basic_file_sink_mt> ErrorFileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(errfilename,true);
+		ErrorFileSink->set_level(spdlog::level::err);
+
+		std::shared_ptr<spdlog::sinks::basic_file_sink_mt> DebugFileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(dbgfilename,true);
+		DebugFileSink->set_level(spdlog::level::debug);
+
+		std::shared_ptr<spdlog::sinks::stdout_color_sink_mt> LogFileConsole = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+		LogFileConsole->set_level(spdlog::level::info);
+
+		std::vector<spdlog::sink_ptr> sinks {DebugFileSink,LogFileSink,ErrorFileSink,LogFileConsole};
+		auto console = std::make_shared<spdlog::logger>(logname,sinks.begin(),sinks.end());
+		spdlog::initialize_logger(console);
+		console->flush_on(spdlog::level::info);
+
+		console->info("Beginning running");
 
 		YAML::Node doc = YAML::LoadFile(configfile);
 
@@ -185,6 +188,7 @@ int main(int argc, char *argv[]) {
 		HistogramManager->RegisterPlot<TH2F>("Mtas_TDiff_Beta_Ion_Gamma_ms","TDiff vs Energy [Beta - Ion - Gamma]; Energy (keV); TDiff (s); ",His2D["Mtas_TDiff_Beta_Ion_Gamma_ms"]);
 		HistogramManager->RegisterPlot<TH2F>("Mtas_TDiff_Beta_Ion_Gamma_s","TDiff vs Energy [Beta - Ion - Gamma]; Energy (keV); TDiff (s); ",His2D["Mtas_TDiff_Beta_Ion_Gamma_s"]);
 		
+		console->info("Generating {}.list file that contains all the declared histograms",StringManip::GetFileBaseName(outputprefix));
 		HistogramManager->WriteInfo();
 
 		ProcessorStruct::MtasImplant* lowgain = nullptr;
@@ -410,8 +414,10 @@ int main(int argc, char *argv[]) {
 		const auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(global_run_time - hrs - mins - secs);
 		console->info("Finished running in {} hours {} minutes {} seconds {} milliseconds",hrs.count(),mins.count(),secs.count(),ms.count());
 		console->critical("All data has been written to {}.root",outputprefix);
+		spdlog::shutdown();
 	}catch( std::exception& e){
 		spdlog::error(e.what());
+		spdlog::shutdown();
 		exit(EXIT_FAILURE);
 	}    
 }
