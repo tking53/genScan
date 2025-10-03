@@ -356,6 +356,7 @@ add_subdirectory(translators)
 add_subdirectory(fitters)
 add_subdirectory(tools)
 add_subdirectory(scripts)
+add_subdirectory(merger)
 
 #MUST BE LAST
 option(GS_BUILD_DOCS "Enable debugging the correlator, output will be very slow" OFF)
