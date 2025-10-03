@@ -117,7 +117,7 @@ int main(int argc, char *argv[]) {
 
 		std::map<std::string,PLOTS::HisHelper1D> His1D = {
 			{"TDiff_Beta_Ion_s",{1000,-10,10}},
-			{"TDiff_Beta_Ion_ms",{1000,-10,10}},
+			{"TDiff_Beta_Ion_ms",{10000,-500,500}},
 			{"Radius_Beta_Ion",{1000,0,10}}
 		};
 
@@ -133,8 +133,6 @@ int main(int argc, char *argv[]) {
 			{"Implant_Radius_Beta_Ion",{16384,0,16384,1000,0,10}},
 			{"AnodeSum_Radius_Beta_Ion",{4096,0,16384,1000,0,10}},
 			{"TDiff_Radius_Beta_Ion_s",{1000,-10,10,1000,0,10}},
-			{"TDiff_Radius_Beta_Ion_ms",{1000,-10,10,1000,0,10}},
-			{"Mtas_TDiff_Beta_Ion_Gamma_ms",{16384,0,16384,1000,-10,10}},
 			{"Mtas_TDiff_Beta_Ion_Gamma_s",{16384,0,16384,1000,-10,10}}
 		};
 
@@ -183,9 +181,7 @@ int main(int argc, char *argv[]) {
 
 		HistogramManager->RegisterPlot<TH2F>("Implant_Radius_Beta_Ion","Radius vs Energy [Beta - Ion]; Energy (keV); Radius (arb.); ",His2D["Implant_Radius_Beta_Ion"]);
 		HistogramManager->RegisterPlot<TH2F>("TDiff_Radius_Beta_Ion_s","Radius vs TDiff [Beta - Ion];  TDiff (s); Radius (arb.)",His2D["TDiff_Radius_Beta_Ion_s"]);
-		HistogramManager->RegisterPlot<TH2F>("TDiff_Radius_Beta_Ion_ms","Radius vs TDiff [Beta - Ion]; TDiff (s); Radius (arb.) ",His2D["TDiff_Radius_Beta_Ion_ms"]);
 		HistogramManager->RegisterPlot<TH2F>("AnodeSum_Radius_Beta_Ion","Radius vs Energy [Beta - Ion]; Energy (keV); Radius (arb.); ",His2D["AnodeSum_Radius_Beta_Ion"]);
-		HistogramManager->RegisterPlot<TH2F>("Mtas_TDiff_Beta_Ion_Gamma_ms","TDiff vs Energy [Beta - Ion - Gamma]; Energy (keV); TDiff (s); ",His2D["Mtas_TDiff_Beta_Ion_Gamma_ms"]);
 		HistogramManager->RegisterPlot<TH2F>("Mtas_TDiff_Beta_Ion_Gamma_s","TDiff vs Energy [Beta - Ion - Gamma]; Energy (keV); TDiff (s); ",His2D["Mtas_TDiff_Beta_Ion_Gamma_s"]);
 		
 		console->info("Generating {}.list file that contains all the declared histograms",StringManip::GetFileBaseName(outputprefix));
@@ -389,13 +385,11 @@ int main(int argc, char *argv[]) {
 				HistogramManager->Fill("Radius_Beta_Ion",radius);
 
 				HistogramManager->Fill("Implant_Radius_Beta_Ion",beta_erg,radius);
-				HistogramManager->Fill("TDiff_Radius_Beta_Ion_s",tdiff,radius);
-				HistogramManager->Fill("TDiff_Radius_Beta_Ion_ms",1.0e3*tdiff,radius);
 				HistogramManager->Fill("AnodeSum_Radius_Beta_Ion",beta_anode_sum,radius);
+				HistogramManager->Fill("TDiff_Radius_Beta_Ion_s",tdiff,radius);
 
 				const auto T = ValidTotals[iter][0].sumenergy;
 				HistogramManager->Fill("Mtas_TDiff_Beta_Ion_Gamma_s",T,tdiff);
-				HistogramManager->Fill("Mtas_TDiff_Beta_Ion_Gamma_s",T,1.0e3*tdiff);
 			}
 			++iiter;
 		}
