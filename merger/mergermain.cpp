@@ -128,7 +128,9 @@ int main(int argc, char *argv[]) {
 
 		std::map<std::string,PLOTS::HisHelper2D> His2D = {
 			{"Energy_Radius_Beta_Ion",{4096,0,16384,1000,0,10}},
-			{"AnodeSum_Radius_Beta_Ion",{4096,0,16384,1000,0,10}}
+			{"AnodeSum_Radius_Beta_Ion",{4096,0,16384,1000,0,10}},
+			{"TDiff_Radius_Beta_Ion_s",{1000,-10,10,1000,0,10}},
+			{"TDiff_Radius_Beta_Ion_ms",{1000,-10,10,1000,0,10}}
 		};
 
 		for( const auto& kv : doc["HISTOGRAM2D"] ){
@@ -175,6 +177,8 @@ int main(int argc, char *argv[]) {
 		HistogramManager->RegisterPlot<TH1F>("Radius_Beta_Ion","Radius [Beta - Ion]; Radius (arb.); ",His1D["Radius_Beta_Ion"]);
 
 		HistogramManager->RegisterPlot<TH2F>("Energy_Radius_Beta_Ion","Radius vs Energy [Beta - Ion]; Energy (keV); Radius (arb.); ",His2D["Energy_Radius_Beta_Ion"]);
+		HistogramManager->RegisterPlot<TH2F>("TDiff_Radius_Beta_Ion_s","Radius vs TDiff [Beta - Ion]; Energy (keV); TDiff (s); ",His2D["TDiff_Radius_Beta_Ion_s"]);
+		HistogramManager->RegisterPlot<TH2F>("TDiff_Radius_Beta_Ion_ms","Radius vs TDiff [Beta - Ion]; Energy (keV); TDiff (s); ",His2D["TDiff_Radius_Beta_Ion_ms"]);
 		HistogramManager->RegisterPlot<TH2F>("AnodeSum_Radius_Beta_Ion","Radius vs Energy [Beta - Ion]; Energy (keV); Radius (arb.); ",His2D["AnodeSum_Radius_Beta_Ion"]);
 		
 		HistogramManager->WriteInfo();
@@ -278,9 +282,9 @@ int main(int argc, char *argv[]) {
 		auto num_entries = pid->GetEntries();
 		auto piter = num_entries/10;
 
-		std::vector<std::pair<Long64_t,double>> ValidImplants;
-		std::vector<std::pair<Long64_t,double>> RitRejectedImplants;
-		std::vector<std::pair<Long64_t,double>> ValidBetas;
+		std::vector<ProcessorStruct::MtasImplant> ValidImplants;
+		std::vector<ProcessorStruct::MtasImplant> RitRejectedImplants;
+		std::vector<ProcessorStruct::MtasImplant> ValidBetas;
 		for( Long64_t ii = 0; ii < num_entries; ++ii ){
 			if( ii%piter == 0 ){
 				console->info("Processed {}/{} Events",ii,num_entries);
@@ -305,13 +309,13 @@ int main(int argc, char *argv[]) {
 				}
 				//this is checking for either light ion or beta
 				if( not LightIon ){
-					ValidImplants.push_back({ii,lowgain->dynodets});
+					ValidImplants.push_back(*lowgain);
 				}else{
-					RitRejectedImplants.push_back({ii,lowgain->dynodets});
+					RitRejectedImplants.push_back(*lowgain);
 				}
 			}
 			if( hasbeta ){
-				ValidBetas.push_back({ii,highgain->dynodets});
+				ValidBetas.push_back(*highgain);
 			}
 		}
 
@@ -326,49 +330,33 @@ int main(int argc, char *argv[]) {
 
 		//the actual correlation step
 		console->info("Begin sorting");
-		std::map<Long64_t,std::vector<Long64_t>> BetaIndices;
+
+		auto period = ValidImplants.size()/10;
+		auto iiter = 0;
 		for( const auto& ion : ValidImplants ){
-			const auto b = ion.second + backward_corr_time*1.0e9; 
+			if( iiter%period == 0 ){
+				console->info("Completed {}/{} Correllations",iiter,ValidImplants.size());
+			}
+			const auto b = ion.dynodets + backward_corr_time*1.0e9; 
 			auto beta_begin = std::lower_bound(ValidBetas.begin(),ValidBetas.end(),b,
-					[](const std::pair<Long64_t,double>& b,double t){ 
-						return b.second <= t; 
+					[](const ProcessorStruct::MtasImplant& b,double t){ 
+						return b.dynodets <= t; 
 					});
 
-			const auto f = ion.second + forward_corr_time*1.0e9; 
+			const auto f = ion.dynodets + forward_corr_time*1.0e9; 
 			auto beta_end = std::upper_bound(ValidBetas.begin(),ValidBetas.end(),f,
-					[](double t,const std::pair<Long64_t,double>& b){ 
-						return b.second >= t; 
+					[](double t,const ProcessorStruct::MtasImplant& b){ 
+						return b.dynodets >= t; 
 					});
 
 			//console->info("{}:{} {} {}:{}",beta_begin->first,beta_begin->second,ion.second,beta_end->first,beta_end->second);
+			const auto ion_ts = ion.dynodets;
+			const auto ion_x = ion.highresx;
+			const auto ion_y = ion.highresy;
 			for( auto iter = ValidBetas.begin()+std::distance(ValidBetas.begin(),beta_begin); iter != ValidBetas.begin()+std::distance(ValidBetas.begin(),beta_end); ++iter ){
-				BetaIndices[ion.first].push_back(iter->first);	
-			}
-		}
-		//for( const auto& beta : ValidBetas ){
-		//	for( const auto& ion : ValidImplants ){
-		//		if( IsWithinCorrelationWindow(forward_corr_time,backward_corr_time,ion.second,beta.second) ){
-		//			BetaIndices[ion.first].push_back(beta.first);
-		//		}
-		//	}	
-		//}
-		console->info("Finished sorting");
-
-		auto biter = BetaIndices.size()/10;
-		auto iter = 0;
-		for( const auto& kv : BetaIndices ){
-			implant->GetEntry(kv.first);
-			if( iter%biter == 0 ){
-				console->info("Correlated {}/{} Beta-Ion events",iter,BetaIndices.size());
-			}
-			const auto ion_ts = lowgain->dynodets;
-			const auto ion_x = lowgain->highresx;
-			const auto ion_y = lowgain->highresy;
-			for( const auto& b_entry : kv.second ){
-				implant->GetEntry(b_entry);
-				const auto beta_ts = highgain->dynodets;
-				const auto beta_x = highgain->highresx;
-				const auto beta_y = highgain->highresy;
+				const auto beta_ts = iter->dynodets;
+				const auto beta_x = iter->highresx;
+				const auto beta_y = iter->highresy;
 				const auto tdiff = 1.0e-9*(beta_ts - ion_ts);
 				const auto xdiff = ion_x - beta_x;
 				const auto ydiff = ion_y - beta_y;
@@ -380,13 +368,15 @@ int main(int argc, char *argv[]) {
 				HistogramManager->Fill("TDiff_Beta_Ion_ms",1.0e3*tdiff);
 				HistogramManager->Fill("Radius_Beta_Ion",radius);
 				HistogramManager->Fill("Energy_Radius_Beta_Ion",beta_erg,radius);
+				HistogramManager->Fill("TDiff_Radius_Beta_Ion_s",tdiff,radius);
+				HistogramManager->Fill("TDiff_Radius_Beta_Ion_ms",1.0e3*tdiff,radius);
 				HistogramManager->Fill("AnodeSum_Radius_Beta_Ion",beta_anode_sum,radius);
 			}
-			++iter;
+			++iiter;
 		}
+		console->info("Finished sorting");
 
 		std::shared_ptr<RootFileManager> RootManager(new RootFileManager(logname,StringManip::StripFileExtension(outputprefix),false));
-		console->info("Created Root File Manager");
 
 		HistogramManager->WriteAllPlots();
 
