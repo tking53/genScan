@@ -344,7 +344,6 @@ int main(int argc, char *argv[]) {
 			for( auto iter = ValidBetas.begin()+std::distance(ValidBetas.begin(),beta_begin); iter != ValidBetas.begin()+std::distance(ValidBetas.begin(),beta_end); ++iter ){
 				BetaIndices[ion.first].push_back(iter->first);	
 			}
-			console->info("{}",BetaIndices[ion.first].size());
 		}
 		//for( const auto& beta : ValidBetas ){
 		//	for( const auto& ion : ValidImplants ){
