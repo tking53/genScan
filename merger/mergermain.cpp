@@ -127,10 +127,12 @@ int main(int argc, char *argv[]) {
 		}
 
 		std::map<std::string,PLOTS::HisHelper2D> His2D = {
-			{"Energy_Radius_Beta_Ion",{4096,0,16384,1000,0,10}},
+			{"Implant_Radius_Beta_Ion",{4096,0,16384,1000,0,10}},
 			{"AnodeSum_Radius_Beta_Ion",{4096,0,16384,1000,0,10}},
 			{"TDiff_Radius_Beta_Ion_s",{1000,-10,10,1000,0,10}},
-			{"TDiff_Radius_Beta_Ion_ms",{1000,-10,10,1000,0,10}}
+			{"TDiff_Radius_Beta_Ion_ms",{1000,-10,10,1000,0,10}},
+			{"Mtas_TDiff_Beta_Ion_Gamma_ms",{16384,0,16384,1000,-10,10}},
+			{"Mtas_TDiff_Beta_Ion_Gamma_s",{16384,0,16384,1000,-10,10}}
 		};
 
 		for( const auto& kv : doc["HISTOGRAM2D"] ){
@@ -176,10 +178,12 @@ int main(int argc, char *argv[]) {
 		
 		HistogramManager->RegisterPlot<TH1F>("Radius_Beta_Ion","Radius [Beta - Ion]; Radius (arb.); ",His1D["Radius_Beta_Ion"]);
 
-		HistogramManager->RegisterPlot<TH2F>("Energy_Radius_Beta_Ion","Radius vs Energy [Beta - Ion]; Energy (keV); Radius (arb.); ",His2D["Energy_Radius_Beta_Ion"]);
-		HistogramManager->RegisterPlot<TH2F>("TDiff_Radius_Beta_Ion_s","Radius vs TDiff [Beta - Ion]; Energy (keV); TDiff (s); ",His2D["TDiff_Radius_Beta_Ion_s"]);
-		HistogramManager->RegisterPlot<TH2F>("TDiff_Radius_Beta_Ion_ms","Radius vs TDiff [Beta - Ion]; Energy (keV); TDiff (s); ",His2D["TDiff_Radius_Beta_Ion_ms"]);
+		HistogramManager->RegisterPlot<TH2F>("Implant_Radius_Beta_Ion","Radius vs Energy [Beta - Ion]; Energy (keV); Radius (arb.); ",His2D["Implant_Radius_Beta_Ion"]);
+		HistogramManager->RegisterPlot<TH2F>("TDiff_Radius_Beta_Ion_s","Radius vs TDiff [Beta - Ion];  TDiff (s); Radius (arb.)",His2D["TDiff_Radius_Beta_Ion_s"]);
+		HistogramManager->RegisterPlot<TH2F>("TDiff_Radius_Beta_Ion_ms","Radius vs TDiff [Beta - Ion]; TDiff (s); Radius (arb.) ",His2D["TDiff_Radius_Beta_Ion_ms"]);
 		HistogramManager->RegisterPlot<TH2F>("AnodeSum_Radius_Beta_Ion","Radius vs Energy [Beta - Ion]; Energy (keV); Radius (arb.); ",His2D["AnodeSum_Radius_Beta_Ion"]);
+		HistogramManager->RegisterPlot<TH2F>("Mtas_TDiff_Beta_Ion_Gamma_ms","TDiff vs Energy [Beta - Ion - Gamma]; Energy (keV); TDiff (s); ",His2D["Mtas_TDiff_Beta_Ion_Gamma_ms"]);
+		HistogramManager->RegisterPlot<TH2F>("Mtas_TDiff_Beta_Ion_Gamma_s","TDiff vs Energy [Beta - Ion - Gamma]; Energy (keV); TDiff (s); ",His2D["Mtas_TDiff_Beta_Ion_Gamma_s"]);
 		
 		HistogramManager->WriteInfo();
 
@@ -285,6 +289,8 @@ int main(int argc, char *argv[]) {
 		std::vector<ProcessorStruct::MtasImplant> ValidImplants;
 		std::vector<ProcessorStruct::MtasImplant> RitRejectedImplants;
 		std::vector<ProcessorStruct::MtasImplant> ValidBetas;
+		std::vector<std::vector<ProcessorStruct::MtasTotal>> ValidTotals;
+		std::vector<std::vector<ProcessorStruct::MtasSegment>> ValidSegments;
 		for( Long64_t ii = 0; ii < num_entries; ++ii ){
 			if( ii%piter == 0 ){
 				console->info("Processed {}/{} Events",ii,num_entries);
@@ -293,6 +299,7 @@ int main(int argc, char *argv[]) {
 			pid->GetEntry(ii);
 			implant->GetEntry(ii);
 			veto->GetEntry(ii);
+			mtas->GetEntry(ii);
 			//this is the gate placed in EXP_11012, 
 			bool LightIon = false;
 			bool hasbeta = ValidBeta.IsWithin(highgain->dynodeerg);
@@ -316,6 +323,13 @@ int main(int argc, char *argv[]) {
 			}
 			if( hasbeta ){
 				ValidBetas.push_back(*highgain);
+				ValidTotals.push_back({*(Total[0]),*(Total[1]),*(Total[2]),*(Total[3]),*(Total[4])});
+				ValidSegments.push_back({
+						*(Segment[0]),*(Segment[1]),*(Segment[2]),*(Segment[3]),*(Segment[4]),*(Segment[5]),
+						*(Segment[6]),*(Segment[7]),*(Segment[8]),*(Segment[9]),*(Segment[10]),*(Segment[11]),
+						*(Segment[12]),*(Segment[13]),*(Segment[14]),*(Segment[15]),*(Segment[16]),*(Segment[17]),
+						*(Segment[18]),*(Segment[19]),*(Segment[20]),*(Segment[21]),*(Segment[22]),*(Segment[23])
+						});
 			}
 		}
 
@@ -353,10 +367,12 @@ int main(int argc, char *argv[]) {
 			const auto ion_ts = ion.dynodets;
 			const auto ion_x = ion.highresx;
 			const auto ion_y = ion.highresy;
-			for( auto iter = ValidBetas.begin()+std::distance(ValidBetas.begin(),beta_begin); iter != ValidBetas.begin()+std::distance(ValidBetas.begin(),beta_end); ++iter ){
-				const auto beta_ts = iter->dynodets;
-				const auto beta_x = iter->highresx;
-				const auto beta_y = iter->highresy;
+			auto start = std::distance(ValidBetas.begin(),beta_begin);
+			auto stop = std::distance(ValidBetas.begin(),beta_end);
+			for( auto iter = start; iter < stop; ++iter ){
+				const auto beta_ts = ValidBetas[iter].dynodets;
+				const auto beta_x = ValidBetas[iter].highresx;
+				const auto beta_y = ValidBetas[iter].highresy;
 				const auto tdiff = 1.0e-9*(beta_ts - ion_ts);
 				const auto xdiff = ion_x - beta_x;
 				const auto ydiff = ion_y - beta_y;
@@ -367,10 +383,15 @@ int main(int argc, char *argv[]) {
 				HistogramManager->Fill("TDiff_Beta_Ion_s",tdiff);
 				HistogramManager->Fill("TDiff_Beta_Ion_ms",1.0e3*tdiff);
 				HistogramManager->Fill("Radius_Beta_Ion",radius);
-				HistogramManager->Fill("Energy_Radius_Beta_Ion",beta_erg,radius);
+
+				HistogramManager->Fill("Implant_Radius_Beta_Ion",beta_erg,radius);
 				HistogramManager->Fill("TDiff_Radius_Beta_Ion_s",tdiff,radius);
 				HistogramManager->Fill("TDiff_Radius_Beta_Ion_ms",1.0e3*tdiff,radius);
 				HistogramManager->Fill("AnodeSum_Radius_Beta_Ion",beta_anode_sum,radius);
+
+				const auto T = ValidTotals[iter][0].sumenergy;
+				HistogramManager->Fill("Mtas_TDiff_Beta_Ion_Gamma_s",T,tdiff);
+				HistogramManager->Fill("Mtas_TDiff_Beta_Ion_Gamma_s",T,1.0e3*tdiff);
 			}
 			++iiter;
 		}
