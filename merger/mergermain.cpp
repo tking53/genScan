@@ -130,7 +130,7 @@ int main(int argc, char *argv[]) {
 		}
 
 		std::map<std::string,PLOTS::HisHelper2D> His2D = {
-			{"Implant_Radius_Beta_Ion",{4096,0,16384,1000,0,10}},
+			{"Implant_Radius_Beta_Ion",{16384,0,16384,1000,0,10}},
 			{"AnodeSum_Radius_Beta_Ion",{4096,0,16384,1000,0,10}},
 			{"TDiff_Radius_Beta_Ion_s",{1000,-10,10,1000,0,10}},
 			{"TDiff_Radius_Beta_Ion_ms",{1000,-10,10,1000,0,10}},
@@ -381,8 +381,8 @@ int main(int argc, char *argv[]) {
 				const auto xdiff = ion_x - beta_x;
 				const auto ydiff = ion_y - beta_y;
 				const auto radius = std::sqrt(xdiff*xdiff + ydiff*ydiff);
-				const auto beta_erg = highgain->dynodeerg;
-				const auto beta_anode_sum = highgain->anodesum;
+				const auto beta_erg = ValidBetas[iter].dynodeerg;
+				const auto beta_anode_sum = ValidBetas[iter].anodesum;
 
 				HistogramManager->Fill("TDiff_Beta_Ion_s",tdiff);
 				HistogramManager->Fill("TDiff_Beta_Ion_ms",1.0e3*tdiff);
