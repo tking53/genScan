@@ -317,6 +317,7 @@ struct PeakFitter1D : public PeakFitter{
 		this->fithist->SetLineColor(kBlack);
 
 		this->fitfunc = new TF1("SimpleImplantationCurve",&PeakFit::SimpleImplantationCurve,XFitRange.first,XFitRange.second,3);
+		this->fitfunc->SetNpx(this->fithist->GetNbinsX()*10);
 		this->fitfunc->SetLineColor(kRed);
 		this->components = {
 			new TF1("Constant",&CommonFit::Constant,XFitRange.first,XFitRange.second,1),
@@ -324,6 +325,8 @@ struct PeakFitter1D : public PeakFitter{
 		};
 		this->components.at(0)->SetLineColor(kMagenta);
 		this->components.at(1)->SetLineColor(kGreen);
+		this->components.at(0)->SetNpx(this->fithist->GetNbinsX()*10);
+		this->components.at(1)->SetNpx(this->fithist->GetNbinsX()*10);
 
 		auto leftbin = this->fithist->FindBin(XFitRange.first);
 		auto zerobin = this->fithist->FindBin(0.0);
