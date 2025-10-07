@@ -305,12 +305,71 @@ struct PeakFitter1D : public PeakFitter{
 			this->InitSingleTailingGaussNLinBkgFit();
 		}else if( mode == 5 ){
 			this->InitErfFit();
+		}else if( mode == 500 ){
+			this->InitSimpleImplantationCurveFit();
 		}else{
 			throw std::runtime_error("Unknown peak fitting mode");
 		}
 	}
 
 
+	void InitSimpleImplantationCurveFit(){
+		this->fithist->SetLineColor(kBlack);
+
+		this->fitfunc = new TF1("SimpleImplantationCurve",&PeakFit::SimpleImplantationCurve,XFitRange.first,XFitRange.second,3);
+		this->fitfunc->SetLineColor(kRed);
+		this->components = {
+			new TF1("Constant",&CommonFit::Constant,XFitRange.first,XFitRange.second,1),
+			new TF1("SimpleHalfLife",&PeakFit::SimpleHalfLife,0.0,XFitRange.second,2)
+		};
+		this->components.at(0)->SetLineColor(kMagenta);
+		this->components.at(1)->SetLineColor(kGreen);
+
+		auto leftbin = this->fithist->FindBin(XFitRange.first);
+		auto zerobin = this->fithist->FindBin(0.0);
+		auto rightbin = this->fithist->FindBin(XFitRange.second);
+		double bkg = this->fithist->Integral(leftbin,zerobin)/(zerobin-leftbin);
+		double l = this->fithist->GetBinContent(zerobin+1) - bkg;
+		double h = l/2.0;
+		double half_life = XFitRange.second;
+		for( int jj = zerobin; jj < rightbin; ++jj ){
+			if( (this->fithist->GetBinContent(jj) - bkg) < h ){
+				half_life = this->fithist->GetBinCenter(jj);
+				break;
+			}
+		}
+		double amp = this->fithist->GetBinContent(zerobin+1);
+		this->keys = { {"Constant",{0,bkg}}, {"Amplitude",{1,amp}}, {"HalfLife",{2,half_life}}};
+		AssignFitParNames();
+		VerifyFixedValues();
+		VerifyBoundedValues();
+
+		auto minbin = this->fithist->FindBin(this->XFitRange.first);
+		auto maxbin = this->fithist->FindBin(this->XFitRange.second);
+		auto integral = this->fithist->Integral(minbin,maxbin);
+		
+		FixAndBoundParameters();
+
+		if( integral > 0.0 ){
+			std::string option = "0SQ";
+			if( this->loglikelihood ){
+				option+="L";
+			}
+			TFitResultPtr fitresult = this->fithist->Fit(this->fitfunc,option.c_str(),"",XFitRange.first,XFitRange.second);
+
+			if( not fitresult->IsEmpty() ){
+				AssignFitValuesErrors(fitresult);
+				AssignFitFuncParams();
+				this->fithist->GetListOfFunctions()->Add(this->fitfunc);
+
+				this->components.at(0)->SetParameters(this->Results["Constant"]);
+				this->fithist->GetListOfFunctions()->Add(this->components.at(0));
+				this->components.at(1)->SetParameters(this->Results["Amplitude"],this->Results["HalfLife"]);
+				this->fithist->GetListOfFunctions()->Add(this->components.at(1));
+			}
+		}
+
+	}
 	
 	void InitGaussNLinBkgFit(){
 		this->fithist->SetLineColor(kBlack);

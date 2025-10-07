@@ -95,6 +95,14 @@ namespace PeakFit{
 		return par[0]*TMath::Exp(arg);
 	}
 
+	double SimpleImplantationCurve(double* x, double* par){
+		if( x[0] < 0 ){
+			return par[0];
+		}else{
+			return par[0] + SimpleHalfLife(x,par+1);
+		}
+	}
+
 	double BiGauss(double* x,double* par){
 		double xval = x[0];
 		double yval = x[1];
