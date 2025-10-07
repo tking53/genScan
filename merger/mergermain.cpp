@@ -5,6 +5,8 @@
 #include <iterator>
 #include <map>
 #include <memory>
+#include <random>
+#include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
@@ -103,10 +105,25 @@ int main(int argc, char *argv[]) {
 		YAML::Node doc = YAML::LoadFile(configfile);
 
 		std::shared_ptr<CUTS::CutRegistry> CutManager(new CUTS::CutRegistry(logname));
-		CutManager->AddCut("PID",doc["PID"].as<std::string>());
+		std::string pid_filename = doc["PID"].as<std::string>(); 
+		CutManager->AddCut("PID",pid_filename);
+		console->critical("Using {} as PID file",pid_filename);
 
 		//this is the good one for fp1 and fp2 usually
 		int tofid = doc["TOFID"].as<int>(6);
+		console->critical("Using fp1Tof_{} for pid cut",tofid);
+
+		bool prob_acceptance = doc["PROBACCEPTANCE"].as<bool>(false);
+		double half_life = half_life = doc["HALFLIFE"].as<double>(-1.0);
+		if( prob_acceptance ){
+			if( half_life <= 0.0 ){
+				throw std::runtime_error("Probabilistic half-life acceptance for beta-ion correlation, but no half-life provided");
+			}else{
+				console->critical("Using Probabilistic half-life acceptance between beta and ion: half-life in seconds: {}",half_life);
+			}
+		}else{
+			console->critical("not using Probabilistic half-life acceptance for beta-ion correlation");
+		}
 
 		//this must be given in seconds
 		double forward_corr_time = doc["CORRELATION"]["Forward"].as<double>(1.0);
@@ -114,10 +131,19 @@ int main(int argc, char *argv[]) {
 		if( backward_corr_time > 0 ){
 			backward_corr_time *= -1.0;
 		}
+		console->critical("Beta-ion correlation times: [{},{}] s",backward_corr_time,forward_corr_time);
+
+		//this default is based on geant4 simulations of the pixelated yso
+		//a 1 MeV electron typically stays within 1 minor pixel
+		//a 2 MeV electron goes up to 3 minor pixels
+		//a 10 MeV electron stays also within 1 minor pixel due to it pair producing/leaving the surface
+		double allowed_radius = doc["RADIUS"].as<double>(0.7);
+		console->critical("Radius acceptance for beta-ion correlation: {} Major Pixels",allowed_radius);
 
 		std::map<std::string,PLOTS::HisHelper1D> His1D = {
-			{"TDiff_Beta_Ion_s",{1000,-10,10}},
-			{"TDiff_Beta_Ion_ms",{10000,-500,500}},
+			{"TDiff_Beta_Ion_s",{1000,backward_corr_time,forward_corr_time}},
+			{"TDiff_Beta_Ion_ms",{10000,backward_corr_time*1000,forward_corr_time*1000}},
+			{"TDiff_Beta_Ion_us",{10000,backward_corr_time*1000,forward_corr_time*1000}},
 			{"Radius_Beta_Ion",{1000,0,10}}
 		};
 
@@ -131,9 +157,12 @@ int main(int argc, char *argv[]) {
 
 		std::map<std::string,PLOTS::HisHelper2D> His2D = {
 			{"Implant_Radius_Beta_Ion",{16384,0,16384,1000,0,10}},
-			{"AnodeSum_Radius_Beta_Ion",{4096,0,16384,1000,0,10}},
-			{"TDiff_Radius_Beta_Ion_s",{1000,-10,10,1000,0,10}},
-			{"Mtas_TDiff_Beta_Ion_Gamma_s",{16384,0,16384,1000,-10,10}}
+			{"Sparse_Implant_Radius_Beta_Ion",{16384,0,65536,1000,0,10}},
+			{"AnodeSum_Radius_Beta_Ion",{16384,0,16384,1000,0,10}},
+			{"Sparse_AnodeSum_Radius_Beta_Ion",{16384,0,65536,1000,0,10}},
+			{"TDiff_Radius_Beta_Ion_s",{1000,backward_corr_time,forward_corr_time,1000,0,10}},
+			{"Mtas_TDiff_Beta_Ion_Gamma_s",{16384,0,16384,1000,backward_corr_time,forward_corr_time}},
+			{"Sparse_Mtas_TDiff_Beta_Ion_Gamma_s",{16384,0,65536,1000,backward_corr_time,forward_corr_time}}
 		};
 
 		for( const auto& kv : doc["HISTOGRAM2D"] ){
@@ -176,13 +205,17 @@ int main(int argc, char *argv[]) {
 
 		HistogramManager->RegisterPlot<TH1F>("TDiff_Beta_Ion_s","TDiff [Beta - Ion]; Time Difference (s); Counts per s",His1D["TDiff_Beta_Ion_s"]);
 		HistogramManager->RegisterPlot<TH1F>("TDiff_Beta_Ion_ms","TDiff [Beta - Ion]; Time Difference (ms); Counts per ms",His1D["TDiff_Beta_Ion_ms"]);
+		HistogramManager->RegisterPlot<TH1F>("TDiff_Beta_Ion_us","TDiff [Beta - Ion]; Time Difference (ms); Counts per ms",His1D["TDiff_Beta_Ion_us"]);
 		
 		HistogramManager->RegisterPlot<TH1F>("Radius_Beta_Ion","Radius [Beta - Ion]; Radius (arb.); ",His1D["Radius_Beta_Ion"]);
 
 		HistogramManager->RegisterPlot<TH2F>("Implant_Radius_Beta_Ion","Radius vs Energy [Beta - Ion]; Energy (keV); Radius (arb.); ",His2D["Implant_Radius_Beta_Ion"]);
+		HistogramManager->RegisterPlot<TH2F>("Sparse_Implant_Radius_Beta_Ion","Radius vs Energy [Beta - Ion]; Energy (keV); Radius (arb.); ",His2D["Sparse_Implant_Radius_Beta_Ion"]);
 		HistogramManager->RegisterPlot<TH2F>("TDiff_Radius_Beta_Ion_s","Radius vs TDiff [Beta - Ion];  TDiff (s); Radius (arb.)",His2D["TDiff_Radius_Beta_Ion_s"]);
 		HistogramManager->RegisterPlot<TH2F>("AnodeSum_Radius_Beta_Ion","Radius vs Energy [Beta - Ion]; Energy (keV); Radius (arb.); ",His2D["AnodeSum_Radius_Beta_Ion"]);
+		HistogramManager->RegisterPlot<TH2F>("Sparse_AnodeSum_Radius_Beta_Ion","Radius vs Energy [Beta - Ion]; Energy (keV); Radius (arb.); ",His2D["Sparse_AnodeSum_Radius_Beta_Ion"]);
 		HistogramManager->RegisterPlot<TH2F>("Mtas_TDiff_Beta_Ion_Gamma_s","TDiff vs Energy [Beta - Ion - Gamma]; Energy (keV); TDiff (s); ",His2D["Mtas_TDiff_Beta_Ion_Gamma_s"]);
+		HistogramManager->RegisterPlot<TH2F>("Sparse_Mtas_TDiff_Beta_Ion_Gamma_s","TDiff vs Energy [Beta - Ion - Gamma]; Energy (keV); TDiff (s); ",His2D["Sparse_Mtas_TDiff_Beta_Ion_Gamma_s"]);
 		
 		console->info("Generating {}.list file that contains all the declared histograms",StringManip::GetFileBaseName(outputprefix));
 		HistogramManager->WriteInfo();
@@ -302,7 +335,6 @@ int main(int argc, char *argv[]) {
 			mtas->GetEntry(ii);
 			//this is the gate placed in EXP_11012, 
 			bool LightIon = false;
-			bool hasbeta = ValidBeta.IsWithin(highgain->dynodeerg);
 			if( CutManager->IsWithin("PID",fp1Tofs[6],fp1->pin[0].energy) ){
 				//let's only only load the rit/fit when we're inside a good tof
 				for( const auto& g : RitReject ){
@@ -321,6 +353,7 @@ int main(int argc, char *argv[]) {
 					RitRejectedImplants.push_back(*lowgain);
 				}
 			}
+			bool hasbeta = ValidBeta.IsWithin(highgain->dynodeerg);
 			if( hasbeta ){
 				ValidBetas.push_back(*highgain);
 				ValidTotals.push_back({*(Total[0]),*(Total[1]),*(Total[2]),*(Total[3]),*(Total[4])});
@@ -334,19 +367,19 @@ int main(int argc, char *argv[]) {
 		}
 
 		console->info("Found {} Valid Implants, {} RitRejectedImplants, {} Valid Betas",ValidImplants.size(),RitRejectedImplants.size(),ValidBetas.size());
-		//correlate the betas and ions together
-		//outer loop over ions, and for each ion keep a vector of betas within the forward and backward check
-
-		//auto IsWithinCorrelationWindow = [](const double& forward_diff,const double& backward_diff,const double& ion_ts,const double& beta_ts){
-		//	const auto tdiff = 1.0e-9*(beta_ts - ion_ts);	
-		//	return tdiff > backward_diff and tdiff < forward_diff;
-		//};
 
 		//the actual correlation step
 		console->info("Begin sorting");
 
 		auto period = ValidImplants.size()/10;
 		auto iiter = 0;
+		std::random_device rd;
+		std::mt19937_64 gen(rd());
+		std::uniform_real_distribution<double> rand_decay(0.0,1.0);
+		auto half_life_check = [&half_life,&rand_decay,&gen](double tdiff){
+			auto randprob = rand_decay(gen);
+			return randprob < half_life*(1.0 - std::exp(-tdiff/half_life));
+		};
 		for( const auto& ion : ValidImplants ){
 			if( iiter%period == 0 ){
 				console->info("Completed {}/{} Correllations",iiter,ValidImplants.size());
@@ -377,19 +410,25 @@ int main(int argc, char *argv[]) {
 				const auto xdiff = ion_x - beta_x;
 				const auto ydiff = ion_y - beta_y;
 				const auto radius = std::sqrt(xdiff*xdiff + ydiff*ydiff);
-				const auto beta_erg = ValidBetas[iter].dynodeerg;
-				const auto beta_anode_sum = ValidBetas[iter].anodesum;
+				if( radius <= allowed_radius ){
+					const auto beta_erg = ValidBetas[iter].dynodeerg;
+					const auto beta_anode_sum = ValidBetas[iter].anodesum;
 
-				HistogramManager->Fill("TDiff_Beta_Ion_s",tdiff);
-				HistogramManager->Fill("TDiff_Beta_Ion_ms",1.0e3*tdiff);
-				HistogramManager->Fill("Radius_Beta_Ion",radius);
+					HistogramManager->Fill("TDiff_Beta_Ion_s",tdiff);
+					HistogramManager->Fill("TDiff_Beta_Ion_ms",1.0e3*tdiff);
+					HistogramManager->Fill("TDiff_Beta_Ion_us",1.0e6*tdiff);
+					HistogramManager->Fill("Radius_Beta_Ion",radius);
 
-				HistogramManager->Fill("Implant_Radius_Beta_Ion",beta_erg,radius);
-				HistogramManager->Fill("AnodeSum_Radius_Beta_Ion",beta_anode_sum,radius);
-				HistogramManager->Fill("TDiff_Radius_Beta_Ion_s",tdiff,radius);
+					HistogramManager->Fill("Implant_Radius_Beta_Ion",beta_erg,radius);
+					HistogramManager->Fill("Sparse_Implant_Radius_Beta_Ion",beta_erg,radius);
+					HistogramManager->Fill("AnodeSum_Radius_Beta_Ion",beta_anode_sum,radius);
+					HistogramManager->Fill("Sparse_AnodeSum_Radius_Beta_Ion",beta_anode_sum,radius);
+					HistogramManager->Fill("TDiff_Radius_Beta_Ion_s",tdiff,radius);
 
-				const auto T = ValidTotals[iter][0].sumenergy;
-				HistogramManager->Fill("Mtas_TDiff_Beta_Ion_Gamma_s",T,tdiff);
+					const auto T = ValidTotals[iter][0].sumenergy;
+					HistogramManager->Fill("Mtas_TDiff_Beta_Ion_Gamma_s",T,tdiff);
+					HistogramManager->Fill("Sparse_Mtas_TDiff_Beta_Ion_Gamma_s",T,tdiff);
+				}
 			}
 			++iiter;
 		}
