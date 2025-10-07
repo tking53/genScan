@@ -16,6 +16,8 @@ namespace PeakFit{
 	double SingleTailingGaussNLinBkg(double*,double*);
 	double SimpleHalfLife(double*,double*);
 	double SimpleImplantationCurve(double*,double*);
+	double ImplantationBatemanStep(double*,double*);
+	double SingleDaughterPairImplantationCurve(double*,double*);
 
 	//ROOT
 	//2D

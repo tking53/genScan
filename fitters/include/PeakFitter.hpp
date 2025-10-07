@@ -307,11 +307,12 @@ struct PeakFitter1D : public PeakFitter{
 			this->InitErfFit();
 		}else if( mode == 500 ){
 			this->InitSimpleImplantationCurveFit();
+		}else if( mode == 510 ){
+			this->InitSingleDaughterImplantationCurveFit();
 		}else{
 			throw std::runtime_error("Unknown peak fitting mode");
 		}
 	}
-
 
 	void InitSimpleImplantationCurveFit(){
 		this->fithist->SetLineColor(kBlack);
@@ -369,6 +370,85 @@ struct PeakFitter1D : public PeakFitter{
 				this->fithist->GetListOfFunctions()->Add(this->components.at(0));
 				this->components.at(1)->SetParameters(this->Results["Amplitude"],this->Results["HalfLife"]);
 				this->fithist->GetListOfFunctions()->Add(this->components.at(1));
+			}
+		}
+
+	}
+	
+	void InitSingleDaughterImplantationCurveFit(){
+		this->fithist->SetLineColor(kBlack);
+
+		this->fitfunc = new TF1("SingleDaughterPairImplantationCurve",&PeakFit::SingleDaughterPairImplantationCurve,XFitRange.first,XFitRange.second,6);
+		this->fitfunc->SetNpx(this->fithist->GetNbinsX()*10);
+		this->fitfunc->SetLineColor(kRed);
+		//there are 4 components, bkg, parent decay, beta-daughter, beta-n-daughter
+		//need to make correct functions for this though
+		this->components = {
+			new TF1("Constant",&CommonFit::Constant,XFitRange.first,XFitRange.second,1),
+			new TF1("Parent",&PeakFit::SimpleImplantationCurve,0.0,XFitRange.second,3),
+			new TF1("BetaDaughter",&PeakFit::ImplantationBatemanStep,0.0,XFitRange.second,4),
+			new TF1("BetaNDaughter",&PeakFit::ImplantationBatemanStep,0.0,XFitRange.second,4)
+		};
+		this->components.at(0)->SetLineColor(kMagenta);
+		this->components.at(1)->SetLineColor(kGreen);
+		this->components.at(2)->SetLineColor(kAzure);
+		this->components.at(3)->SetLineColor(kOrange-3);
+		this->components.at(0)->SetNpx(this->fithist->GetNbinsX()*10);
+		this->components.at(1)->SetNpx(this->fithist->GetNbinsX()*10);
+		this->components.at(2)->SetNpx(this->fithist->GetNbinsX()*10);
+		this->components.at(3)->SetNpx(this->fithist->GetNbinsX()*10);
+
+		auto leftbin = this->fithist->FindBin(XFitRange.first);
+		auto zerobin = this->fithist->FindBin(0.0);
+		auto rightbin = this->fithist->FindBin(XFitRange.second);
+		double bkg = this->fithist->Integral(leftbin,zerobin)/(zerobin-leftbin);
+		double l = this->fithist->GetBinContent(zerobin+1) - bkg;
+		double h = l/2.0;
+		double half_life = XFitRange.second;
+		for( int jj = zerobin; jj < rightbin; ++jj ){
+			if( (this->fithist->GetBinContent(jj) - bkg) < h ){
+				half_life = this->fithist->GetBinCenter(jj);
+				break;
+			}
+		}
+		double amp = this->fithist->GetBinContent(zerobin+1);
+		double pn = 0.0;
+		this->keys = { {"Constant",{0,bkg}}, {"Amplitude",{1,amp}}, {"HalfLife",{2,half_life}}, 
+			{"Pn",{3,pn}}, {"BetaHalfLife",{4,half_life}}, {"BetaNHalfLife",{5,half_life}} };
+		AssignFitParNames();
+		VerifyFixedValues();
+		VerifyBoundedValues();
+
+		auto minbin = this->fithist->FindBin(this->XFitRange.first);
+		auto maxbin = this->fithist->FindBin(this->XFitRange.second);
+		auto integral = this->fithist->Integral(minbin,maxbin);
+	
+		if( this->fvalues.find("Pn") == this->fvalues.end() and this->bvalues.find("Pn") == this->bvalues.end() ){
+			this->bvalues["Pn"] = {0.0,1.0}; 
+		}
+	
+		FixAndBoundParameters();
+
+		if( integral > 0.0 ){
+			std::string option = "0SQ";
+			if( this->loglikelihood ){
+				option+="L";
+			}
+			TFitResultPtr fitresult = this->fithist->Fit(this->fitfunc,option.c_str(),"",XFitRange.first,XFitRange.second);
+
+			if( not fitresult->IsEmpty() ){
+				AssignFitValuesErrors(fitresult);
+				AssignFitFuncParams();
+				this->fithist->GetListOfFunctions()->Add(this->fitfunc);
+
+				this->components.at(0)->SetParameters(this->Results["Constant"]);
+				this->fithist->GetListOfFunctions()->Add(this->components.at(0));
+				this->components.at(1)->SetParameters(this->Results["Constant"],this->Results["Amplitude"],this->Results["HalfLife"]);
+				this->fithist->GetListOfFunctions()->Add(this->components.at(1));
+				this->components.at(2)->SetParameters(this->Results["Constant"],this->Results["Amplitude"]*(1.0-this->Results["Pn"]),this->Results["HalfLife"],this->Results["BetaHalfLife"]);
+				this->fithist->GetListOfFunctions()->Add(this->components.at(2));
+				this->components.at(3)->SetParameters(this->Results["Constant"],this->Results["Amplitude"]*this->Results["Pn"],this->Results["HalfLife"],this->Results["BetaNHalfLife"]);
+				this->fithist->GetListOfFunctions()->Add(this->components.at(3));
 			}
 		}
 

@@ -92,7 +92,7 @@ namespace PeakFit{
 		if( TMath::Abs(par[1]) > 0.0 ){
 			arg = -(TMath::Log(2.0)/par[1])*x[0];
 		}
-		return par[0]*TMath::Exp(arg);
+		return (par[0]/par[1])*TMath::Exp(arg);
 	}
 
 	double SimpleImplantationCurve(double* x, double* par){
@@ -100,6 +100,38 @@ namespace PeakFit{
 			return par[0];
 		}else{
 			return par[0] + SimpleHalfLife(x,par+1);
+		}
+	}
+
+	double ImplantationBatemanStep(double* x,double* par){
+		if( x[0] < 0 ){
+			return par[0];
+		}else{
+			double lambda1 = TMath::Log(2.0)/par[2];
+			double lambda2 = TMath::Log(2.0)/par[3];
+			double halfliferatio = lambda1/(lambda2 - lambda1);
+			return par[0] + halfliferatio*par[1]*(TMath::Exp(-lambda1*x[0]) - TMath::Exp(-lambda2*x[0]));
+		}
+	}
+	
+	double SingleDaughterPairImplantationCurve(double* x,double* par){
+		//par[0] -> Constant
+		//par[1,2] -> SimpleHalfLife
+		//par[3,4,5] -> Pn, Beta-daughter-HalfLife, Beta-n-daughter-HalfLife 
+		auto bkg = par[0];
+
+		auto primary = SimpleHalfLife(x,par+1);
+
+		double beta_par[] = {0.0,(1.0-par[3])*par[1],par[2],par[4]};
+		double beta_daughter = ImplantationBatemanStep(x,beta_par);
+
+		double beta_n_par[] = {0.0,par[3]*par[1],par[2],par[5]};
+		double beta_n_daugther = ImplantationBatemanStep(x,beta_n_par);
+
+		if( x[0] < 0 ){
+			return bkg;
+		}else{
+			return bkg + primary + beta_daughter + beta_n_daugther;
 		}
 	}
 

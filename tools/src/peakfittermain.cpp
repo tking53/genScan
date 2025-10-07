@@ -163,7 +163,8 @@ int main(int argc, char *argv[]) {
        	FittingMessage += "\n4->SingleTailGaussN+LinBkg";
        	FittingMessage += "\n5->Compton Edge (Erfc model)";
        	//FittingMessage += "\n6->Simple Half Life + ConstBkg";
-       	FittingMessage += "\n500->Implantation Curve (negative time constant, positive time is single half-life+same constant)";
+       	FittingMessage += "\n500->Simple Implantation Curve (no daughters) (negative time constant, positive time is single half-life+same constant)";
+       	FittingMessage += "\n510->Single Daughter pair Implantation Curve (allows beta and beta-n daughter for single step) (negative time constant, positive time is single half-life+single-bateman pair+same constant)";
        	FittingMessage += "\n1000->2D fit of bigaussian_pdf";
 
 	boost::program_options::options_description cmdline_options("Generic Options");
