@@ -158,7 +158,7 @@ int main(int argc, char *argv[]) {
 			{"Mtas_T_TDiff_Beta_Ion_Gamma_s",{16384,0,16384,1000,backward_corr_time,forward_corr_time}},
 			{"Sparse_Mtas_T_TDiff_Beta_Ion_Gamma_s",{16384,0,65536,1000,backward_corr_time,forward_corr_time}},
 
-			{"Mtas_TDiff_C_Beta_Ion_Gamma_s",{16384,0,16384,1000,backward_corr_time,forward_corr_time}},
+			{"Mtas_C_TDiff_Beta_Ion_Gamma_s",{16384,0,16384,1000,backward_corr_time,forward_corr_time}},
 			{"Sparse_Mtas_C_TDiff_Beta_Ion_Gamma_s",{16384,0,65536,1000,backward_corr_time,forward_corr_time}},
 
 			{"Mtas_I_TDiff_Beta_Ion_Gamma_s",{16384,0,16384,1000,backward_corr_time,forward_corr_time}},
@@ -214,15 +214,15 @@ int main(int argc, char *argv[]) {
 		HistogramManager->RegisterPlot<TH1F>("TDiff_Beta_Ion_us","TDiff [Beta - Ion]; Time Difference (ms); Counts per ms",His1D["TDiff_Beta_Ion_us"]);
 		
 		HistogramManager->RegisterPlot<TH2F>("Mtas_T_TDiff_Beta_Ion_Gamma_s","TDiff vs Energy [Beta - Ion - Gamma]; Energy (keV); TDiff (s); ",His2D["Mtas_T_TDiff_Beta_Ion_Gamma_s"]);
-		HistogramManager->RegisterPlot<TH2F>("Sparse_T_Mtas_TDiff_Beta_Ion_Gamma_s","TDiff vs Energy [Beta - Ion - Gamma]; Energy (keV); TDiff (s); ",His2D["Sparse_T_Mtas_TDiff_Beta_Ion_Gamma_s"]);
+		HistogramManager->RegisterPlot<TH2F>("Sparse_Mtas_T_TDiff_Beta_Ion_Gamma_s","TDiff vs Energy [Beta - Ion - Gamma]; Energy (keV); TDiff (s); ",His2D["Sparse_Mtas_T_TDiff_Beta_Ion_Gamma_s"]);
 		HistogramManager->RegisterPlot<TH2F>("Mtas_C_TDiff_Beta_Ion_Gamma_s","TDiff vs Energy [Beta - Ion - Gamma]; Energy (keV); TDiff (s); ",His2D["Mtas_C_TDiff_Beta_Ion_Gamma_s"]);
-		HistogramManager->RegisterPlot<TH2F>("Sparse_C_Mtas_TDiff_Beta_Ion_Gamma_s","TDiff vs Energy [Beta - Ion - Gamma]; Energy (keV); TDiff (s); ",His2D["Sparse_C_Mtas_TDiff_Beta_Ion_Gamma_s"]);
+		HistogramManager->RegisterPlot<TH2F>("Sparse_Mtas_C_TDiff_Beta_Ion_Gamma_s","TDiff vs Energy [Beta - Ion - Gamma]; Energy (keV); TDiff (s); ",His2D["Sparse_Mtas_C_TDiff_Beta_Ion_Gamma_s"]);
 		HistogramManager->RegisterPlot<TH2F>("Mtas_I_TDiff_Beta_Ion_Gamma_s","TDiff vs Energy [Beta - Ion - Gamma]; Energy (keV); TDiff (s); ",His2D["Mtas_I_TDiff_Beta_Ion_Gamma_s"]);
-		HistogramManager->RegisterPlot<TH2F>("Sparse_I_Mtas_TDiff_Beta_Ion_Gamma_s","TDiff vs Energy [Beta - Ion - Gamma]; Energy (keV); TDiff (s); ",His2D["Sparse_I_Mtas_TDiff_Beta_Ion_Gamma_s"]);
+		HistogramManager->RegisterPlot<TH2F>("Sparse_Mtas_I_TDiff_Beta_Ion_Gamma_s","TDiff vs Energy [Beta - Ion - Gamma]; Energy (keV); TDiff (s); ",His2D["Sparse_Mtas_I_TDiff_Beta_Ion_Gamma_s"]);
 		HistogramManager->RegisterPlot<TH2F>("Mtas_M_TDiff_Beta_Ion_Gamma_s","TDiff vs Energy [Beta - Ion - Gamma]; Energy (keV); TDiff (s); ",His2D["Mtas_M_TDiff_Beta_Ion_Gamma_s"]);
-		HistogramManager->RegisterPlot<TH2F>("Sparse_M_Mtas_TDiff_Beta_Ion_Gamma_s","TDiff vs Energy [Beta - Ion - Gamma]; Energy (keV); TDiff (s); ",His2D["Sparse_M_Mtas_TDiff_Beta_Ion_Gamma_s"]);
+		HistogramManager->RegisterPlot<TH2F>("Sparse_Mtas_M_TDiff_Beta_Ion_Gamma_s","TDiff vs Energy [Beta - Ion - Gamma]; Energy (keV); TDiff (s); ",His2D["Sparse_Mtas_M_TDiff_Beta_Ion_Gamma_s"]);
 		HistogramManager->RegisterPlot<TH2F>("Mtas_O_TDiff_Beta_Ion_Gamma_s","TDiff vs Energy [Beta - Ion - Gamma]; Energy (keV); TDiff (s); ",His2D["Mtas_O_TDiff_Beta_Ion_Gamma_s"]);
-		HistogramManager->RegisterPlot<TH2F>("Sparse_O_Mtas_TDiff_Beta_Ion_Gamma_s","TDiff vs Energy [Beta - Ion - Gamma]; Energy (keV); TDiff (s); ",His2D["Sparse_O_Mtas_TDiff_Beta_Ion_Gamma_s"]);
+		HistogramManager->RegisterPlot<TH2F>("Sparse_Mtas_O_TDiff_Beta_Ion_Gamma_s","TDiff vs Energy [Beta - Ion - Gamma]; Energy (keV); TDiff (s); ",His2D["Sparse_Mtas_O_TDiff_Beta_Ion_Gamma_s"]);
 		
 		console->info("Generating {}.list file that contains all the declared histograms",StringManip::GetFileBaseName(outputprefix));
 		HistogramManager->WriteInfo();
@@ -427,23 +427,23 @@ int main(int argc, char *argv[]) {
 
 					const auto T = ValidTotals[iter][0].sumenergy;
 					HistogramManager->Fill("Mtas_T_TDiff_Beta_Ion_Gamma_s",T,tdiff);
-					HistogramManager->Fill("Sparse_T_Mtas_TDiff_Beta_Ion_Gamma_s",T,tdiff);
+					HistogramManager->Fill("Sparse_Mtas_T_TDiff_Beta_Ion_Gamma_s",T,tdiff);
 
 					const auto C = ValidTotals[iter][1].sumenergy;
 					HistogramManager->Fill("Mtas_C_TDiff_Beta_Ion_Gamma_s",C,tdiff);
-					HistogramManager->Fill("Sparse_C_Mtas_TDiff_Beta_Ion_Gamma_s",C,tdiff);
+					HistogramManager->Fill("Sparse_Mtas_C_TDiff_Beta_Ion_Gamma_s",C,tdiff);
 
 					const auto I = ValidTotals[iter][2].sumenergy;
 					HistogramManager->Fill("Mtas_I_TDiff_Beta_Ion_Gamma_s",I,tdiff);
-					HistogramManager->Fill("Sparse_I_Mtas_TDiff_Beta_Ion_Gamma_s",I,tdiff);
+					HistogramManager->Fill("Sparse_Mtas_I_TDiff_Beta_Ion_Gamma_s",I,tdiff);
 
 					const auto M = ValidTotals[iter][3].sumenergy;
 					HistogramManager->Fill("Mtas_M_TDiff_Beta_Ion_Gamma_s",M,tdiff);
-					HistogramManager->Fill("Sparse_M_Mtas_TDiff_Beta_Ion_Gamma_s",M,tdiff);
+					HistogramManager->Fill("Sparse_Mtas_M_TDiff_Beta_Ion_Gamma_s",M,tdiff);
 
 					const auto O = ValidTotals[iter][4].sumenergy;
 					HistogramManager->Fill("Mtas_O_TDiff_Beta_Ion_Gamma_s",O,tdiff);
-					HistogramManager->Fill("Sparse_O_Mtas_TDiff_Beta_Ion_Gamma_s",O,tdiff);
+					HistogramManager->Fill("Sparse_Mtas_O_TDiff_Beta_Ion_Gamma_s",O,tdiff);
 				}
 			}
 			++iiter;
