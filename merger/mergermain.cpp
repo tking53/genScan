@@ -168,7 +168,11 @@ int main(int argc, char *argv[]) {
 			{"Sparse_Mtas_M_TDiff_Beta_Ion_Gamma_s",{16384,0,65536,1000,backward_corr_time,forward_corr_time}},
 
 			{"Mtas_O_TDiff_Beta_Ion_Gamma_s",{16384,0,16384,1000,backward_corr_time,forward_corr_time}},
-			{"Sparse_Mtas_O_TDiff_Beta_Ion_Gamma_s",{16384,0,65536,1000,backward_corr_time,forward_corr_time}}
+			{"Sparse_Mtas_O_TDiff_Beta_Ion_Gamma_s",{16384,0,65536,1000,backward_corr_time,forward_corr_time}},
+
+			{"Ion_Spatial_Distribution",{1000,0,10,1000,0,10}},
+			{"Positive_Beta_Spatial_Distribution",{1000,0,10,1000,0,10}},
+			{"Negative_Beta_Spatial_Distribution",{1000,0,10,1000,0,10}}
 		};
 
 		for( const auto& kv : doc["HISTOGRAM2D"] ){
@@ -223,6 +227,10 @@ int main(int argc, char *argv[]) {
 		HistogramManager->RegisterPlot<TH2F>("Sparse_Mtas_M_TDiff_Beta_Ion_Gamma_s","TDiff vs Energy [Beta - Ion - Gamma]; Energy (keV); TDiff (s); ",His2D["Sparse_Mtas_M_TDiff_Beta_Ion_Gamma_s"]);
 		HistogramManager->RegisterPlot<TH2F>("Mtas_O_TDiff_Beta_Ion_Gamma_s","TDiff vs Energy [Beta - Ion - Gamma]; Energy (keV); TDiff (s); ",His2D["Mtas_O_TDiff_Beta_Ion_Gamma_s"]);
 		HistogramManager->RegisterPlot<TH2F>("Sparse_Mtas_O_TDiff_Beta_Ion_Gamma_s","TDiff vs Energy [Beta - Ion - Gamma]; Energy (keV); TDiff (s); ",His2D["Sparse_Mtas_O_TDiff_Beta_Ion_Gamma_s"]);
+
+		HistogramManager->RegisterPlot<TH2F>("Ion_Spatial_Distribution"," Ion Spatial Distribution; X (arb.); Y (arb.);",His2D["Ion_Spatial_Distribution"]);
+		HistogramManager->RegisterPlot<TH2F>("Positive_Beta_Spatial_Distribution"," Beta Spatial Distribution; X (arb.); Y (arb.);",His2D["Positive_Beta_Spatial_Distribution"]);
+		HistogramManager->RegisterPlot<TH2F>("Negative_Beta_Spatial_Distribution"," Beta Spatial Distribution; X (arb.); Y (arb.);",His2D["Negative_Beta_Spatial_Distribution"]);
 		
 		console->info("Generating {}.list file that contains all the declared histograms",StringManip::GetFileBaseName(outputprefix));
 		HistogramManager->WriteInfo();
@@ -407,6 +415,7 @@ int main(int argc, char *argv[]) {
 			const auto ion_ts = ion.dynodets;
 			const auto ion_x = ion.highresx;
 			const auto ion_y = ion.highresy;
+			HistogramManager->Fill("Ion_Spatial_Distribution",ion_x,ion_y);
 			auto start = std::distance(ValidBetas.begin(),beta_begin);
 			auto stop = std::distance(ValidBetas.begin(),beta_end);
 			for( auto iter = start; iter < stop; ++iter ){
@@ -420,6 +429,12 @@ int main(int argc, char *argv[]) {
 				if( radius <= allowed_radius ){
 					const auto beta_erg = ValidBetas[iter].dynodeerg;
 					const auto beta_anode_sum = ValidBetas[iter].anodesum;
+
+					if( tdiff < 0 ){
+						HistogramManager->Fill("Negative_Beta_Spatial_Distribution",beta_x,beta_y);
+					}else{
+						HistogramManager->Fill("Positive_Beta_Spatial_Distribution",beta_x,beta_y);
+					}
 
 					HistogramManager->Fill("TDiff_Beta_Ion_s",tdiff);
 					HistogramManager->Fill("TDiff_Beta_Ion_ms",1.0e3*tdiff);
