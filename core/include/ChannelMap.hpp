@@ -11,6 +11,7 @@
 
 #include "PhysicsData.hpp"
 #include "TrapezoidFilter.hpp"
+#include "IntegrationFilter.hpp"
 
 class XiaDecoder;
 
@@ -103,6 +104,8 @@ class ChannelMap{
 			std::vector<double> Params;
 			TrapezoidFilter<float,uint16_t> InternalFilter;
 			std::vector<double> InternalParams;
+			IntegrationFilter<uint16_t> Integral;
+			std::vector<double> IntegralParams;
 
 			template<typename OStream>
 			friend OStream& operator<<(OStream& os, const ChannelMap::ChannelInfo& c) {
@@ -131,6 +134,16 @@ class ChannelMap{
 					for( const auto& p : c.InternalParams )
 						os << p << ",";
 				}
+				if( c.IntegralParams.size() > 0 ){
+					os << " IntegrationFilter(bl_low_idx,bl_high_idx,i_low_idx,i_high_idx): )"
+						<< c.Integral.bll << ","
+						<< c.Integral.blu << ","
+						<< c.Integral.il << ","
+						<< c.Integral.iu << ")";
+					os << " IntegralCalParams: ";
+					for( const auto& p : c.IntegralParams )
+						os << p << ",";
+				}
 				return os;
 			}
 
@@ -142,10 +155,11 @@ class ChannelMap{
 		int GetNumCrates() const;
 		int GetNumChannelsPerBoard() const;
 
-		[[nodiscard]] std::tuple<double,double,double> GetCalibratedEnergy(int,int,int,double,const std::vector<uint16_t>&);
+		[[nodiscard]] std::tuple<double,double,double,double,double> GetCalibratedEnergy(int,int,int,double,double,const std::vector<uint16_t>&);
 		
 		[[nodiscard]] bool SetParams(int,int,int,const std::string&,const std::string&,const std::string&,const std::string&,const std::set<std::string>&,const std::vector<double>&);
-		[[nodiscard]] bool SetParams(int,int,int,const std::string&,const std::string&,const std::string&,const std::string&,const std::set<std::string>&,const std::vector<double>&,int,int,int,float,const std::vector<double>&);
+		void SetInternalTrapParams(int,int,int,int,int,int,float,const std::vector<double>&);
+		void SetIntegralParams(int,int,int,int,int,int,int,const std::vector<double>&);
 
 		[[nodiscard]] int GetBoardFrequency(int,int) const;
 		[[nodiscard]] ChannelMap::FirmwareVersion GetBoardFirmware(int,int) const;

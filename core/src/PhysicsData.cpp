@@ -83,7 +83,10 @@ PhysicsData::PhysicsData(const PhysicsData& other) :
 	TagList(other.TagList),
 	TraceFitInfo(other.TraceFitInfo),
 	InternalFilterRaw(other.InternalFilterRaw),
-	InternalFilterEnergy(other.InternalFilterEnergy)
+	InternalFilterEnergy(other.InternalFilterEnergy),
+	InternalIntegralRaw(other.InternalIntegralRaw),
+	InternalIntegralEnergy(other.InternalIntegralEnergy),
+	AliasValue(other.AliasValue)
 {
 }
 
@@ -126,7 +129,10 @@ PhysicsData::PhysicsData(PhysicsData&& other) noexcept :
 	TagList(std::move(other.TagList)),
 	TraceFitInfo(std::move(other.TraceFitInfo)),
 	InternalFilterRaw(other.InternalFilterRaw),
-	InternalFilterEnergy(other.InternalFilterEnergy)
+	InternalFilterEnergy(other.InternalFilterEnergy),
+	InternalIntegralRaw(other.InternalIntegralRaw),
+	InternalIntegralEnergy(other.InternalIntegralEnergy),
+	AliasValue(other.AliasValue)
 {
 }
 
@@ -171,6 +177,9 @@ PhysicsData& PhysicsData::operator=(const PhysicsData& other){
 		TraceFitInfo = other.TraceFitInfo;
 		InternalFilterRaw = other.InternalFilterRaw;
 		InternalFilterEnergy = other.InternalFilterEnergy;
+		InternalIntegralRaw = other.InternalIntegralRaw;
+		InternalIntegralEnergy = other.InternalIntegralEnergy;
+		AliasValue = other.AliasValue;
 	}
 	return *this;
 }
@@ -216,6 +225,9 @@ PhysicsData& PhysicsData::operator=(PhysicsData&& other) noexcept{
 		TraceFitInfo = std::move(other.TraceFitInfo);
 		InternalFilterRaw = other.InternalFilterRaw;
 		InternalFilterEnergy = other.InternalFilterEnergy;
+		InternalIntegralRaw = other.InternalIntegralRaw;
+		InternalIntegralEnergy = other.InternalIntegralEnergy;
+		AliasValue = other.AliasValue;
 	}
 	return *this;
 }
@@ -255,11 +267,23 @@ uint64_t PhysicsData::GetSpillID() const{
 }
 
 //Energy
-void PhysicsData::SetEnergy(double value1,double value2,double ivalue1,double ivalue2){
+void PhysicsData::SetFilterEnergy(double value1,double value2){
 	this->RawEnergyWRandom = value1;
 	this->Energy = value2;
-	this->InternalFilterRaw = ivalue1;
-	this->InternalFilterEnergy = ivalue2;
+}
+
+void PhysicsData::SetAliasValue(double value){
+	this->AliasValue = value;
+}
+
+void PhysicsData::SetInternalFilterEnergy(double value1,double value2){
+	this->InternalFilterRaw = value1;
+	this->InternalFilterEnergy = value2;
+}
+
+void PhysicsData::SetInternalIntegralEnergy(double value1,double value2){
+	this->InternalIntegralRaw = value1;
+	this->InternalIntegralEnergy = value2;
 }
 
 double PhysicsData::GetEnergy() const{
@@ -635,4 +659,16 @@ double PhysicsData::GetInternalFilterRaw() const{
 
 double PhysicsData::GetInternalFilterEnergy() const{
 	return this->InternalFilterEnergy;
+}
+
+double PhysicsData::GetInternalIntegralRaw() const{
+	return this->InternalIntegralRaw;
+}
+
+double PhysicsData::GetInternalIntegralEnergy() const{
+	return this->InternalIntegralEnergy;
+}
+
+double PhysicsData::GetAliasValue() const{
+	return this->AliasValue;
 }

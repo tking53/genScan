@@ -365,20 +365,20 @@ void ConfigParser::ParseMap(ChannelMap* cmap){
 							}
 						}
 
+						auto duplicate = cmap->SetParams(crid,bid,cid,type,subtype,group,tags,taglist,params); 
+						if( duplicate ){
+							std::stringstream ss;
+							ss << "ConfigParser::ParseMap() : config file named \""
+								<< *(this->ConfigName) 
+								<< "\" is malformed. Because Parameters for channel with number=\""
+								<< cid << "\" in module with number=\""
+								<< bid << "\" in crate with number=\""
+								<< crid << "\" is duplicated";
+							throw std::runtime_error(ss.str());
+						}
+
 						pugi::xml_node trapfilter = channel.child("TrapFilter");
-						if( !trapfilter ){
-							auto duplicate = cmap->SetParams(crid,bid,cid,type,subtype,group,tags,taglist,params); 
-							if( duplicate ){
-								std::stringstream ss;
-								ss << "ConfigParser::ParseMap() : config file named \""
-									<< *(this->ConfigName) 
-									<< "\" is malformed. Because Parameters for channel with number=\""
-									<< cid << "\" in module with number=\""
-									<< bid << "\" in crate with number=\""
-									<< crid << "\" is duplicated";
-								throw std::runtime_error(ss.str());
-							}
-						}else{
+						if( trapfilter ){
 							pugi::xml_node trapfiltercalibration = trapfilter.child("Calibration");
 							std::vector<double> tfparams;
 							if( !trapfiltercalibration ){
@@ -405,17 +405,39 @@ void ConfigParser::ParseMap(ChannelMap* cmap){
 										<< bid << "\" is missing the \"text\" containing the calibration parameters";
 									throw std::runtime_error(ss.str());
 								}
-								auto duplicate = cmap->SetParams(crid,bid,cid,type,subtype,group,tags,taglist,params,len,gap,bline,tau,tfparams); 
-								if( duplicate ){
+								cmap->SetInternalTrapParams(crid,bid,cid,len,gap,bline,tau,tfparams); 
+							}
+						}
+
+						pugi::xml_node integrationfilter = channel.child("IntegrationFilter");
+						if( integrationfilter ){
+							pugi::xml_node integrationfiltercalibration = integrationfilter.child("Calibration");
+							std::vector<double> tfparams;
+							if( !integrationfiltercalibration ){
+								std::stringstream ss;
+								ss << "ConfigParser::ParseMap() : config file named \""
+									<< *(this->ConfigName) 
+									<< "\" is malformed. Because no Calibration tag exists for TrapFilter on channel with number=\""
+									<< cid << "\" in module with number=\""
+									<< bid << "\"";
+								throw std::runtime_error(ss.str());
+							}else{
+								int bll = integrationfilter.attribute("bl_low_idx").as_int(0);
+								int blu = integrationfilter.attribute("bl_high_idx").as_int(0);
+								int il = integrationfilter.attribute("int_low_idx").as_int(0);
+								int iu = integrationfilter.attribute("int_high_idx").as_int(0);
+								std::string calstring = integrationfiltercalibration.text().get();
+								StringManip::ParseCalString(calstring,tfparams);
+								if( params.size() == 0 ){
 									std::stringstream ss;
 									ss << "ConfigParser::ParseMap() : config file named \""
 										<< *(this->ConfigName) 
-										<< "\" is malformed. Because Parameters for channel with number=\""
+										<< "\" is malformed. Because TrapFilter Calibration tag for channel with number=\""
 										<< cid << "\" in module with number=\""
-										<< bid << "\" in crate with number=\""
-										<< crid << "\" is duplicated";
+										<< bid << "\" is missing the \"text\" containing the calibration parameters";
 									throw std::runtime_error(ss.str());
 								}
+								cmap->SetIntegralParams(crid,bid,cid,bll,blu,il,iu,tfparams); 
 							}
 						}
 					}

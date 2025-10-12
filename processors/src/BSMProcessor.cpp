@@ -215,10 +215,12 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 			}
 	
 			this->Traces[detectorposition] = evt->GetRawTraceData();
-			this->UnCorrectedBSM[detectorposition] = evt->GetEnergy();
+			//this->UnCorrectedBSM[detectorposition] = integral*0.1;
+			this->UnCorrectedBSM[detectorposition] = evt->GetInternalIntegralEnergy();
 			this->HitTimeStamps[detectorposition] = evt->GetTimeStamp();
 			this->TimeStamps.push_back(evt->GetTimeStamp());
-			this->RawBSM[detectorposition] = evt->GetRawEnergyWRandom();
+			//this->RawBSM[detectorposition] = evt->GetRawEnergyWRandom();
+			this->RawBSM[detectorposition] = evt->GetInternalIntegralRaw();
 			++this->BSMHits[detectorposition];
 		}else{
 			++this->BSMHits[detectorposition];

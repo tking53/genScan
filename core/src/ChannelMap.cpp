@@ -8,6 +8,7 @@
 #include "ChannelMap.hpp"
 
 #include "BitDecoder.hpp"
+#include "IntegrationFilter.hpp"
 
 ChannelMap::ChannelMap(int mc,int mbpc,int mcpb,int mcppc){
 	MAX_CRATES = mc;
@@ -159,50 +160,41 @@ ChannelMap::FirmwareVersion ChannelMap::CalcFirmwareEnum(const std::string& type
 		.unique_id = currunique_id,
 		.Params = p,
 		.InternalFilter = TrapezoidFilter<float,uint16_t>(1,1,1,1.0),
-		.InternalParams = {}
+		.InternalParams = {},
+		.Integral = IntegrationFilter<uint16_t>(0,0,0,0),
+		.IntegralParams = {}
 	};
 	auto retval = this->ChannelConfigMap.insert_or_assign(gcid,CurrChannelInfo);
 	return !retval.second; 
 }
 
-[[nodiscard]] bool ChannelMap::SetParams(int crid,int bid,int cid,const std::string& t,const std::string& st,const std::string& g,const std::string& tt,const std::set<std::string>& tg,const std::vector<double>& p,int fl,int fg,int fb,float ftau,const std::vector<double>& ip){
+void ChannelMap::SetInternalTrapParams(int crid,int bid,int cid,int fl,int fg,int fb,float ftau,const std::vector<double>& ip){
 	auto gcid = this->GetGlobalChanID(crid,bid,cid);
 	auto gbid = this->GetGlobalBoardID(crid,bid);
 	if( (gcid >= MAX_FID) or (gbid >= MAX_BOARDS) or (cid >= MAX_CHANNELS_PER_BOARD) ){
 		std::string mess = "Invalid config file, Crate : "+std::to_string(crid)+"Board : "+std::to_string(bid)+" Channel : "+std::to_string(cid)+" Is Invalid";
 		throw std::runtime_error(mess);
 	}
-	std::string currunique_id = t + ":" + st + ":" + g;
-	for( auto& currtag : tg )
-		currunique_id += ":" + currtag;
-	auto result = this->KnownUID.insert_unique(currunique_id);
-	if( not result.second ){
-		throw std::runtime_error("Channel : "+std::to_string(cid)+
-				" Board : "+std::to_string(bid)+
-				" Crate : "+std::to_string(crid)+
-				" type:subtype:group:(tags) : "+currunique_id+
-				" has duplicate type:subtype:group:(tags) as another");
+
+	auto& val = this->ChannelConfigMap.at(gcid);
+	val.InternalFilter =  TrapezoidFilter<float,uint16_t>(fl,fg,fb,ftau);
+	val.InternalParams = ip; 
+
+}
+void ChannelMap::SetIntegralParams(int crid,int bid,int cid,int bl,int bu,int il,int iu,const std::vector<double>& ip){
+	auto gcid = this->GetGlobalChanID(crid,bid,cid);
+	auto gbid = this->GetGlobalBoardID(crid,bid);
+	if( (gcid >= MAX_FID) or (gbid >= MAX_BOARDS) or (cid >= MAX_CHANNELS_PER_BOARD) ){
+		std::string mess = "Invalid config file, Crate : "+std::to_string(crid)+"Board : "+std::to_string(bid)+" Channel : "+std::to_string(cid)+" Is Invalid";
+		throw std::runtime_error(mess);
 	}
 
-	ChannelInfo CurrChannelInfo = {
-		.ChannelIDInBoard = cid,
-		.BoardIDInCrate = bid,
-		.CrateID = crid,
-		.GlobalChannelID = gcid,
-		.type = t,
-		.subtype = st,
-		.group = g,
-		.tags = tt,
-		.taglist = tg,
-		.unique_id = currunique_id,
-		.Params = p,
-		.InternalFilter = TrapezoidFilter<float,uint16_t>(fl,fg,fb,ftau),
-		.InternalParams = ip
-	};
-	auto retval = this->ChannelConfigMap.insert_or_assign(gcid,CurrChannelInfo);
-	return !retval.second; 
+	auto& val = this->ChannelConfigMap.at(gcid);
+	val.Integral =  IntegrationFilter<uint16_t>(bl,bu,il,iu);
+	val.IntegralParams = ip; 
 }
-std::tuple<double,double,double> ChannelMap::GetCalibratedEnergy(int crid,int bid,int cid,double erg,const std::vector<uint16_t>& trace){
+
+std::tuple<double,double,double,double,double> ChannelMap::GetCalibratedEnergy(int crid,int bid,int cid,double erg,double alias,const std::vector<uint16_t>& trace){
 	auto gcid = this->GetGlobalChanID(crid,bid,cid);
 	auto gbid = this->GetGlobalBoardID(crid,bid);
 	if( (gcid >= MAX_FID) or (gbid >= MAX_BOARDS) or (cid >= MAX_CHANNELS_PER_BOARD) ){
@@ -230,7 +222,7 @@ std::tuple<double,double,double> ChannelMap::GetCalibratedEnergy(int crid,int bi
 	double InternalRaw = std::numeric_limits<float>::max();
 	double InternalCal = std::numeric_limits<float>::max();
 	if( c.InternalParams.size() > 0 ){
-		InternalRaw = c.InternalFilter.RunFilter(trace);
+		InternalRaw = c.InternalFilter.RunFilter(trace) + alias;
 		InternalCal = 0.0;
 		switch(c.InternalParams.size()){
 			case 1:
@@ -249,7 +241,29 @@ std::tuple<double,double,double> ChannelMap::GetCalibratedEnergy(int crid,int bi
 				break;
 		}
 	}
-	return std::make_tuple(BoardErg,InternalRaw,InternalCal);
+	double IntegrationRaw = std::numeric_limits<float>::max();
+	double IntegrationCal = std::numeric_limits<float>::max();
+	if( c.IntegralParams.size() > 0 ){
+		IntegrationRaw = c.Integral.RunFilter(trace) + alias;
+		IntegrationCal = 0.0;
+		switch(c.IntegralParams.size()){
+			case 1:
+				IntegrationCal = c.IntegralParams[0];
+				break;
+			case 2:
+				IntegrationCal = c.IntegralParams[0] + c.IntegralParams[1]*IntegrationRaw;
+				break;
+			case 3:
+				IntegrationCal = c.IntegralParams[0] + c.IntegralParams[1]*IntegrationRaw + c.IntegralParams[2]*IntegrationRaw*IntegrationRaw;
+				break;
+			default:
+				for( size_t ii = 0; ii < c.IntegralParams.size(); ++ii ){
+					IntegrationCal += c.IntegralParams[ii]*std::pow(IntegrationRaw,ii);
+				}
+				break;
+		}
+	}
+	return std::make_tuple(BoardErg,InternalRaw,InternalCal,IntegrationRaw,IntegrationCal);
 }
 
 bool ChannelMap::SetBoardInfo(int crid,int bid,const char& rev,const std::string& firm,int freq){
