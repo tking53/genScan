@@ -171,6 +171,7 @@ int main(int argc, char *argv[]) {
 			{"Sparse_Mtas_O_TDiff_Beta_Ion_Gamma_s",{16384,0,65536,1000,backward_corr_time,forward_corr_time}},
 
 			{"Ion_Spatial_Distribution",{1000,0,10,1000,0,10}},
+			{"Corrected_Ion_Spatial_Distribution",{1000,-10,10,1000,-10,10}},
 			{"Positive_Beta_Spatial_Distribution",{1000,0,10,1000,0,10}},
 			{"Negative_Beta_Spatial_Distribution",{1000,0,10,1000,0,10}}
 		};
@@ -229,6 +230,7 @@ int main(int argc, char *argv[]) {
 		HistogramManager->RegisterPlot<TH2F>("Sparse_Mtas_O_TDiff_Beta_Ion_Gamma_s","TDiff vs Energy [Beta - Ion - Gamma]; Energy (keV); TDiff (s); ",His2D["Sparse_Mtas_O_TDiff_Beta_Ion_Gamma_s"]);
 
 		HistogramManager->RegisterPlot<TH2F>("Ion_Spatial_Distribution"," Ion Spatial Distribution; X (arb.); Y (arb.);",His2D["Ion_Spatial_Distribution"]);
+		HistogramManager->RegisterPlot<TH2F>("Corrected_Ion_Spatial_Distribution"," Ion Spatial Distribution; X (arb.); Y (arb.);",His2D["Corrected_Ion_Spatial_Distribution"]);
 		HistogramManager->RegisterPlot<TH2F>("Positive_Beta_Spatial_Distribution"," Beta Spatial Distribution; X (arb.); Y (arb.);",His2D["Positive_Beta_Spatial_Distribution"]);
 		HistogramManager->RegisterPlot<TH2F>("Negative_Beta_Spatial_Distribution"," Beta Spatial Distribution; X (arb.); Y (arb.);",His2D["Negative_Beta_Spatial_Distribution"]);
 		
@@ -395,6 +397,17 @@ int main(int argc, char *argv[]) {
 			auto randprob = rand_decay(gen);
 			return randprob < half_life*(1.0 - std::exp(-tdiff/half_life));
 		};
+		//-0.4, 1.8
+		//-0.06, 0.06 gives clover pattern like we're inverting the outside to the inside
+		//-0.06, 0.006 gives round shape
+		//-0.06, 0.0006 gives pincushion
+		//-0.006, 0.0006 curves at top and bottom towards corners
+		//-0.0006, 0.0006 curves at top and bottom towards corners
+		//-0.0006, 0.006 
+		const double k1 = -0.0006;
+		const double k2 = 0.006;
+		const double xc = 3.5;
+		const double yc = 4.5;
 		for( const auto& ion : ValidImplants ){
 			if( iiter%period == 0 ){
 				console->info("Completed {}/{} Correllations",iiter,ValidImplants.size());
@@ -415,7 +428,13 @@ int main(int argc, char *argv[]) {
 			const auto ion_ts = ion.dynodets;
 			const auto ion_x = ion.highresx;
 			const auto ion_y = ion.highresy;
+			const auto ion_xdiff = ion_x - xc;
+			const auto ion_ydiff = ion_y - yc;
+			const auto ion_r2 = ion_xdiff*ion_xdiff + ion_ydiff*ion_ydiff;
+			const auto c_ion_x = ion_xdiff/(1.0 + k1*ion_r2 + k2*ion_r2*ion_r2);
+			const auto c_ion_y = ion_ydiff/(1.0 + k1*ion_r2 + k2*ion_r2*ion_r2);
 			HistogramManager->Fill("Ion_Spatial_Distribution",ion_x,ion_y);
+			HistogramManager->Fill("Corrected_Ion_Spatial_Distribution",c_ion_x,c_ion_y);
 			auto start = std::distance(ValidBetas.begin(),beta_begin);
 			auto stop = std::distance(ValidBetas.begin(),beta_end);
 			for( auto iter = start; iter < stop; ++iter ){
