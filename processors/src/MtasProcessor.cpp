@@ -1970,3 +1970,35 @@ const double& MtasProcessor::GetFirstFireTime() const{
 const double& MtasProcessor::GetLastFireTime() const{
 	return this->LastTime;
 }
+
+const double& MtasProcessor::GetIndividualCenterPMTEnergy(const int& idx) const{
+	return this->CalCenter[idx];
+}
+
+const double& MtasProcessor::GetIndividualCenterPMTRawEnergy(const int& idx) const{
+	return this->RawCenter[idx];
+}
+
+const double& MtasProcessor::GetIndividualInnerPMTEnergy(const int& idx) const{
+	return this->CalInner[idx];
+}
+
+const double& MtasProcessor::GetIndividualInnerPMTRawEnergy(const int& idx) const{
+	return this->RawInner[idx];
+}
+
+const double& MtasProcessor::GetIndividualMiddlePMTEnergy(const int& idx) const{
+	return this->CalMiddle[idx];
+}
+
+const double& MtasProcessor::GetIndividualMiddlePMTRawEnergy(const int& idx) const{
+	return this->RawMiddle[idx];
+}
+
+const double& MtasProcessor::GetIndividualOuterPMTEnergy(const int& idx) const{
+	return this->CalOuter[idx];
+}
+
+const double& MtasProcessor::GetIndividualOuterPMTRawEnergy(const int& idx) const{
+	return this->RawOuter[idx];
+}

@@ -50,6 +50,14 @@ class MtasProcessor : public Processor{
 		const bool& DidAnyOuterPileup() const;
 
 		const double& GetCrystalEnergy(const int&) const;
+		const double& GetIndividualCenterPMTEnergy(const int&) const;
+		const double& GetIndividualCenterPMTRawEnergy(const int&) const;
+		const double& GetIndividualInnerPMTEnergy(const int&) const;
+		const double& GetIndividualInnerPMTRawEnergy(const int&) const;
+		const double& GetIndividualMiddlePMTEnergy(const int&) const;
+		const double& GetIndividualMiddlePMTRawEnergy(const int&) const;
+		const double& GetIndividualOuterPMTEnergy(const int&) const;
+		const double& GetIndividualOuterPMTRawEnergy(const int&) const;
 		bool DidIndividualPMTSaturate(const int&) const;
 		bool DidIndividualPMTPileup(const int&) const;
 

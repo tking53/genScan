@@ -47,7 +47,7 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 		{3200,{16384,0,16384}},
 
 		{3300,{16384,0,16384}},
-		
+	
 		{3730,{16384,0,16384}}
 
 	};
@@ -92,6 +92,11 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 		{33628,{2048,0,16384,512,0,512}},
 		{33638,{2048,0,16384,512,0,512}},
 
+		{3411, {8192,0.0,8192.0,12,0,12}},
+		{3412, {8192,0.0,8192.0,12,0,12}},
+		{3413, {8192,0.0,8192.0,12,0,12}},
+		{3414, {8192,0.0,8192.0,12,0,12}},
+
 		{3500,{8192,0,8192,1000,0,10000}},
 		{3501,{8192,0,8192,1000,0,10000}},
 		{3502,{8192,0,8192,1000,0,10000}},
@@ -99,6 +104,11 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 		{3504,{8192,0,8192,1000,0,10000}},
 		{3505,{8192,0,8192,1000,0,10000}},
 
+		{3511, {8192,0.0,8192.0,12,0,12}},
+		{3512, {8192,0.0,8192.0,12,0,12}},
+		{3513, {8192,0.0,8192.0,12,0,12}},
+		{3514, {8192,0.0,8192.0,12,0,12}},
+	
 		{3600,{8192,0,8192,1000,0,10000}},
 		{3601,{8192,0,8192,1000,0,10000}},
 		{3602,{8192,0,8192,1000,0,10000}},
@@ -391,6 +401,32 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 				}else{
 					hismanager->Fill("BKG_3100",this->MtasProc->GetTotalEnergy(0));
 				}
+
+				for( int ii = 0; ii < 6; ++ii ){
+					hismanager->Fill("BKG_3411",this->MtasProc->GetIndividualCenterPMTRawEnergy(2*ii),2*ii);
+					hismanager->Fill("BKG_3411",this->MtasProc->GetIndividualCenterPMTRawEnergy(2*ii + 1),2*ii + 1);
+
+					hismanager->Fill("BKG_3412",this->MtasProc->GetIndividualInnerPMTRawEnergy(2*ii),2*ii);
+					hismanager->Fill("BKG_3412",this->MtasProc->GetIndividualInnerPMTRawEnergy(2*ii + 1),2*ii + 1);
+
+					hismanager->Fill("BKG_3413",this->MtasProc->GetIndividualMiddlePMTRawEnergy(2*ii),2*ii);
+					hismanager->Fill("BKG_3413",this->MtasProc->GetIndividualMiddlePMTRawEnergy(2*ii + 1),2*ii + 1);
+
+					hismanager->Fill("BKG_3414",this->MtasProc->GetIndividualOuterPMTRawEnergy(2*ii),2*ii);
+					hismanager->Fill("BKG_3414",this->MtasProc->GetIndividualOuterPMTRawEnergy(2*ii + 1),2*ii + 1);
+
+					hismanager->Fill("BKG_3511",this->MtasProc->GetIndividualCenterPMTEnergy(2*ii),2*ii);
+					hismanager->Fill("BKG_3511",this->MtasProc->GetIndividualCenterPMTEnergy(2*ii + 1),2*ii + 1);
+
+					hismanager->Fill("BKG_3512",this->MtasProc->GetIndividualInnerPMTEnergy(2*ii),2*ii);
+					hismanager->Fill("BKG_3512",this->MtasProc->GetIndividualInnerPMTEnergy(2*ii + 1),2*ii + 1);
+
+					hismanager->Fill("BKG_3513",this->MtasProc->GetIndividualMiddlePMTEnergy(2*ii),2*ii);
+					hismanager->Fill("BKG_3513",this->MtasProc->GetIndividualMiddlePMTEnergy(2*ii + 1),2*ii + 1);
+
+					hismanager->Fill("BKG_3514",this->MtasProc->GetIndividualOuterPMTEnergy(2*ii),2*ii);
+					hismanager->Fill("BKG_3514",this->MtasProc->GetIndividualOuterPMTEnergy(2*ii + 1),2*ii + 1);
+				}
 			}
 		}else if( TapeProc->GetCurrentCycleState() == TAPE::IRRADIATION ){
 			//add in HPGe monitor
@@ -558,6 +594,16 @@ void anl2021Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH1F>("BKG_3100","Mtas Background Cycle Gated anti-#beta Gated; Energy (keV)",this->h1dsettings.at(3100));
 	hismanager->RegisterPlot<TH1F>("BKG_3200","Mtas Background Cycle Gated; Energy (keV)",this->h1dsettings.at(3200));
 	hismanager->RegisterPlot<TH1F>("BKG_3300","Mtas Background Cycle Gated #beta Gated; Energy (keV)",this->h1dsettings.at(3300));
+
+	hismanager->RegisterPlot<TH2F>("BKG_3411","Raw IndividualPMT C PMTs Background Cycle gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3411));
+	hismanager->RegisterPlot<TH2F>("BKG_3412","Raw IndividualPMT I PMTs Background Cycle gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3412));
+	hismanager->RegisterPlot<TH2F>("BKG_3413","Raw IndividualPMT M PMTs Background Cycle gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3413));
+	hismanager->RegisterPlot<TH2F>("BKG_3414","Raw IndividualPMT O PMTs Background Cycle gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3414));
+
+	hismanager->RegisterPlot<TH2F>("BKG_3511","Calibrated IndividualPMT C PMTs Background Cycle gated; Energy (keV); PMT (arb.)",this->h2dsettings.at(3511));
+	hismanager->RegisterPlot<TH2F>("BKG_3512","Calibrated IndividualPMT I PMTs Background Cycle gated; Energy (keV); PMT (arb.)",this->h2dsettings.at(3512));
+	hismanager->RegisterPlot<TH2F>("BKG_3513","Calibrated IndividualPMT M PMTs Background Cycle gated; Energy (keV); PMT (arb.)",this->h2dsettings.at(3513));
+	hismanager->RegisterPlot<TH2F>("BKG_3514","Calibrated IndividualPMT O PMTs Background Cycle gated; Energy (keV); PMT (arb.)",this->h2dsettings.at(3514));
 
 	hismanager->RegisterPlot<TH2F>("IRRAD_2100","HPGe Irradiation Cycle Gated anti-#beta Gated; Energy (keV); Crystal Number (arb.)",this->h2dsettings.at(2100));
 	hismanager->RegisterPlot<TH2F>("IRRAD_2200","HPGe Irradiation Cycle Gated; Energy (keV); Crystal Number (arb.)",this->h2dsettings.at(2200));

@@ -173,7 +173,15 @@ int main(int argc, char *argv[]) {
 			{"Ion_Spatial_Distribution",{1000,0,10,1000,0,10}},
 			{"Corrected_Ion_Spatial_Distribution",{1000,-10,10,1000,-10,10}},
 			{"Positive_Beta_Spatial_Distribution",{1000,0,10,1000,0,10}},
-			{"Negative_Beta_Spatial_Distribution",{1000,0,10,1000,0,10}}
+			{"Negative_Beta_Spatial_Distribution",{1000,0,10,1000,0,10}},
+			{"Positive_Mtas_C_v_T",{4096,0,16384,4096,0,16384}},
+			{"Negative_Mtas_C_v_T",{4096,0,16384,4096,0,16384}},
+			{"Positive_Mtas_Ci_v_T",{4096,0,16384,4096,0,16384}},
+			{"Negative_Mtas_Ci_v_T",{4096,0,16384,4096,0,16384}},
+			{"Positive_Mtas_Ci_v_C",{4096,0,16384,4096,0,16384}},
+			{"Negative_Mtas_Ci_v_C",{4096,0,16384,4096,0,16384}},
+			{"Positive_Mtas_IMO_v_T",{4096,0,16384,4096,0,16384}},
+			{"Negative_Mtas_IMO_v_T",{4096,0,16384,4096,0,16384}}
 		};
 
 		for( const auto& kv : doc["HISTOGRAM2D"] ){
@@ -233,6 +241,14 @@ int main(int argc, char *argv[]) {
 		HistogramManager->RegisterPlot<TH2F>("Corrected_Ion_Spatial_Distribution"," Ion Spatial Distribution; X (arb.); Y (arb.);",His2D["Corrected_Ion_Spatial_Distribution"]);
 		HistogramManager->RegisterPlot<TH2F>("Positive_Beta_Spatial_Distribution"," Beta Spatial Distribution; X (arb.); Y (arb.);",His2D["Positive_Beta_Spatial_Distribution"]);
 		HistogramManager->RegisterPlot<TH2F>("Negative_Beta_Spatial_Distribution"," Beta Spatial Distribution; X (arb.); Y (arb.);",His2D["Negative_Beta_Spatial_Distribution"]);
+		HistogramManager->RegisterPlot<TH2F>("Positive_Mtas_C_v_T","Mtas C v T; Total Energy (keV); Center Sum Energy (keV)",His2D["Positive_Mtas_C_v_T"]);
+		HistogramManager->RegisterPlot<TH2F>("Negative_Mtas_C_v_T","Mtas C v T; Total Energy (keV); Center Sum Energy (keV)",His2D["Negative_Mtas_C_v_T"]);
+		HistogramManager->RegisterPlot<TH2F>("Positive_Mtas_Ci_v_T","Mtas Ci v T; Total Energy (keV); Center Crystal Energy (keV)",His2D["Positive_Mtas_Ci_v_T"]);
+		HistogramManager->RegisterPlot<TH2F>("Negative_Mtas_Ci_v_T","Mtas Ci v T; Total Energy (keV); Center Crystal Energy (keV)",His2D["Negative_Mtas_Ci_v_T"]);
+		HistogramManager->RegisterPlot<TH2F>("Positive_Mtas_Ci_v_C","Mtas Ci v C; Center Sum Energy (keV); Center Crystal Energy (keV)",His2D["Positive_Mtas_Ci_v_C"]);
+		HistogramManager->RegisterPlot<TH2F>("Negative_Mtas_Ci_v_C","Mtas Ci v C; Center Sum Energy (keV); Center Crystal Energy (keV)",His2D["Negative_Mtas_Ci_v_C"]);
+		HistogramManager->RegisterPlot<TH2F>("Positive_Mtas_IMO_v_T","Mtas IMO v T; Total Energy (keV); IMO Crystal Energy (keV)",His2D["Positive_Mtas_IMO_v_T"]);
+		HistogramManager->RegisterPlot<TH2F>("Negative_Mtas_IMO_v_T","Mtas IMO v T; Total Energy (keV); IMO Crystal Energy (keV)",His2D["Negative_Mtas_IMO_v_T"]);
 		
 		console->info("Generating {}.list file that contains all the declared histograms",StringManip::GetFileBaseName(outputprefix));
 		HistogramManager->WriteInfo();
@@ -403,9 +419,10 @@ int main(int argc, char *argv[]) {
 		//-0.06, 0.0006 gives pincushion
 		//-0.006, 0.0006 curves at top and bottom towards corners
 		//-0.0006, 0.0006 curves at top and bottom towards corners
-		//-0.0006, 0.006 
-		const double k1 = -0.0006;
-		const double k2 = 0.006;
+		//-0.0006, 0.006  full circle again
+		//-0.06, 0.0 gives pincushion
+		const double k1 = -0.06;
+		const double k2 = 0.0;
 		const double xc = 3.5;
 		const double yc = 4.5;
 		for( const auto& ion : ValidImplants ){
@@ -448,34 +465,51 @@ int main(int argc, char *argv[]) {
 				if( radius <= allowed_radius ){
 					const auto beta_erg = ValidBetas[iter].dynodeerg;
 					const auto beta_anode_sum = ValidBetas[iter].anodesum;
+					
+					const auto T = ValidTotals[iter][0].sumenergy;
+					const auto C = ValidTotals[iter][1].sumenergy;
+					const auto I = ValidTotals[iter][2].sumenergy;
+					const auto M = ValidTotals[iter][3].sumenergy;
+					const auto O = ValidTotals[iter][4].sumenergy;
 
 					if( tdiff < 0 ){
 						HistogramManager->Fill("Negative_Beta_Spatial_Distribution",beta_x,beta_y);
+						HistogramManager->Fill("Negative_Mtas_C_v_T",T,C);
+						for( size_t ii = 0; ii < 6; ++ii ){
+							HistogramManager->Fill("Negative_Mtas_Ci_v_T",T,ValidSegments[iter][ii].sumenergy);
+							HistogramManager->Fill("Negative_Mtas_Ci_v_C",C,ValidSegments[iter][ii].sumenergy);
+							HistogramManager->Fill("Negative_Mtas_IMO_v_T",T,ValidSegments[iter][ii+6].sumenergy);
+							HistogramManager->Fill("Negative_Mtas_IMO_v_T",T,ValidSegments[iter][ii+12].sumenergy);
+							HistogramManager->Fill("Negative_Mtas_IMO_v_T",T,ValidSegments[iter][ii+18].sumenergy);
+						}
 					}else{
 						HistogramManager->Fill("Positive_Beta_Spatial_Distribution",beta_x,beta_y);
+						HistogramManager->Fill("Positive_Mtas_C_v_T",T,C);
+						for( size_t ii = 0; ii < 6; ++ii ){
+							HistogramManager->Fill("Positive_Mtas_Ci_v_T",T,ValidSegments[iter][ii].sumenergy);
+							HistogramManager->Fill("Positive_Mtas_Ci_v_C",C,ValidSegments[iter][ii].sumenergy);
+							HistogramManager->Fill("Positive_Mtas_IMO_v_T",T,ValidSegments[iter][ii+6].sumenergy);
+							HistogramManager->Fill("Positive_Mtas_IMO_v_T",T,ValidSegments[iter][ii+12].sumenergy);
+							HistogramManager->Fill("Positive_Mtas_IMO_v_T",T,ValidSegments[iter][ii+18].sumenergy);
+						}
 					}
 
 					HistogramManager->Fill("TDiff_Beta_Ion_s",tdiff);
 					HistogramManager->Fill("TDiff_Beta_Ion_ms",1.0e3*tdiff);
 					HistogramManager->Fill("TDiff_Beta_Ion_us",1.0e6*tdiff);
 
-					const auto T = ValidTotals[iter][0].sumenergy;
 					HistogramManager->Fill("Mtas_T_TDiff_Beta_Ion_Gamma_s",T,tdiff);
 					HistogramManager->Fill("Sparse_Mtas_T_TDiff_Beta_Ion_Gamma_s",T,tdiff);
 
-					const auto C = ValidTotals[iter][1].sumenergy;
 					HistogramManager->Fill("Mtas_C_TDiff_Beta_Ion_Gamma_s",C,tdiff);
 					HistogramManager->Fill("Sparse_Mtas_C_TDiff_Beta_Ion_Gamma_s",C,tdiff);
 
-					const auto I = ValidTotals[iter][2].sumenergy;
 					HistogramManager->Fill("Mtas_I_TDiff_Beta_Ion_Gamma_s",I,tdiff);
 					HistogramManager->Fill("Sparse_Mtas_I_TDiff_Beta_Ion_Gamma_s",I,tdiff);
 
-					const auto M = ValidTotals[iter][3].sumenergy;
 					HistogramManager->Fill("Mtas_M_TDiff_Beta_Ion_Gamma_s",M,tdiff);
 					HistogramManager->Fill("Sparse_Mtas_M_TDiff_Beta_Ion_Gamma_s",M,tdiff);
 
-					const auto O = ValidTotals[iter][4].sumenergy;
 					HistogramManager->Fill("Mtas_O_TDiff_Beta_Ion_Gamma_s",O,tdiff);
 					HistogramManager->Fill("Sparse_Mtas_O_TDiff_Beta_Ion_Gamma_s",O,tdiff);
 				}
