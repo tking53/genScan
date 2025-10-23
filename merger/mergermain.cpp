@@ -143,7 +143,27 @@ int main(int argc, char *argv[]) {
 		std::map<std::string,PLOTS::HisHelper1D> His1D = {
 			{"TDiff_Beta_Ion_s",{1000,backward_corr_time,forward_corr_time}},
 			{"TDiff_Beta_Ion_ms",{10000,backward_corr_time*1000,forward_corr_time*1000}},
-			{"TDiff_Beta_Ion_us",{10000,backward_corr_time*1000,forward_corr_time*1000}}
+			{"TDiff_Beta_Ion_us",{10000,backward_corr_time*1000,forward_corr_time*1000}},
+			{"Positive_Radius",{1000,0,10}},
+			{"Negative_Radius",{1000,0,10}},
+			{"Positive_Mtas_T",{16384,0,16384}},
+			{"Negative_Mtas_T",{16384,0,16384}},
+			{"Positive_Mtas_C",{16384,0,16384}},
+			{"Negative_Mtas_C",{16384,0,16384}},
+			{"Positive_Mtas_I",{16384,0,16384}},
+			{"Negative_Mtas_I",{16384,0,16384}},
+			{"Positive_Mtas_M",{16384,0,16384}},
+			{"Negative_Mtas_M",{16384,0,16384}},
+			{"Positive_Mtas_O",{16384,0,16384}},
+			{"Negative_Mtas_O",{16384,0,16384}},
+			{"Positive_Mtas_C_Stack",{16384,0,16384}},
+			{"Negative_Mtas_C_Stack",{16384,0,16384}},
+			{"Positive_Mtas_I_Stack",{16384,0,16384}},
+			{"Negative_Mtas_I_Stack",{16384,0,16384}},
+			{"Positive_Mtas_M_Stack",{16384,0,16384}},
+			{"Negative_Mtas_M_Stack",{16384,0,16384}},
+			{"Positive_Mtas_O_Stack",{16384,0,16384}},
+			{"Negative_Mtas_O_Stack",{16384,0,16384}}
 		};
 
 		for( const auto& kv : doc["HISTOGRAM1D"] ){
@@ -161,19 +181,35 @@ int main(int argc, char *argv[]) {
 			{"Mtas_C_TDiff_Beta_Ion_Gamma_s",{16384,0,16384,1000,backward_corr_time,forward_corr_time}},
 			{"Sparse_Mtas_C_TDiff_Beta_Ion_Gamma_s",{16384,0,65536,1000,backward_corr_time,forward_corr_time}},
 
+			{"Mtas_Ci_TDiff_Beta_Ion_Gamma_s",{16384,0,16384,1000,backward_corr_time,forward_corr_time}},
+			{"Sparse_Mtas_Ci_TDiff_Beta_Ion_Gamma_s",{16384,0,65536,1000,backward_corr_time,forward_corr_time}},
+
 			{"Mtas_I_TDiff_Beta_Ion_Gamma_s",{16384,0,16384,1000,backward_corr_time,forward_corr_time}},
 			{"Sparse_Mtas_I_TDiff_Beta_Ion_Gamma_s",{16384,0,65536,1000,backward_corr_time,forward_corr_time}},
+
+			{"Mtas_Ii_TDiff_Beta_Ion_Gamma_s",{16384,0,16384,1000,backward_corr_time,forward_corr_time}},
+			{"Sparse_Mtas_Ii_TDiff_Beta_Ion_Gamma_s",{16384,0,65536,1000,backward_corr_time,forward_corr_time}},
 
 			{"Mtas_M_TDiff_Beta_Ion_Gamma_s",{16384,0,16384,1000,backward_corr_time,forward_corr_time}},
 			{"Sparse_Mtas_M_TDiff_Beta_Ion_Gamma_s",{16384,0,65536,1000,backward_corr_time,forward_corr_time}},
 
+			{"Mtas_Mi_TDiff_Beta_Ion_Gamma_s",{16384,0,16384,1000,backward_corr_time,forward_corr_time}},
+			{"Sparse_Mtas_Mi_TDiff_Beta_Ion_Gamma_s",{16384,0,65536,1000,backward_corr_time,forward_corr_time}},
+
 			{"Mtas_O_TDiff_Beta_Ion_Gamma_s",{16384,0,16384,1000,backward_corr_time,forward_corr_time}},
 			{"Sparse_Mtas_O_TDiff_Beta_Ion_Gamma_s",{16384,0,65536,1000,backward_corr_time,forward_corr_time}},
+			
+			{"Mtas_Oi_TDiff_Beta_Ion_Gamma_s",{16384,0,16384,1000,backward_corr_time,forward_corr_time}},
+			{"Sparse_Mtas_Oi_TDiff_Beta_Ion_Gamma_s",{16384,0,65536,1000,backward_corr_time,forward_corr_time}},
 
 			{"Ion_Spatial_Distribution",{1000,0,10,1000,0,10}},
 			{"Corrected_Ion_Spatial_Distribution",{1000,-10,10,1000,-10,10}},
 			{"Positive_Beta_Spatial_Distribution",{1000,0,10,1000,0,10}},
 			{"Negative_Beta_Spatial_Distribution",{1000,0,10,1000,0,10}},
+
+			{"Positive_Beta_v_Radius",{1000,0,10,4096,0,16384}},
+			{"Negative_Beta_v_Radius",{1000,0,10,4096,0,16384}},
+
 			{"Positive_Mtas_C_v_T",{4096,0,16384,4096,0,16384}},
 			{"Negative_Mtas_C_v_T",{4096,0,16384,4096,0,16384}},
 			{"Positive_Mtas_Ci_v_T",{4096,0,16384,4096,0,16384}},
@@ -181,7 +217,19 @@ int main(int argc, char *argv[]) {
 			{"Positive_Mtas_Ci_v_C",{4096,0,16384,4096,0,16384}},
 			{"Negative_Mtas_Ci_v_C",{4096,0,16384,4096,0,16384}},
 			{"Positive_Mtas_IMO_v_T",{4096,0,16384,4096,0,16384}},
-			{"Negative_Mtas_IMO_v_T",{4096,0,16384,4096,0,16384}}
+			{"Negative_Mtas_IMO_v_T",{4096,0,16384,4096,0,16384}},
+
+			{"Positive_Beta_v_Mtas_T",{4096,0,16384,4096,0,16384}},
+			{"Negative_Beta_v_Mtas_T",{4096,0,16384,4096,0,16384}},
+			{"Positive_Beta_v_Mtas_C",{4096,0,16384,4096,0,16384}},
+			{"Negative_Beta_v_Mtas_C",{4096,0,16384,4096,0,16384}},
+			{"Positive_Beta_v_Mtas_Ci",{4096,0,16384,4096,0,16384}},
+			{"Negative_Beta_v_Mtas_Ci",{4096,0,16384,4096,0,16384}},
+			{"Positive_Beta_v_Mtas_IMO",{4096,0,16384,4096,0,16384}},
+			{"Negative_Beta_v_Mtas_IMO",{4096,0,16384,4096,0,16384}},
+
+			{"Positive_Gamma_Gamma",{4096,0,16384,4096,0,16384}},
+			{"Negative_Gamma_Gamma",{4096,0,16384,4096,0,16384}}
 		};
 
 		for( const auto& kv : doc["HISTOGRAM2D"] ){
@@ -222,33 +270,13 @@ int main(int argc, char *argv[]) {
 
 		std::shared_ptr<PLOTS::PlotRegistry> HistogramManager(new PLOTS::PlotRegistry(logname,StringManip::StripFileExtension(outputprefix),port));
 
-		HistogramManager->RegisterPlot<TH1F>("TDiff_Beta_Ion_s","TDiff [Beta - Ion]; Time Difference (s); Counts per s",His1D["TDiff_Beta_Ion_s"]);
-		HistogramManager->RegisterPlot<TH1F>("TDiff_Beta_Ion_ms","TDiff [Beta - Ion]; Time Difference (ms); Counts per ms",His1D["TDiff_Beta_Ion_ms"]);
-		HistogramManager->RegisterPlot<TH1F>("TDiff_Beta_Ion_us","TDiff [Beta - Ion]; Time Difference (ms); Counts per ms",His1D["TDiff_Beta_Ion_us"]);
-		
-		HistogramManager->RegisterPlot<TH2F>("Mtas_T_TDiff_Beta_Ion_Gamma_s","TDiff vs Energy [Beta - Ion - Gamma]; Energy (keV); TDiff (s); ",His2D["Mtas_T_TDiff_Beta_Ion_Gamma_s"]);
-		HistogramManager->RegisterPlot<TH2F>("Sparse_Mtas_T_TDiff_Beta_Ion_Gamma_s","TDiff vs Energy [Beta - Ion - Gamma]; Energy (keV); TDiff (s); ",His2D["Sparse_Mtas_T_TDiff_Beta_Ion_Gamma_s"]);
-		HistogramManager->RegisterPlot<TH2F>("Mtas_C_TDiff_Beta_Ion_Gamma_s","TDiff vs Energy [Beta - Ion - Gamma]; Energy (keV); TDiff (s); ",His2D["Mtas_C_TDiff_Beta_Ion_Gamma_s"]);
-		HistogramManager->RegisterPlot<TH2F>("Sparse_Mtas_C_TDiff_Beta_Ion_Gamma_s","TDiff vs Energy [Beta - Ion - Gamma]; Energy (keV); TDiff (s); ",His2D["Sparse_Mtas_C_TDiff_Beta_Ion_Gamma_s"]);
-		HistogramManager->RegisterPlot<TH2F>("Mtas_I_TDiff_Beta_Ion_Gamma_s","TDiff vs Energy [Beta - Ion - Gamma]; Energy (keV); TDiff (s); ",His2D["Mtas_I_TDiff_Beta_Ion_Gamma_s"]);
-		HistogramManager->RegisterPlot<TH2F>("Sparse_Mtas_I_TDiff_Beta_Ion_Gamma_s","TDiff vs Energy [Beta - Ion - Gamma]; Energy (keV); TDiff (s); ",His2D["Sparse_Mtas_I_TDiff_Beta_Ion_Gamma_s"]);
-		HistogramManager->RegisterPlot<TH2F>("Mtas_M_TDiff_Beta_Ion_Gamma_s","TDiff vs Energy [Beta - Ion - Gamma]; Energy (keV); TDiff (s); ",His2D["Mtas_M_TDiff_Beta_Ion_Gamma_s"]);
-		HistogramManager->RegisterPlot<TH2F>("Sparse_Mtas_M_TDiff_Beta_Ion_Gamma_s","TDiff vs Energy [Beta - Ion - Gamma]; Energy (keV); TDiff (s); ",His2D["Sparse_Mtas_M_TDiff_Beta_Ion_Gamma_s"]);
-		HistogramManager->RegisterPlot<TH2F>("Mtas_O_TDiff_Beta_Ion_Gamma_s","TDiff vs Energy [Beta - Ion - Gamma]; Energy (keV); TDiff (s); ",His2D["Mtas_O_TDiff_Beta_Ion_Gamma_s"]);
-		HistogramManager->RegisterPlot<TH2F>("Sparse_Mtas_O_TDiff_Beta_Ion_Gamma_s","TDiff vs Energy [Beta - Ion - Gamma]; Energy (keV); TDiff (s); ",His2D["Sparse_Mtas_O_TDiff_Beta_Ion_Gamma_s"]);
+		for( const auto& kv : His1D ){
+			HistogramManager->RegisterPlot<TH1F>(kv.first,"",kv.second);
+		}
 
-		HistogramManager->RegisterPlot<TH2F>("Ion_Spatial_Distribution"," Ion Spatial Distribution; X (arb.); Y (arb.);",His2D["Ion_Spatial_Distribution"]);
-		HistogramManager->RegisterPlot<TH2F>("Corrected_Ion_Spatial_Distribution"," Ion Spatial Distribution; X (arb.); Y (arb.);",His2D["Corrected_Ion_Spatial_Distribution"]);
-		HistogramManager->RegisterPlot<TH2F>("Positive_Beta_Spatial_Distribution"," Beta Spatial Distribution; X (arb.); Y (arb.);",His2D["Positive_Beta_Spatial_Distribution"]);
-		HistogramManager->RegisterPlot<TH2F>("Negative_Beta_Spatial_Distribution"," Beta Spatial Distribution; X (arb.); Y (arb.);",His2D["Negative_Beta_Spatial_Distribution"]);
-		HistogramManager->RegisterPlot<TH2F>("Positive_Mtas_C_v_T","Mtas C v T; Total Energy (keV); Center Sum Energy (keV)",His2D["Positive_Mtas_C_v_T"]);
-		HistogramManager->RegisterPlot<TH2F>("Negative_Mtas_C_v_T","Mtas C v T; Total Energy (keV); Center Sum Energy (keV)",His2D["Negative_Mtas_C_v_T"]);
-		HistogramManager->RegisterPlot<TH2F>("Positive_Mtas_Ci_v_T","Mtas Ci v T; Total Energy (keV); Center Crystal Energy (keV)",His2D["Positive_Mtas_Ci_v_T"]);
-		HistogramManager->RegisterPlot<TH2F>("Negative_Mtas_Ci_v_T","Mtas Ci v T; Total Energy (keV); Center Crystal Energy (keV)",His2D["Negative_Mtas_Ci_v_T"]);
-		HistogramManager->RegisterPlot<TH2F>("Positive_Mtas_Ci_v_C","Mtas Ci v C; Center Sum Energy (keV); Center Crystal Energy (keV)",His2D["Positive_Mtas_Ci_v_C"]);
-		HistogramManager->RegisterPlot<TH2F>("Negative_Mtas_Ci_v_C","Mtas Ci v C; Center Sum Energy (keV); Center Crystal Energy (keV)",His2D["Negative_Mtas_Ci_v_C"]);
-		HistogramManager->RegisterPlot<TH2F>("Positive_Mtas_IMO_v_T","Mtas IMO v T; Total Energy (keV); IMO Crystal Energy (keV)",His2D["Positive_Mtas_IMO_v_T"]);
-		HistogramManager->RegisterPlot<TH2F>("Negative_Mtas_IMO_v_T","Mtas IMO v T; Total Energy (keV); IMO Crystal Energy (keV)",His2D["Negative_Mtas_IMO_v_T"]);
+		for( const auto& kv : His2D ){
+			HistogramManager->RegisterPlot<TH2F>(kv.first,"",kv.second);
+		}
 		
 		console->info("Generating {}.list file that contains all the declared histograms",StringManip::GetFileBaseName(outputprefix));
 		HistogramManager->WriteInfo();
@@ -475,22 +503,76 @@ int main(int argc, char *argv[]) {
 					if( tdiff < 0 ){
 						HistogramManager->Fill("Negative_Beta_Spatial_Distribution",beta_x,beta_y);
 						HistogramManager->Fill("Negative_Mtas_C_v_T",T,C);
+						HistogramManager->Fill("Negative_Mtas_T",T);
+						HistogramManager->Fill("Negative_Mtas_C",C);
+						HistogramManager->Fill("Negative_Mtas_I",I);
+						HistogramManager->Fill("Negative_Mtas_M",M);
+						HistogramManager->Fill("Negative_Mtas_O",O);
+						HistogramManager->Fill("Negative_Radius",radius);
+						HistogramManager->Fill("Negative_Beta_v_Mtas_T",T,beta_erg);
+						HistogramManager->Fill("Negative_Beta_v_Mtas_C",C,beta_erg);
+						HistogramManager->Fill("Negative_Beta_v_Radius",radius,beta_erg);
 						for( size_t ii = 0; ii < 6; ++ii ){
 							HistogramManager->Fill("Negative_Mtas_Ci_v_T",T,ValidSegments[iter][ii].sumenergy);
 							HistogramManager->Fill("Negative_Mtas_Ci_v_C",C,ValidSegments[iter][ii].sumenergy);
 							HistogramManager->Fill("Negative_Mtas_IMO_v_T",T,ValidSegments[iter][ii+6].sumenergy);
 							HistogramManager->Fill("Negative_Mtas_IMO_v_T",T,ValidSegments[iter][ii+12].sumenergy);
 							HistogramManager->Fill("Negative_Mtas_IMO_v_T",T,ValidSegments[iter][ii+18].sumenergy);
+						
+							HistogramManager->Fill("Negative_Mtas_C_Stack",ValidSegments[iter][ii].sumenergy);
+							HistogramManager->Fill("Negative_Mtas_I_Stack",ValidSegments[iter][ii+6].sumenergy);
+							HistogramManager->Fill("Negative_Mtas_M_Stack",ValidSegments[iter][ii+12].sumenergy);
+							HistogramManager->Fill("Negative_Mtas_O_Stack",ValidSegments[iter][ii+18].sumenergy);
+						
+							HistogramManager->Fill("Negative_Beta_v_Mtas_Ci",ValidSegments[iter][ii].sumenergy,beta_erg);
+							HistogramManager->Fill("Negative_Beta_v_Mtas_IMO",ValidSegments[iter][ii+6].sumenergy,beta_erg);
+							HistogramManager->Fill("Negative_Beta_v_Mtas_IMO",ValidSegments[iter][ii+12].sumenergy,beta_erg);
+							HistogramManager->Fill("Negative_Beta_v_Mtas_IMO",ValidSegments[iter][ii+18].sumenergy,beta_erg);
+						}
+						for( size_t ii = 0; ii < 24; ++ii ){
+							for( size_t jj = ii+1; jj < 24; ++jj ){
+								HistogramManager->Fill("Negative_Gamma_Gamma",
+										ValidSegments[iter][ii].sumenergy,ValidSegments[iter][jj].sumenergy);
+								HistogramManager->Fill("Negative_Gamma_Gamma",
+										ValidSegments[iter][jj].sumenergy,ValidSegments[iter][ii].sumenergy);
+							}
 						}
 					}else{
 						HistogramManager->Fill("Positive_Beta_Spatial_Distribution",beta_x,beta_y);
 						HistogramManager->Fill("Positive_Mtas_C_v_T",T,C);
+						HistogramManager->Fill("Positive_Mtas_T",T);
+						HistogramManager->Fill("Positive_Mtas_C",C);
+						HistogramManager->Fill("Positive_Mtas_I",I);
+						HistogramManager->Fill("Positive_Mtas_M",M);
+						HistogramManager->Fill("Positive_Mtas_O",O);
+						HistogramManager->Fill("Positive_Radius",radius);
+						HistogramManager->Fill("Positive_Beta_v_Mtas_T",T,beta_erg);
+						HistogramManager->Fill("Positive_Beta_v_Mtas_C",C,beta_erg);
+						HistogramManager->Fill("Positive_Beta_v_Radius",radius,beta_erg);
 						for( size_t ii = 0; ii < 6; ++ii ){
 							HistogramManager->Fill("Positive_Mtas_Ci_v_T",T,ValidSegments[iter][ii].sumenergy);
 							HistogramManager->Fill("Positive_Mtas_Ci_v_C",C,ValidSegments[iter][ii].sumenergy);
 							HistogramManager->Fill("Positive_Mtas_IMO_v_T",T,ValidSegments[iter][ii+6].sumenergy);
 							HistogramManager->Fill("Positive_Mtas_IMO_v_T",T,ValidSegments[iter][ii+12].sumenergy);
 							HistogramManager->Fill("Positive_Mtas_IMO_v_T",T,ValidSegments[iter][ii+18].sumenergy);
+						
+							HistogramManager->Fill("Positive_Mtas_C_Stack",ValidSegments[iter][ii].sumenergy);
+							HistogramManager->Fill("Positive_Mtas_I_Stack",ValidSegments[iter][ii+6].sumenergy);
+							HistogramManager->Fill("Positive_Mtas_M_Stack",ValidSegments[iter][ii+12].sumenergy);
+							HistogramManager->Fill("Positive_Mtas_O_Stack",ValidSegments[iter][ii+18].sumenergy);
+						
+							HistogramManager->Fill("Positive_Beta_v_Mtas_Ci",ValidSegments[iter][ii].sumenergy,beta_erg);
+							HistogramManager->Fill("Positive_Beta_v_Mtas_IMO",ValidSegments[iter][ii+6].sumenergy,beta_erg);
+							HistogramManager->Fill("Positive_Beta_v_Mtas_IMO",ValidSegments[iter][ii+12].sumenergy,beta_erg);
+							HistogramManager->Fill("Positive_Beta_v_Mtas_IMO",ValidSegments[iter][ii+18].sumenergy,beta_erg);
+						}
+						for( size_t ii = 0; ii < 24; ++ii ){
+							for( size_t jj = ii+1; jj < 24; ++jj ){
+								HistogramManager->Fill("Positive_Gamma_Gamma",
+										ValidSegments[iter][ii].sumenergy,ValidSegments[iter][jj].sumenergy);
+								HistogramManager->Fill("Positive_Gamma_Gamma",
+										ValidSegments[iter][jj].sumenergy,ValidSegments[iter][ii].sumenergy);
+							}
 						}
 					}
 
