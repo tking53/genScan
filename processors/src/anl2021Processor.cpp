@@ -43,10 +43,34 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 		{1010,{16384,-8192,8191}},
 
 		{3100,{16384,0,16384}},
+		{3110,{16384,0,16384}},
+		{3120,{16384,0,16384}},
+		{3130,{16384,0,16384}},
+		{3140,{16384,0,16384}},
+		{3115,{16384,0,16384}},
+		{3125,{16384,0,16384}},
+		{3135,{16384,0,16384}},
+		{3145,{16384,0,16384}},
 
 		{3200,{16384,0,16384}},
+		{3210,{16384,0,16384}},
+		{3220,{16384,0,16384}},
+		{3230,{16384,0,16384}},
+		{3240,{16384,0,16384}},
+		{3215,{16384,0,16384}},
+		{3225,{16384,0,16384}},
+		{3235,{16384,0,16384}},
+		{3245,{16384,0,16384}},
 
 		{3300,{16384,0,16384}},
+		{3310,{16384,0,16384}},
+		{3320,{16384,0,16384}},
+		{3330,{16384,0,16384}},
+		{3340,{16384,0,16384}},
+		{3315,{16384,0,16384}},
+		{3325,{16384,0,16384}},
+		{3335,{16384,0,16384}},
+		{3345,{16384,0,16384}},
 	
 		{3730,{16384,0,16384}}
 
@@ -396,10 +420,40 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 		}else if( TapeProc->GetCurrentCycleState() == TAPE::BACKGROUND ){
 			if( not this->MtasProc->DidAnyPileup() and not this->MtasProc->DidAnySaturate() ){
 				hismanager->Fill("BKG_3200",this->MtasProc->GetTotalEnergy(0));
+				hismanager->Fill("BKG_3210",this->MtasProc->GetTotalEnergy(1));
+				hismanager->Fill("BKG_3220",this->MtasProc->GetTotalEnergy(2));
+				hismanager->Fill("BKG_3230",this->MtasProc->GetTotalEnergy(3));
+				hismanager->Fill("BKG_3240",this->MtasProc->GetTotalEnergy(4));
+				for( size_t ii = 0; ii < 6; ++ii ){
+					hismanager->Fill("BKG_3215",this->MtasProc->GetCrystalEnergy(ii));
+					hismanager->Fill("BKG_3225",this->MtasProc->GetCrystalEnergy(ii+6));
+					hismanager->Fill("BKG_3235",this->MtasProc->GetCrystalEnergy(ii+12));
+					hismanager->Fill("BKG_3245",this->MtasProc->GetCrystalEnergy(ii+18));
+				}
 				if( summary->ContainsEventTag(this->beta) ){
 					hismanager->Fill("BKG_3300",this->MtasProc->GetTotalEnergy(0));
+					hismanager->Fill("BKG_3310",this->MtasProc->GetTotalEnergy(1));
+					hismanager->Fill("BKG_3320",this->MtasProc->GetTotalEnergy(2));
+					hismanager->Fill("BKG_3330",this->MtasProc->GetTotalEnergy(3));
+					hismanager->Fill("BKG_3340",this->MtasProc->GetTotalEnergy(4));
+					for( size_t ii = 0; ii < 6; ++ii ){
+						hismanager->Fill("BKG_3315",this->MtasProc->GetCrystalEnergy(ii));
+						hismanager->Fill("BKG_3325",this->MtasProc->GetCrystalEnergy(ii+6));
+						hismanager->Fill("BKG_3335",this->MtasProc->GetCrystalEnergy(ii+12));
+						hismanager->Fill("BKG_3345",this->MtasProc->GetCrystalEnergy(ii+18));
+					}
 				}else{
 					hismanager->Fill("BKG_3100",this->MtasProc->GetTotalEnergy(0));
+					hismanager->Fill("BKG_3110",this->MtasProc->GetTotalEnergy(1));
+					hismanager->Fill("BKG_3120",this->MtasProc->GetTotalEnergy(2));
+					hismanager->Fill("BKG_3130",this->MtasProc->GetTotalEnergy(3));
+					hismanager->Fill("BKG_3140",this->MtasProc->GetTotalEnergy(4));
+					for( size_t ii = 0; ii < 6; ++ii ){
+						hismanager->Fill("BKG_3115",this->MtasProc->GetCrystalEnergy(ii));
+						hismanager->Fill("BKG_3125",this->MtasProc->GetCrystalEnergy(ii+6));
+						hismanager->Fill("BKG_3135",this->MtasProc->GetCrystalEnergy(ii+12));
+						hismanager->Fill("BKG_3145",this->MtasProc->GetCrystalEnergy(ii+18));
+					}
 				}
 
 				for( int ii = 0; ii < 6; ++ii ){
@@ -591,9 +645,35 @@ void anl2021Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	this->HPGeProc->DeclarePlots(hismanager);
 	this->ImplantProc->DeclarePlots(hismanager);
 
-	hismanager->RegisterPlot<TH1F>("BKG_3100","Mtas Background Cycle Gated anti-#beta Gated; Energy (keV)",this->h1dsettings.at(3100));
-	hismanager->RegisterPlot<TH1F>("BKG_3200","Mtas Background Cycle Gated; Energy (keV)",this->h1dsettings.at(3200));
-	hismanager->RegisterPlot<TH1F>("BKG_3300","Mtas Background Cycle Gated #beta Gated; Energy (keV)",this->h1dsettings.at(3300));
+	hismanager->RegisterPlot<TH1F>("BKG_3100","Mtas Total Background Cycle Gated anti-#beta Gated; Energy (keV)",this->h1dsettings.at(3100));
+	hismanager->RegisterPlot<TH1F>("BKG_3110","Mtas Center Sum Background Cycle Gated anti-#beta Gated; Energy (keV)",this->h1dsettings.at(3110));
+	hismanager->RegisterPlot<TH1F>("BKG_3120","Mtas Inner Sum Background Cycle Gated anti-#beta Gated; Energy (keV)",this->h1dsettings.at(3120));
+	hismanager->RegisterPlot<TH1F>("BKG_3130","Mtas Middle Sum Background Cycle Gated anti-#beta Gated; Energy (keV)",this->h1dsettings.at(3130));
+	hismanager->RegisterPlot<TH1F>("BKG_3140","Mtas Outer Sum Background Cycle Gated anti-#beta Gated; Energy (keV)",this->h1dsettings.at(3140));
+	hismanager->RegisterPlot<TH1F>("BKG_3115","Mtas Center Stack Background Cycle Gated anti-#beta Gated; Energy (keV)",this->h1dsettings.at(3115));
+	hismanager->RegisterPlot<TH1F>("BKG_3125","Mtas Inner Stack Background Cycle Gated anti-#beta Gated; Energy (keV)",this->h1dsettings.at(3125));
+	hismanager->RegisterPlot<TH1F>("BKG_3135","Mtas Middle Stack Background Cycle Gated anti-#beta Gated; Energy (keV)",this->h1dsettings.at(3135));
+	hismanager->RegisterPlot<TH1F>("BKG_3145","Mtas Outer Stack Background Cycle Gated anti-#beta Gated; Energy (keV)",this->h1dsettings.at(3145));
+
+	hismanager->RegisterPlot<TH1F>("BKG_3200","Mtas Total Background Cycle Gated; Energy (keV)",this->h1dsettings.at(3200));
+	hismanager->RegisterPlot<TH1F>("BKG_3210","Mtas Center Sum Background Cycle Gated; Energy (keV)",this->h1dsettings.at(3210));
+	hismanager->RegisterPlot<TH1F>("BKG_3220","Mtas Inner Sum Background Cycle Gated; Energy (keV)",this->h1dsettings.at(3220));
+	hismanager->RegisterPlot<TH1F>("BKG_3230","Mtas Middle Sum Background Cycle Gated; Energy (keV)",this->h1dsettings.at(3230));
+	hismanager->RegisterPlot<TH1F>("BKG_3240","Mtas Outer Sum Background Cycle Gated; Energy (keV)",this->h1dsettings.at(3240));
+	hismanager->RegisterPlot<TH1F>("BKG_3215","Mtas Center Stack Background Cycle Gated; Energy (keV)",this->h1dsettings.at(3215));
+	hismanager->RegisterPlot<TH1F>("BKG_3225","Mtas Inner Stack Background Cycle Gated; Energy (keV)",this->h1dsettings.at(3225));
+	hismanager->RegisterPlot<TH1F>("BKG_3235","Mtas Middle Stack Background Cycle Gated; Energy (keV)",this->h1dsettings.at(3235));
+	hismanager->RegisterPlot<TH1F>("BKG_3145","Mtas Outer Stack Background Cycle Gated; Energy (keV)",this->h1dsettings.at(3245));
+
+	hismanager->RegisterPlot<TH1F>("BKG_3300","Mtas Total Background Cycle Gated #beta Gated; Energy (keV)",this->h1dsettings.at(3300));
+	hismanager->RegisterPlot<TH1F>("BKG_3310","Mtas Center Sum Background Cycle Gated #beta Gated; Energy (keV)",this->h1dsettings.at(3310));
+	hismanager->RegisterPlot<TH1F>("BKG_3320","Mtas Inner Sum Background Cycle Gated #beta Gated; Energy (keV)",this->h1dsettings.at(3320));
+	hismanager->RegisterPlot<TH1F>("BKG_3330","Mtas Middle Sum Background Cycle Gated #beta Gated; Energy (keV)",this->h1dsettings.at(3330));
+	hismanager->RegisterPlot<TH1F>("BKG_3340","Mtas Outer Sum Background Cycle Gated #beta Gated; Energy (keV)",this->h1dsettings.at(3340));
+	hismanager->RegisterPlot<TH1F>("BKG_3315","Mtas Center Stack Background Cycle Gated #beta Gated; Energy (keV)",this->h1dsettings.at(3315));
+	hismanager->RegisterPlot<TH1F>("BKG_3325","Mtas Inner Stack Background Cycle Gated #beta Gated; Energy (keV)",this->h1dsettings.at(3325));
+	hismanager->RegisterPlot<TH1F>("BKG_3335","Mtas Middle Stack Background Cycle Gated #beta Gated; Energy (keV)",this->h1dsettings.at(3335));
+	hismanager->RegisterPlot<TH1F>("BKG_3345","Mtas Outer Stack Background Cycle Gated #beta Gated; Energy (keV)",this->h1dsettings.at(3345));
 
 	hismanager->RegisterPlot<TH2F>("BKG_3411","Raw IndividualPMT C PMTs Background Cycle gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3411));
 	hismanager->RegisterPlot<TH2F>("BKG_3412","Raw IndividualPMT I PMTs Background Cycle gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3412));
