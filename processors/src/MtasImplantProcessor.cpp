@@ -23,15 +23,15 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 		{7007,{4096,0,4096,4096,0,4096}},
 		{70078,{4096,0,32768,4096,0,32768}},
 
-		{7012,{10,0,10,10,0,10}},
-		{7013,{10,0,10,10,0,10}},
-		{7014,{1000,0,10,1000,0,10}},
-		{7015,{1000,0,10,1000,0,10}},
+		{7012,{10,-5,5,10,-5,5}},
+		{7013,{10,-5,5,10,-5,5}},
+		{7014,{1000,-5,5,1000,-5,5}},
+		{7015,{1000,-5,5,1000,-5,5}},
 		
-		{7016,{10,0,10,10,0,10}},
-		{7017,{10,0,10,10,0,10}},
-		{7018,{1000,-1,10,1000,-1,10}},
-		{7019,{1000,-1,10,1000,-1,10}},
+		{7016,{10,-5,5,10,-5,5}},
+		{7017,{10,-5,5,10,-5,5}},
+		{7018,{1000,-5,5,1000,-5,5}},
+		{7019,{1000,-5,5,1000,-5,5}},
 		
 		{7020,{4096,0,4096,4096,0,4096}},
 		{70208,{4096,0,32768,4096,0,32768}},
@@ -45,31 +45,31 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 		{7050,{4096,0,65536,4096,0,64}},
 		{7051,{4096,0,65536,4096,0,64}},
 		
-		{7060,{1000,0,10,1000,-1,10}},
-		{7061,{1000,0,10,1000,-1,10}},
-		{7062,{4096,0,4096,1000,-1,10}},
-		{70628,{4096,0,65536,1000,-1,10}},
-		{7063,{4096,0,4096,1000,-1,10}},
-		{70638,{4096,0,65536,1000,-1,10}},
-		{7064,{4096,0,4096,1000,-1,10}},
-		{70648,{4096,0,65536,1000,-1,10}},
-		{7065,{4096,0,4096,1000,-1,10}},
-		{70658,{4096,0,65536,1000,-1,10}},
-		{7066,{64,0,64,1000,-1,10}},
-		{7067,{64,0,64,1000,-1,10}},
+		{7060,{1000,-5,5,1000,-5,5}},
+		{7061,{1000,-5,5,1000,-5,5}},
+		{7062,{4096,0,4096,1000,-5,5}},
+		{70628,{4096,0,65536,1000,-5,5}},
+		{7063,{4096,0,4096,1000,-5,5}},
+		{70638,{4096,0,65536,1000,-5,5}},
+		{7064,{4096,0,4096,1000,-5,5}},
+		{70648,{4096,0,65536,1000,-5,5}},
+		{7065,{4096,0,4096,1000,-5,5}},
+		{70658,{4096,0,65536,1000,-5,5}},
+		{7066,{64,0,64,1000,-5,5}},
+		{7067,{64,0,64,1000,-5,5}},
 		
-		{7070,{1000,0,10,1000,-1,10}},
-		{7071,{1000,0,10,1000,-1,10}},
-		{7072,{4096,0,4096,1000,-1,10}},
-		{70728,{4096,0,65536,1000,-1,10}},
-		{7073,{4096,0,4096,1000,-1,10}},
-		{70738,{4096,0,65536,1000,-1,10}},
-		{7074,{4096,0,4096,1000,-1,10}},
-		{70748,{4096,0,65536,1000,-1,10}},
-		{7075,{4096,0,4096,1000,-1,10}},
-		{70758,{4096,0,65536,1000,-1,10}},
-		{7076,{64,0,64,1000,-1,10}},
-		{7077,{64,0,64,1000,-1,10}}
+		{7070,{1000,-5,5,1000,-5,5}},
+		{7071,{1000,-5,5,1000,-5,5}},
+		{7072,{4096,0,4096,1000,-5,5}},
+		{70728,{4096,0,65536,1000,-5,5}},
+		{7073,{4096,0,4096,1000,-5,5}},
+		{70738,{4096,0,65536,1000,-5,5}},
+		{7074,{4096,0,4096,1000,-5,5}},
+		{70748,{4096,0,65536,1000,-5,5}},
+		{7075,{4096,0,4096,1000,-5,5}},
+		{70758,{4096,0,65536,1000,-5,5}},
+		{7076,{64,0,64,1000,-5,5}},
+		{7077,{64,0,64,1000,-5,5}}
 	};
 
 	this->lowgaintag = "lowgain";
@@ -145,7 +145,7 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 		auto HGIndices = this->get_sorted_indices(this->HighGainAnodes);
 		this->hgImage.secondarylowResPosition = this->CalcXY(HGIndices[this->HighGainAnodeHits-1]);
 	}else{
-		this->hgImage.secondarylowResPosition = {-1,-1};
+		this->hgImage.secondarylowResPosition = {-999,-999};
 	}
 	this->HighGain.highresx = this->hgImage.highResPosition.first;
 	this->HighGain.highresy = this->hgImage.highResPosition.second;
@@ -179,7 +179,7 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 		auto LGIndices = this->get_sorted_indices(this->LowGainAnodes);
 		this->lgImage.secondarylowResPosition = this->CalcXY(LGIndices[1]);
 	}else{
-		this->lgImage.secondarylowResPosition = {-1,-1};
+		this->lgImage.secondarylowResPosition = {-999,-999};
 	}
 	this->LowGain.highresx = this->lgImage.highResPosition.first;
 	this->LowGain.highresy = this->lgImage.highResPosition.second;
@@ -382,8 +382,8 @@ void MtasImplantProcessor::Reset(){
 	this->lgPSD = 0.0;
 }
 		
-std::pair<unsigned int,unsigned int> MtasImplantProcessor::CalcXY(const unsigned int& idx) const{
-	return std::make_pair(idx%8,8-idx/8);
+std::pair<int,int> MtasImplantProcessor::CalcXY(const unsigned int& idx) const{
+	return std::make_pair(idx%8-4,4-idx/8);
 }
 
 void MtasImplantProcessor::CalcPosition(const std::vector<double>& ergs,SIPMIMP::Image& img){
