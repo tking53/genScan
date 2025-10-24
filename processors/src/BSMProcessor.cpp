@@ -4,6 +4,7 @@
 #include "HistogramManager.hpp"
 #include <TTree.h>
 #include <algorithm>
+#include <cmath>
 #include <string>
 #include <tuple>
 
@@ -40,7 +41,10 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 				{4001 , {8192,0,8192.0,1024,0.0,1024.0}},
 				{4002 , {8192,0,8192.0,1024,0.0,1024.0}},
 				{4003 , {8192,0,8192.0,1024,0.0,1024.0}},
-				{4004 , {8192,0,8192.0,1024,0.0,1024.0}}
+				{4004 , {8192,0,8192.0,1024,0.0,1024.0}},
+
+				//this plot comes from eq. 11 in https://arxiv.org/pdf/1310.8351
+				{5000 , {4096,-128,128,4096,-16,16}}
 			    };
 	
 	this->NumPairs = 1;
@@ -303,6 +307,10 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 
 				name = "BSM_363"+id+"_B";
 				hismanager->Fill(name,this->TDiff[ii],this->UnCorrectedBSM[2*ii + 1]);
+
+				//this plot comes from eq. 11 in https://arxiv.org/pdf/1310.8351
+				name = "BSM_500"+id;
+				hismanager->Fill(name,this->TDiff[ii],std::log(this->UnCorrectedBSM[2*ii +1]/this->UnCorrectedBSM[2*ii]));
 			}
 		}
 
@@ -624,6 +632,10 @@ void BSMProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 		title = "#betaSM"+std::to_string(ii+1)+"_B G.S. Pileup; Clock Ticks (arb.); adc (arb.)";
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3900));
 
+		//this plot comes from eq. 11 in https://arxiv.org/pdf/1310.8351
+		name = "BSM_500"+std::to_string(ii);
+		title = "#betaSM"+std::to_string(ii+1)+" Light vs Timing Correlation; tdiff (ns); ln(q1/q2) (a.u.)";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(5000));
 	}
 	hismanager->RegisterPlot<TH2F>("BSM_4000","Run Time vs #betaSM Total; #betaSM Energy (keV); Run Time (ms)",this->h2dsettings.at(4000));
 	hismanager->RegisterPlot<TH2F>("BSM_4001","Run Time vs #betaSM Total; #betaSM Energy (keV); Run Time (s)",this->h2dsettings.at(4001));
