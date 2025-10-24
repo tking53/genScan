@@ -663,7 +663,7 @@ void anl2021Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH1F>("BKG_3215","Mtas Center Stack Background Cycle Gated; Energy (keV)",this->h1dsettings.at(3215));
 	hismanager->RegisterPlot<TH1F>("BKG_3225","Mtas Inner Stack Background Cycle Gated; Energy (keV)",this->h1dsettings.at(3225));
 	hismanager->RegisterPlot<TH1F>("BKG_3235","Mtas Middle Stack Background Cycle Gated; Energy (keV)",this->h1dsettings.at(3235));
-	hismanager->RegisterPlot<TH1F>("BKG_3145","Mtas Outer Stack Background Cycle Gated; Energy (keV)",this->h1dsettings.at(3245));
+	hismanager->RegisterPlot<TH1F>("BKG_3245","Mtas Outer Stack Background Cycle Gated; Energy (keV)",this->h1dsettings.at(3245));
 
 	hismanager->RegisterPlot<TH1F>("BKG_3300","Mtas Total Background Cycle Gated #beta Gated; Energy (keV)",this->h1dsettings.at(3300));
 	hismanager->RegisterPlot<TH1F>("BKG_3310","Mtas Center Sum Background Cycle Gated #beta Gated; Energy (keV)",this->h1dsettings.at(3310));
