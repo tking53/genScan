@@ -83,6 +83,12 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 	this->YSOHGThreshold = 0.0;
 	this->YSOLGThreshold = 0.0;
 
+	for( size_t ii = 0; ii < 8; ++ii ){
+		for( size_t jj = 0; jj < 8; ++jj ){
+			this->PositionMap.push_back({-3.5+jj,3.5-ii});
+		}
+	}
+
 	this->Reset();
 }
 
@@ -382,8 +388,9 @@ void MtasImplantProcessor::Reset(){
 	this->lgPSD = 0.0;
 }
 		
-std::pair<int,int> MtasImplantProcessor::CalcXY(const unsigned int& idx) const{
-	return std::make_pair(idx%8-4,4-idx/8);
+std::pair<double,double> MtasImplantProcessor::CalcXY(const unsigned int& idx) const{
+	//return std::make_pair(idx%8,8-idx/8);
+	return this->PositionMap[idx];
 }
 
 void MtasImplantProcessor::CalcPosition(const std::vector<double>& ergs,SIPMIMP::Image& img){
@@ -401,6 +408,8 @@ void MtasImplantProcessor::CalcPosition(const std::vector<double>& ergs,SIPMIMP:
 			img.lowResPosition = pixel;
 		}
 		esum += e;
+		//need to get the edges to be -4,-3,-2,-1,0,1,2,3,4
+		//with the centers being -3.5, -2.5, -1.5, -0.5, 0.5, 1.5, 2.5, 3.5
 		xtmp += e*pixel.first;
 		xtmp2 += e*pixel.first*pixel.first;
 		ytmp += e*pixel.second;

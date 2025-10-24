@@ -29,10 +29,11 @@ class MtasImplantProcessor : public Processor{
 	
 		void Reset();
 	private:
-		std::pair<int,int> CalcXY(const unsigned int&) const;
+		std::pair<double,double> CalcXY(const unsigned int&) const;
 		void CalcPosition(const std::vector<double>&,SIPMIMP::Image&);
 		std::vector<size_t> get_sorted_indices(const std::vector<double>&);
 
+		std::vector<std::pair<double,double>> PositionMap;
 
 		enum IMPLANTSIPMTYPE{
 			HIGHGAINANODE,
