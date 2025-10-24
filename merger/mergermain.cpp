@@ -202,10 +202,12 @@ int main(int argc, char *argv[]) {
 			{"Mtas_Oi_TDiff_Beta_Ion_Gamma_s",{16384,0,16384,1000,backward_corr_time,forward_corr_time}},
 			{"Sparse_Mtas_Oi_TDiff_Beta_Ion_Gamma_s",{16384,0,65536,1000,backward_corr_time,forward_corr_time}},
 
-			{"Ion_Spatial_Distribution",{1000,0,10,1000,0,10}},
-			{"Corrected_Ion_Spatial_Distribution",{1000,-10,10,1000,-10,10}},
-			{"Positive_Beta_Spatial_Distribution",{1000,0,10,1000,0,10}},
-			{"Negative_Beta_Spatial_Distribution",{1000,0,10,1000,0,10}},
+			{"Ion_Spatial_Distribution",{1000,-5,5,1000,-5,5}},
+			{"Ion_R2_v_X",{1000,-5,5,1000,0,100}},
+			{"Ion_R2_v_Y",{1000,-5,5,1000,0,100}},
+			{"Corrected_Ion_Spatial_Distribution",{1000,-5,5,1000,-5,5}},
+			{"Positive_Beta_Spatial_Distribution",{1000,-5,5,1000,-5,5}},
+			{"Negative_Beta_Spatial_Distribution",{1000,-5,5,1000,-5,5}},
 
 			{"Positive_Beta_v_Radius",{1000,0,10,4096,0,16384}},
 			{"Negative_Beta_v_Radius",{1000,0,10,4096,0,16384}},
@@ -451,8 +453,8 @@ int main(int argc, char *argv[]) {
 		//-0.06, 0.0 gives pincushion
 		const double k1 = -0.06;
 		const double k2 = 0.0;
-		const double xc = 3.5;
-		const double yc = 4.5;
+		const double xc = 0.0;
+		const double yc = 0.0;
 		for( const auto& ion : ValidImplants ){
 			if( iiter%period == 0 ){
 				console->info("Completed {}/{} Correllations",iiter,ValidImplants.size());
@@ -479,6 +481,8 @@ int main(int argc, char *argv[]) {
 			const auto c_ion_x = ion_xdiff/(1.0 + k1*ion_r2 + k2*ion_r2*ion_r2);
 			const auto c_ion_y = ion_ydiff/(1.0 + k1*ion_r2 + k2*ion_r2*ion_r2);
 			HistogramManager->Fill("Ion_Spatial_Distribution",ion_x,ion_y);
+			HistogramManager->Fill("Ion_R2_v_X",ion_xdiff,ion_r2);
+			HistogramManager->Fill("Ion_R2_v_Y",ion_ydiff,ion_r2);
 			HistogramManager->Fill("Corrected_Ion_Spatial_Distribution",c_ion_x,c_ion_y);
 			auto start = std::distance(ValidBetas.begin(),beta_begin);
 			auto stop = std::distance(ValidBetas.begin(),beta_end);
