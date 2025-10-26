@@ -2,7 +2,7 @@
 #define __BSM_PROCESSOR_HPP__
 
 #include "Processor.hpp"
-#include "BSMTraceFitStruct.hpp"
+#include "BSMStruct.hpp"
 #include "Correction.hpp"
 
 class BSMProcessor : public Processor{
@@ -70,6 +70,8 @@ class BSMProcessor : public Processor{
 
 		ProcessorStruct::BSMTraceFit fronttracefitvalues;
 		ProcessorStruct::BSMTraceFit backtracefitvalues;
+
+		std::vector<ProcessorStruct::BSMSingle> PMTDataVec;
 
 		double AverageTotalEnergy;
 		double GeometricTotalEnergy;
