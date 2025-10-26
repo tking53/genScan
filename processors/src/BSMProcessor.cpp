@@ -44,7 +44,7 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 				{4004 , {8192,0,8192.0,1024,0.0,1024.0}},
 
 				//this plot comes from eq. 11 in https://arxiv.org/pdf/1310.8351
-				{5000 , {4096,-128,128,4096,-16,16}}
+				{5000 , {4096,-64,64,4096,-8,8}}
 			    };
 	
 	this->NumPairs = 1;
