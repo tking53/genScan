@@ -36,7 +36,9 @@ class VetoProcessor : public Processor{
 
 		SUBTYPE currsubtype;
 		double rit;
+		double rit_psd;
 		double fit;
+		double fit_psd;
 
 		std::vector<Gate<double>> FitReject;
 		std::vector<Gate<double>> RitReject;

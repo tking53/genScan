@@ -17,7 +17,8 @@ VetoProcessor::VetoProcessor(const std::string& log) : Processor(log,"VetoProces
 
 	this->h2dsettings = {
 		{3000,{4096,0,4096,4096,0,4096}},
-		{30008,{4096,0,4096,4096,0,4096}}
+		{30008,{4096,0,4096,4096,0,4096}},
+		{4000,{4096,0,65536,4096,-15,15}}
 	};
 
 	this->rit = 0.0;
@@ -51,19 +52,27 @@ VetoProcessor::VetoProcessor(const std::string& log) : Processor(log,"VetoProces
 		if( this->currsubtype == SUBTYPE::FIT ){
 			if( evt->GetEnergy() > this->fit ){
 				this->fit = evt->GetEnergy();
+				auto [head,tail,total] = evt->GetTraceFixedPSD();
+				this->fit_psd = head/tail; 
 				this->fit_root.energy = evt->GetEnergy();
 				this->fit_root.pileup = evt->GetPileup();
 				this->fit_root.saturate = evt->GetSaturation();
 				this->fit_root.timestamp = evt->GetTimeStamp();
+				this->fit_root.head = head;
+				this->fit_root.tail = tail;
 			}
 			hismanager->Fill("VETO_1010",evt->GetEnergy());
 		}else if( this->currsubtype == SUBTYPE::RIT ){
 			if( evt->GetEnergy() > this->rit ){
 				this->rit = evt->GetEnergy();
+				auto [head,tail,total] = evt->GetTraceFixedPSD();
+				this->rit_psd = head/tail; 
 				this->rit_root.energy = evt->GetEnergy();
 				this->rit_root.pileup = evt->GetPileup();
 				this->rit_root.saturate = evt->GetSaturation();
 				this->rit_root.timestamp = evt->GetTimeStamp();
+				this->rit_root.head = head;
+				this->rit_root.tail = tail;
 			}
 			hismanager->Fill("VETO_2010",evt->GetEnergy());
 		}else{
@@ -90,6 +99,7 @@ VetoProcessor::VetoProcessor(const std::string& log) : Processor(log,"VetoProces
 	hismanager->Fill("VETO_2000",this->rit);
 	hismanager->Fill("VETO_3000",this->rit,this->fit);
 	hismanager->Fill("VETO_30008",this->rit,this->fit);
+	hismanager->Fill("VETO_4000",this->rit,this->rit_psd);
 
 	Processor::EndProcess();
 	return true;
@@ -137,6 +147,8 @@ void VetoProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH2F>("VETO_3000","Max Front Veto vs Max Rear Veto; Energy (arb.); Energy (arb.)",this->h2dsettings.at(3000));
 	hismanager->RegisterPlot<TH2F>("VETO_30008","Max Front Veto vs Max Rear Veto; Energy (arb.); Energy (arb.)",this->h2dsettings.at(30008));
 
+	hismanager->RegisterPlot<TH2F>("VETO_4000","Max Rear Veto PSD; Energy (arb.); PSD (arb.);",this->h2dsettings.at(4000));
+
 	this->console->info("Finished Declaring Plots");
 }
 
@@ -155,6 +167,8 @@ void VetoProcessor::CleanupTree(){
 void VetoProcessor::Reset(){
 	this->rit = 0.0;
 	this->fit = 0.0;
+	this->rit_psd = -999.0;
+	this->fit_psd = -999.0;
 }
 
 const double& VetoProcessor::GetRIT() const{
