@@ -18,6 +18,10 @@ add_executable(GenTraceFit src/fitmain.cpp)
 target_link_libraries(GenTraceFit PRIVATE Eigen3::Eigen pugixml GenScanFitters GenScanUtility ${ROOT_LIBRARIES})
 list(APPEND EXE_LIST GenTraceFit)
 
+add_executable(GenSplineFit src/makimamain.cpp)
+target_link_libraries(GenSplineFit PRIVATE GenScanFitters GenScanUtility ${ROOT_LIBRARIES})
+list(APPEND EXE_LIST GenSplineFit)
+
 add_executable(GenPeakFit src/peakfittermain.cpp)
 target_link_libraries(GenPeakFit PRIVATE Eigen3::Eigen GenScanFitters GenScanUtility ${ROOT_LIBRARIES} yaml-cpp::yaml-cpp)
 list(APPEND EXE_LIST GenPeakFit)
