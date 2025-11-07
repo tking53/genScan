@@ -18,6 +18,7 @@
 #include <boost/program_options.hpp>
 #include <boost/regex.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/describe.hpp>
 
 #include <yaml-cpp/emitter.h>
 #include <yaml-cpp/emittermanip.h>
@@ -132,6 +133,25 @@ std::vector<std::pair<double,double>> ParseGates(const std::vector<std::string>&
 	return retvals;
 }
 
+template<class E> struct enum_descriptor
+{
+	E value;
+	char const * name;
+};
+
+template<class E, template<class... T> class L, class... T>
+	constexpr std::array<enum_descriptor<E>, sizeof...(T)>
+describe_enumerators_as_array_impl( L<T...> )
+{
+	return { { { T::value, T::name }... } };
+}
+
+template<class E> constexpr auto describe_enumerators_as_array()
+{
+	return describe_enumerators_as_array_impl<E>( boost::describe::describe_enumerators<E>() );
+}
+
+
 int main(int argc, char *argv[]) {
 
 	std::string outputprefix;
@@ -155,17 +175,20 @@ int main(int argc, char *argv[]) {
 	double ellipse;
 	int npoints;
 
-	std::string FittingMessage = "peak fitting mode (0-999): 1D fits, 1000+: 2D fits ";
-       	FittingMessage += "\n0->GaussN+LinBkg";
-       	FittingMessage += "\n1->GaussN+CompBkg+LinBkg";
-       	FittingMessage += "\n2->SingleTailGaussN";
-       	FittingMessage += "\n3->DoubleTailGaussN";
-       	FittingMessage += "\n4->SingleTailGaussN+LinBkg";
-       	FittingMessage += "\n5->Compton Edge (Erfc model)";
-       	//FittingMessage += "\n6->Simple Half Life + ConstBkg";
-       	FittingMessage += "\n500->Simple Implantation Curve (no daughters) (negative time constant, positive time is single half-life+same constant)";
-       	FittingMessage += "\n510->Single Daughter pair Implantation Curve (allows beta and beta-n daughter for single step) (negative time constant, positive time is single half-life+single-bateman pair+same constant)";
-       	FittingMessage += "\n1000->2D fit of bigaussian_pdf";
+	constexpr auto oned = describe_enumerators_as_array<FitTypes::OneDim>();
+	constexpr auto twod = describe_enumerators_as_array<FitTypes::TwoDim>();
+
+	std::string FittingMessage = "peak fitting mode modenum:function";
+	FittingMessage += "\n=========== 1D Fits ===========";
+	for( auto const& x: oned ){
+		FittingMessage += "\n"+std::to_string(x.value)+":"+std::string(x.name);
+	}
+	FittingMessage += "\n=========== 1D Fits ===========";
+	FittingMessage += "\n=========== 2D Fits ===========";
+	for( auto const& x: twod ){
+		FittingMessage += "\n"+std::to_string(x.value)+":"+std::string(x.name);
+	}
+	FittingMessage += "\n=========== 2D Fits ===========";
 
 	boost::program_options::options_description cmdline_options("Generic Options");
 	cmdline_options.add_options()
@@ -192,6 +215,7 @@ int main(int argc, char *argv[]) {
 
 	boost::program_options::positional_options_description p;
 
+	bool is1dfit = false;
 	try{
 		boost::program_options::variables_map vm;
 		store(boost::program_options::command_line_parser(argc, argv).options(cmdline_options).positional(p).run(), vm);
@@ -199,6 +223,30 @@ int main(int argc, char *argv[]) {
 		if( vm.count("help") or argc <= 2 ){
 			spdlog::info(cmdline_options);
 			exit(EXIT_SUCCESS);
+		}
+		for( const auto& x : oned ){
+			if( x.value == mode ){
+				is1dfit = true;
+				break;
+			}
+		}	
+
+		bool isknownfit = false;
+		for( const auto& x : oned ){
+			if( x.value == mode ){
+				isknownfit = true;
+				break;
+			}
+		}
+		for( const auto& x : twod ){
+			if( x.value == mode ){
+				isknownfit = true;
+				break;
+			}
+		}
+		if( not isknownfit ){
+			spdlog::error("unknown fit type {}, see help for list of known fits. If you added one recently double check you added it to the BOOST_DESCRIBE_ENUM macro",mode);
+			exit(EXIT_FAILURE);
 		}
 
 		auto numproj = indices.size();
@@ -212,12 +260,12 @@ int main(int argc, char *argv[]) {
 			spdlog::error("missing upperbound");
 			exit(EXIT_FAILURE);
 		}	
-		if( dimensionality == 2 and numproj < 1 and numgates < 1 and mode < 1000){
+		if( dimensionality == 2 and numproj < 1 and numgates < 1 and is1dfit ){
 			spdlog::error("dimensionality is 2, but no projections or gates given, and not fitting a 2D dataset");
 			exit(EXIT_FAILURE);
 		}
 
-		if( mode < 1000 ){
+		if( is1dfit ){
 			if( low.size() != 1 ){
 				spdlog::error("did not provide 1 lowerbound for fitting 1D function");
 				exit(EXIT_FAILURE);
@@ -283,7 +331,7 @@ int main(int argc, char *argv[]) {
 			boost::regex re1d("TH1");
 			TH1* histofit;
 			if( boost::regex_search(histype, re2d) ){
-				if( mode < 1000 ){
+				if( is1dfit ){
 					for( const auto& idx : indices ){
 						auto name = std::string(mainhis->GetName())+"_proj_"+axis+std::to_string(idx);
 						if( axis.compare("x") == 0 ){

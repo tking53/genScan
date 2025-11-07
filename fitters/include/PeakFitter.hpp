@@ -26,6 +26,35 @@
 #include "CommonFitFunctions.hpp"
 #include "PeakFitFunctions.hpp"
 
+#include <boost/describe.hpp>
+
+namespace FitTypes{
+	enum OneDim : int {
+		GaussNLinBkgFit = 1,
+		GaussNErfBkgFit = 2,
+		SingleTailingGaussNFit = 10,
+		SingleTailingGaussNLinBkgFit = 11,
+		DoubleTailingGaussNFit = 20,
+		ErfFit = 30,
+		SimpleImplantationCurveFit = 500,
+		SingleDaughterImplantationCurveFit = 510
+	};
+	BOOST_DESCRIBE_ENUM(OneDim,
+			GaussNLinBkgFit,GaussNErfBkgFit,
+			SingleTailingGaussNFit,SingleTailingGaussNLinBkgFit,
+			DoubleTailingGaussNFit,
+			ErfFit,
+			SimpleImplantationCurveFit,
+			SingleDaughterImplantationCurveFit
+			)
+	enum TwoDim : int {
+		BiGauss = 1000
+	};
+	BOOST_DESCRIBE_ENUM(TwoDim,
+			BiGauss
+			)
+};
+
 struct PeakFitter{
 	bool loglikelihood;
 	std::map<std::string,double> fvalues;
@@ -101,7 +130,7 @@ struct PeakFitter2D : public PeakFitter{
 				throw std::runtime_error("Parameter is both fixed and bounded");
 			}
 		}
-		if( mode == 1000){
+		if( mode == FitTypes::TwoDim::BiGauss ){
 			this->InitBiGaussFit(ellipse,npts);
 		}else{
 			throw std::runtime_error("Unknown peak fitting mode");
@@ -293,21 +322,21 @@ struct PeakFitter1D : public PeakFitter{
 				throw std::runtime_error("Parameter is both fixed and bounded");
 			}
 		}
-		if( mode == 0){
+		if( mode == FitTypes::OneDim::GaussNLinBkgFit ){
 			this->InitGaussNLinBkgFit();
-		}else if( mode == 1 ){
+		}else if( mode == FitTypes::OneDim::GaussNErfBkgFit ){
 			this->InitGaussNErfBkgFit();
-		}else if( mode == 2 ){
+		}else if( mode == FitTypes::OneDim::SingleTailingGaussNFit ){
 			this->InitSingleTailingGaussNFit();
-		}else if( mode == 3 ){
+		}else if( mode == FitTypes::OneDim::DoubleTailingGaussNFit ){
 			this->InitDoubleTailingGaussNFit();
-		}else if( mode == 4 ){
+		}else if( mode == FitTypes::OneDim::SingleTailingGaussNLinBkgFit ){
 			this->InitSingleTailingGaussNLinBkgFit();
-		}else if( mode == 5 ){
+		}else if( mode == FitTypes::OneDim::ErfFit ){
 			this->InitErfFit();
-		}else if( mode == 500 ){
+		}else if( mode == FitTypes::OneDim::SimpleImplantationCurveFit ){
 			this->InitSimpleImplantationCurveFit();
-		}else if( mode == 510 ){
+		}else if( mode == FitTypes::SingleDaughterImplantationCurveFit ){
 			this->InitSingleDaughterImplantationCurveFit();
 		}else{
 			throw std::runtime_error("Unknown peak fitting mode");
