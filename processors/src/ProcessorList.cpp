@@ -278,19 +278,19 @@ void ProcessorList::ProcessRaw(EventHistoryManager* History,PLOTS::PlotRegistry*
 		auto gBoardID = evt.GetGlobalBoardID();
 		auto scalartime = 1.0e-9*(evt.GetTimeStamp()-this->FirstTimeStamp);
 		auto scalartime_m = scalartime/60.0;
-		auto scalartime_h = scalartime_m/60.0;
+		auto scalartime_5m = scalartime_m/5.0;
 		int rate_y = scalartime/scalarsize;
 		int rate_x = static_cast<int>(scalartime)%scalarsize;
 		int rate_m_y = scalartime_m/scalarsize;
 		int rate_m_x = static_cast<int>(scalartime_m)%scalarsize;
-		int rate_h_y = scalartime_h/scalarsize;
-		int rate_h_x = static_cast<int>(scalartime_h)%scalarsize;
+		int rate_5m_y = scalartime_5m/scalarsize;
+		int rate_5m_x = static_cast<int>(scalartime_5m)%scalarsize;
 		HistogramManager->Fill("Raw",evt.GetRawEnergyWRandom(),gChanID);
 		HistogramManager->Fill("InternalRaw",evt.GetInternalFilterRaw(),gChanID);
 		HistogramManager->Fill("IntegralRaw",evt.GetInternalIntegralRaw(),gChanID);
 		HistogramManager->Fill("Scalar",scalartime,gChanID);
 		HistogramManager->Fill("Scalar_M",scalartime_m,gChanID);
-		HistogramManager->Fill("Scalar_H",scalartime_h,gChanID);
+		HistogramManager->Fill("Scalar_5M",scalartime_5m,gChanID);
 		HistogramManager->Fill("Cal",evt.GetEnergy(),gChanID);
 		HistogramManager->Fill("InternalCal",evt.GetInternalFilterEnergy(),gChanID);
 		HistogramManager->Fill("IntegralCal",evt.GetInternalIntegralEnergy(),gChanID);
@@ -298,7 +298,7 @@ void ProcessorList::ProcessRaw(EventHistoryManager* History,PLOTS::PlotRegistry*
 		HistogramManager->Fill("Trace_Size",gChanID,evt.GetRawTrace().size());
 		HistogramManager->Fill("Total_Rate",rate_x,rate_y);
 		HistogramManager->Fill("Total_Rate_M",rate_m_x,rate_m_y);
-		HistogramManager->Fill("Total_Rate_H",rate_h_x,rate_h_y);
+		HistogramManager->Fill("Total_Rate_5M",rate_5m_x,rate_5m_y);
 		if( evt.GetPileup() ){
 			HistogramManager->Fill("Total_Pileup",gBoardID,evt.GetChannel());
 		}

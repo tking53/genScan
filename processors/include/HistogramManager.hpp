@@ -212,7 +212,7 @@ namespace PLOTS{
 				RegisterPlot<TH2F>("IntegralRaw","Internal Integral Filter Raw Energy; Energy (channel); Channel (arb.);",ergsize,-0.5*ergsize,0.5*ergsize,numchannels,0,numchannels);
 				RegisterPlot<TH2F>("Scalar","Scalar Rate; Time (s); Channel (arb.);",scalarsize,0.0,scalarsize,numchannels,0,numchannels);
 				RegisterPlot<TH2F>("Scalar_M","Scalar Rate; Time (min); Channel (arb.);",scalarsize,0.0,scalarsize,numchannels,0,numchannels);
-				RegisterPlot<TH2F>("Scalar_H","Scalar Rate; Time (hr); Channel (arb.);",scalarsize,0.0,scalarsize,numchannels,0,numchannels);
+				RegisterPlot<TH2F>("Scalar_5M","Scalar Rate; Time (5 min); Channel (arb.);",scalarsize,0.0,scalarsize,numchannels,0,numchannels);
 				RegisterPlot<TH2F>("Cal","Cal. Energy; Energy (keV); Channel (arb.);",ergsize,0.0,ergsize,numchannels,0,numchannels);
 				RegisterPlot<TH2F>("InternalCal","Internal Trapezoid Cal. Energy; Energy (keV); Channel (arb.);",ergsize,-0.5*ergsize,0.5*ergsize,numchannels,0,numchannels);
 				RegisterPlot<TH2F>("IntegralCal","Internal Integral Cal. Energy; Energy (keV); Channel (arb.);",ergsize,-0.5*ergsize,0.5*ergsize,numchannels,0,numchannels);
@@ -222,7 +222,7 @@ namespace PLOTS{
 				RegisterPlot<TH2F>("Event_Scale","Event Size vs Event Width; Time (ns); Event Size (arb.);",width_size,0,width_size,event_size,0,event_size);
 				RegisterPlot<TH2F>("Total_Rate","Total Rate of All Channels; Time (s); Rollover (arb.)",scalarsize,0,scalarsize,roll_size,0,roll_size);
 				RegisterPlot<TH2F>("Total_Rate_M","Total Rate of All Channels; Time (min); Rollover (arb.)",scalarsize,0,scalarsize,roll_size,0,roll_size);
-				RegisterPlot<TH2F>("Total_Rate_H","Total Rate of All Channels; Time (min); Rollover (arb.)",scalarsize,0,scalarsize,roll_size,0,roll_size);
+				RegisterPlot<TH2F>("Total_Rate_5M","Total Rate of All Channels; Time (5 min); Rollover (arb.)",scalarsize,0,scalarsize,roll_size,0,roll_size);
 				RegisterPlot<TH2F>("Total_Pileup","Map of Channels that Underwent Pileup; Linearized Mod Num (arb.); Channel Num (arb.)",PLOTS::SA,0,PLOTS::SA,PLOTS::S6,0,PLOTS::S6);
 				RegisterPlot<TH2F>("Total_Saturate","Map of Channels that Saturated; Linearized Mod Num (arb.); Channel Num (arb.)",PLOTS::SA,0,PLOTS::SA,PLOTS::S6,0,PLOTS::S6);
 				RegisterPlot<TH2F>("Total_Hits","Map of Channels that Fired; Linearized Mod Num (arb.); Channel Num (arb.)",PLOTS::SA,0,PLOTS::SA,PLOTS::S6,0,PLOTS::S6);
