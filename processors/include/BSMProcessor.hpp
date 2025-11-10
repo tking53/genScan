@@ -114,6 +114,11 @@ class BSMProcessor : public Processor{
 		int NumPMTs;
 
 		bool PlotAllTraces;
+
+		TH2Poly* BSM_2500;
+		TH2Poly* BSM_2501;
+		TH2Poly* BSM_2502;
+		TH2Poly* BSM_2503;
 };
 
 #endif

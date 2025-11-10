@@ -534,7 +534,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 				}
 			}
 			if( this->CenterHits[2*ii+1] ){
-				for( size_t jj = 0; jj < this->CenterHits[2*ii]; ++jj ){
+				for( size_t jj = 0; jj < this->CenterHits[2*ii+1]; ++jj ){
 					this->MTAS_2502->Fill(currhx.first,currhx.second,1.0);
 					this->MTAS_2503->Fill(currhx.first,currhx.second,-1.0);
 				}
@@ -551,7 +551,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 				}
 			}
 			if( this->InnerHits[2*ii+1] ){
-				for( size_t jj = 0; jj < this->InnerHits[2*ii]; ++jj ){
+				for( size_t jj = 0; jj < this->InnerHits[2*ii+1]; ++jj ){
 					this->MTAS_2502->Fill(currhx.first,currhx.second,1.0);
 					this->MTAS_2503->Fill(currhx.first,currhx.second,-1.0);
 				}
@@ -568,7 +568,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 				}
 			}
 			if( this->MiddleHits[2*ii+1] ){
-				for( size_t jj = 0; jj < this->MiddleHits[2*ii]; ++jj ){
+				for( size_t jj = 0; jj < this->MiddleHits[2*ii+1]; ++jj ){
 					this->MTAS_2502->Fill(currhx.first,currhx.second,1.0);
 					this->MTAS_2503->Fill(currhx.first,currhx.second,-1.0);
 				}
@@ -585,7 +585,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 				}
 			}
 			if( this->OuterHits[2*ii+1] ){
-				for( size_t jj = 0; jj < this->OuterHits[2*ii]; ++jj ){
+				for( size_t jj = 0; jj < this->OuterHits[2*ii+1]; ++jj ){
 					this->MTAS_2502->Fill(currhx.first,currhx.second,1.0);
 					this->MTAS_2503->Fill(currhx.first,currhx.second,-1.0);
 				}

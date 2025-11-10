@@ -2,6 +2,7 @@
 #include "BSMStruct.hpp"
 #include "CutManager.hpp"
 #include "EventSummary.hpp"
+#include "Geometry.hpp"
 #include "HistogramManager.hpp"
 #include <TTree.h>
 #include <algorithm>
@@ -321,6 +322,17 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 				name = "BSM_500"+id;
 				hismanager->Fill(name,this->TDiff[ii],std::log(this->UnCorrectedBSM[2*ii +1]/this->UnCorrectedBSM[2*ii]));
 			}
+			if( this->BSMHits[2*ii] and this->BSMHits[2*ii+1] ){
+				this->BSM_2500->Fill(0.0,0.0,1.0);
+			}
+			if( this->BSMHits[2*ii] ){
+				this->BSM_2501->Fill(0.0,0.0,1.0*this->BSMHits[2*ii]);
+				this->BSM_2503->Fill(0.0,0.0,1.0*this->BSMHits[2*ii]);
+			}
+			if( this->BSMHits[2*ii+1] ){
+				this->BSM_2502->Fill(0.0,0.0,1.0*this->BSMHits[2*ii+1]);
+				this->BSM_2503->Fill(0.0,0.0,-1.0*this->BSMHits[2*ii+1]);
+			}
 		}
 
 		for( int ii = 0; ii < this->NumPairs; ++ii ){
@@ -350,17 +362,17 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 		hismanager->Fill("BSM_3500",this->TotalMult[ii],ii);
 		hismanager->Fill("BSM_3501",this->BSMHits[ii],ii);
 	}
-	if( this->SummaryData.size() > 2 ){
-		int sum = 0;
-		for( int ii = 0; ii < this->NumPMTs; ++ii ){
-			sum += this->TotalMult[ii];
-			this->console->error("channel {} : {}",ii,this->TotalMult[ii]);
-		}
-		for( const auto& evt : this->SummaryData ){
-			this->console->error("id : {}, ts : {} erg : {} pileup : {} saturate : {}",evt->GetSpillID(),evt->GetTimeStamp(),evt->GetRawEnergy(),evt->GetPileup(),evt->GetSaturation());
-		}
-		this->console->info("Total: {}/{}",sum,this->SummaryData.size());
-	}
+	//if( this->SummaryData.size() > 2 ){
+	//	int sum = 0;
+	//	for( int ii = 0; ii < this->NumPMTs; ++ii ){
+	//		sum += this->TotalMult[ii];
+	//		this->console->error("channel {} : {}",ii,this->TotalMult[ii]);
+	//	}
+	//	for( const auto& evt : this->SummaryData ){
+	//		this->console->error("id : {}, ts : {} erg : {} pileup : {} saturate : {}",evt->GetSpillID(),evt->GetTimeStamp(),evt->GetRawEnergy(),evt->GetPileup(),evt->GetSaturation());
+	//	}
+	//	this->console->info("Total: {}/{}",sum,this->SummaryData.size());
+	//}
 
 	Processor::EndProcess();
 	return true;
@@ -651,6 +663,17 @@ void BSMProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH2F>("BSM_4002","Run Time vs #betaSM Total; #betaSM Energy (keV); Run Time (min)",this->h2dsettings.at(4002));
 	hismanager->RegisterPlot<TH2F>("BSM_4003","Run Time vs #betaSM Total; #betaSM Energy (keV); Run Time (hr)",this->h2dsettings.at(4003));
 	hismanager->RegisterPlot<TH2F>("BSM_4004","Run Time vs #betaSM Total; #betaSM Energy (keV); Run Time (day)",this->h2dsettings.at(4004));
+
+	//radius is 0.45
+	auto bsm = Geometry::hexagon(0.0,0.0,0.5,0.95);
+	this->BSM_2500 = hismanager->RegisterPlot("BSM_2500","BSM Segment Hit Map Beam is out of the page");
+	this->BSM_2500->AddBin(6,bsm.xcoords,bsm.ycoords);
+	this->BSM_2501 = hismanager->RegisterPlot("BSM_2501","BSM Front Hit Map Beam is out of the page");
+	this->BSM_2501->AddBin(6,bsm.xcoords,bsm.ycoords);
+	this->BSM_2502 = hismanager->RegisterPlot("BSM_2502","BSM Back Hit Map Beam is out of the page");
+	this->BSM_2502->AddBin(6,bsm.xcoords,bsm.ycoords);
+	this->BSM_2503 = hismanager->RegisterPlot("BSM_2503","BSM Asymmetry Hit Map Beam is out of the page, Front is positive, Back is negative");
+	this->BSM_2503->AddBin(6,bsm.xcoords,bsm.ycoords);
 
 	this->console->info("Finished Declaring Plots");
 }
