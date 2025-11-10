@@ -7,6 +7,9 @@ namespace CommonFit{
 	double Linear(double*,double*);
 	double Quad(double*,double*);
 	double Sin(double*,double*);
+
+	//2d root
+	double LinXY(double*,double*);
 	
 	//eigen
 	double Sin(double,double,double,double);

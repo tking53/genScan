@@ -22,6 +22,8 @@ namespace PeakFit{
 	//ROOT
 	//2D
 	double BiGauss(double*,double*);
+	double BiGaussFlatBkg(double*,double*);
+	double BiGaussLinXYBkg(double*,double*);
 
 }
 

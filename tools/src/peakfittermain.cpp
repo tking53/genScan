@@ -174,6 +174,8 @@ int main(int argc, char *argv[]) {
 	std::vector<std::pair<double,double>> gatevalues;
 	double ellipse;
 	int npoints;
+	int xrebin;
+	int yrebin;
 
 	constexpr auto oned = describe_enumerators_as_array<FitTypes::OneDim>();
 	constexpr auto twod = describe_enumerators_as_array<FitTypes::TwoDim>();
@@ -210,6 +212,8 @@ int main(int argc, char *argv[]) {
 		("storechi2,s",boost::program_options::value<bool>(&storechi2)->default_value(true),"store chi2 plot")
 		("tpoints,t",boost::program_options::value<int>(&npoints)->default_value(15),"npoints in the uncertainty ellipse tcut")
 		("upperbound,u",boost::program_options::value<std::vector<double>>(&high)->multitoken(),"upper bound to perform fit, if 1 provided then Xhigh, if 2 then Xhigh,Yhigh")
+		("xrebin,x",boost::program_options::value<int>(&xrebin)->default_value(0),"rebin factor for the x direction")
+		("yrebin,y",boost::program_options::value<int>(&yrebin)->default_value(0),"rebin factor for the y direction")
 		;
 
 
@@ -340,6 +344,9 @@ int main(int argc, char *argv[]) {
 							histofit = dynamic_cast<TH2*>(mainhis)->ProjectionY(name.c_str(),idx,idx);
 						}	
 						histofit->SetDirectory(0);
+						if( xrebin > 0 ){
+							histofit->RebinX(xrebin);
+						}
 						pfs1d.push_back(new PeakFitter1D(low[0],high[0],chi2,mode,histofit,fixedvalues,boundedvalues));
 					}
 					int idx = 0;
@@ -355,12 +362,21 @@ int main(int argc, char *argv[]) {
 							histofit = dynamic_cast<TH2*>(mainhis)->ProjectionX(name.c_str(),minbin,maxbin);
 						}
 						histofit->SetDirectory(0);
+						if( xrebin > 0 ){
+							histofit->RebinX(xrebin);
+						}
 						pfs1d.push_back(new PeakFitter1D(low[0],high[0],chi2,mode,histofit,fixedvalues,boundedvalues));
 						++idx;
 					}
 				}else{
 					TH2* histofit2d = dynamic_cast<TH2*>(mainhis); 
 					histofit2d->SetDirectory(0);
+					if( xrebin > 0 ){
+						histofit2d->RebinX(xrebin);
+					}
+					if( yrebin > 0 ){
+						histofit2d->RebinY(yrebin);
+					}
 					pfs2d.push_back(new PeakFitter2D(low[0],high[0],low[1],high[1],chi2,mode,histofit2d,fixedvalues,boundedvalues,ellipse,npoints));
 				}
 			}else if( boost::regex_search(histype,re1d) ){

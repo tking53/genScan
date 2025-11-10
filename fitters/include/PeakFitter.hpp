@@ -48,10 +48,12 @@ namespace FitTypes{
 			SingleDaughterImplantationCurveFit
 			)
 	enum TwoDim : int {
-		BiGauss = 1000
+		BiGauss = 1000,
+		BiGaussFlatBkg = 1001,
+		BiGaussLinXYBkg = 1002,
 	};
 	BOOST_DESCRIBE_ENUM(TwoDim,
-			BiGauss
+			BiGauss, BiGaussFlatBkg, BiGaussLinXYBkg
 			)
 };
 
@@ -132,6 +134,10 @@ struct PeakFitter2D : public PeakFitter{
 		}
 		if( mode == FitTypes::TwoDim::BiGauss ){
 			this->InitBiGaussFit(ellipse,npts);
+		} else if ( mode == FitTypes::TwoDim::BiGaussFlatBkg ){
+			this->InitBiGaussFlatBkgFit(ellipse,npts);
+		} else if ( mode == FitTypes::TwoDim::BiGaussLinXYBkg ){
+			this->InitBiGaussLinXYBkgFit(ellipse,npts);
 		}else{
 			throw std::runtime_error("Unknown peak fitting mode");
 		}
@@ -154,6 +160,128 @@ struct PeakFitter2D : public PeakFitter{
 		double corr = 0.0;
 
 		this->keys = { {"Area",{0,area}},{"XMean",{1,xoffset}},{"XSigma",{2,xwidth}},{"YMean",{3,yoffset}},{"YSigma",{4,ywidth}},{"Correlation",{5,corr}}};
+		AssignFitParNames();
+		VerifyFixedValues();
+		VerifyBoundedValues();
+		if( this->fvalues.find("XMean") == this->fvalues.end() and this->bvalues.find("XMean") == this->bvalues.end() ){
+			this->bvalues["XMean"] = this->XFitRange; 
+		}
+		if( this->fvalues.find("YMean") == this->fvalues.end() and this->bvalues.find("YMean") == this->bvalues.end() ){
+			this->bvalues["YMean"] = this->YFitRange; 
+		}
+		if( this->fvalues.find("Correlation") == this->fvalues.end() and this->bvalues.find("Correlation") == this->bvalues.end() ){
+			this->bvalues["Correlation"] = {-1.0,1.0}; 
+		}
+
+		FixAndBoundParameters();
+
+		if( area > 0.0 ){
+			std::string option = "R0SQ";
+			if( this->loglikelihood ){
+				option+="L";
+			}
+			//need to include the range
+			TFitResultPtr fitresult = this->fithist->Fit(this->fitfunc,option.c_str());
+
+			if( not fitresult->IsEmpty() ){
+				AssignFitValuesErrors(fitresult);
+				AssignFitFuncParams();
+				this->fithist->GetListOfFunctions()->Add(this->fitfunc);
+
+				this->AddUncertaintyEllipse(ellipse,npts);
+			}
+		}
+	}
+
+	void InitBiGaussFlatBkgFit(double ellipse,int npts){
+		this->fitfunc = new TF2("BiGaussFlatBkg",&PeakFit::BiGaussFlatBkg,XFitRange.first,XFitRange.second,YFitRange.first,YFitRange.second,7);
+		this->components = {
+			new TF2("BiGauss",&PeakFit::BiGauss,XFitRange.first,XFitRange.second,YFitRange.first,YFitRange.second,6),
+			new TF2("FlatBkg",&CommonFit::Constant,XFitRange.first,XFitRange.second,YFitRange.first,YFitRange.second,1)
+		};
+
+		double xwidth = this->XFitRange.second - this->XFitRange.first;
+		double ywidth = this->YFitRange.second - this->YFitRange.first;
+		double xoffset = (this->XFitRange.second + this->XFitRange.first)/2.0;
+		double yoffset = (this->YFitRange.second + this->YFitRange.first)/2.0;
+		double xlow = this->fithist->GetXaxis()->FindBin(this->XFitRange.first);
+		double xhigh = this->fithist->GetXaxis()->FindBin(this->XFitRange.second);
+		double ylow = this->fithist->GetYaxis()->FindBin(this->YFitRange.first);
+		double yhigh = this->fithist->GetYaxis()->FindBin(this->YFitRange.second);
+		double area = this->fithist->Integral(xlow,xhigh,ylow,yhigh);
+		double bkg = 0.0;
+		double corr = 0.0;
+
+		this->keys = { {"Area",{0,area}},
+			{"XMean",{1,xoffset}},{"XSigma",{2,xwidth}},
+			{"YMean",{3,yoffset}},{"YSigma",{4,ywidth}},
+			{"Correlation",{5,corr}},
+			{"Constant",{6,bkg}}
+		};
+		AssignFitParNames();
+		VerifyFixedValues();
+		VerifyBoundedValues();
+		if( this->fvalues.find("XMean") == this->fvalues.end() and this->bvalues.find("XMean") == this->bvalues.end() ){
+			this->bvalues["XMean"] = this->XFitRange; 
+		}
+		if( this->fvalues.find("YMean") == this->fvalues.end() and this->bvalues.find("YMean") == this->bvalues.end() ){
+			this->bvalues["YMean"] = this->YFitRange; 
+		}
+		if( this->fvalues.find("Correlation") == this->fvalues.end() and this->bvalues.find("Correlation") == this->bvalues.end() ){
+			this->bvalues["Correlation"] = {-1.0,1.0}; 
+		}
+
+		FixAndBoundParameters();
+
+		if( area > 0.0 ){
+			std::string option = "R0SQ";
+			if( this->loglikelihood ){
+				option+="L";
+			}
+			//need to include the range
+			TFitResultPtr fitresult = this->fithist->Fit(this->fitfunc,option.c_str());
+
+			if( not fitresult->IsEmpty() ){
+				AssignFitValuesErrors(fitresult);
+				AssignFitFuncParams();
+				this->fithist->GetListOfFunctions()->Add(this->fitfunc);
+
+				this->AddUncertaintyEllipse(ellipse,npts);
+			}
+		}
+	}
+
+	void InitBiGaussLinXYBkgFit(double ellipse,int npts){
+		this->fitfunc = new TF2("BiGaussLinXYBkg",&PeakFit::BiGaussLinXYBkg,XFitRange.first,XFitRange.second,YFitRange.first,YFitRange.second,10);
+		this->components = {
+			new TF2("BiGauss",&PeakFit::BiGauss,XFitRange.first,XFitRange.second,YFitRange.first,YFitRange.second,6),
+			new TF2("LinXYBkg",&CommonFit::LinXY,XFitRange.first,XFitRange.second,YFitRange.first,YFitRange.second,4)
+		};
+
+		double xwidth = this->XFitRange.second - this->XFitRange.first;
+		double ywidth = this->YFitRange.second - this->YFitRange.first;
+		double xoffset = (this->XFitRange.second + this->XFitRange.first)/2.0;
+		double yoffset = (this->YFitRange.second + this->YFitRange.first)/2.0;
+		double xlow = this->fithist->GetXaxis()->FindBin(this->XFitRange.first);
+		double xhigh = this->fithist->GetXaxis()->FindBin(this->XFitRange.second);
+		double ylow = this->fithist->GetYaxis()->FindBin(this->YFitRange.first);
+		double yhigh = this->fithist->GetYaxis()->FindBin(this->YFitRange.second);
+		double area = this->fithist->Integral(xlow,xhigh,ylow,yhigh);
+		double xlin = 0.0;
+		double xcon = 0.0;
+		double ylin = 0.0;
+		double ycon = 0.0;
+		double corr = 0.0;
+
+		this->keys = { {"Area",{0,area}},
+			{"XMean",{1,xoffset}},{"XSigma",{2,xwidth}},
+			{"YMean",{3,yoffset}},{"YSigma",{4,ywidth}},
+			{"Correlation",{5,corr}},
+			{"XConstant",{6,xcon}},
+			{"XLinear",{7,xlin}},
+			{"YConstant",{8,ycon}},
+			{"YLinear",{9,ylin}}
+		};
 		AssignFitParNames();
 		VerifyFixedValues();
 		VerifyBoundedValues();

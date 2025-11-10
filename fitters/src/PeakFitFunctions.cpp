@@ -152,4 +152,12 @@ namespace PeakFit{
 		double z = u*u - 2.0*Corr*u*v + v*v;
 		return Amp*TMath::Exp(-z/(2.0*c));
 	}
+
+	double BiGaussFlatBkg(double* x,double* par){
+		return BiGauss(x,par) + CommonFit::Constant(x,par+6);
+	}
+
+	double BiGaussLinXYBkg(double* x,double* par){
+		return BiGauss(x,par) + CommonFit::LinXY(x,par+6);
+	}
 }
