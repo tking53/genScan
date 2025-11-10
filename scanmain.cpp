@@ -45,8 +45,6 @@
 
 #include "EventHistoryManager.hpp"
 
-#include <THttpServer.h>
-
 volatile bool ctrlCPressed = false;
 
 void signalHandler(int signum) {
@@ -299,9 +297,6 @@ int main(int argc, char *argv[]) {
 		plotter.join();
 	}
 
-	//auto server = new THttpServer("http:8080?top=genScanor");
-	//server->SetTimer(100, kFALSE);
-	
 	std::signal(SIGINT, signalHandler);
 
 	std::shared_ptr<EventHistoryManager> EvtManager( new EventHistoryManager(logname,limit));
