@@ -797,3 +797,15 @@ bool BSMProcessor::DidIndividualPMTPileup(const int& idx) const{
 const bool& BSMProcessor::DidAnyPileup() const{
 	return this->AnyPileup;
 }
+
+int BSMProcessor::GetNumPMTs() const{
+	return this->NumPMTs;
+}
+
+int BSMProcessor::GetNumSegments() const{
+	return this->NumPairs;
+}
+
+double BSMProcessor::GetIndividualPMTEnergy(const int& idx) const{
+	return this->CorrectedBSM[idx];
+}

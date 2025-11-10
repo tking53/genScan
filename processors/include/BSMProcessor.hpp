@@ -43,6 +43,11 @@ class BSMProcessor : public Processor{
 		void FillGSPileupTracePlots(PLOTS::PlotRegistry*) const;
 		void FillPositionPlots(PLOTS::PlotRegistry*) const;
 
+		int GetNumPMTs() const;
+		int GetNumSegments() const;
+
+		double GetIndividualPMTEnergy(const int&) const;
+
 	private:
 		struct TraceAnalysis{
 			float integralthreshold;
