@@ -1,3 +1,4 @@
+#include <Rtypes.h>
 #include <cstdlib>
 #include <fstream>
 #include <iomanip>
@@ -150,16 +151,28 @@ void DecodeOperation(const std::string& id,std::vector<manipulator::operation*>&
 	auto assign_value = [](const std::string& v,const double& xl,const double& xc,const double& xu,const double& yl,const double& yc,const double& yu){
 		if( v.compare("xl") == 0 ){
 			return xl;
+		}else if( v.compare("-xl") == 0 ){
+			return -xl;
 		}else if( v.compare("xc") == 0 ){
 			return xc;
+		}else if( v.compare("-xc") == 0 ){
+			return -xc;
 		}else if( v.compare("xu") == 0 ){
 			return xu;
+		}else if( v.compare("-xu") == 0 ){
+			return -xu;
 		}else if( v.compare("yl") == 0 ){
 			return yl;
+		}else if( v.compare("-yl") == 0 ){
+			return -yl;
 		}else if( v.compare("yc") == 0 ){
 			return yc;
+		}else if( v.compare("-yc") == 0 ){
+			return -yc;
 		}else if( v.compare("yu") == 0 ){
 			return yu;
+		}else if( v.compare("-yu") == 0 ){
+			return -yu;
 		}else{
 			return std::stod(v);
 		}
@@ -260,6 +273,8 @@ int main(int argc, char *argv[]) {
 		for( const auto& op : operations ){
 			op->apply(*cut);
 		}
+		cut->SetLineWidth(4);
+		cut->SetLineColor(kBlack);
 		cut->SaveAs(outputfile.c_str());
 
 	}catch( std::exception& e){
