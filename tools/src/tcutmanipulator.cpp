@@ -143,10 +143,37 @@ namespace manipulator{
 		protected:
 			double value;
 	};
+
+	class set : public operation {
+		public:
+			set(axis ax,double xc,double yc,double value) : operation(ax,xc,yc), value(value) {
+			}
+			virtual void apply(TCutG& cut) const{
+				auto npts = cut.GetN();
+				double svalue = (this->ax == axis::X) ? (value - xcom) : (value - ycom);
+				for( auto ii = 0; ii < npts; ++ii ){
+					switch( this->ax ){
+						case axis::X:
+							cut.SetPointX(ii,cut.GetPointX(ii) + svalue);
+							break;
+						case axis::Y:
+							cut.SetPointY(ii,cut.GetPointY(ii) + svalue);
+							break;
+						default:
+							throw std::runtime_error("axis not implemented for mult");
+							break;
+					}
+				}
+			}
+		protected:
+			double value;
+	};
+
+
 }
 
 void DecodeOperation(const std::string& id,std::vector<manipulator::operation*>& ops,const double& xcom,const double& ycom,const double& xl,const double& xu,const double& yl,const double& yu){
-	boost::regex re("([xy])(shift|mirror|zero|mult)(?::([^:\\s]+))?");
+	boost::regex re("([xy])(shift|mirror|zero|mult|set)(?::([^:\\s]+))?");
 	boost::smatch what;
 	auto assign_value = [](const std::string& v,const double& xl,const double& xc,const double& xu,const double& yl,const double& yc,const double& yu){
 		if( v.compare("xl") == 0 ){
@@ -192,6 +219,9 @@ void DecodeOperation(const std::string& id,std::vector<manipulator::operation*>&
 			}else if( what[2].compare("mult") == 0 ){
 				auto val = assign_value(what[3],xl,xcom,xu,yl,ycom,yu);
 				ops.push_back(new manipulator::mult(ax,xcom,ycom,val));
+			}else if( what[2].compare("set") == 0 ){
+				auto val = assign_value(what[3],xl,xcom,xu,yl,ycom,yu);
+				ops.push_back(new manipulator::set(ax,xcom,ycom,val));
 			}else{
 				//this is zero
 				ops.push_back(new manipulator::zero(ax,xcom,ycom));
