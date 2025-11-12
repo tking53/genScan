@@ -106,8 +106,14 @@ BSMExpProcessor::BSMExpProcessor(const std::string& log) : Processor(log,"BSMExp
 				hismanager->Fill("BSMEXP_3300_PILEUP",MTASErg);
 			}
 			for( size_t ii = 0; ii < 6 ; ++ii ){
-				if( cutmanager->IsWithin("PairProduction",MTASErg,this->MtasProc->GetCrystalEnergy(ii)) ){
+				//if( cutmanager->IsWithin("PairProduction",MTASErg,this->MtasProc->GetCrystalEnergy(ii)) ){
+				//above is old version, below is better segmented 3353, which should then allow us to look at 3300 for what states we 
+				//populate, this won't necessarily catch everything but should cleanly catch all the pure e+/e- 
+				//to catch all we would need to make this gate such that we look for back to back with 511's and allow anything 
+				//in the other 4 crystals, but this won't catch if the two that we allow share some portion of the energy
+				if( cutmanager->IsWithin("PairProduction",this->MtasProc->GetTotalEnergy(1),this->MtasProc->GetCrystalEnergy(ii)) ){
 					if( this->MtasProc->GetFirstFireTime() > 0.0 and this->BSMProc->GetFirstFireTime() > 0.0 ){
+						hismanager->Fill("BSMEXP_3300_PP",MTASErg);
 						hismanager->Fill("BSMEXP_2000_PP",TDiff);
 						hismanager->Fill("BSMEXP_3600_PP",BSMErg);
 						break;
@@ -338,6 +344,7 @@ void BSMExpProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	if( this->PPCutExists ){
 		hismanager->RegisterPlot<TH1F>("BSMEXP_3600_PP","#betaSM Energy [PairProduction]; Energy (keV)",this->h1dsettings.at(3600));
 		hismanager->RegisterPlot<TH1F>("BSMEXP_2000_PP","TDiff (#betaSM - Mtas) [PairProduction]; TDiff (ns)",this->h1dsettings.at(2000));
+		hismanager->RegisterPlot<TH1F>("BSMEXP_3300_PP","MTAS Total [PairProduction]; Energy (keV)",this->h1dsettings.at(3300));
 	}
 
 	hismanager->RegisterPlot<TH1F>("BSMEXP_3300_PILEUP","MTAS Total #betaSM Pileup; Energy (kev)",this->h1dsettings.at(3300));
