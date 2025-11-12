@@ -96,4 +96,8 @@ namespace CUTS{
 	bool CutRegistry::CutIDExists(const std::string& cutid) const{
 		return (this->Cuts.find(cutid) != this->Cuts.end());
 	}
+
+	TCutG* CutRegistry::GetCut(const std::string& cutid){
+		return this->Cuts.at(cutid);
+	}
 }

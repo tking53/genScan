@@ -14,6 +14,10 @@ add_executable(GenDev src/devmain.cpp)
 target_link_libraries(GenDev PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES})
 list(APPEND EXE_LIST GenDev)
 
+add_executable(GenTCutManipulator src/tcutmanipulator.cpp)
+target_link_libraries(GenTCutManipulator PRIVATE GenScanProcessors GenScanUtility ${ROOT_LIBRARIES})
+list(APPEND EXE_LIST GenTCutManipulator)
+
 add_executable(GenTraceFit src/fitmain.cpp)
 target_link_libraries(GenTraceFit PRIVATE Eigen3::Eigen pugixml GenScanFitters GenScanUtility ${ROOT_LIBRARIES})
 list(APPEND EXE_LIST GenTraceFit)
