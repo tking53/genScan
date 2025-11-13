@@ -63,6 +63,19 @@ BSMExpProcessor::BSMExpProcessor(const std::string& log) : Processor(log,"BSMExp
 	this->BetaThreshold = 0.0;
 	this->QBeta = 8192.0;
 	this->PPCutExists = false;
+	this->PPBkgExists = {
+		{"A",false},
+		{"B",false},
+		{"C",false},
+		{"D",false},
+		{"E",false},
+		{"F",false},
+		{"G",false},
+		{"H",false},
+		{"Compton",false},
+		{"Single",false},
+		{"Double",false}
+	};
 }
 
 [[maybe_unused]] bool BSMExpProcessor::PreProcess(EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
@@ -117,6 +130,20 @@ BSMExpProcessor::BSMExpProcessor(const std::string& log) : Processor(log,"BSMExp
 						hismanager->Fill("BSMEXP_2000_PP",TDiff);
 						hismanager->Fill("BSMEXP_3600_PP",BSMErg);
 						break;
+					}
+				}
+			}
+		}
+		for( const auto& kv : this->PPBkgExists ){
+			if( kv.second ){
+				for( size_t ii = 0; ii < 6; ++ii ){
+					if( cutmanager->IsWithin("PPBkg"+kv.first,this->MtasProc->GetTotalEnergy(1),this->MtasProc->GetCrystalEnergy(ii)) ){
+						if( this->MtasProc->GetFirstFireTime() > 0.0 and this->BSMProc->GetFirstFireTime() > 0.0 ){
+							hismanager->Fill("BSMEXP_3300_PPBkg"+kv.first,MTASErg);
+							hismanager->Fill("BSMEXP_2000_PPBkg"+kv.first,TDiff);
+							hismanager->Fill("BSMEXP_3600_PPBkg"+kv.first,BSMErg);
+							break;
+						}
 					}
 				}
 			}
@@ -326,6 +353,9 @@ void BSMExpProcessor::Init(const pugi::xml_node& config){
 	this->LoadCustomCuts(config);
 	
 	this->PPCutExists = (this->customcuts.find("PairProduction") != this->customcuts.end());
+	for( auto& kv : this->PPBkgExists ){
+		kv.second = (this->customcuts.find("PPBkg"+kv.first) != this->customcuts.end());
+	}
 }
 		
 void BSMExpProcessor::Finalize(){
@@ -345,6 +375,14 @@ void BSMExpProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 		hismanager->RegisterPlot<TH1F>("BSMEXP_3600_PP","#betaSM Energy [PairProduction]; Energy (keV)",this->h1dsettings.at(3600));
 		hismanager->RegisterPlot<TH1F>("BSMEXP_2000_PP","TDiff (#betaSM - Mtas) [PairProduction]; TDiff (ns)",this->h1dsettings.at(2000));
 		hismanager->RegisterPlot<TH1F>("BSMEXP_3300_PP","MTAS Total [PairProduction]; Energy (keV)",this->h1dsettings.at(3300));
+	}
+
+	for( const auto& kv : this->PPBkgExists ){
+		if( kv.second ){
+			hismanager->RegisterPlot<TH1F>("BSMEXP_3600_PPBkg"+kv.first,"#betaSM Energy [PPBkg"+kv.first+"]; Energy (keV)",this->h1dsettings.at(3600));
+			hismanager->RegisterPlot<TH1F>("BSMEXP_2000_PPBkg"+kv.first,"TDiff (#betaSM - Mtas) [PPBkg"+kv.first+"]; TDiff (ns)",this->h1dsettings.at(2000));
+			hismanager->RegisterPlot<TH1F>("BSMEXP_3300_PPBkg"+kv.first,"MTAS Total [PPBkg"+kv.first+"]; Energy (keV)",this->h1dsettings.at(3300));
+		}
 	}
 
 	hismanager->RegisterPlot<TH1F>("BSMEXP_3300_PILEUP","MTAS Total #betaSM Pileup; Energy (kev)",this->h1dsettings.at(3300));

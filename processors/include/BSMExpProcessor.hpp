@@ -29,6 +29,7 @@ class BSMExpProcessor : public Processor{
 		std::pair<double,double> BSMPosBounds;
 
 		bool PPCutExists;
+		std::map<std::string,bool> PPBkgExists;
 
 		std::unique_ptr<BSMProcessor> BSMProc;
 		std::unique_ptr<MtasProcessor> MtasProc;
