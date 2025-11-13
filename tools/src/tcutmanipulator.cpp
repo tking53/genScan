@@ -236,6 +236,7 @@ int main(int argc, char *argv[]) {
 	std::string outputfile;
 	std::vector<std::string> opcodes;
 	std::vector<manipulator::operation*> operations;
+	std::string name;
 
 	std::string operation_message = "operation to perform, they are done in order they are passed to the program";
 	operation_message += "\ncurrently supported operations";
@@ -255,6 +256,7 @@ int main(int argc, char *argv[]) {
 		("tcutfile,t",boost::program_options::value<std::string>(&tcutfile),"filename to read tcut from, is expected to be a cxx")
 		("outputfile,o",boost::program_options::value<std::string>(&outputfile),"filename to output to, will be a cxx")
 		("operation,v",boost::program_options::value<std::vector<std::string>>(&opcodes)->multitoken(),operation_message.c_str())
+		("name,n",boost::program_options::value<std::string>(&name)->default_value("dump"),"name that the cut will have when saved")
 		;
 
 
@@ -305,6 +307,7 @@ int main(int argc, char *argv[]) {
 		}
 		cut->SetLineWidth(4);
 		cut->SetLineColor(kBlack);
+		cut->SetName(name.c_str());
 		cut->SaveAs(outputfile.c_str());
 
 	}catch( std::exception& e){
