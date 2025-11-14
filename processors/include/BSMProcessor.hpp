@@ -48,6 +48,8 @@ class BSMProcessor : public Processor{
 
 		double GetIndividualPMTEnergy(const int&) const;
 
+		int GetBSMHits(const int&) const;
+
 	private:
 		struct TraceAnalysis{
 			float integralthreshold;

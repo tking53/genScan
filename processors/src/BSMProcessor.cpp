@@ -832,3 +832,8 @@ int BSMProcessor::GetNumSegments() const{
 double BSMProcessor::GetIndividualPMTEnergy(const int& idx) const{
 	return this->CorrectedBSM[idx];
 }
+
+
+int BSMProcessor::GetBSMHits(const int& idx) const{
+	return this->BSMHits[idx];
+}

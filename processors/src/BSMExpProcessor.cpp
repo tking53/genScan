@@ -101,7 +101,9 @@ BSMExpProcessor::BSMExpProcessor(const std::string& log) : Processor(log,"BSMExp
 		this->BSMProc->PreProcess(eventhistory,hismanager,cutmanager);
 	}
 
-	bool AllWithinTDiff = (std::abs(this->BSMProc->GetTDiff(0)) <= 80.0);
+	//when doing the Zr90 0+ we had the check on the TDiff of the BSM to tighter constrain things, let's 
+	//see what making this default to true causes
+	bool AllWithinTDiff = true;//(std::abs(this->BSMProc->GetTDiff(0)) <= 80.0);
 	bool AllWithinPos = ((this->BSMProc->GetPosition(0) >= this->BSMPosBounds.first) and (this->BSMProc->GetPosition(0) <= this->BSMPosBounds.second));
 
 	//auto BSMErg = this->BSMProc->GetAverageTotalEnergy();
@@ -109,15 +111,26 @@ BSMExpProcessor::BSMExpProcessor(const std::string& log) : Processor(log,"BSMExp
 	auto MTASErg = this->MtasProc->GetTotalEnergy(0);
 	auto TDiff = this->MtasProc->GetFirstFireTime() - this->BSMProc->GetFirstFireTime();
 
+	//let's not check if there is anything except for a pileup in the BSM, this is true pileup from pixie
+	//hopefully this is out beta followed by e+/e- in Y90 decay to Zr90
+	if( this->BSMProc->DidAnyPileup() ){
+		hismanager->Fill("BSMEXP_3300_PIXIE_PILEUP",MTASErg);
+	}
+
+	//this is internal pileup, i.e. bsm fired twice or more within our event window
+	//if this expected to be common, we need to setup the BSM to properly handle determining clusters of values
+	//we would need to do the same with MTAS and probably move to a true rolling window though
+	//and basically do a chunk_by like view, where we cluster with a subevent????
+	if( this->BSMProc->GetBSMHits(0) > 1 and this->BSMProc->GetBSMHits(1) > 1 ){
+		hismanager->Fill("BSMEXP_3300_EVT_PILEUP",MTASErg);
+	}
+
 	if( this->HasBSM and AllWithinTDiff and AllWithinPos ){
 		if( this->MtasProc->GetFirstFireTime() > 0.0 and this->BSMProc->GetFirstFireTime() > 0.0 ){
 			hismanager->Fill("BSMEXP_2000",TDiff);
 		}
 		
 		if( this->PPCutExists ){
-			if( this->BSMProc->DidAnyPileup() ){
-				hismanager->Fill("BSMEXP_3300_PILEUP",MTASErg);
-			}
 			for( size_t ii = 0; ii < 6 ; ++ii ){
 				//if( cutmanager->IsWithin("PairProduction",MTASErg,this->MtasProc->GetCrystalEnergy(ii)) ){
 				//above is old version, below is better segmented 3353, which should then allow us to look at 3300 for what states we 
@@ -385,7 +398,8 @@ void BSMExpProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 		}
 	}
 
-	hismanager->RegisterPlot<TH1F>("BSMEXP_3300_PILEUP","MTAS Total #betaSM Pileup; Energy (kev)",this->h1dsettings.at(3300));
+	hismanager->RegisterPlot<TH1F>("BSMEXP_3300_PIXIE_PILEUP","MTAS Total #betaSM Pileup Pixie; Energy (kev)",this->h1dsettings.at(3300));
+	hismanager->RegisterPlot<TH1F>("BSMEXP_3300_EVT_PILEUP","MTAS Total #betaSM Pileup Evt; Energy (kev)",this->h1dsettings.at(3300));
 
 	//1D plots
 	hismanager->RegisterPlot<TH1F>("BSM_3600","#betaSM Total; Energy (keV)",this->h1dsettings.at(3600));
