@@ -685,11 +685,11 @@ void BSMProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 		title = "#betaSM"+std::to_string(ii+1)+"_B Pixie Pileup Traces; Clock Ticks (arb.); trace id";
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(6000));
 
-		name = "BSM_600"+std::to_string(ii)+"_F";
+		name = "BSM_601"+std::to_string(ii)+"_F";
 		title = "#betaSM"+std::to_string(ii+1)+"_F Pixie Pileup Traces Both Pileup; Clock Ticks (arb.); trace id";
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(6000));
 
-		name = "BSM_600"+std::to_string(ii)+"_B";
+		name = "BSM_601"+std::to_string(ii)+"_B";
 		title = "#betaSM"+std::to_string(ii+1)+"_B Pixie Pileup Traces Both Pileup; Clock Ticks (arb.); trace id";
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(6000));
 	}
