@@ -607,7 +607,8 @@ int main(int argc, char *argv[]) {
 		std::shared_ptr<RootFileManager> RootManager(new RootFileManager(logname,StringManip::StripFileExtension(outputprefix),false));
 
 		HistogramManager->WriteAllPlots();
-
+		//this closes the damn root file
+		RootManager->FinalizeTrees();
 
 		std::chrono::time_point<std::chrono::high_resolution_clock> global_stop_time = std::chrono::high_resolution_clock::now();
 		auto global_run_time = global_stop_time - global_start_time;
