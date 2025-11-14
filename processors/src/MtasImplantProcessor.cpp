@@ -147,12 +147,12 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 	}
 
 	this->CalcPosition(this->HighGainAnodes,this->hgImage);
-	if( this->HighGainAnodeHits > 1 ){
-		auto HGIndices = this->get_sorted_indices(this->HighGainAnodes);
-		this->hgImage.secondarylowResPosition = this->CalcXY(HGIndices[this->HighGainAnodeHits-1]);
-	}else{
+	//if( this->HighGainAnodeHits > 1 ){
+	//	auto HGIndices = this->get_sorted_indices(this->HighGainAnodes);
+	//	this->hgImage.secondarylowResPosition = this->CalcXY(HGIndices[this->HighGainAnodeHits-1]);
+	//}else{
 		this->hgImage.secondarylowResPosition = {-999,-999};
-	}
+	//}
 	this->HighGain.highresx = this->hgImage.highResPosition.first;
 	this->HighGain.highresy = this->hgImage.highResPosition.second;
 	this->HighGain.lowresx = this->hgImage.lowResPosition.first;
@@ -181,12 +181,12 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 	hismanager->Fill("IMPLANT_7067",this->HighGainAnodeHits,this->hgImage.highResStdDev.second);
 
 	this->CalcPosition(this->LowGainAnodes,this->lgImage);
-	if( this->LowGainAnodeHits > 1 ){
-		auto LGIndices = this->get_sorted_indices(this->LowGainAnodes);
-		this->lgImage.secondarylowResPosition = this->CalcXY(LGIndices[1]);
-	}else{
+	//if( this->LowGainAnodeHits > 1 ){
+	//	auto LGIndices = this->get_sorted_indices(this->LowGainAnodes);
+	//	this->lgImage.secondarylowResPosition = this->CalcXY(LGIndices[1]);
+	//}else{
 		this->lgImage.secondarylowResPosition = {-999,-999};
-	}
+	//}
 	this->LowGain.highresx = this->lgImage.highResPosition.first;
 	this->LowGain.highresy = this->lgImage.highResPosition.second;
 	this->LowGain.lowresx = this->lgImage.lowResPosition.first;
