@@ -2,6 +2,7 @@
 #define __MTAS_PROCESSOR_HPP__
 
 #include "Correction.hpp"
+#include "Gates.hpp"
 #include "Geometry.hpp"
 #include "HistogramManager.hpp"
 #include "MtasStruct.hpp"
@@ -69,6 +70,9 @@ class MtasProcessor : public Processor{
 		void FillNoLogicBetaPlots(PLOTS::PlotRegistry*);
 		void FillNoLogicNonBetaPlots(PLOTS::PlotRegistry*);
 
+		bool DidBack2BackCenterSegmentsFire() const;
+		bool DidBack2BackCenterSegmentsFireIn511Region() const;
+
 	private:
 		double CalcPosition(double,double);
 		void Reset();
@@ -102,6 +106,7 @@ class MtasProcessor : public Processor{
 		std::vector<double> CalOuter;
 
 		std::vector<int> CenterHits;
+		std::vector<bool> ValidCenterSegments;
 		std::vector<int> InnerHits;
 		std::vector<int> MiddleHits;
 		std::vector<int> OuterHits;
@@ -126,7 +131,12 @@ class MtasProcessor : public Processor{
 		bool MiddleFire;
 		bool OuterFire;
 		bool AnyFire;
-			
+
+		bool Back2BackCenterFire;
+		bool Back2BackCenter511RegionFire;
+
+		Gate<double> Center511Region;
+
 		std::vector<double> TotalEnergy;
 		std::vector<double> CrystalEnergy;
 

@@ -232,6 +232,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 	this->CalOuter = std::vector<double>(12,0.0);
 
 	this->CenterHits = std::vector<int>(12,0);
+	this->ValidCenterSegments = std::vector<bool>(6,false);
 	this->InnerHits = std::vector<int>(12,0);
 	this->MiddleHits = std::vector<int>(12,0);
 	this->OuterHits = std::vector<int>(12,0);
@@ -259,6 +260,9 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 	this->MiddleFire = false;
 	this->OuterFire = false;
 	this->AnyFire = false;
+	
+	this->Back2BackCenterFire = false;
+	this->Back2BackCenter511RegionFire = false;
 
 	this->FirstTime = -1.0;
 	this->LastTime = -1.0;
@@ -728,8 +732,20 @@ void MtasProcessor::NewCenterCalculation(){
 			this->AnyFire = true;
 			this->NumFire[0] += 1;
 			this->NumFire[1] += 1;
+			this->ValidCenterSegments[ii] = true;
 		}
 	}
+	//this check is not straightforward, since compton scatters will confuse this quite easily
+	//however the 511 gate, should help clean things easier
+	for( size_t ii = 0; ii < 3; ++ii ){
+		if( this->ValidCenterSegments[ii] && this->ValidCenterSegments[ii+2] ){
+			this->Back2BackCenterFire = true;
+			if( this->Center511Region.IsWithin(this->CrystalEnergy[ii]) && this->Center511Region.IsWithin(this->CrystalEnergy[ii+2]) ){
+				this->Back2BackCenter511RegionFire = true;
+			}
+		}
+	}
+
 	for( size_t ii = 0; ii < 6; ++ii ){
 		if( ( this->PosCorrectionMap[2*ii] != nullptr ) and ( this->PosCorrectionMap[2*ii + 1] != nullptr ) ){
 			if( this->CenterHits[2*ii] and this->CenterHits[2*ii + 1] ){
@@ -807,6 +823,19 @@ void MtasProcessor::Init(const pugi::xml_node& config){
 		this->PosCorrectionMap[id]->mean = cross;
 		this->console->info("Found PositionCorrection Node for {} : p0:{} p1:{} cross:{}, E'= E*(cross/exp(p0+p1*P)); P = (Efront-Eback)/(Efront+Eback)",tag,p0,p1,cross);
 	}
+
+	//let's default this before we try to set it
+	this->Center511Region = Gate<double>(446.0,540.0);
+	for( pugi::xml_node gate = config.child("Gate"); gate; gate = gate.next_sibling("Gate") ){
+		std::string label = gate.attribute("label").as_string("");
+		if( label.compare("Center511") == 0 ){
+			//these are the values seen from Zr90
+			auto low = gate.attribute("lowerbound").as_double(446.0);
+			auto high = gate.attribute("upperbound").as_double(540.0);
+			this->Center511Region = Gate<double>(low,high);
+		}
+	}
+
 
 	this->diagnosticplots = config.attribute("diagnostic").as_bool(false);
 	this->logictimeplots = config.attribute("logic").as_bool(false);
@@ -1238,10 +1267,17 @@ void MtasProcessor::Reset(){
 	this->OuterFire = false;
 	this->AnyFire = false;
 
+	this->Back2BackCenterFire = false;
+	this->Back2BackCenter511RegionFire = false;
+
 	this->FirstTime = -1.0;
 	this->LastTime = -1.0;
 
 	this->TimeStamps.clear();
+
+	for( size_t ii = 0; ii < 6; ++ii ){
+		this->ValidCenterSegments[ii] = false;
+	}
 
 	for( size_t ii = 0; ii < 12; ++ii ){
 		this->Center[ii] = 0.0;
@@ -2001,4 +2037,12 @@ const double& MtasProcessor::GetIndividualOuterPMTEnergy(const int& idx) const{
 
 const double& MtasProcessor::GetIndividualOuterPMTRawEnergy(const int& idx) const{
 	return this->RawOuter[idx];
+}
+
+bool MtasProcessor::DidBack2BackCenterSegmentsFire() const{
+	return this->Back2BackCenterFire;
+}
+
+bool MtasProcessor::DidBack2BackCenterSegmentsFireIn511Region() const{
+	return this->Back2BackCenter511RegionFire;
 }
