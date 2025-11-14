@@ -57,7 +57,10 @@ BSMExpProcessor::BSMExpProcessor(const std::string& log) : Processor(log,"BSMExp
 		{3660 , {4096,0.0,4096.0,4096,0.0,4096.0}},
 		{36608 , {2048,0.0,16384.0,2048,0.0,16384.0}},
 		{3661 , {4096,0.0,4096.0,4096,0.0,4096.0}},
-		{36618 , {2048,0.0,16384.0,2048,0.0,16384.0}}
+		{36618 , {2048,0.0,16384.0,2048,0.0,16384.0}},
+
+		//internal tdiff timing to try and extract the Zr90 0+
+		{3700,{8192,0,8192,1000,0,10000}}
 	};
 
 	this->BetaThreshold = 0.0;
@@ -142,6 +145,7 @@ BSMExpProcessor::BSMExpProcessor(const std::string& log) : Processor(log,"BSMExp
 						hismanager->Fill("BSMEXP_3300_PP",MTASErg);
 						hismanager->Fill("BSMEXP_2000_PP",TDiff);
 						hismanager->Fill("BSMEXP_3600_PP",BSMErg);
+						hismanager->Fill("BSMEXP_3700",BSMErg,TDiff);
 						break;
 					}
 				}
@@ -388,6 +392,7 @@ void BSMExpProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 		hismanager->RegisterPlot<TH1F>("BSMEXP_3600_PP","#betaSM Energy [PairProduction]; Energy (keV)",this->h1dsettings.at(3600));
 		hismanager->RegisterPlot<TH1F>("BSMEXP_2000_PP","TDiff (#betaSM - Mtas) [PairProduction]; TDiff (ns)",this->h1dsettings.at(2000));
 		hismanager->RegisterPlot<TH1F>("BSMEXP_3300_PP","MTAS Total [PairProduction]; Energy (keV)",this->h1dsettings.at(3300));
+		hismanager->RegisterPlot<TH2F>("BSMEXP_3700","TDiff (#betaSM -Mtas) vs #betaSM Energy [PairProduction]; Energy (keV); TDiff (ns);",this->h2dsettings.at(3700));
 	}
 
 	for( const auto& kv : this->PPBkgExists ){

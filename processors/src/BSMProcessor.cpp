@@ -46,7 +46,10 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 				{4004 , {8192,0,8192.0,1024,0.0,1024.0}},
 
 				//this plot comes from eq. 11 in https://arxiv.org/pdf/1310.8351
-				{5000 , {4096,-64,64,4096,-8,8}}
+				{5000 , {4096,-64,64,4096,-8,8}},
+				
+				//first N pileup traces so we can manipulate them easier?
+				{6000 , {512,0,512,1000,0,1000}}
 			    };
 	
 	this->NumPairs = 1;
@@ -96,6 +99,15 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 				for( const auto& tracevalue : evt->GetRawTrace() ){
 					hismanager->Fill(tracehis,idx,tracevalue);
 					++idx;
+				}
+
+				if( this->SinglePileupTraceCounter[detectorposition] < this->MaxTraceStore ){
+					auto trace = evt->GetRawTrace();
+					std::string pileuptracehis = (isfront) ? ("BSM_600"+std::to_string(position)+"_F") : ("BSM_600"+std::to_string(position)+"_B");
+					for( size_t ii = 0; ii < std::min(trace.size(),this->MaxTraceLength); ++ii ){
+						hismanager->SetBin(pileuptracehis,ii+1,this->SinglePileupTraceCounter[detectorposition]+1,trace[ii],false);
+					}
+					++(this->SinglePileupTraceCounter[detectorposition]);
 				}
 
 				std::string tracederivativehis = (isfront) ? ("BSM_386"+std::to_string(position)+"_F") :  ("BSM_386"+std::to_string(position)+"_B");
@@ -164,15 +176,15 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 			std::string psdhis = (isfront) ?  ("BSM_371"+std::to_string(position)+"_F") :  ("BSM_371"+std::to_string(position)+"_B");
 			hismanager->Fill(psdhis,integral,psd);
 			//hismanager->Fill(psdhis,evt->GetRawEnergyWRandom(),psd);
-			if( this->TraceSettings[detectorposition] != nullptr ){
-				if( integral < this->TraceSettings[detectorposition]->integralthreshold ){
-					continue;
-				}else{
-					if( cutmanager->IsWithin(this->TraceSettings[detectorposition]->cutid,integral,psd) ){
-						continue;
-					}
-				}
-			}
+			//if( this->TraceSettings[detectorposition] != nullptr ){
+			//	if( integral < this->TraceSettings[detectorposition]->integralthreshold ){
+			//		continue;
+			//	}else{
+			//		if( cutmanager->IsWithin(this->TraceSettings[detectorposition]->cutid,integral,psd) ){
+			//			continue;
+			//		}
+			//	}
+			//}
 
 			std::string baselinehis = (isfront) ?  ("BSM_372"+std::to_string(position)+"_F") :  ("BSM_372"+std::to_string(position)+"_B");
 			hismanager->Fill(baselinehis,baseline.second,baseline.first);
@@ -415,6 +427,9 @@ void BSMProcessor::Init(const pugi::xml_node& config){
 	this->HitTimeStamps = std::vector<double>(this->NumPMTs,0.0);
 	this->Traces = std::vector<std::vector<uint16_t>>(this->NumPMTs,std::vector<uint16_t>());
 	this->Pairs = std::vector<PhysicsData*>(this->NumPMTs,nullptr);
+		
+	this->SinglePileupTraceCounter = std::vector<int>(this->NumPMTs,0);
+	this->CoincPileupTraceCounter = std::vector<int>(this->NumPairs,0);
 	for( size_t ii = 0; ii < this->NumPMTs; ++ii ){
 		this->TraceSettings.push_back(nullptr);
 		this->PosCorrectionMap.push_back(nullptr);
@@ -457,6 +472,10 @@ void BSMProcessor::Init(const pugi::xml_node& config){
 
 	this->LoadHistogramSettings(config);
 	this->LoadCustomCuts(config);
+
+	//this is where we store this info
+	this->MaxTraceStore = this->h2dsettings.at(6000).nbinsy;
+	this->MaxTraceLength = this->h2dsettings.at(6000).nbinsx;
 }
 		
 void BSMProcessor::Finalize(){
@@ -657,6 +676,22 @@ void BSMProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 		name = "BSM_500"+std::to_string(ii);
 		title = "#betaSM"+std::to_string(ii+1)+" Light vs Timing Correlation; tdiff (ns); ln(q1/q2) (a.u.)";
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(5000));
+
+		name = "BSM_600"+std::to_string(ii)+"_F";
+		title = "#betaSM"+std::to_string(ii+1)+"_F Pixie Pileup Traces; Clock Ticks (arb.); trace id";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(6000));
+
+		name = "BSM_600"+std::to_string(ii)+"_B";
+		title = "#betaSM"+std::to_string(ii+1)+"_B Pixie Pileup Traces; Clock Ticks (arb.); trace id";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(6000));
+
+		name = "BSM_600"+std::to_string(ii)+"_F";
+		title = "#betaSM"+std::to_string(ii+1)+"_F Pixie Pileup Traces Both Pileup; Clock Ticks (arb.); trace id";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(6000));
+
+		name = "BSM_600"+std::to_string(ii)+"_B";
+		title = "#betaSM"+std::to_string(ii+1)+"_B Pixie Pileup Traces Both Pileup; Clock Ticks (arb.); trace id";
+		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(6000));
 	}
 	hismanager->RegisterPlot<TH2F>("BSM_4000","Run Time vs #betaSM Total; #betaSM Energy (keV); Run Time (ms)",this->h2dsettings.at(4000));
 	hismanager->RegisterPlot<TH2F>("BSM_4001","Run Time vs #betaSM Total; #betaSM Energy (keV); Run Time (s)",this->h2dsettings.at(4001));

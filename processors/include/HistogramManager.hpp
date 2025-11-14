@@ -422,6 +422,37 @@ namespace PLOTS{
 				}
 			}
 
+			void SetBin(const std::string& name,int binx,int count,bool calcerr){
+				auto test = this->Plots_1D.find(name);
+				if( test != this->Plots_1D.end() ){
+					test->second->SetBinContent(binx,count);
+					if( not calcerr ){
+						test->second->SetBinError(binx,0.0);
+					}else{
+						test->second->SetBinError(binx,std::sqrt(count));
+					}
+				}else{
+					std::string mess = "Plot : "+name+" does not exist as a 1D plot";
+					this->console->error("{}",mess);
+					throw mess;
+				}
+			}
+
+			void SetBin(TH1* his,int binx,int count,bool calcerr){
+				if( his != nullptr ){
+					his->SetBinContent(binx,count);
+					if( not calcerr ){
+						his->SetBinError(binx,0.0);
+					}else{
+						his->SetBinError(binx,std::sqrt(count));
+					}
+				}else{
+					std::string mess = "Passed nullptr histogram to 1D SetBin";
+					this->console->error("{}",mess);
+					throw mess;
+				}
+			}
+
 			void Fill(const std::string& name,double xval,double yval){
 				auto test = this->Plots_2D.find(name);
 				if( test != this->Plots_2D.end() ){
@@ -520,6 +551,37 @@ namespace PLOTS{
 					}
 				}else{
 					std::string mess = "Passed nullptr histogram to 2D IncrementBin()";
+					this->console->error("{}",mess);
+					throw mess;
+				}
+			}
+
+			void SetBin(const std::string& name,int binx,int biny,int count,bool calcerr){
+				auto test = this->Plots_2D.find(name);
+				if( test != this->Plots_2D.end() ){
+					test->second->SetBinContent(binx,biny,count);
+					if( not calcerr ){
+						test->second->SetBinError(binx,biny,0.0);
+					}else{
+						test->second->SetBinError(binx,biny,std::sqrt(count));
+					}
+				}else{
+					std::string mess = "Plot : "+name+" does not exist as a 2D plot";
+					this->console->error("{}",mess);
+					throw mess;
+				}
+			}
+
+			void SetBin(TH2* his,int binx,int biny,int count,bool calcerr){
+				if( his != nullptr ){
+					his->SetBinContent(binx,biny,count);
+					if( not calcerr ){
+						his->SetBinError(binx,biny,0.0);
+					}else{
+						his->SetBinError(binx,biny,std::sqrt(count));
+					}
+				}else{
+					std::string mess = "Passed nullptr histogram to 2D SetBin()";
 					this->console->error("{}",mess);
 					throw mess;
 				}

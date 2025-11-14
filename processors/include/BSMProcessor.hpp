@@ -73,6 +73,10 @@ class BSMProcessor : public Processor{
 		std::vector<double> CorrectedBSM;
 		std::vector<int> BSMHits;
 		std::vector<int> TotalMult;
+		std::vector<int> SinglePileupTraceCounter;
+		std::vector<int> CoincPileupTraceCounter;
+		size_t MaxTraceStore;
+		size_t MaxTraceLength;
 		std::vector<std::unique_ptr<TraceAnalysis>> TraceSettings;
 
 		ProcessorStruct::BSMTraceFit fronttracefitvalues;
