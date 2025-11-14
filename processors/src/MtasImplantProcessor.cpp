@@ -149,7 +149,7 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 	this->CalcPosition(this->HighGainAnodes,this->hgImage);
 	//if( this->HighGainAnodeHits > 1 ){
 	//	auto HGIndices = this->get_sorted_indices(this->HighGainAnodes);
-	//	this->hgImage.secondarylowResPosition = this->CalcXY(HGIndices[this->HighGainAnodeHits-1]);
+	//	this->hgImage.secondarylowResPosition = this->CalcXY(HGIndices[1]);
 	//}else{
 		this->hgImage.secondarylowResPosition = {-999,-999};
 	//}
