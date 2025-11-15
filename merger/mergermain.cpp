@@ -434,7 +434,7 @@ int main(int argc, char *argv[]) {
 		//the actual correlation step
 		console->info("Begin sorting");
 
-		auto period = ValidImplants.size() > 0 ? ValidImplants.size()/10 : 1;
+		volatile const auto period = ValidImplants.size()/10 + 1;
 		auto iiter = 0;
 		std::random_device rd;
 		std::mt19937_64 gen(rd());
