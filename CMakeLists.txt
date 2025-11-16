@@ -390,7 +390,7 @@ endif()
 target_include_directories(GenScanProcessors PUBLIC core/include)
 
 add_executable(GenScanor scanmain.cpp)
-add_dependencies(GenScanor force_git_version)
+add_dependencies(GenScanor force_version_info)
 set_property(TARGET GenScanor PROPERTY
     ADDITIONAL_MAKE_CLEAN_FILES 
     "${CMAKE_BINARY_DIR}/generated/include/git_version.hpp"

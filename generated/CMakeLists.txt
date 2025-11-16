@@ -11,17 +11,21 @@ execute_process(
 	OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
+#get git info
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/include/git_version.hpp.in" "${CMAKE_BINARY_DIR}/generated/include/git_version.hpp" @ONLY)
-add_custom_target(force_git_version ALL
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_BINARY_DIR}/generated/include/git_version.hpp ${CMAKE_BINARY_DIR}/generated/include/git_version.hpp
-    COMMENT "Force rebuilding the git version"
-)
 
 #get the compiler info
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/include/compiler_version.hpp.in" "${CMAKE_BINARY_DIR}/generated/include/compiler_version.hpp" @ONLY)
 
 #get the cmake info
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/include/cmake_info.hpp.in" "${CMAKE_BINARY_DIR}/generated/include/cmake_info.hpp" @ONLY)
+
+add_custom_target(force_version_info ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_BINARY_DIR}/generated/include/git_version.hpp ${CMAKE_BINARY_DIR}/generated/include/git_version.hpp
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_BINARY_DIR}/generated/include/compiler_version.hpp ${CMAKE_BINARY_DIR}/generated/include/compiler_version.hpp
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_BINARY_DIR}/generated/include/cmake_info.hpp ${CMAKE_BINARY_DIR}/generated/include/cmake_info.hpp
+    COMMENT "Force rebuilding version info"
+)
 
 file(GLOB header_files ${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp)
 
