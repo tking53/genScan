@@ -708,7 +708,7 @@ struct PeakFitter1D : public PeakFitter{
 		double offset = (this->XFitRange.second + this->XFitRange.first)/2.0;
 		double area = this->fithist->GetBinContent(this->fithist->FindBin(offset));
 
-		this->fitfunc = new TF1("NGaussN",&PeakFit::NGaussN,XFitRange.first,XFitRange.second,3*npeaks+3);
+		this->fitfunc = new TF1("NGaussNLinBkg",&PeakFit::NGaussNLinBkg,XFitRange.first,XFitRange.second,3*npeaks+3);
 		this->fitfunc->SetLineColor(kRed);
 		this->keys = { {"NPeaks",{0,npeaks}} };
 		for( int ii = 0; ii < npeaks; ++ii ){
