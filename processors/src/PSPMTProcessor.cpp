@@ -409,7 +409,7 @@ void PSPMTProcessor::FillRootStruct(ProcessorStruct::PSPMT& Rstruct, const PSPMT
 	Rstruct.dynodeqdc = qdcImage.dynode;
 	Rstruct.dynodets = enImage.DynodeTimeStamp;
 
-};
+}
 
 const PSPMT::Image& PSPMTProcessor::GetLowGainImage() const{
 	return this->lgImage;
