@@ -93,6 +93,7 @@ int main(int argc, char *argv[]) {
 		("version","print version number and exit")
 		("cmake-info","print info about the cmake used")
 		("compiler-info","print info about the compiler used")
+		("git-info","print info about the git branch and version used")
 		;
 
 
@@ -106,6 +107,11 @@ int main(int argc, char *argv[]) {
 
 		if( vm.count("version") ){
 			std::cout << GIT_COMMIT_HASH << std::endl;
+			exit(EXIT_SUCCESS);
+		}
+
+		if( vm.count("git-info") ){
+			std::cout << GIT_INFO << std::endl;
 			exit(EXIT_SUCCESS);
 		}
 
