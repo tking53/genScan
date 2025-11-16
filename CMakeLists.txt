@@ -357,6 +357,7 @@ add_subdirectory(fitters)
 add_subdirectory(tools)
 add_subdirectory(scripts)
 add_subdirectory(merger)
+add_subdirectory(generated)
 
 #MUST BE LAST
 option(GS_BUILD_DOCS "Enable debugging the correlator, output will be very slow" OFF)
@@ -387,6 +388,7 @@ if( EXTERNAL_DEPS )
 	add_dependencies(GenScanor ${EXTERNAL_DEPS})
 endif()
 target_link_libraries(GenScanor PRIVATE BSMStruct VetoStruct MtasImplantStruct MtasStruct PidStruct PSPMTStruct RootDevStruct GenScanTranslators GenScanCore)
+target_include_directories(GenScanor PRIVATE ${CMAKE_BINARY_DIR}/generated/include)
 
 if( USE_SYSTEM_FMT )
 	target_link_libraries(GenScanor PRIVATE fmt::fmt)

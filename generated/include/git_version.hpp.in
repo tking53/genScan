@@ -1,0 +1,8 @@
+#ifndef __GIT_VERSION_HPP__
+#define __GIT_VERSION_HPP__
+
+#include <string_view>
+
+constexpr std::string_view GIT_COMMIT_HASH = "@GIT_DESCRIBE@";
+
+#endif 

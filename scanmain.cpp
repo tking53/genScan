@@ -45,6 +45,10 @@
 
 #include "EventHistoryManager.hpp"
 
+#include "git_version.hpp"
+#include "compiler_version.hpp"
+#include "cmake_info.hpp"
+
 volatile bool ctrlCPressed = false;
 
 void signalHandler(int signum) {
@@ -71,9 +75,11 @@ int main(int argc, char *argv[]) {
 	int MAX_CHANNELS_PER_BOARD = 16;
 	int MAX_CAL_PARAMS_PER_CHANNEL = 4;
 
+	std::string version(GIT_COMMIT_HASH);
+
 	boost::program_options::options_description cmdline_options("Generic Options");
 	cmdline_options.add_options()
-		("help,h", "produce help message")
+		("help,h","produce this message")
 		("configfile,c",boost::program_options::value<std::string>(&configfile)->default_value("config.xml"),"[filename] filename for channel map")
 		("outputfile,o",boost::program_options::value<std::string>(&outputfile)->default_value("out"),"[filename] filename for output")
 		("enabletree,t",boost::program_options::value<bool>(&enabletree)->default_value(true),"enable root tree output or disable it and only generate histograms")
@@ -84,6 +90,9 @@ int main(int argc, char *argv[]) {
 		("max_crates,i",boost::program_options::value<int>(&MAX_CRATES)->default_value(1),"[MAX_CRATES] Number of crates to expect in data stream")
 		("max_slots,j",boost::program_options::value<int>(&MAX_CARDS_PER_CRATE)->default_value(13),"[MAX_CARDS_PER_CRATE] Number of cards per crate to expect in data stream")
 		("max_channels,k",boost::program_options::value<int>(&MAX_CHANNELS_PER_BOARD)->default_value(16),"[MAX_CHANNELS_PER_BOARD] Number of channels per board to expect in data stream")
+		("version","print version number and exit")
+		("cmake-info","print info about the cmake used")
+		("compiler-info","print info about the compiler used")
 		;
 
 
@@ -94,6 +103,21 @@ int main(int argc, char *argv[]) {
 		boost::program_options::variables_map vm;
 		store(boost::program_options::command_line_parser(argc, argv).options(cmdline_options).positional(p).run(), vm);
         	notify(vm);
+
+		if( vm.count("version") ){
+			std::cout << GIT_COMMIT_HASH << std::endl;
+			exit(EXIT_SUCCESS);
+		}
+
+		if( vm.count("cmake-info") ){
+			std::cout << BUILD_CMAKE_COMMAND << " " << BUILD_CMAKE_VERSION << std::endl;
+			exit(EXIT_SUCCESS);
+		}
+
+		if( vm.count("compiler-info") ){
+			std::cout << BUILD_COMPILER_ID << " " << BUILD_COMPILER_VERSION << std::endl;
+			exit(EXIT_SUCCESS);
+		}
 		if( vm.count("help") or argc <= 2 ){
 			spdlog::info(cmdline_options);
 			exit(EXIT_SUCCESS);
@@ -149,6 +173,9 @@ int main(int argc, char *argv[]) {
 	auto console = std::make_shared<spdlog::logger>(logname,sinks.begin(),sinks.end());
 	spdlog::initialize_logger(console);
 	console->flush_on(spdlog::level::info);
+
+	console->debug("version : {}",version);
+	console->debug("options : {}",cmdline_options);
 
 	if( limit > upper_limit ){
 		console->warn("limit of {} is greater than upper_limit of {}. Using upper_limit instead",limit,upper_limit);
@@ -348,6 +375,7 @@ int main(int argc, char *argv[]) {
 	RootManager->WriteTNamed("MAX_CRATES",std::to_string(MAX_CRATES));
 	RootManager->WriteTNamed("MAX_CARDS_PER_CRATE",std::to_string(MAX_CARDS_PER_CRATE));
 	RootManager->WriteTNamed("MAX_CHANNELS_PER_BOARD",std::to_string(MAX_CHANNELS_PER_BOARD));
+	RootManager->WriteTNamed("VERSION",version);
 	//dump the config file info
 	std::filesystem::path configfilepath(configfile);
 	auto abspath = TString(std::filesystem::absolute(configfilepath).string());
