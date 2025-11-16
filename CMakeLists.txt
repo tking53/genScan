@@ -4,9 +4,10 @@ project(GENSCAN C CXX )
 include(CheckCXXCompilerFlag)
 
 #make cmake depend on git things
-#set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-#    ${CMAKE_SOURCE_DIR}/.git/HEAD
-#)
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
+    "${CMAKE_SOURCE_DIR}/.git/HEAD"
+    "${CMAKE_SOURCE_DIR}/.git/index"
+)
 
 #Set the C++ standard to c++20.
 if(NOT CMAKE_CXX_STANDARD)
