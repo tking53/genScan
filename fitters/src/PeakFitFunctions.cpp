@@ -144,6 +144,11 @@ namespace PeakFit{
 		return fitval;
 	}
 
+	double NGaussNLinBkg(double* x,double* par){
+		int npeaks = par[0];
+		return NGaussN(x,par) + CommonFit::Linear(x,par+(3*npeaks+1));
+	}
+
 	double BiGauss(double* x,double* par){
 		double xval = x[0];
 		double yval = x[1];
