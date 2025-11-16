@@ -135,6 +135,15 @@ namespace PeakFit{
 		}
 	}
 
+	double NGaussN(double* x,double* par){
+		int npeaks = par[0];
+		double fitval = 0.0;
+		for( int ii = 0; ii < npeaks; ++ii ){
+			fitval += GaussN(x,par+3*ii+1);
+		}
+		return fitval;
+	}
+
 	double BiGauss(double* x,double* par){
 		double xval = x[0];
 		double yval = x[1];

@@ -1,6 +1,7 @@
 #ifndef __PEAK_FITTER_HPP__
 #define __PEAK_FITTER_HPP__
 
+#include <Rtypes.h>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -36,6 +37,7 @@ namespace FitTypes{
 		SingleTailingGaussNLinBkgFit = 11,
 		DoubleTailingGaussNFit = 20,
 		ErfFit = 30,
+		NGaussN = 40,
 		SimpleImplantationCurveFit = 500,
 		SingleDaughterImplantationCurveFit = 510
 	};
@@ -44,6 +46,7 @@ namespace FitTypes{
 			SingleTailingGaussNFit,SingleTailingGaussNLinBkgFit,
 			DoubleTailingGaussNFit,
 			ErfFit,
+			NGaussN,
 			SimpleImplantationCurveFit,
 			SingleDaughterImplantationCurveFit
 			)
@@ -462,6 +465,8 @@ struct PeakFitter1D : public PeakFitter{
 			this->InitSingleTailingGaussNLinBkgFit();
 		}else if( mode == FitTypes::OneDim::ErfFit ){
 			this->InitErfFit();
+		}else if( mode == FitTypes::OneDim::NGaussN ){
+			this->InitNGaussNFit();
 		}else if( mode == FitTypes::OneDim::SimpleImplantationCurveFit ){
 			this->InitSimpleImplantationCurveFit();
 		}else if( mode == FitTypes::SingleDaughterImplantationCurveFit ){
@@ -611,6 +616,82 @@ struct PeakFitter1D : public PeakFitter{
 
 	}
 	
+	void InitNGaussNFit(){
+		this->fithist->SetLineColor(kBlack);
+		int npeaks = -1;
+		if( this->fvalues.find("NPeaks") == this->fvalues.end() ){
+			throw std::runtime_error("NGaussN fit requires a fixed value named NPeaks to generate fit");
+		}else{
+			npeaks = this->fvalues["NPeaks"];
+		}
+
+		double bkg_offset = 0;
+		double bkg_slope = 0;
+		double width = this->XFitRange.second - this->XFitRange.first;
+		double offset = (this->XFitRange.second + this->XFitRange.first)/2.0;
+		double area = this->fithist->GetBinContent(this->fithist->FindBin(offset));
+
+		this->fitfunc = new TF1("NGaussN",&PeakFit::NGaussN,XFitRange.first,XFitRange.second,3*npeaks+1);
+		this->fitfunc->SetLineColor(kRed);
+		this->keys = { {"NPeaks",{0,npeaks}} };
+		for( int ii = 0; ii < npeaks; ++ii ){
+			this->components.push_back(new TF1("GaussN",&PeakFit::GaussN,XFitRange.first,XFitRange.second,3));
+			this->components.back()->SetLineColor(kMagenta+(ii%6)-4);
+			this->keys.insert({"Area"+std::to_string(ii),{3*ii+1,area}});
+			this->keys.insert({"Mean"+std::to_string(ii),{3*ii+2,area}});
+			this->keys.insert({"Sigma"+std::to_string(ii),{3*ii+3,area}});
+		}
+
+		AssignFitParNames();
+		VerifyFixedValues();
+		VerifyBoundedValues();
+		for( int ii = 0; ii < npeaks; ++ii ){
+			if( this->fvalues.find("Mean"+std::to_string(ii)) == this->fvalues.end() 
+					and this->bvalues.find("Mean"+std::to_string(ii)) == this->bvalues.end() ){
+				this->bvalues["Mean"+std::to_string(ii)] = this->XFitRange; 
+			}
+		}
+
+		auto minbin = this->fithist->FindBin(this->XFitRange.first);
+		auto maxbin = this->fithist->FindBin(this->XFitRange.second);
+		auto integral = this->fithist->Integral(minbin,maxbin);
+
+		FixAndBoundParameters();
+
+		if( integral > 0.0 ){
+			std::string option = "0SQ";
+			if( this->loglikelihood ){
+				option+="L";
+			}
+			TFitResultPtr fitresult = this->fithist->Fit(this->fitfunc,option.c_str(),"",XFitRange.first,XFitRange.second);
+
+			if( not fitresult->IsEmpty() ){
+				AssignFitValuesErrors(fitresult);
+				AssignFitFuncParams();
+				this->fithist->GetListOfFunctions()->Add(this->fitfunc);
+
+				std::vector<TLine*> centroids;
+				for( int ii = 0; ii < npeaks; ++ii ){
+					this->components.at(ii)->SetParameters(
+							this->Results["Area"+std::to_string(ii)],
+							this->Results["Mean"+std::to_string(ii)],
+							this->Results["Sigma"+std::to_string(ii)]
+							);
+					this->fithist->GetListOfFunctions()->Add(this->components.at(ii));
+					centroids.push_back(new TLine(
+							this->Results["Mean"+std::to_string(ii)],
+							0,
+							this->Results["Mean"+std::to_string(ii)],
+							0.75*(this->fithist->GetBinContent(this->fithist->FindBin(this->Results["Mean"+std::to_string(ii)]))))
+							);
+					centroids.back()->SetLineColor(kAzure+(ii%6)-4);
+					this->fithist->GetListOfFunctions()->Add(centroids.at(ii));
+				}
+			}
+		}
+	}
+	
+
 	void InitGaussNLinBkgFit(){
 		this->fithist->SetLineColor(kBlack);
 

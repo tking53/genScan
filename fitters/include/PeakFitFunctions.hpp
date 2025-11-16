@@ -18,6 +18,7 @@ namespace PeakFit{
 	double SimpleImplantationCurve(double*,double*);
 	double ImplantationBatemanStep(double*,double*);
 	double SingleDaughterPairImplantationCurve(double*,double*);
+	double NGaussN(double*,double*);
 
 	//ROOT
 	//2D
