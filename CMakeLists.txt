@@ -390,6 +390,13 @@ endif()
 target_include_directories(GenScanProcessors PUBLIC core/include)
 
 add_executable(GenScanor scanmain.cpp)
+add_dependencies(GenScanor force_git_version)
+set_property(TARGET GenScanor PROPERTY
+    ADDITIONAL_MAKE_CLEAN_FILES 
+    "${CMAKE_BINARY_DIR}/generated/include/git_version.hpp"
+    "${CMAKE_BINARY_DIR}/generated/include/cmake_info.hpp"
+    "${CMAKE_BINARY_DIR}/generated/include/compiler_version.hpp"
+)
 if( EXTERNAL_DEPS )
 	add_dependencies(GenScanor ${EXTERNAL_DEPS})
 endif()
