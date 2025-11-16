@@ -1,6 +1,6 @@
 #black magic to get the commit hash so we can embed it into genscan itself
 execute_process(
-	COMMAND git describe --always --dirty --long --tags
+	COMMAND git describe --all --dirty --long --always
 	OUTPUT_VARIABLE GIT_DESCRIBE
 	OUTPUT_STRIP_TRAILING_WHITESPACE
 )
