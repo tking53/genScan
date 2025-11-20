@@ -124,6 +124,7 @@ BSMExpProcessor::BSMExpProcessor(const std::string& log) : Processor(log,"BSMExp
 	//if this expected to be common, we need to setup the BSM to properly handle determining clusters of values
 	//we would need to do the same with MTAS and probably move to a true rolling window though
 	//and basically do a chunk_by like view, where we cluster with a subevent????
+	//this will have nothing in it, if the 2L+G for the energy filter + trace_delay is greater than event building window
 	if( this->BSMProc->GetBSMHits(0) > 1 and this->BSMProc->GetBSMHits(1) > 1 ){
 		hismanager->Fill("BSMEXP_3300_EVT_PILEUP",MTASErg);
 	}
