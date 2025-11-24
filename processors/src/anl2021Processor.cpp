@@ -269,20 +269,20 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 					for( size_t ii = 6; ii < 24; ++ii ){
 						hismanager->Fill("EARLY_3350",MtasProc->GetCrystalEnergy(ii),erg);
 					}
-				}else if( this->MidCycle.IsWithin(cycletime) ){
+				}
+				if( this->MidCycle.IsWithin(cycletime) ){
 					hismanager->Fill("MID_3300",erg);
 					hismanager->Fill("MID_3351",erg,cerg);
 					for( size_t ii = 6; ii < 24; ++ii ){
 						hismanager->Fill("MID_3350",MtasProc->GetCrystalEnergy(ii),erg);
 					}
-				}else if( this->LateCycle.IsWithin(cycletime) ){
+				}
+				if( this->LateCycle.IsWithin(cycletime) ){
 					hismanager->Fill("LATE_3300",erg);
 					hismanager->Fill("LATE_3351",erg,cerg);
 					for( size_t ii = 6; ii < 24; ++ii ){
 						hismanager->Fill("LATE_3350",MtasProc->GetCrystalEnergy(ii),erg);
 					}
-				}else{
-					//no-op
 				}
 				this->MtasProc->FillBetaPlots(hismanager);
 				hismanager->Fill("MEASURE_3360",erg,cycletime*1.0e3);
@@ -714,6 +714,7 @@ void anl2021Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH2F>("ISOMER_3703","Mtas prev-#beta curr-no-#beta Measure Cycle Gated; Prev Energy (keV); Time (us)",this->h2dsettings.at(3703));
 	hismanager->RegisterPlot<TH2F>("ISOMER_3704","Mtas prev-#beta curr-no-#beta Measure Cycle Gated; Curr+Prev Energy (keV); Time (ns)",this->h2dsettings.at(3704));
 	hismanager->RegisterPlot<TH2F>("ISOMER_3705","Mtas prev-#beta curr-no-#beta Measure Cycle Gated; Curr+Prev Energy (keV); Time (us)",this->h2dsettings.at(3705));
+
 	for( size_t ii = 0; ii < this->ISOMER_3701_Gates.size(); ++ii ){
 		std::string label = "ISOMER_373"+std::to_string(ii);
 		std::string title = "Mtas prev-#beta curr-no-#beta Measure Cycle Gated Curr Total Energy Gated [";
