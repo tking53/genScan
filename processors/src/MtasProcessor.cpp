@@ -678,7 +678,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 			}	
 		}
 		for( int ii = 6; ii < 24; ++ii ){
-			for( int jj = 6; jj < 24; ++jj ){
+			for( int jj = ii+1; jj < 24; ++jj ){
 				hismanager->Fill("MTAS_5200",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
 				hismanager->Fill("MTAS_5200",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
 				hismanager->Fill("MTAS_5202",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
@@ -1655,7 +1655,7 @@ void MtasProcessor::FillBetaPlots(PLOTS::PlotRegistry* hismanager){
 			}	
 		}
 		for( int ii = 6; ii < 24; ++ii ){
-			for( int jj = 6; jj < 24; ++jj ){
+			for( int jj = ii+1; jj < 24; ++jj ){
 				hismanager->Fill("MTAS_5300",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
 				hismanager->Fill("MTAS_5300",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
 				hismanager->Fill("MTAS_5302",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
@@ -1889,7 +1889,7 @@ void MtasProcessor::FillNonBetaPlots(PLOTS::PlotRegistry* hismanager){
 			}	
 		}
 		for( int ii = 6; ii < 24; ++ii ){
-			for( int jj = 6; jj < 24; ++jj ){
+			for( int jj = ii+1; jj < 24; ++jj ){
 				hismanager->Fill("MTAS_5100",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
 				hismanager->Fill("MTAS_5100",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
 				hismanager->Fill("MTAS_5102",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
