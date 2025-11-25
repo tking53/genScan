@@ -81,6 +81,10 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 		{2200,{8192,0,8192,4,0,4}},
 		{2300,{8192,0,8192,4,0,4}},
 
+		{2500,{4096,0,4096,4096,0,4096}},
+		{2600,{4096,0,4096,4096,0,4096}},
+		{2700,{4096,0,4096,4096,0,4096}},
+
 		{3160,{8192,0,8192,512,0,512}},
 		{3161,{8192,0,8192,512,0,512}},
 		{3162,{8192,0,8192,512,0,512}},
@@ -486,7 +490,12 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 			//add in HPGe monitor
 			for( auto ii = 0; ii < this->HPGeProc->GetNumCrystals(); ++ii ){
 				hismanager->Fill("IRRAD_2200",this->HPGeProc->GetEnergy(ii),ii);
+				for( auto jj = ii+1; jj < this->HPGeProc->GetNumCrystals(); ++jj ){
+					hismanager->Fill("IRRAD_2600",this->HPGeProc->GetEnergy(ii),this->HPGeProc->GetEnergy(jj));
+					hismanager->Fill("IRRAD_2600",this->HPGeProc->GetEnergy(jj),this->HPGeProc->GetEnergy(ii));
+				}
 			}
+
 			
 			//this is the nose implant plastic, was either 2x1 or 2x2
 			//this is the logic that makes PSPMT_1902 show up, use it here too
@@ -494,10 +503,18 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 			if( hgimage.anodesum > this->ImplantThreshold ){
 				for( auto ii = 0; ii < this->HPGeProc->GetNumCrystals(); ++ii ){
 					hismanager->Fill("IRRAD_2300",this->HPGeProc->GetEnergy(ii),ii);
+					for( auto jj = ii+1; jj < this->HPGeProc->GetNumCrystals(); ++jj ){
+						hismanager->Fill("IRRAD_2700",this->HPGeProc->GetEnergy(ii),this->HPGeProc->GetEnergy(jj));
+						hismanager->Fill("IRRAD_2700",this->HPGeProc->GetEnergy(jj),this->HPGeProc->GetEnergy(ii));
+					}
 				}
 			}else{
 				for( auto ii = 0; ii < this->HPGeProc->GetNumCrystals(); ++ii ){
 					hismanager->Fill("IRRAD_2100",this->HPGeProc->GetEnergy(ii),ii);
+					for( auto jj = ii+1; jj < this->HPGeProc->GetNumCrystals(); ++jj ){
+						hismanager->Fill("IRRAD_2500",this->HPGeProc->GetEnergy(ii),this->HPGeProc->GetEnergy(jj));
+						hismanager->Fill("IRRAD_2500",this->HPGeProc->GetEnergy(jj),this->HPGeProc->GetEnergy(ii));
+					}
 				}
 			}
 			
@@ -688,6 +705,11 @@ void anl2021Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH2F>("IRRAD_2100","HPGe Irradiation Cycle Gated anti-#beta Gated; Energy (keV); Crystal Number (arb.)",this->h2dsettings.at(2100));
 	hismanager->RegisterPlot<TH2F>("IRRAD_2200","HPGe Irradiation Cycle Gated; Energy (keV); Crystal Number (arb.)",this->h2dsettings.at(2200));
 	hismanager->RegisterPlot<TH2F>("IRRAD_2300","HPGe Irradiation Cycle Gated #beta Gated; Energy (keV); Crystal Number (arb.)",this->h2dsettings.at(2300));
+	
+	hismanager->RegisterPlot<TH2F>("IRRAD_2500","HPGe Gamma-Gamma Irradiation Cycle Gated anti-#beta Gated; Energy (keV); Energy (keV)",this->h2dsettings.at(2500));
+	hismanager->RegisterPlot<TH2F>("IRRAD_2600","HPGe Gamma-Gamma Irradiation Cycle Gated; Energy (keV); Energy (keV)",this->h2dsettings.at(2600));
+	hismanager->RegisterPlot<TH2F>("IRRAD_2700","HPGe Gamma-Gamma Irradiation Cycle Gated #beta Gated; Energy (keV); Energy (keV)",this->h2dsettings.at(2700));
+	
 	
 	//Prev    | Curr    | His 
 	//beta    | no-beta | 370X   
