@@ -5,6 +5,7 @@
 #include "TapeCycle.hpp"
 #include <TTree.h>
 #include <stdexcept>
+#include <string>
 
 anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2021Processor",{}){
 	this->MtasProc = std::make_shared<MtasProcessor>(log);
@@ -78,8 +79,25 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 
 	this->h2dsettings = {
 		{2100,{8192,0,8192,4,0,4}},
+
+		{2160,{8192,0,8192,512,0,512}},
+		{2161,{8192,0,8192,512,0,512}},
+		{2162,{8192,0,8192,512,0,512}},
+		{2163,{8192,0,8192,512,0,512}},
+
 		{2200,{8192,0,8192,4,0,4}},
+
+		{2260,{8192,0,8192,512,0,512}},
+		{2261,{8192,0,8192,512,0,512}},
+		{2262,{8192,0,8192,512,0,512}},
+		{2263,{8192,0,8192,512,0,512}},
+
 		{2300,{8192,0,8192,4,0,4}},
+
+		{2360,{8192,0,8192,512,0,512}},
+		{2361,{8192,0,8192,512,0,512}},
+		{2362,{8192,0,8192,512,0,512}},
+		{2363,{8192,0,8192,512,0,512}},
 
 		{2500,{4096,0,4096,4096,0,4096}},
 		{2600,{4096,0,4096,4096,0,4096}},
@@ -158,9 +176,24 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 		{3804,{8192,0,8192,1000,0,10000}},
 		{3805,{8192,0,8192,1000,0,10000}},
 
-		{3900,{8192,0,8192,1000,0,1000}}
+		{3900,{8192,0,8192,1000,0,1000}},
+
+		{4500,{8192,0,8192,1000,0,10000}},
+		{4501,{8192,0,8192,1000,0,10000}},
+	
+		{4600,{8192,0,8192,1000,0,10000}},
+		{4601,{8192,0,8192,1000,0,10000}},
+
+		{4700,{8192,0,8192,1000,0,10000}},
+		{4701,{8192,0,8192,1000,0,10000}},
+
+		{4800,{8192,0,8192,1000,0,10000}},
+		{4801,{8192,0,8192,1000,0,10000}}
+
 	};
 
+	this->implant = "implant";
+	this->hpge = "hpge";
 	this->beta = "beta";
 	this->gamma = "gamma";
 	this->muon = "muon";
@@ -173,6 +206,7 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 
 	this->SiliconThreshold = 0.0;
 	this->ImplantThreshold = 0.0;
+	this->HPGeThreshold = 0.0;
 
 	this->Reset();
 }
@@ -207,22 +241,33 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 		auto lgImage = this->ImplantProc->GetLowGainImage();
 		if( lgImage.anodesum > this->ImplantThreshold ){
 			summary->AddEventTag(this->implant);
+			summary->AddEventObservable("LGAnodeSum",lgImage.anodesum);
 		}
 	}
 
 	if( this->HasHPGe ){
 		this->HPGeProc->PreProcess(eventhistory,hismanager,cutmanager);
+		for( auto ii = 0; ii < this->HPGeProc->GetNumCrystals(); ++ii ){
+			auto erg = this->HPGeProc->GetEnergy(ii);
+			if( erg > this->HPGeThreshold ){
+				summary->AddEventTag(this->hpge);
+				summary->AddEventObservable("HPGe_"+std::to_string(ii),erg);
+			}
+		}
 	}
 
 	if( this->HasSilicon ){
 		this->SiliconProc->PreProcess(eventhistory,hismanager,cutmanager);
-		if( this->SiliconProc->GetMaxEnergy() > this->SiliconThreshold ){
+		auto simax = this->SiliconProc->GetMaxEnergy();
+		if( simax > this->SiliconThreshold ){
 			summary->AddEventTag(this->beta);
+			summary->AddEventObservable("SiMax",simax);
 		}
 	}
 
 	if( this->HasMTAS ){
 		this->MtasProc->PreProcess(eventhistory,hismanager,cutmanager);
+		//mtas already adds its own observables and tags
 	}
 
 	Processor::EndProcess();
@@ -487,13 +532,111 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 				}
 			}
 		}else if( TapeProc->GetCurrentCycleState() == TAPE::IRRADIATION ){
+			bool hashpge = summary->ContainsEventTag(this->hpge);
+			bool hasimplant = summary->ContainsEventTag(this->implant);
+
+			if( numhist > 1 ){
+				//current event has gamma not-muon, not-beta
+				if( not hasimplant ){
+					for( size_t ii = 1; ii < eventhistory->GetMaxHistoryID(); ++ii ){
+						auto prevsummary = eventhistory->GetPreviousEventSummary(ii);
+						auto prevmuon = prevsummary->ContainsEventTag(this->muon);
+						if( prevmuon ){
+							continue;
+						}
+						auto previmplant = prevsummary->ContainsEventTag(this->implant);
+						auto prevhpge = prevsummary->ContainsEventTag(this->hpge);
+						//this looks for a beta decay into a delayed level
+						//like 137Cs
+						if( previmplant ){
+							auto isomer_tdiff = summary->GetRawEvents().front().GetTimeStamp() - prevsummary->GetRawEvents().front().GetTimeStamp();
+							for( size_t jj = 0; jj < this->HPGeProc->GetNumCrystals(); ++jj ){
+								auto hpge_erg = this->HPGeProc->GetEnergy(jj);
+								hismanager->Fill("ISOMER_4700",hpge_erg,isomer_tdiff);
+								hismanager->Fill("ISOMER_4701",hpge_erg,isomer_tdiff*1.0e-3);
+							}
+							break;
+						}
+					}
+					for( size_t ii = 1; ii < eventhistory->GetMaxHistoryID(); ++ii ){
+						auto prevsummary =  eventhistory->GetPreviousEventSummary(ii);
+						auto prevmuon = prevsummary->ContainsEventTag(this->muon);
+						if( prevmuon ){
+							continue;
+						}
+						auto previmplant = prevsummary->ContainsEventTag(this->implant);
+						auto prevhpge = prevsummary->ContainsEventTag(this->hpge);
+						//looking for stepping through short isomer after we start in daughter isomer
+						if( not previmplant ){
+							auto isomer_tdiff = summary->GetRawEvents().front().GetTimeStamp() - prevsummary->GetRawEvents().front().GetTimeStamp();
+
+							for( size_t jj = 0; jj < this->HPGeProc->GetNumCrystals(); ++jj ){
+								auto hpge_erg = this->HPGeProc->GetEnergy(jj);
+								hismanager->Fill("ISOMER_4600",hpge_erg,isomer_tdiff);
+								hismanager->Fill("ISOMER_4601",hpge_erg,isomer_tdiff*1.0e-3);
+							}
+							break;
+						}
+					}
+				}
+				//current event does not have beta 
+				if( hasimplant ){
+					for( size_t ii = 1; ii < eventhistory->GetMaxHistoryID(); ++ii ){
+						auto prevsummary =  eventhistory->GetPreviousEventSummary(ii);
+						auto prevmuon = prevsummary->ContainsEventTag(this->muon);
+						if( prevmuon ){
+							continue;
+						}
+						auto previmplant = prevsummary->ContainsEventTag(this->implant);
+						auto prevhpge = prevsummary->ContainsEventTag(this->hpge);
+
+						//this looks for a gamma decay into a delayed beta
+						//i.e. beam isomer, but need mtas energy for this old event
+						if( not previmplant ){
+							auto isomer_tdiff = summary->GetRawEvents().front().GetTimeStamp() - prevsummary->GetRawEvents().front().GetTimeStamp();
+							for( size_t jj = 0; jj < this->HPGeProc->GetNumCrystals(); ++jj ){
+								auto hpge_erg = this->HPGeProc->GetEnergy(jj);
+								hismanager->Fill("ISOMER_4800",hpge_erg,isomer_tdiff);
+								hismanager->Fill("ISOMER_4801",hpge_erg,isomer_tdiff*1.0e-3);
+							}
+							break;
+						}
+					}
+					for( size_t ii = 1; ii < eventhistory->GetMaxHistoryID(); ++ii ){
+						auto prevsummary =  eventhistory->GetPreviousEventSummary(ii);
+						auto prevmuon = prevsummary->ContainsEventTag(this->muon);
+						if( prevmuon ){
+							continue;
+						}
+						auto previmplant = prevsummary->ContainsEventTag(this->implant);
+						auto prevhpge = prevsummary->ContainsEventTag(this->hpge);
+
+						//this looks for a gamma decay into a delayed beta
+						//i.e. beam isomer, but need mtas energy for this old event
+						if( previmplant ){
+							auto isomer_tdiff = summary->GetRawEvents().front().GetTimeStamp() - prevsummary->GetRawEvents().front().GetTimeStamp();
+							for( size_t jj = 0; jj < this->HPGeProc->GetNumCrystals(); ++jj ){
+								auto hpge_erg = this->HPGeProc->GetEnergy(jj);
+								hismanager->Fill("ISOMER_4500",hpge_erg,isomer_tdiff);
+								hismanager->Fill("ISOMER_4501",hpge_erg,isomer_tdiff*1.0e-3);
+							}
+							break;
+						}
+					}
+				}
+			}
 			//add in HPGe monitor
 			for( auto ii = 0; ii < this->HPGeProc->GetNumCrystals(); ++ii ){
-				hismanager->Fill("IRRAD_2200",this->HPGeProc->GetEnergy(ii),ii);
+				auto hpge_erg = this->HPGeProc->GetEnergy(ii);
+				hismanager->Fill("IRRAD_2200",hpge_erg,ii);
 				for( auto jj = ii+1; jj < this->HPGeProc->GetNumCrystals(); ++jj ){
-					hismanager->Fill("IRRAD_2600",this->HPGeProc->GetEnergy(ii),this->HPGeProc->GetEnergy(jj));
-					hismanager->Fill("IRRAD_2600",this->HPGeProc->GetEnergy(jj),this->HPGeProc->GetEnergy(ii));
+					hismanager->Fill("IRRAD_2600",hpge_erg,this->HPGeProc->GetEnergy(jj));
+					hismanager->Fill("IRRAD_2600",this->HPGeProc->GetEnergy(jj),hpge_erg);
 				}
+				hismanager->Fill("IRRAD_2260",hpge_erg,cycletime*1.0e3);
+				hismanager->Fill("IRRAD_2261",hpge_erg,cycletime);
+				hismanager->Fill("IRRAD_2262",hpge_erg,cycletime/60.0);
+				hismanager->Fill("IRRAD_2263",hpge_erg,cycletime/(60.0*60.0));
 			}
 
 			
@@ -502,19 +645,29 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 			auto hgimage = this->ImplantProc->GetHighGainImage();
 			if( hgimage.anodesum > this->ImplantThreshold ){
 				for( auto ii = 0; ii < this->HPGeProc->GetNumCrystals(); ++ii ){
-					hismanager->Fill("IRRAD_2300",this->HPGeProc->GetEnergy(ii),ii);
+					auto hpge_erg = this->HPGeProc->GetEnergy(ii);
+					hismanager->Fill("IRRAD_2300",hpge_erg,ii);
 					for( auto jj = ii+1; jj < this->HPGeProc->GetNumCrystals(); ++jj ){
-						hismanager->Fill("IRRAD_2700",this->HPGeProc->GetEnergy(ii),this->HPGeProc->GetEnergy(jj));
-						hismanager->Fill("IRRAD_2700",this->HPGeProc->GetEnergy(jj),this->HPGeProc->GetEnergy(ii));
+						hismanager->Fill("IRRAD_2700",hpge_erg,this->HPGeProc->GetEnergy(jj));
+						hismanager->Fill("IRRAD_2700",this->HPGeProc->GetEnergy(jj),hpge_erg);
 					}
+					hismanager->Fill("IRRAD_2360",hpge_erg,cycletime*1.0e3);
+					hismanager->Fill("IRRAD_2361",hpge_erg,cycletime);
+					hismanager->Fill("IRRAD_2362",hpge_erg,cycletime/60.0);
+					hismanager->Fill("IRRAD_2363",hpge_erg,cycletime/(60.0*60.0));
 				}
 			}else{
 				for( auto ii = 0; ii < this->HPGeProc->GetNumCrystals(); ++ii ){
-					hismanager->Fill("IRRAD_2100",this->HPGeProc->GetEnergy(ii),ii);
+					auto hpge_erg = this->HPGeProc->GetEnergy(ii);
+					hismanager->Fill("IRRAD_2100",hpge_erg,ii);
 					for( auto jj = ii+1; jj < this->HPGeProc->GetNumCrystals(); ++jj ){
-						hismanager->Fill("IRRAD_2500",this->HPGeProc->GetEnergy(ii),this->HPGeProc->GetEnergy(jj));
-						hismanager->Fill("IRRAD_2500",this->HPGeProc->GetEnergy(jj),this->HPGeProc->GetEnergy(ii));
+						hismanager->Fill("IRRAD_2500",hpge_erg,this->HPGeProc->GetEnergy(jj));
+						hismanager->Fill("IRRAD_2500",this->HPGeProc->GetEnergy(jj),hpge_erg);
 					}
+					hismanager->Fill("IRRAD_2160",hpge_erg,cycletime*1.0e3);
+					hismanager->Fill("IRRAD_2161",hpge_erg,cycletime);
+					hismanager->Fill("IRRAD_2162",hpge_erg,cycletime/60.0);
+					hismanager->Fill("IRRAD_2163",hpge_erg,cycletime/(60.0*60.0));
 				}
 			}
 			
@@ -588,6 +741,7 @@ void anl2021Processor::Init(const pugi::xml_node& config){
 
 	this->SiliconThreshold = config.attribute("siliconthresh").as_double(0.0);
 	this->ImplantThreshold = config.attribute("implantthresh").as_double(0.0);
+	this->HPGeThreshold = config.attribute("hpgethresh").as_double(0.0);
 	//need to load in early and late time gate for generating duplicates of 3350 3351 since they're not easy to make without a shitload of memory
 	auto earlygate = config.child("EarlyCycle");
 	if( earlygate ){
@@ -703,9 +857,24 @@ void anl2021Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH2F>("BKG_3514","Calibrated IndividualPMT O PMTs Background Cycle gated; Energy (keV); PMT (arb.)",this->h2dsettings.at(3514));
 
 	hismanager->RegisterPlot<TH2F>("IRRAD_2100","HPGe Irradiation Cycle Gated anti-#beta Gated; Energy (keV); Crystal Number (arb.)",this->h2dsettings.at(2100));
+	hismanager->RegisterPlot<TH2F>("IRRAD_2160","HPGe vs Cycle Time (ms) anti-#beta-gated; Energy (keV); Cycle Time (ms)",this->h2dsettings.at(2160));
+	hismanager->RegisterPlot<TH2F>("IRRAD_2161","HPGe vs Cycle Time (s) anti-#beta-gated; Energy (keV); Cycle Time (s)",this->h2dsettings.at(2161));
+	hismanager->RegisterPlot<TH2F>("IRRAD_2162","HPGe vs Cycle Time (min) anti-#beta-gated; Energy (keV); Cycle Time (min)",this->h2dsettings.at(2162));
+	hismanager->RegisterPlot<TH2F>("IRRAD_2163","HPGe vs Cycle Time (hr) anti-#beta-gated; Energy (keV); Cycle Time (hr)",this->h2dsettings.at(2163));
+
 	hismanager->RegisterPlot<TH2F>("IRRAD_2200","HPGe Irradiation Cycle Gated; Energy (keV); Crystal Number (arb.)",this->h2dsettings.at(2200));
+	hismanager->RegisterPlot<TH2F>("IRRAD_2260","HPGe vs Cycle Time (ms); Energy (keV); Cycle Time (ms)",this->h2dsettings.at(2260));
+	hismanager->RegisterPlot<TH2F>("IRRAD_2261","HPGe vs Cycle Time (s); Energy (keV); Cycle Time (s)",this->h2dsettings.at(2261));
+	hismanager->RegisterPlot<TH2F>("IRRAD_2262","HPGe vs Cycle Time (min); Energy (keV); Cycle Time (min)",this->h2dsettings.at(2262));
+	hismanager->RegisterPlot<TH2F>("IRRAD_2263","HPGe vs Cycle Time (hr); Energy (keV); Cycle Time (hr)",this->h2dsettings.at(2263));
+
 	hismanager->RegisterPlot<TH2F>("IRRAD_2300","HPGe Irradiation Cycle Gated #beta Gated; Energy (keV); Crystal Number (arb.)",this->h2dsettings.at(2300));
 	
+	hismanager->RegisterPlot<TH2F>("IRRAD_2360","HPGe vs Cycle Time (ms) #beta-gated; Energy (keV); Cycle Time (ms)",this->h2dsettings.at(2360));
+	hismanager->RegisterPlot<TH2F>("IRRAD_2361","HPGe vs Cycle Time (s) #beta-gated; Energy (keV); Cycle Time (s)",this->h2dsettings.at(2361));
+	hismanager->RegisterPlot<TH2F>("IRRAD_2362","HPGe vs Cycle Time (min) #beta-gated; Energy (keV); Cycle Time (min)",this->h2dsettings.at(2362));
+	hismanager->RegisterPlot<TH2F>("IRRAD_2363","HPGe vs Cycle Time (hr) #beta-gated; Energy (keV); Cycle Time (hr)",this->h2dsettings.at(2363));
+
 	hismanager->RegisterPlot<TH2F>("IRRAD_2500","HPGe Gamma-Gamma Irradiation Cycle Gated anti-#beta Gated; Energy (keV); Energy (keV)",this->h2dsettings.at(2500));
 	hismanager->RegisterPlot<TH2F>("IRRAD_2600","HPGe Gamma-Gamma Irradiation Cycle Gated; Energy (keV); Energy (keV)",this->h2dsettings.at(2600));
 	hismanager->RegisterPlot<TH2F>("IRRAD_2700","HPGe Gamma-Gamma Irradiation Cycle Gated #beta Gated; Energy (keV); Energy (keV)",this->h2dsettings.at(2700));
@@ -755,6 +924,18 @@ void anl2021Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH2F>("ISOMER_3805","Mtas prev-no-#beta curr-#beta Measure Cycle Gated; Curr+Prev Energy (keV); Time (us)",this->h2dsettings.at(3805));
 
 	hismanager->RegisterPlot<TH2F>("ISOMER_3900","Mtas curr-#beta TDiff (Last MTAS - First Si) Measure Cycle Gated; Energy (keV); Time (ns)",this->h2dsettings.at(3900));
+
+	hismanager->RegisterPlot<TH2F>("ISOMER_4500","HPGe prev-#beta curr-#beta Measure Cycle Gated; Curr Energy (keV); Time (ns)",this->h2dsettings.at(3500));
+	hismanager->RegisterPlot<TH2F>("ISOMER_4501","HPGe prev-#beta curr-#beta Measure Cycle Gated; Curr Energy (keV); Time (us)",this->h2dsettings.at(3501));
+	
+	hismanager->RegisterPlot<TH2F>("ISOMER_4600","HPGe prev-no-#beta curr-no-#beta Measure Cycle Gated; Curr Energy (keV); Time (ns)",this->h2dsettings.at(3600));
+	hismanager->RegisterPlot<TH2F>("ISOMER_4601","HPGe prev-no-#beta curr-no-#beta Measure Cycle Gated; Curr Energy (keV); Time (us)",this->h2dsettings.at(3601));
+	
+	hismanager->RegisterPlot<TH2F>("ISOMER_4700","HPGe prev-#beta curr-no-#beta Measure Cycle Gated; Curr Energy (keV); Time (ns)",this->h2dsettings.at(3700));
+	hismanager->RegisterPlot<TH2F>("ISOMER_4701","HPGe prev-#beta curr-no-#beta Measure Cycle Gated; Curr Energy (keV); Time (us)",this->h2dsettings.at(3701));
+
+	hismanager->RegisterPlot<TH2F>("ISOMER_4800","HPGe prev-no-#beta curr-#beta Measure Cycle Gated; Curr Energy (keV); Time (ns)",this->h2dsettings.at(3800));
+	hismanager->RegisterPlot<TH2F>("ISOMER_4801","HPGe prev-no-#beta curr-#beta Measure Cycle Gated; Curr Energy (keV); Time (us)",this->h2dsettings.at(3801));
 
 	hismanager->RegisterPlot<TH2F>("MEASURE_3160","Mtas Total vs Cycle Time (ms) anti-#beta-gated; Mtas Total Energy (keV); Cycle Time (ms)",this->h2dsettings.at(3160));
 	hismanager->RegisterPlot<TH2F>("MEASURE_3161","Mtas Total vs Cycle Time (s) anti-#beta-gated; Mtas Total Energy (keV); Cycle Time (s)",this->h2dsettings.at(3161));

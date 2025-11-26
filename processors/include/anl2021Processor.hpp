@@ -36,6 +36,7 @@ class anl2021Processor : public Processor{
 
 		double SiliconThreshold;
 		double ImplantThreshold;
+		double HPGeThreshold;
 
 		Gate<double> EarlyCycle;
 		Gate<double> MidCycle;
@@ -44,6 +45,7 @@ class anl2021Processor : public Processor{
 		std::vector<BoxGate<double>> ISOMER_3701_Gates;
 
 		std::string implant;
+		std::string hpge;
 		std::string beta;
 		std::string gamma;
 		std::string muon;
