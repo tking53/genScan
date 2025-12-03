@@ -25,7 +25,7 @@ class MtasIsomerProcessor : public Processor{
 
 		virtual void DeclarePlots(PLOTS::PlotRegistry*);
 	private:
-		std::shared_ptr<Processor> ParentProc;
+		Processor* ParentProc;
 
 		std::vector<BoxGate<double>> ISOMER_3701_Gates;
 		

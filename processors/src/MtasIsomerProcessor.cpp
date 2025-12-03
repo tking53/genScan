@@ -3,7 +3,7 @@
 #include <memory>
 
 MtasIsomerProcessor::MtasIsomerProcessor(const std::string& log,Processor* parent) : Processor(log,"MtasIsomerProcessor",{}){
-	this->ParentProc = std::shared_ptr<Processor>(parent);
+	this->ParentProc = parent;
 
 	this->h2dsettings = {
 		{3500,{8192,0,8192,1000,0,10000}},
