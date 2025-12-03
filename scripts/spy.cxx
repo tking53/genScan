@@ -12,6 +12,7 @@
 #include <TGClient.h>
 #include <TGTextBuffer.h>
 #include <exception>
+#include <limits>
 #include <set>
 #include <string>
 #include <iostream>
@@ -26,6 +27,8 @@ class Spy {
 		TGHorizontalFrame   *fHorz;
 		TGHorizontalFrame   *fHorz2;
 		TGHorizontalFrame   *fHorz3;
+		TGHorizontalFrame   *fHorz4;
+		TGHorizontalFrame   *fHorz5;
 		TGLayoutHints       *fLbut;
 		TGLayoutHints       *fLhorz;
 		TGLayoutHints       *fLcan;
@@ -36,7 +39,13 @@ class Spy {
 		TGButton            *fQuit;
 		TGButton            *fUpdateLists;
 		TGButton            *fPlotSelected;
-		TGNumberEntry         *fSelectPort;
+		TGNumberEntry       *fSelectPort;
+		TGNumberEntry       *fXMin;
+		TGNumberEntry       *fXMax;
+		TGNumberEntry       *fYMin;
+		TGNumberEntry       *fYMax;
+		TGNumberEntry       *fZMin;
+		TGNumberEntry       *fZMax;
 		TGTextEntry         *fSelectHistogram;
 		TGTextEntry         *fSelectOptions;
 		TSocket             *fSock;
@@ -50,6 +59,9 @@ class Spy {
 
 		void Connect();
 		void DoButton();
+
+		void ApplyMinMax(TH1*);
+		void ApplyMinMax(TH2*);
 
 		void PlotSelected();
 };
@@ -82,10 +94,13 @@ void Spy::DoButton()
 	if (fHist) delete fHist;
 	if (mess->GetClass()->InheritsFrom(TH1::Class())) {
 		fHist = (TH1*) mess->ReadObject(mess->GetClass());
-		if (mess->GetClass()->InheritsFrom(TH2::Class()))
+		if (mess->GetClass()->InheritsFrom(TH2::Class())){
+			this->ApplyMinMax(fHist);
 			fHist->Draw("colz");
-		else
+		}else{
+			this->ApplyMinMax(fHist);
 			fHist->Draw();
+		}
 		fCanvas->GetCanvas()->Modified();
 		fCanvas->GetCanvas()->Update();
 	}
@@ -173,6 +188,42 @@ Spy::Spy()
 	fPlotSelected->Connect("Clicked()", "Spy", this, "PlotSelected()");
 	fHorz2->AddFrame(fPlotSelected, fLbut);
 
+	fHorz4 = new TGHorizontalFrame(fMain, 100, 100);
+	fMain->AddFrame(fHorz4, fLhorz);
+
+	fXMin = new TGNumberEntry(fHorz4,std::numeric_limits<double>::max());
+	fXMin->SetName("fXMin");
+	fXMin->Resize(102,21);
+	fHorz4->AddFrame(fXMin,fLbut);
+
+	fYMin = new TGNumberEntry(fHorz4,std::numeric_limits<double>::max());
+	fYMin->SetName("fYMin");
+	fYMin->Resize(102,21);
+	fHorz4->AddFrame(fYMin,fLbut);
+
+	fZMin = new TGNumberEntry(fHorz4,std::numeric_limits<double>::max());
+	fZMin->SetName("fZMin");
+	fZMin->Resize(102,21);
+	fHorz4->AddFrame(fZMin,fLbut);
+
+	fHorz5 = new TGHorizontalFrame(fMain, 100, 100);
+	fMain->AddFrame(fHorz5, fLhorz);
+
+	fXMax = new TGNumberEntry(fHorz5,std::numeric_limits<double>::min());
+	fXMax->SetName("fXMax");
+	fXMax->Resize(102,21);
+	fHorz5->AddFrame(fXMax,fLbut);
+
+	fYMax = new TGNumberEntry(fHorz5,std::numeric_limits<double>::min());
+	fYMax->SetName("fYMax");
+	fYMax->Resize(102,21);
+	fHorz5->AddFrame(fYMax,fLbut);
+
+	fZMax = new TGNumberEntry(fHorz5,std::numeric_limits<double>::min());
+	fZMax->SetName("fZMax");
+	fZMax->Resize(102,21);
+	fHorz5->AddFrame(fZMax,fLbut);
+
 	// Create a horizontal frame containing two text buttons
 	fHorz3 = new TGHorizontalFrame(fMain, 100, 100);
 	fMain->AddFrame(fHorz3, fLhorz);
@@ -222,6 +273,38 @@ Spy::~Spy()
 	delete fMain;
 }
 
+void Spy::ApplyMinMax(TH1* hist){
+	auto xmin = fXMin->GetNumber();
+	auto xmax = fXMax->GetNumber();
+	auto ymin = fYMin->GetNumber();
+	auto ymax = fYMax->GetNumber();
+	if( xmin < xmax ){
+		hist->GetXaxis()->SetRangeUser(xmin,xmax);
+	}
+	if( ymin < ymax ){
+		hist->GetYaxis()->SetRangeUser(ymin,ymax);
+	}
+}
+
+void Spy::ApplyMinMax(TH2* hist){
+	auto xmin = fXMin->GetNumber();
+	auto xmax = fXMax->GetNumber();
+	auto ymin = fYMin->GetNumber();
+	auto ymax = fYMax->GetNumber();
+	auto zmin = fZMin->GetNumber();
+	auto zmax = fZMax->GetNumber();
+	if( xmin < xmax ){
+		hist->GetXaxis()->SetRangeUser(xmin,xmax);
+	}
+	if( ymin < ymax ){
+		hist->GetYaxis()->SetRangeUser(ymin,ymax);
+	}
+	if( zmin < zmax ){
+		hist->SetMinimum(zmin);
+		hist->SetMaximum(zmax);
+	}
+}
+
 void Spy::PlotSelected(){
 	auto id = std::string(fSelectHistogram->GetText());
 	auto opts = std::string(fSelectOptions->GetText());
@@ -258,8 +341,10 @@ void Spy::PlotSelected(){
 			}
 		}
 		if( not fTempHis.empty() ){
+			this->ApplyMinMax(fTempHis.at(0));
 			fTempHis.at(0)->Draw();
 			for( size_t ii = 1; ii < fTempHis.size(); ++ii ){
+				this->ApplyMinMax(fTempHis.at(ii));
 				fTempHis.at(ii)->Draw("same");
 			}
 
@@ -281,8 +366,10 @@ void Spy::PlotSelected(){
 		if (mess->GetClass()->InheritsFrom(TH1::Class())) {
 			fHist = (TH1*) mess->ReadObject(mess->GetClass());
 			if (mess->GetClass()->InheritsFrom(TH2::Class())){
+				this->ApplyMinMax(fHist);
 				fHist->Draw("colz");
 			}else{
+				this->ApplyMinMax(fHist);
 				fHist->Draw();
 			}
 		}
