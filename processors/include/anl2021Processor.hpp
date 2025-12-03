@@ -1,6 +1,7 @@
 #ifndef __ANL2021_PROCESSOR_HPP__
 #define __ANL2021_PROCESSOR_HPP__
 
+#include "MtasIsomerProcessor.hpp"
 #include "Processor.hpp"
 #include "MtasProcessor.hpp"
 #include "MtasSSDProcessor.hpp"
@@ -9,7 +10,6 @@
 #include "PSPMTProcessor.hpp"
 
 #include "Gates.hpp"
-#include <vector>
 
 class anl2021Processor : public Processor{
 	public:
@@ -33,6 +33,7 @@ class anl2021Processor : public Processor{
 		bool HasTape;
 		bool HasHPGe;
 		bool HasPSPMT;
+		bool HasIsomer;
 
 		double SiliconThreshold;
 		double ImplantThreshold;
@@ -42,8 +43,6 @@ class anl2021Processor : public Processor{
 		Gate<double> MidCycle;
 		Gate<double> LateCycle;
 		
-		std::vector<BoxGate<double>> ISOMER_3701_Gates;
-
 		std::string implant;
 		std::string hpge;
 		std::string beta;
@@ -61,6 +60,7 @@ class anl2021Processor : public Processor{
 		std::shared_ptr<MtasProcessor> MtasProc;
 		std::shared_ptr<SimpleHPGeProcessor> HPGeProc;
 		std::shared_ptr<PSPMTProcessor> ImplantProc;
+		std::shared_ptr<MtasIsomerProcessor> IsomerProc;
 };
 
 #endif

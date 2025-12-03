@@ -13,6 +13,7 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 	this->TapeProc = std::make_shared<MtasTapeProcessor>(log);
 	this->HPGeProc = std::make_shared<SimpleHPGeProcessor>(log);
 	this->ImplantProc = std::make_shared<PSPMTProcessor>(log);
+	this->IsomerProc = std::make_shared<MtasIsomerProcessor>(log,this);
 
 	//need also the hpge and two implants
 	for( const auto& type : this->MtasProc->GetKnownTypes() ){
@@ -143,52 +144,25 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 		{3413, {8192,0.0,8192.0,12,0,12}},
 		{3414, {8192,0.0,8192.0,12,0,12}},
 
-		{3500,{8192,0,8192,1000,0,10000}},
-		{3501,{8192,0,8192,1000,0,10000}},
-		{3502,{8192,0,8192,1000,0,10000}},
-		{3503,{8192,0,8192,1000,0,10000}},
-		{3504,{8192,0,8192,1000,0,10000}},
-		{3505,{8192,0,8192,1000,0,10000}},
-
 		{3511, {8192,0.0,8192.0,12,0,12}},
 		{3512, {8192,0.0,8192.0,12,0,12}},
 		{3513, {8192,0.0,8192.0,12,0,12}},
 		{3514, {8192,0.0,8192.0,12,0,12}},
 	
-		{3600,{8192,0,8192,1000,0,10000}},
-		{3601,{8192,0,8192,1000,0,10000}},
-		{3602,{8192,0,8192,1000,0,10000}},
-		{3603,{8192,0,8192,1000,0,10000}},
-		{3604,{8192,0,8192,1000,0,10000}},
-		{3605,{8192,0,8192,1000,0,10000}},
+		//Si Max vs Total
+		{3650,{4096,0,4096,4096,0,4096}},
+		{36508,{2048,0,8192,2048,0,8192}},
 
-		{3700,{8192,0,8192,1000,0,10000}},
-		{3701,{8192,0,8192,1000,0,10000}},
-		{3702,{8192,0,8192,1000,0,10000}},
-		{3703,{8192,0,8192,1000,0,10000}},
-		{3704,{8192,0,8192,1000,0,10000}},
-		{3705,{8192,0,8192,1000,0,10000}},
+		//Si Max vs Cycle Time
+		{5360,{8192,0,8192,512,0,512}},
+		{5361,{8192,0,8192,512,0,512}},
+		{5362,{8192,0,8192,512,0,512}},
+		{5363,{8192,0,8192,512,0,512}},
 
-		{3800,{8192,0,8192,1000,0,10000}},
-		{3801,{8192,0,8192,1000,0,10000}},
-		{3802,{8192,0,8192,1000,0,10000}},
-		{3803,{8192,0,8192,1000,0,10000}},
-		{3804,{8192,0,8192,1000,0,10000}},
-		{3805,{8192,0,8192,1000,0,10000}},
-
-		{3900,{8192,0,8192,1000,0,1000}},
-
-		{4500,{8192,0,8192,1000,0,10000}},
-		{4501,{8192,0,8192,1000,0,10000}},
-	
-		{4600,{8192,0,8192,1000,0,10000}},
-		{4601,{8192,0,8192,1000,0,10000}},
-
-		{4700,{8192,0,8192,1000,0,10000}},
-		{4701,{8192,0,8192,1000,0,10000}},
-
-		{4800,{8192,0,8192,1000,0,10000}},
-		{4801,{8192,0,8192,1000,0,10000}}
+		{53608,{2048,0,16384,512,0,512}},
+		{53618,{2048,0,16384,512,0,512}},
+		{53628,{2048,0,16384,512,0,512}},
+		{53638,{2048,0,16384,512,0,512}}
 
 	};
 
@@ -203,6 +177,7 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 	this->HasSilicon = false;
 	this->HasHPGe = false;
 	this->HasPSPMT = false;
+	this->HasIsomer = false;
 
 	this->SiliconThreshold = 0.0;
 	this->ImplantThreshold = 0.0;
@@ -308,10 +283,13 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 			hismanager->Fill("MEASURE_32628",erg,cycletime/60.0);
 			hismanager->Fill("MEASURE_32638",erg,cycletime/(60.0*60.0));
 
+			//handle filling the isomer things
 			auto internaltdiff = (this->MtasProc->GetLastFireTime() - this->SiliconProc->GetFirstFireTime());
-			hismanager->Fill("ISOMER_3900",erg,internaltdiff);
+			this->IsomerProc->SetInternalTDiff(internaltdiff);
+			this->IsomerProc->FillMtasPlots(eventhistory,hismanager,cutmanager,this->MtasProc.get(),this->SiliconProc.get());
 
 			if( hasbeta ){
+				auto sierg = summary->GetEventObservable("SiMax").value_or(0.0);
 				if( this->EarlyCycle.IsWithin(cycletime) ){
 					hismanager->Fill("EARLY_3300",erg);
 					hismanager->Fill("EARLY_3351",erg,cerg);
@@ -334,6 +312,9 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 					}
 				}
 				this->MtasProc->FillBetaPlots(hismanager);
+				hismanager->Fill("MEASURE_3650",erg,sierg);
+				hismanager->Fill("MEASURE_36508",erg,sierg);
+
 				hismanager->Fill("MEASURE_3360",erg,cycletime*1.0e3);
 				hismanager->Fill("MEASURE_3361",erg,cycletime);
 				hismanager->Fill("MEASURE_3362",erg,cycletime/60.0);
@@ -343,6 +324,16 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 				hismanager->Fill("MEASURE_33618",erg,cycletime);
 				hismanager->Fill("MEASURE_33628",erg,cycletime/60.0);
 				hismanager->Fill("MEASURE_33638",erg,cycletime/(60.0*60.0));
+				
+				hismanager->Fill("MEASURE_5360",sierg,cycletime*1.0e3);
+				hismanager->Fill("MEASURE_5361",sierg,cycletime);
+				hismanager->Fill("MEASURE_5362",sierg,cycletime/60.0);
+				hismanager->Fill("MEASURE_5363",sierg,cycletime/(60.0*60.0));
+
+				hismanager->Fill("MEASURE_53608",sierg,cycletime*1.0e3);
+				hismanager->Fill("MEASURE_53618",sierg,cycletime);
+				hismanager->Fill("MEASURE_53628",sierg,cycletime/60.0);
+				hismanager->Fill("MEASURE_53638",sierg,cycletime/(60.0*60.0));
 			}else{
 				this->MtasProc->FillNonBetaPlots(hismanager);
 				hismanager->Fill("MEASURE_3160",erg,cycletime*1.0e3);
@@ -355,117 +346,6 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 				hismanager->Fill("MEASURE_31628",erg,cycletime/60.0);
 				hismanager->Fill("MEASURE_31638",erg,cycletime/(60.0*60.0));
 			}
-
-			if( numhist > 1 ){
-				//current event has gamma not-muon, not-beta
-				if( not hasbeta ){
-					for( size_t ii = 1; ii < eventhistory->GetMaxHistoryID(); ++ii ){
-						auto prevsummary =  eventhistory->GetPreviousEventSummary(ii);
-						auto prevmuon = prevsummary->ContainsEventTag(this->muon);
-						if( prevmuon ){
-							continue;
-						}
-						auto prevbeta = prevsummary->ContainsEventTag(this->beta);
-						auto prevgamma = prevsummary->ContainsEventTag(this->gamma);
-						//this looks for a beta decay into a delayed level
-						//like 137Cs
-						if( prevbeta ){
-							auto isomer_tdiff = summary->GetRawEvents().front().GetTimeStamp() - prevsummary->GetRawEvents().front().GetTimeStamp();
-							hismanager->Fill("ISOMER_3700",erg,isomer_tdiff);
-							hismanager->Fill("ISOMER_3701",erg,isomer_tdiff*1.0e-3);
-
-							auto olderg = prevsummary->GetEventObservable("MTAS_Total").value_or(0.0);
-							hismanager->Fill("ISOMER_3702",olderg,isomer_tdiff);
-							hismanager->Fill("ISOMER_3703",olderg,isomer_tdiff*1.0e-3);
-							//trying to find how we got into this level
-							for( size_t ii = 0; ii < this->ISOMER_3701_Gates.size(); ++ii ){
-								if( this->ISOMER_3701_Gates.at(ii).IsWithin(erg,isomer_tdiff*1.0e-3) ){
-									std::string label = "ISOMER_373"+std::to_string(ii);
-									hismanager->Fill(label,olderg);
-								}
-							}
-
-							hismanager->Fill("ISOMER_3704",erg+olderg,isomer_tdiff);
-							hismanager->Fill("ISOMER_3705",erg+olderg,isomer_tdiff*1.0e-3);
-							break;
-						}
-					}
-					for( size_t ii = 1; ii < eventhistory->GetMaxHistoryID(); ++ii ){
-						auto prevsummary =  eventhistory->GetPreviousEventSummary(ii);
-						auto prevmuon = prevsummary->ContainsEventTag(this->muon);
-						if( prevmuon ){
-							continue;
-						}
-						auto prevbeta = prevsummary->ContainsEventTag(this->beta);
-						auto prevgamma = prevsummary->ContainsEventTag(this->gamma);
-						//looking for stepping through short isomer after we start in daughter isomer
-						if( not prevbeta ){
-							auto isomer_tdiff = summary->GetRawEvents().front().GetTimeStamp() - prevsummary->GetRawEvents().front().GetTimeStamp();
-							hismanager->Fill("ISOMER_3600",erg,isomer_tdiff);
-							hismanager->Fill("ISOMER_3601",erg,isomer_tdiff*1.0e-3);
-							auto olderg = prevsummary->GetEventObservable("MTAS_Total").value_or(0.0);
-							hismanager->Fill("ISOMER_3602",olderg,isomer_tdiff);
-							hismanager->Fill("ISOMER_3603",olderg,isomer_tdiff*1.0e-3);
-							
-							hismanager->Fill("ISOMER_3604",erg+olderg,isomer_tdiff);
-							hismanager->Fill("ISOMER_3605",erg+olderg,isomer_tdiff*1.0e-3);
-							break;
-						}
-					}
-				}
-				//current event does not have beta 
-				if( hasbeta ){
-					for( size_t ii = 1; ii < eventhistory->GetMaxHistoryID(); ++ii ){
-						auto prevsummary =  eventhistory->GetPreviousEventSummary(ii);
-						auto prevmuon = prevsummary->ContainsEventTag(this->muon);
-						if( prevmuon ){
-							continue;
-						}
-						auto prevbeta = prevsummary->ContainsEventTag(this->beta);
-						auto prevgamma = prevsummary->ContainsEventTag(this->gamma);
-
-						//this looks for a gamma decay into a delayed beta
-						//i.e. beam isomer, but need mtas energy for this old event
-						if( not prevbeta ){
-							auto isomer_tdiff = summary->GetRawEvents().front().GetTimeStamp() - prevsummary->GetRawEvents().front().GetTimeStamp();
-							hismanager->Fill("ISOMER_3800",erg,isomer_tdiff);
-							hismanager->Fill("ISOMER_3801",erg,isomer_tdiff*1.0e-3);
-							auto olderg = prevsummary->GetEventObservable("MTAS_Total").value_or(0.0);
-							hismanager->Fill("ISOMER_3802",olderg,isomer_tdiff);
-							hismanager->Fill("ISOMER_3803",olderg,isomer_tdiff*1.0e-3);
-							
-							hismanager->Fill("ISOMER_3804",erg+olderg,isomer_tdiff);
-							hismanager->Fill("ISOMER_3805",erg+olderg,isomer_tdiff*1.0e-3);
-							break;
-						}
-					}
-					for( size_t ii = 1; ii < eventhistory->GetMaxHistoryID(); ++ii ){
-						auto prevsummary =  eventhistory->GetPreviousEventSummary(ii);
-						auto prevmuon = prevsummary->ContainsEventTag(this->muon);
-						if( prevmuon ){
-							continue;
-						}
-						auto prevbeta = prevsummary->ContainsEventTag(this->beta);
-						auto prevgamma = prevsummary->ContainsEventTag(this->gamma);
-
-						//this looks for a gamma decay into a delayed beta
-						//i.e. beam isomer, but need mtas energy for this old event
-						if( prevbeta ){
-							auto isomer_tdiff = summary->GetRawEvents().front().GetTimeStamp() - prevsummary->GetRawEvents().front().GetTimeStamp();
-							hismanager->Fill("ISOMER_3500",erg,isomer_tdiff);
-							hismanager->Fill("ISOMER_3501",erg,isomer_tdiff*1.0e-3);
-							auto olderg = prevsummary->GetEventObservable("MTAS_Total").value_or(0.0);
-							hismanager->Fill("ISOMER_3502",olderg,isomer_tdiff);
-							hismanager->Fill("ISOMER_3503",olderg,isomer_tdiff*1.0e-3);
-							
-							hismanager->Fill("ISOMER_3504",erg+olderg,isomer_tdiff);
-							hismanager->Fill("ISOMER_3505",erg+olderg,isomer_tdiff*1.0e-3);
-							break;
-						}
-					}
-				}
-			}
-
 		}else if( TapeProc->GetCurrentCycleState() == TAPE::BACKGROUND ){
 			if( not this->MtasProc->DidAnyPileup() and not this->MtasProc->DidAnySaturate() ){
 				hismanager->Fill("BKG_3200",this->MtasProc->GetTotalEnergy(0));
@@ -535,96 +415,6 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 			bool hashpge = summary->ContainsEventTag(this->hpge);
 			bool hasimplant = summary->ContainsEventTag(this->implant);
 
-			if( numhist > 1 ){
-				//current event has gamma not-muon, not-beta
-				if( not hasimplant ){
-					for( size_t ii = 1; ii < eventhistory->GetMaxHistoryID(); ++ii ){
-						auto prevsummary = eventhistory->GetPreviousEventSummary(ii);
-						auto prevmuon = prevsummary->ContainsEventTag(this->muon);
-						if( prevmuon ){
-							continue;
-						}
-						auto previmplant = prevsummary->ContainsEventTag(this->implant);
-						auto prevhpge = prevsummary->ContainsEventTag(this->hpge);
-						//this looks for a beta decay into a delayed level
-						//like 137Cs
-						if( previmplant ){
-							auto isomer_tdiff = summary->GetRawEvents().front().GetTimeStamp() - prevsummary->GetRawEvents().front().GetTimeStamp();
-							for( size_t jj = 0; jj < this->HPGeProc->GetNumCrystals(); ++jj ){
-								auto hpge_erg = this->HPGeProc->GetEnergy(jj);
-								hismanager->Fill("ISOMER_4700",hpge_erg,isomer_tdiff);
-								hismanager->Fill("ISOMER_4701",hpge_erg,isomer_tdiff*1.0e-3);
-							}
-							break;
-						}
-					}
-					for( size_t ii = 1; ii < eventhistory->GetMaxHistoryID(); ++ii ){
-						auto prevsummary =  eventhistory->GetPreviousEventSummary(ii);
-						auto prevmuon = prevsummary->ContainsEventTag(this->muon);
-						if( prevmuon ){
-							continue;
-						}
-						auto previmplant = prevsummary->ContainsEventTag(this->implant);
-						auto prevhpge = prevsummary->ContainsEventTag(this->hpge);
-						//looking for stepping through short isomer after we start in daughter isomer
-						if( not previmplant ){
-							auto isomer_tdiff = summary->GetRawEvents().front().GetTimeStamp() - prevsummary->GetRawEvents().front().GetTimeStamp();
-
-							for( size_t jj = 0; jj < this->HPGeProc->GetNumCrystals(); ++jj ){
-								auto hpge_erg = this->HPGeProc->GetEnergy(jj);
-								hismanager->Fill("ISOMER_4600",hpge_erg,isomer_tdiff);
-								hismanager->Fill("ISOMER_4601",hpge_erg,isomer_tdiff*1.0e-3);
-							}
-							break;
-						}
-					}
-				}
-				//current event does not have beta 
-				if( hasimplant ){
-					for( size_t ii = 1; ii < eventhistory->GetMaxHistoryID(); ++ii ){
-						auto prevsummary =  eventhistory->GetPreviousEventSummary(ii);
-						auto prevmuon = prevsummary->ContainsEventTag(this->muon);
-						if( prevmuon ){
-							continue;
-						}
-						auto previmplant = prevsummary->ContainsEventTag(this->implant);
-						auto prevhpge = prevsummary->ContainsEventTag(this->hpge);
-
-						//this looks for a gamma decay into a delayed beta
-						//i.e. beam isomer, but need mtas energy for this old event
-						if( not previmplant ){
-							auto isomer_tdiff = summary->GetRawEvents().front().GetTimeStamp() - prevsummary->GetRawEvents().front().GetTimeStamp();
-							for( size_t jj = 0; jj < this->HPGeProc->GetNumCrystals(); ++jj ){
-								auto hpge_erg = this->HPGeProc->GetEnergy(jj);
-								hismanager->Fill("ISOMER_4800",hpge_erg,isomer_tdiff);
-								hismanager->Fill("ISOMER_4801",hpge_erg,isomer_tdiff*1.0e-3);
-							}
-							break;
-						}
-					}
-					for( size_t ii = 1; ii < eventhistory->GetMaxHistoryID(); ++ii ){
-						auto prevsummary =  eventhistory->GetPreviousEventSummary(ii);
-						auto prevmuon = prevsummary->ContainsEventTag(this->muon);
-						if( prevmuon ){
-							continue;
-						}
-						auto previmplant = prevsummary->ContainsEventTag(this->implant);
-						auto prevhpge = prevsummary->ContainsEventTag(this->hpge);
-
-						//this looks for a gamma decay into a delayed beta
-						//i.e. beam isomer, but need mtas energy for this old event
-						if( previmplant ){
-							auto isomer_tdiff = summary->GetRawEvents().front().GetTimeStamp() - prevsummary->GetRawEvents().front().GetTimeStamp();
-							for( size_t jj = 0; jj < this->HPGeProc->GetNumCrystals(); ++jj ){
-								auto hpge_erg = this->HPGeProc->GetEnergy(jj);
-								hismanager->Fill("ISOMER_4500",hpge_erg,isomer_tdiff);
-								hismanager->Fill("ISOMER_4501",hpge_erg,isomer_tdiff*1.0e-3);
-							}
-							break;
-						}
-					}
-				}
-			}
 			//add in HPGe monitor
 			for( auto ii = 0; ii < this->HPGeProc->GetNumCrystals(); ++ii ){
 				auto hpge_erg = this->HPGeProc->GetEnergy(ii);
@@ -670,6 +460,9 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 					hismanager->Fill("IRRAD_2163",hpge_erg,cycletime/(60.0*60.0));
 				}
 			}
+
+			//fill in isomer plots 
+			this->IsomerProc->FillImplantPlots(eventhistory,hismanager,cutmanager,this->HPGeProc.get(),this->ImplantProc.get());
 			
 			//this is the diagnostic cross implant plastic, was always a 2x2
 			//auto lgimage = this->ImplantProc->GetLowGainImage();
@@ -734,6 +527,9 @@ void anl2021Processor::Init(const pugi::xml_node& config){
 		}else if( name.compare("SimpleHPGeProcessor") == 0 ){
 			this->HPGeProc->Init(proc);
 			this->HasHPGe = true;
+		}else if( name.compare("MtasIsomerProcessor") == 0 ){
+			this->IsomerProc->Init(proc);
+			this->HasIsomer = true;
 		}else{
 			throw std::runtime_error("unknown subprocessor declared in anl2021Processor");
 		}
@@ -762,17 +558,6 @@ void anl2021Processor::Init(const pugi::xml_node& config){
 		this->LateCycle = Gate<double>(lategate.attribute("lowerbound").as_double(0.0),lategate.attribute("upperbound").as_double(0.0));
 	}else{
 		this->LateCycle = Gate<double>(0.0,0.0);
-	}
-
-	for( pugi::xml_node boxgate = config.child("BoxGate"); boxgate; boxgate = boxgate.next_sibling("BoxGate") ){
-		std::string label = boxgate.attribute("label").as_string("");
-		if( label.compare("ISOMER_3701") == 0 ){
-			auto xlow = boxgate.attribute("xlowerbound").as_double(0.0);
-			auto xhigh = boxgate.attribute("xupperbound").as_double(16384.0);
-			auto ylow = boxgate.attribute("ylowerbound").as_double(0.0);
-			auto yhigh = boxgate.attribute("yupperbound").as_double(16384.0);
-			this->ISOMER_3701_Gates.push_back(BoxGate<double>(xlow,xhigh,ylow,yhigh));
-		}
 	}
 
 	if( not this->HasMTAS ){
@@ -815,6 +600,7 @@ void anl2021Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	this->SiliconProc->DeclarePlots(hismanager);
 	this->HPGeProc->DeclarePlots(hismanager);
 	this->ImplantProc->DeclarePlots(hismanager);
+	this->IsomerProc->DeclarePlots(hismanager);
 
 	hismanager->RegisterPlot<TH1F>("BKG_3100","Mtas Total Background Cycle Gated anti-#beta Gated; Energy (keV)",this->h1dsettings.at(3100));
 	hismanager->RegisterPlot<TH1F>("BKG_3110","Mtas Center Sum Background Cycle Gated anti-#beta Gated; Energy (keV)",this->h1dsettings.at(3110));
@@ -879,64 +665,6 @@ void anl2021Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH2F>("IRRAD_2600","HPGe Gamma-Gamma Irradiation Cycle Gated; Energy (keV); Energy (keV)",this->h2dsettings.at(2600));
 	hismanager->RegisterPlot<TH2F>("IRRAD_2700","HPGe Gamma-Gamma Irradiation Cycle Gated #beta Gated; Energy (keV); Energy (keV)",this->h2dsettings.at(2700));
 	
-	
-	//Prev    | Curr    | His 
-	//beta    | no-beta | 370X   
-	//no-beta | beta    | 380X 
-	//beta    | beta    | 350X
-	//no-beta | no-beta | 360X 
-	hismanager->RegisterPlot<TH2F>("ISOMER_3500","Mtas prev-#beta curr-#beta Measure Cycle Gated; Curr Energy (keV); Time (ns)",this->h2dsettings.at(3500));
-	hismanager->RegisterPlot<TH2F>("ISOMER_3501","Mtas prev-#beta curr-#beta Measure Cycle Gated; Curr Energy (keV); Time (us)",this->h2dsettings.at(3501));
-	hismanager->RegisterPlot<TH2F>("ISOMER_3502","Mtas prev-#beta curr-#beta Measure Cycle Gated; Prev Energy (keV); Time (ns)",this->h2dsettings.at(3502));
-	hismanager->RegisterPlot<TH2F>("ISOMER_3503","Mtas prev-#beta curr-#beta Measure Cycle Gated; Prev Energy (keV); Time (us)",this->h2dsettings.at(3503));
-	hismanager->RegisterPlot<TH2F>("ISOMER_3504","Mtas prev-#beta curr-#beta Measure Cycle Gated; Curr+Prev Energy (keV); Time (ns)",this->h2dsettings.at(3504));
-	hismanager->RegisterPlot<TH2F>("ISOMER_3505","Mtas prev-#beta curr-#beta Measure Cycle Gated; Curr+Prev Energy (keV); Time (us)",this->h2dsettings.at(3505));
-	
-	hismanager->RegisterPlot<TH2F>("ISOMER_3600","Mtas prev-no-#beta curr-no-#beta Measure Cycle Gated; Curr Energy (keV); Time (ns)",this->h2dsettings.at(3600));
-	hismanager->RegisterPlot<TH2F>("ISOMER_3601","Mtas prev-no-#beta curr-no-#beta Measure Cycle Gated; Curr Energy (keV); Time (us)",this->h2dsettings.at(3601));
-	hismanager->RegisterPlot<TH2F>("ISOMER_3602","Mtas prev-no-#beta curr-no-#beta Measure Cycle Gated; Prev Energy (keV); Time (ns)",this->h2dsettings.at(3602));
-	hismanager->RegisterPlot<TH2F>("ISOMER_3603","Mtas prev-no-#beta curr-no-#beta Measure Cycle Gated; Prev Energy (keV); Time (us)",this->h2dsettings.at(3603));
-	hismanager->RegisterPlot<TH2F>("ISOMER_3604","Mtas prev-no-#beta curr-no-#beta Measure Cycle Gated; Curr+Prev Energy (keV); Time (ns)",this->h2dsettings.at(3604));
-	hismanager->RegisterPlot<TH2F>("ISOMER_3605","Mtas prev-no-#beta curr-no-#beta Measure Cycle Gated; Curr+Prev Energy (keV); Time (us)",this->h2dsettings.at(3605));
-	
-	hismanager->RegisterPlot<TH2F>("ISOMER_3700","Mtas prev-#beta curr-no-#beta Measure Cycle Gated; Curr Energy (keV); Time (ns)",this->h2dsettings.at(3700));
-	hismanager->RegisterPlot<TH2F>("ISOMER_3701","Mtas prev-#beta curr-no-#beta Measure Cycle Gated; Curr Energy (keV); Time (us)",this->h2dsettings.at(3701));
-	hismanager->RegisterPlot<TH2F>("ISOMER_3702","Mtas prev-#beta curr-no-#beta Measure Cycle Gated; Prev Energy (keV); Time (ns)",this->h2dsettings.at(3702));
-	hismanager->RegisterPlot<TH2F>("ISOMER_3703","Mtas prev-#beta curr-no-#beta Measure Cycle Gated; Prev Energy (keV); Time (us)",this->h2dsettings.at(3703));
-	hismanager->RegisterPlot<TH2F>("ISOMER_3704","Mtas prev-#beta curr-no-#beta Measure Cycle Gated; Curr+Prev Energy (keV); Time (ns)",this->h2dsettings.at(3704));
-	hismanager->RegisterPlot<TH2F>("ISOMER_3705","Mtas prev-#beta curr-no-#beta Measure Cycle Gated; Curr+Prev Energy (keV); Time (us)",this->h2dsettings.at(3705));
-
-	for( size_t ii = 0; ii < this->ISOMER_3701_Gates.size(); ++ii ){
-		std::string label = "ISOMER_373"+std::to_string(ii);
-		std::string title = "Mtas prev-#beta curr-no-#beta Measure Cycle Gated Curr Total Energy Gated [";
-		title += std::to_string(this->ISOMER_3701_Gates.at(ii).GetLowerXBound())+","+std::to_string(this->ISOMER_3701_Gates.at(ii).GetUpperXBound());
-		title += "] Time Gated [";
-		title += std::to_string(this->ISOMER_3701_Gates.at(ii).GetLowerYBound())+","+std::to_string(this->ISOMER_3701_Gates.at(ii).GetUpperYBound());
-		title += "]; Prev. Energy (keV);";
-		hismanager->RegisterPlot<TH1F>(label,title,this->h1dsettings.at(3730));
-	}
-
-	hismanager->RegisterPlot<TH2F>("ISOMER_3800","Mtas prev-no-#beta curr-#beta Measure Cycle Gated; Curr Energy (keV); Time (ns)",this->h2dsettings.at(3800));
-	hismanager->RegisterPlot<TH2F>("ISOMER_3801","Mtas prev-no-#beta curr-#beta Measure Cycle Gated; Curr Energy (keV); Time (us)",this->h2dsettings.at(3801));
-	hismanager->RegisterPlot<TH2F>("ISOMER_3802","Mtas prev-no-#beta curr-#beta Measure Cycle Gated; Prev Energy (keV); Time (ns)",this->h2dsettings.at(3802));
-	hismanager->RegisterPlot<TH2F>("ISOMER_3803","Mtas prev-no-#beta curr-#beta Measure Cycle Gated; Prev Energy (keV); Time (us)",this->h2dsettings.at(3803));
-	hismanager->RegisterPlot<TH2F>("ISOMER_3804","Mtas prev-no-#beta curr-#beta Measure Cycle Gated; Curr+Prev Energy (keV); Time (ns)",this->h2dsettings.at(3804));
-	hismanager->RegisterPlot<TH2F>("ISOMER_3805","Mtas prev-no-#beta curr-#beta Measure Cycle Gated; Curr+Prev Energy (keV); Time (us)",this->h2dsettings.at(3805));
-
-	hismanager->RegisterPlot<TH2F>("ISOMER_3900","Mtas curr-#beta TDiff (Last MTAS - First Si) Measure Cycle Gated; Energy (keV); Time (ns)",this->h2dsettings.at(3900));
-
-	hismanager->RegisterPlot<TH2F>("ISOMER_4500","HPGe prev-#beta curr-#beta Measure Cycle Gated; Curr Energy (keV); Time (ns)",this->h2dsettings.at(3500));
-	hismanager->RegisterPlot<TH2F>("ISOMER_4501","HPGe prev-#beta curr-#beta Measure Cycle Gated; Curr Energy (keV); Time (us)",this->h2dsettings.at(3501));
-	
-	hismanager->RegisterPlot<TH2F>("ISOMER_4600","HPGe prev-no-#beta curr-no-#beta Measure Cycle Gated; Curr Energy (keV); Time (ns)",this->h2dsettings.at(3600));
-	hismanager->RegisterPlot<TH2F>("ISOMER_4601","HPGe prev-no-#beta curr-no-#beta Measure Cycle Gated; Curr Energy (keV); Time (us)",this->h2dsettings.at(3601));
-	
-	hismanager->RegisterPlot<TH2F>("ISOMER_4700","HPGe prev-#beta curr-no-#beta Measure Cycle Gated; Curr Energy (keV); Time (ns)",this->h2dsettings.at(3700));
-	hismanager->RegisterPlot<TH2F>("ISOMER_4701","HPGe prev-#beta curr-no-#beta Measure Cycle Gated; Curr Energy (keV); Time (us)",this->h2dsettings.at(3701));
-
-	hismanager->RegisterPlot<TH2F>("ISOMER_4800","HPGe prev-no-#beta curr-#beta Measure Cycle Gated; Curr Energy (keV); Time (ns)",this->h2dsettings.at(3800));
-	hismanager->RegisterPlot<TH2F>("ISOMER_4801","HPGe prev-no-#beta curr-#beta Measure Cycle Gated; Curr Energy (keV); Time (us)",this->h2dsettings.at(3801));
-
 	hismanager->RegisterPlot<TH2F>("MEASURE_3160","Mtas Total vs Cycle Time (ms) anti-#beta-gated; Mtas Total Energy (keV); Cycle Time (ms)",this->h2dsettings.at(3160));
 	hismanager->RegisterPlot<TH2F>("MEASURE_3161","Mtas Total vs Cycle Time (s) anti-#beta-gated; Mtas Total Energy (keV); Cycle Time (s)",this->h2dsettings.at(3161));
 	hismanager->RegisterPlot<TH2F>("MEASURE_3162","Mtas Total vs Cycle Time (min) anti-#beta-gated; Mtas Total Energy (keV); Cycle Time (min)",this->h2dsettings.at(3162));
@@ -967,6 +695,9 @@ void anl2021Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH2F>("MEASURE_33628","Mtas Total vs Cycle Time (min) #beta-gated; Mtas Total Energy (8 keV/bin); Cycle Time (min)",this->h2dsettings.at(33628));
 	hismanager->RegisterPlot<TH2F>("MEASURE_33638","Mtas Total vs Cycle Time (hr) #beta-gated; Mtas Total Energy (8 keV/bin); Cycle Time (hr)",this->h2dsettings.at(33638));
 
+	hismanager->RegisterPlot<TH2F>("MEASURE_3650","Si Max vs Mtas Total; Mtas Total Energy (keV); Si Max (keV)",this->h2dsettings.at(3650));
+	hismanager->RegisterPlot<TH2F>("MEASURE_36508","Si Max vs Mtas Total; Mtas Total Energy (8 keV/bin); Si Max (8 keV/bin)",this->h2dsettings.at(36508));
+
 	hismanager->RegisterPlot<TH1F>("CYCLE_1000","Cycle Time; Cycle Time (ms);",this->h1dsettings.at(1000));
 	hismanager->RegisterPlot<TH1F>("CYCLE_1001","Cycle Time; Cycle Time (s);",this->h1dsettings.at(1001));
 	hismanager->RegisterPlot<TH1F>("CYCLE_1002","Cycle Time; Cycle Time (min);",this->h1dsettings.at(1002));
@@ -996,6 +727,15 @@ void anl2021Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH2F>("MID_33518","C vs Mtas Total #beta-gated MID Cycle Time; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(33518));
 	hismanager->RegisterPlot<TH2F>("LATE_33518","C vs Mtas Total #beta-gated LATE Cycle Time; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(33518));
 
+	hismanager->RegisterPlot<TH2F>("MEASURE_5360","Si Max vs Cycle Time (ms) #beta-gated; Si Max Energy (keV); Cycle Time (ms)",this->h2dsettings.at(5360));
+	hismanager->RegisterPlot<TH2F>("MEASURE_5361","Si Max vs Cycle Time (s) #beta-gated; Si Max Energy (keV); Cycle Time (s)",this->h2dsettings.at(5361));
+	hismanager->RegisterPlot<TH2F>("MEASURE_5362","Si Max vs Cycle Time (min) #beta-gated; Si Max Energy (keV); Cycle Time (min)",this->h2dsettings.at(5362));
+	hismanager->RegisterPlot<TH2F>("MEASURE_5363","Si Max vs Cycle Time (hr) #beta-gated; Si Max Energy (keV); Cycle Time (hr)",this->h2dsettings.at(5363));
+
+	hismanager->RegisterPlot<TH2F>("MEASURE_53608","Si Max vs Cycle Time (ms) #beta-gated; Si Max Energy (8 keV/bin); Cycle Time (ms)",this->h2dsettings.at(53608));
+	hismanager->RegisterPlot<TH2F>("MEASURE_53618","Si Max vs Cycle Time (s) #beta-gated; Si Max Energy (8 keV/bin); Cycle Time (s)",this->h2dsettings.at(53618));
+	hismanager->RegisterPlot<TH2F>("MEASURE_53628","Si Max vs Cycle Time (min) #beta-gated; Si Max Energy (8 keV/bin); Cycle Time (min)",this->h2dsettings.at(53628));
+	hismanager->RegisterPlot<TH2F>("MEASURE_53638","Si Max vs Cycle Time (hr) #beta-gated; Si Max Energy (8 keV/bin); Cycle Time (hr)",this->h2dsettings.at(53638));
 
 	this->console->info("Finished Declaring Plots");
 }
@@ -1006,6 +746,7 @@ void anl2021Processor::RegisterTree(std::unordered_map<std::string,TTree*>& outp
 	this->SiliconProc->RegisterTree(outputtrees);
 	this->HPGeProc->RegisterTree(outputtrees);
 	this->ImplantProc->RegisterTree(outputtrees);
+	this->IsomerProc->RegisterTree(outputtrees);
 }
 
 void anl2021Processor::CleanupTree(){
@@ -1014,6 +755,7 @@ void anl2021Processor::CleanupTree(){
 	this->SiliconProc->CleanupTree();
 	this->HPGeProc->CleanupTree();
 	this->ImplantProc->CleanupTree();
+	this->IsomerProc->CleanupTree();
 }
 
 void anl2021Processor::Reset(){

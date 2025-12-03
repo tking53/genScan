@@ -83,6 +83,8 @@ MtasSSDProcessor::MtasSSDProcessor(const std::string& log) : Processor(log,"Mtas
 		hismanager->Fill("SILICON_2000",this->BottomSi[ii],ii+7);
 	}
 
+	summary->AddEventObservable("SiMax",this->MaxErg);
+
 	Processor::EndProcess();
 	return true;
 }

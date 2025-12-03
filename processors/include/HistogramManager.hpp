@@ -127,6 +127,8 @@ namespace PLOTS{
 			}
 
 			~PlotRegistry(){
+				this->console->info("1D bucket count : {}, load factor {}/{}",this->Plots_1D.bucket_count(),this->Plots_1D.load_factor(),this->Plots_1D.max_load_factor());
+				this->console->info("2D bucket count : {}, load factor {}/{}",this->Plots_2D.bucket_count(),this->Plots_2D.load_factor(),this->Plots_2D.max_load_factor());
 				this->console->info("Num 1D Fills : {} | Num 2D Fills : {}",this->FillCounter1D,this->FillCounter2D);
 			}
 
