@@ -27,6 +27,8 @@
 #include "CommonFitFunctions.hpp"
 #include "PeakFitFunctions.hpp"
 
+#include "StringManipFunctions.hpp"
+
 #include <boost/describe.hpp>
 
 namespace FitTypes{
@@ -39,6 +41,7 @@ namespace FitTypes{
 		ErfFit = 30,
 		NGaussNFit = 40,
 		NGaussNLinBkgFit = 41,
+		NGaussNErfBkgFit = 42,
 		SimpleImplantationCurveFit = 500,
 		SingleDaughterImplantationCurveFit = 510
 	};
@@ -49,6 +52,7 @@ namespace FitTypes{
 			ErfFit,
 			NGaussNFit,
 			NGaussNLinBkgFit,
+			NGaussNErfBkgFit,
 			SimpleImplantationCurveFit,
 			SingleDaughterImplantationCurveFit
 			)
@@ -128,6 +132,8 @@ struct PeakFitter2D : public PeakFitter{
 	TH2* fithist;
 	TF2* fitfunc;
 	std::vector<TF2*> components;
+	static constexpr auto twod = describe_enumerators_as_array<FitTypes::TwoDim>();
+	std::string fitname;
 
 	PeakFitter2D(double xl,double xu,double yl,double yu,bool chi2,int mode,TH2* hist,
 			const std::map<std::string,double>& fixedvalues,const std::map<std::string,std::pair<double,double>>& boundedvalues,double ellipse,int npts) 
@@ -137,6 +143,13 @@ struct PeakFitter2D : public PeakFitter{
 				throw std::runtime_error("Parameter is both fixed and bounded");
 			}
 		}
+
+		for( const auto& x : twod ){
+			if( x.value == mode ){
+				this->fitname = std::string(x.name);
+			}
+		}
+
 		if( mode == FitTypes::TwoDim::BiGauss ){
 			this->InitBiGaussFit(ellipse,npts);
 		} else if ( mode == FitTypes::TwoDim::BiGaussFlatBkg ){
@@ -446,6 +459,8 @@ struct PeakFitter1D : public PeakFitter{
 	TH1* fithist;
 	TF1* fitfunc;
 	std::vector<TF1*> components;
+	static constexpr auto oned = describe_enumerators_as_array<FitTypes::OneDim>();
+	std::string fitname;
 
 	PeakFitter1D(double l,double u,bool chi2,int mode,TH1* hist,
 			const std::map<std::string,double>& fixedvalues,const std::map<std::string,std::pair<double,double>>& boundedvalues) 
@@ -455,6 +470,13 @@ struct PeakFitter1D : public PeakFitter{
 				throw std::runtime_error("Parameter is both fixed and bounded");
 			}
 		}
+		
+		for( const auto& x : oned ){
+			if( x.value == mode ){
+				this->fitname = std::string(x.name);
+			}
+		}
+
 		if( mode == FitTypes::OneDim::GaussNLinBkgFit ){
 			this->InitGaussNLinBkgFit();
 		}else if( mode == FitTypes::OneDim::GaussNErfBkgFit ){
@@ -471,6 +493,8 @@ struct PeakFitter1D : public PeakFitter{
 			this->InitNGaussNFit();
 		}else if( mode == FitTypes::OneDim::NGaussNLinBkgFit ){
 			this->InitNGaussNLinBkgFit();
+		}else if( mode == FitTypes::OneDim::NGaussNErfBkgFit ){
+			this->InitNGaussNErfBkgFit();
 		}else if( mode == FitTypes::OneDim::SimpleImplantationCurveFit ){
 			this->InitSimpleImplantationCurveFit();
 		}else if( mode == FitTypes::SingleDaughterImplantationCurveFit ){
@@ -770,6 +794,100 @@ struct PeakFitter1D : public PeakFitter{
 				}
 				this->components.at(npeaks)->SetParameters(this->Results["BkgOffset"],this->Results["BkgSlope"]);
 				this->fithist->GetListOfFunctions()->Add(this->components.at(npeaks));
+			}
+		}
+	}
+
+	void InitNGaussNErfBkgFit(){
+		this->fithist->SetLineColor(kBlack);
+		int npeaks = -1;
+		if( this->fvalues.find("NPeaks") == this->fvalues.end() ){
+			throw std::runtime_error("NGaussN fit requires a fixed value named NPeaks to generate fit");
+		}else{
+			npeaks = this->fvalues["NPeaks"];
+		}
+
+		double bkg_offset = 0;
+		double bkg_slope = 0;
+		double width = this->XFitRange.second - this->XFitRange.first;
+		double offset = (this->XFitRange.second + this->XFitRange.first)/2.0;
+		double area = this->fithist->GetBinContent(this->fithist->FindBin(offset));
+
+		this->fitfunc = new TF1("NGaussNErfBkg",&PeakFit::NGaussNErfBkg,XFitRange.first,XFitRange.second,4*npeaks+3);
+		this->fitfunc->SetLineColor(kRed);
+		this->keys = { {"NPeaks",{0,npeaks}} };
+		for( int ii = 0; ii < npeaks; ++ii ){
+			this->components.push_back(new TF1("GaussN",&PeakFit::GaussN,XFitRange.first,XFitRange.second,3));
+			this->components.back()->SetLineColor(kMagenta+(ii%6)-4);
+			this->keys.insert({"Area"+std::to_string(ii),{4*ii+1,area}});
+			this->keys.insert({"Mean"+std::to_string(ii),{4*ii+2,offset}});
+			this->keys.insert({"Sigma"+std::to_string(ii),{4*ii+3,width}});
+			
+			//add in the erf for each as well
+			this->components.push_back(new TF1("ErfBkg",&PeakFit::GaussErf,XFitRange.first,XFitRange.second,3));
+			this->components.back()->SetLineColor(kGreen+(ii%6)-4);
+			this->keys.insert({"ComptonArea"+std::to_string(ii),{4*ii+4,width}});
+		}
+		this->components.push_back(new TF1("LinBkg",&CommonFit::Linear,XFitRange.first,XFitRange.second,2));
+		this->keys.insert({"BkgOffset",{4*npeaks+1,bkg_offset}});
+		this->keys.insert({"BkgSlope",{4*npeaks+2,bkg_slope}});
+		this->components.back()->SetLineColor(kViolet);
+
+		AssignFitParNames();
+		VerifyFixedValues();
+		VerifyBoundedValues();
+		for( int ii = 0; ii < npeaks; ++ii ){
+			if( this->fvalues.find("Mean"+std::to_string(ii)) == this->fvalues.end() 
+					and this->bvalues.find("Mean"+std::to_string(ii)) == this->bvalues.end() ){
+				this->bvalues["Mean"+std::to_string(ii)] = this->XFitRange; 
+			}
+		}
+
+		auto minbin = this->fithist->FindBin(this->XFitRange.first);
+		auto maxbin = this->fithist->FindBin(this->XFitRange.second);
+		auto integral = this->fithist->Integral(minbin,maxbin);
+
+		FixAndBoundParameters();
+
+		if( integral > 0.0 ){
+			std::string option = "0SQ";
+			if( this->loglikelihood ){
+				option+="L";
+			}
+			TFitResultPtr fitresult = this->fithist->Fit(this->fitfunc,option.c_str(),"",XFitRange.first,XFitRange.second);
+
+			if( not fitresult->IsEmpty() ){
+				AssignFitValuesErrors(fitresult);
+				AssignFitFuncParams();
+				this->fithist->GetListOfFunctions()->Add(this->fitfunc);
+
+				std::vector<TLine*> centroids;
+				for( int ii = 0; ii < npeaks; ++ii ){
+					this->components.at(2*ii)->SetParameters(
+							this->Results["Area"+std::to_string(ii)],
+							this->Results["Mean"+std::to_string(ii)],
+							this->Results["Sigma"+std::to_string(ii)]
+							);
+					this->fithist->GetListOfFunctions()->Add(this->components.at(2*ii));
+
+					this->components.at(2*ii+1)->SetParameters(
+							this->Results["ComptonArea"+std::to_string(ii)],
+							this->Results["Mean"+std::to_string(ii)],
+							this->Results["Sigma"+std::to_string(ii)]
+							);
+					this->fithist->GetListOfFunctions()->Add(this->components.at(2*ii+1));
+
+					centroids.push_back(new TLine(
+							this->Results["Mean"+std::to_string(ii)],
+							0,
+							this->Results["Mean"+std::to_string(ii)],
+							0.75*(this->fithist->GetBinContent(this->fithist->FindBin(this->Results["Mean"+std::to_string(ii)]))))
+							);
+					centroids.back()->SetLineColor(kAzure+(ii%6)-4);
+					this->fithist->GetListOfFunctions()->Add(centroids.at(ii));
+				}
+				this->components.at(2*npeaks)->SetParameters(this->Results["BkgOffset"],this->Results["BkgSlope"]);
+				this->fithist->GetListOfFunctions()->Add(this->components.at(2*npeaks));
 			}
 		}
 	}

@@ -34,27 +34,71 @@
 
 YAML::Emitter& operator << (YAML::Emitter& out, const PeakFitter1D* pf) {
 	out <<  YAML::BeginMap << YAML::Key << "HisName" << YAML::Value << pf->fithist->GetName() 
-			       << YAML::Key << "Range" << YAML::BeginMap 
-			       		<< YAML::Key << "XLow" << YAML::Value << pf->XFitRange.first
-			       		<< YAML::Key << "XHigh" << YAML::Value << pf->XFitRange.second << YAML::EndMap
-			       << YAML::Key << "Values" << YAML::Value << pf->Results 
-			       << YAML::Key << "Errors" << YAML::Value << pf->Errors 
-			       << YAML::Key << "ReducedChi2" << YAML::Value << pf->Results.at("Chi2")/pf->Errors.at("NDF") 
-	     << YAML::EndMap;
+		<< YAML::Key << "Range" 
+		<< YAML::BeginMap 
+		<< YAML::Key << "XLow" << YAML::Value << pf->XFitRange.first
+		<< YAML::Key << "XHigh" << YAML::Value << pf->XFitRange.second 
+		<< YAML::EndMap
+		<< YAML::Key << "FitName" << YAML::Value << pf->fitname;
+	out << YAML::Key << "Bounded" << YAML::BeginMap;
+	out << YAML::Key << "NValues" << YAML::Value << pf->bvalues.size();
+	for( const auto& kv : pf->bvalues ){
+		out << YAML::Key << kv.first << 
+			YAML::BeginMap << 
+			YAML::Key << "Min" << YAML::Value << kv.second.first <<
+			YAML::Key << "Max" << YAML::Value << kv.second.second <<
+			YAML::EndMap;
+	}	
+	out << YAML::EndMap;
+	out << YAML::Key << "Fixed" << YAML::BeginMap;
+	out << YAML::Key << "NValues" << YAML::Value << pf->fvalues.size();
+	for( const auto& kv : pf->fvalues ){
+		out << YAML::Key << kv.first <<
+			YAML::BeginMap <<
+			YAML::Key << "Value" << YAML::Value << kv.second <<
+			YAML::EndMap;
+	}
+	out << YAML::EndMap;
+
+	out 		       << YAML::Key << "Values" << YAML::Value << pf->Results 
+		<< YAML::Key << "Errors" << YAML::Value << pf->Errors 
+		<< YAML::Key << "ReducedChi2" << YAML::Value << pf->Results.at("Chi2")/pf->Errors.at("NDF") 
+		<< YAML::EndMap;
 	return out;
 }
 
 YAML::Emitter& operator << (YAML::Emitter& out, const PeakFitter2D* pf) {
 	out <<  YAML::BeginMap << YAML::Key << "HisName" << YAML::Value << pf->fithist->GetName() 
-			       << YAML::Key << "Range" << YAML::BeginMap 
-			       		<< YAML::Key << "XLow" << YAML::Value << pf->XFitRange.first
-			       		<< YAML::Key << "XHigh" << YAML::Value << pf->XFitRange.second 
-			       		<< YAML::Key << "YLow" << YAML::Value << pf->YFitRange.first
-			       		<< YAML::Key << "YHigh" << YAML::Value << pf->YFitRange.second << YAML::EndMap
-			       << YAML::Key << "Values" << YAML::Value << pf->Results 
-			       << YAML::Key << "Errors" << YAML::Value << pf->Errors 
-			       << YAML::Key << "ReducedChi2" << YAML::Value << pf->Results.at("Chi2")/pf->Errors.at("NDF") 
-	     << YAML::EndMap;
+		<< YAML::Key << "Range" 
+		<< YAML::BeginMap 
+		<< YAML::Key << "XLow" << YAML::Value << pf->XFitRange.first
+		<< YAML::Key << "XHigh" << YAML::Value << pf->XFitRange.second 
+		<< YAML::Key << "YLow" << YAML::Value << pf->YFitRange.first
+		<< YAML::Key << "YHigh" << YAML::Value << pf->YFitRange.second 
+		<< YAML::EndMap;
+	out << YAML::Key << "Bounded" << YAML::BeginMap;
+	out << YAML::Key << "NValues" << YAML::Value << pf->bvalues.size();
+	for( const auto& kv : pf->bvalues ){
+		out << YAML::Key << kv.first << 
+			YAML::BeginMap << 
+			YAML::Key << "Min" << YAML::Value << kv.second.first <<
+			YAML::Key << "Max" << YAML::Value << kv.second.second <<
+			YAML::EndMap;
+	}	
+	out << YAML::EndMap;
+	out << YAML::Key << "Fixed" << YAML::BeginMap;
+	out << YAML::Key << "NValues" << YAML::Value << pf->fvalues.size();
+	for( const auto& kv : pf->fvalues ){
+		out << YAML::Key << kv.first <<
+			YAML::BeginMap <<
+			YAML::Key << "Value" << YAML::Value << kv.second <<
+			YAML::EndMap;
+	}
+	out << YAML::EndMap;
+	out 	       << YAML::Key << "Values" << YAML::Value << pf->Results 
+		<< YAML::Key << "Errors" << YAML::Value << pf->Errors 
+		<< YAML::Key << "ReducedChi2" << YAML::Value << pf->Results.at("Chi2")/pf->Errors.at("NDF") 
+		<< YAML::EndMap;
 	return out;
 }
 
@@ -101,7 +145,7 @@ std::map<std::string,std::pair<double,double>> ParseBoundedValues(const std::vec
 				if( boost::regex_match(strs[1],lmatch,number) and boost::regex_match(strs[2],lmatch,number) ){
 					retvals[valname] = {std::stod(strs[1]),std::stod(strs[2])};
 				}else{
-					throw std::runtime_error("Invalid bounded pair, not two numbers");
+					throw std::runtime_error("Invalid bounded pair : "+s+", not two numbers");
 				}
 			}
 		}else{
@@ -132,25 +176,6 @@ std::vector<std::pair<double,double>> ParseGates(const std::vector<std::string>&
 	}
 	return retvals;
 }
-
-template<class E> struct enum_descriptor
-{
-	E value;
-	char const * name;
-};
-
-template<class E, template<class... T> class L, class... T>
-	constexpr std::array<enum_descriptor<E>, sizeof...(T)>
-describe_enumerators_as_array_impl( L<T...> )
-{
-	return { { { T::value, T::name }... } };
-}
-
-template<class E> constexpr auto describe_enumerators_as_array()
-{
-	return describe_enumerators_as_array_impl<E>( boost::describe::describe_enumerators<E>() );
-}
-
 
 int main(int argc, char *argv[]) {
 

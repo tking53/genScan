@@ -8,6 +8,7 @@ namespace PeakFit{
 	double GaussN(double*,double*);
 	double GaussNLinBkg(double*,double*);
 	double GaussErf(double*,double*);
+	double GaussNErf(double*,double*);
 	double GaussNErfBkg(double*,double*);
 	double Erf(double*,double*);
 	double TailingGaussN(double*,double*);
@@ -20,6 +21,8 @@ namespace PeakFit{
 	double SingleDaughterPairImplantationCurve(double*,double*);
 	double NGaussN(double*,double*);
 	double NGaussNLinBkg(double*,double*);
+	double NGaussNErf(double*,double*);
+	double NGaussNErfBkg(double*,double*);
 
 	//ROOT
 	//2D

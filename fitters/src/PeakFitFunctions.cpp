@@ -32,7 +32,7 @@ namespace PeakFit{
 		return fitval;
 	}
 
-	double GaussNErfBkg(double* x,double* par){
+	double GaussNErf(double* x,double* par){
 		//have to calc by hand because we can't transform the params to work without causing memory issues
 		double arg = 0.0;
 		double norm = par[3];
@@ -43,8 +43,13 @@ namespace PeakFit{
 		double ce = norm*(TMath::Erfc(arg));
 		
 		auto gaussn = GaussN(x,par);
+		return gaussn + ce;
+	}
+
+	double GaussNErfBkg(double* x,double* par){
+		//have to calc by hand because we can't transform the params to work without causing memory issues
 		auto bkg = CommonFit::Linear(x,par+4);
-		return gaussn + ce + bkg;
+		return GaussNErf(x,par) + bkg;
 	}
 	
 	double Erf(double* x,double* par){
@@ -147,6 +152,20 @@ namespace PeakFit{
 	double NGaussNLinBkg(double* x,double* par){
 		int npeaks = par[0];
 		return NGaussN(x,par) + CommonFit::Linear(x,par+(3*npeaks+1));
+	}
+
+	double NGaussNErf(double* x,double* par){
+		int npeaks = par[0];
+		double fitval = 0.0;
+		for( int ii = 0; ii < npeaks; ++ii ){
+			fitval += GaussNErf(x,par+4*ii+1);
+		}
+		return fitval;
+	}
+
+	double NGaussNErfBkg(double* x,double* par){
+		int npeaks = par[0];
+		return NGaussNErf(x,par) + CommonFit::Linear(x,par+(4*npeaks+1));
 	}
 
 	double BiGauss(double* x,double* par){
