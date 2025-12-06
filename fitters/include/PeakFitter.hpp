@@ -1,4 +1,4 @@
-#ifndef __PEAK_FITTER_HPP__
+../fitters/include/PeakFitter.hpp #ifndef __PEAK_FITTER_HPP__
 #define __PEAK_FITTER_HPP__
 
 #include <Rtypes.h>
@@ -86,6 +86,18 @@ struct PeakFitter{
 	PeakFitter& operator=(const PeakFitter&) = default;
 	PeakFitter& operator=(PeakFitter&&) = default;
 
+	virtual const std::map<std::string,std::pair<int,double>>& GetKeys() const final{
+		return this->keys;
+	}
+
+	virtual const std::map<std::string,double>& GetFValues() const final{
+		return this->fvalues;
+	}
+
+	virtual const std::map<std::string,std::pair<double,double>>& GetBValues() const final{
+		return this->bvalues;
+	}
+	
 	virtual void FixAndBoundParameters(){
 	}
 	
@@ -826,7 +838,7 @@ struct PeakFitter1D : public PeakFitter{
 			//add in the erf for each as well
 			this->components.push_back(new TF1("ErfBkg",&PeakFit::GaussErf,XFitRange.first,XFitRange.second,3));
 			this->components.back()->SetLineColor(kGreen+(ii%6)-4);
-			this->keys.insert({"ComptonArea"+std::to_string(ii),{4*ii+4,width}});
+			this->keys.insert({"ComptonArea"+std::to_string(ii),{4*ii+4,area}});
 		}
 		this->components.push_back(new TF1("LinBkg",&CommonFit::Linear,XFitRange.first,XFitRange.second,2));
 		this->keys.insert({"BkgOffset",{4*npeaks+1,bkg_offset}});

@@ -420,11 +420,51 @@ int main(int argc, char *argv[]) {
 			if( pfs1d.size() > 0 ){
 				for( const auto& f : pfs1d ){
 					f->WriteHistogram(storechi2);
+					auto keys = f->GetKeys();
+					auto bounds = f->GetBValues();
+					for( const auto& kv : keys ){
+						auto p = (*f)[kv.first];
+						if( p.second >= std::abs(p.first) ){
+							spdlog::warn("The error for {} is larger than its fit value {} +- {}",
+									kv.first,p.first,p.second);
+						}
+						auto bres = bounds.find(kv.first);
+						if( bres != bounds.end() ){
+							if( p.first <= bres->second.first ){
+								spdlog::warn("{} is at the lower limit of its bounds [{},{},{}]",
+										kv.first,bres->second.first,p.first,bres->second.second);
+							}
+							if( p.first >= bres->second.second ){
+								spdlog::warn("{} is at the upper limit of its bounds [{},{},{}]",
+										kv.first,bres->second.first,p.first,bres->second.second);
+							}
+						}
+					}
 				}
 			}
 			if( pfs2d.size() > 0 ){
 				for( const auto& f : pfs2d ){
 					f->WriteHistogram(storechi2);
+					auto keys = f->GetKeys();
+					auto bounds = f->GetBValues();
+					for( const auto& kv : keys ){
+						auto p = (*f)[kv.first];
+						if( p.second >= std::abs(p.first) ){
+							spdlog::warn("The error for {} is larger than its fit value {} +- {}",
+									kv.first,p.first,p.second);
+						}
+						auto bres = bounds.find(kv.first);
+						if( bres != bounds.end() ){
+							if( p.first <= bres->second.first ){
+								spdlog::warn("{} is at the lower limit of its bounds [{},{},{}]",
+										kv.first,bres->second.first,p.first,bres->second.second);
+							}
+							if( p.first >= bres->second.second ){
+								spdlog::warn("{} is at the upper limit of its bounds [{},{},{}]",
+										kv.first,bres->second.first,p.first,bres->second.second);
+							}
+						}
+					}
 				}
 			}
 			ofile->Close();
