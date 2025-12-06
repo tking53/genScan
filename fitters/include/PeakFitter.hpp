@@ -97,7 +97,7 @@ struct PeakFitter{
 	virtual const std::map<std::string,std::pair<double,double>>& GetBValues() const final{
 		return this->bvalues;
 	}
-	
+
 	virtual void FixAndBoundParameters(){
 	}
 	
@@ -146,6 +146,10 @@ struct PeakFitter2D : public PeakFitter{
 	std::vector<TF2*> components;
 	static constexpr auto twod = describe_enumerators_as_array<FitTypes::TwoDim>();
 	std::string fitname;
+
+	const std::string GetHisName() const{
+		return std::string(this->fithist->GetName());
+	}
 
 	PeakFitter2D(double xl,double xu,double yl,double yu,bool chi2,int mode,TH2* hist,
 			const std::map<std::string,double>& fixedvalues,const std::map<std::string,std::pair<double,double>>& boundedvalues,double ellipse,int npts) 
@@ -473,6 +477,10 @@ struct PeakFitter1D : public PeakFitter{
 	std::vector<TF1*> components;
 	static constexpr auto oned = describe_enumerators_as_array<FitTypes::OneDim>();
 	std::string fitname;
+
+	const std::string GetHisName() const{
+		return std::string(this->fithist->GetName());
+	}
 
 	PeakFitter1D(double l,double u,bool chi2,int mode,TH1* hist,
 			const std::map<std::string,double>& fixedvalues,const std::map<std::string,std::pair<double,double>>& boundedvalues) 

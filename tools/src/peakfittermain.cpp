@@ -425,17 +425,19 @@ int main(int argc, char *argv[]) {
 					for( const auto& kv : keys ){
 						auto p = (*f)[kv.first];
 						if( p.second >= std::abs(p.first) ){
-							spdlog::warn("The error for {} is larger than its fit value {} +- {}",
-									kv.first,p.first,p.second);
+							spdlog::warn("{}: The error for {} is larger than its fit value {} +- {}",
+									f->GetHisName(),kv.first,p.first,p.second);
 						}
 						auto bres = bounds.find(kv.first);
 						if( bres != bounds.end() ){
 							if( p.first <= bres->second.first ){
-								spdlog::warn("{} is at the lower limit of its bounds [{},{},{}]",
+								spdlog::warn("{}: {} is at the lower limit of its bounds [{},{},{}]",
+										f->GetHisName(),
 										kv.first,bres->second.first,p.first,bres->second.second);
 							}
 							if( p.first >= bres->second.second ){
-								spdlog::warn("{} is at the upper limit of its bounds [{},{},{}]",
+								spdlog::warn("{}: {} is at the upper limit of its bounds [{},{},{}]",
+										f->GetHisName(),
 										kv.first,bres->second.first,p.first,bres->second.second);
 							}
 						}
@@ -450,17 +452,19 @@ int main(int argc, char *argv[]) {
 					for( const auto& kv : keys ){
 						auto p = (*f)[kv.first];
 						if( p.second >= std::abs(p.first) ){
-							spdlog::warn("The error for {} is larger than its fit value {} +- {}",
-									kv.first,p.first,p.second);
+							spdlog::warn("{}: The error for {} is larger than its fit value {} +- {}",
+									f->GetHisName(),kv.first,p.first,p.second);
 						}
 						auto bres = bounds.find(kv.first);
 						if( bres != bounds.end() ){
 							if( p.first <= bres->second.first ){
-								spdlog::warn("{} is at the lower limit of its bounds [{},{},{}]",
+								spdlog::warn("{}: {} is at the lower limit of its bounds [{},{},{}]",
+										f->GetHisName(),
 										kv.first,bres->second.first,p.first,bres->second.second);
 							}
 							if( p.first >= bres->second.second ){
-								spdlog::warn("{} is at the upper limit of its bounds [{},{},{}]",
+								spdlog::warn("{}: {} is at the upper limit of its bounds [{},{},{}]",
+										f->GetHisName(),
 										kv.first,bres->second.first,p.first,bres->second.second);
 							}
 						}
