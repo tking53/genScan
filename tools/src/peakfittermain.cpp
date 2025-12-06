@@ -197,6 +197,7 @@ int main(int argc, char *argv[]) {
 	std::map<std::string,double> fixedvalues; 
 	std::map<std::string,std::pair<double,double>> boundedvalues; 
 	std::vector<std::pair<double,double>> gatevalues;
+	double tol;
 	double ellipse;
 	int npoints;
 	int xrebin;
@@ -234,6 +235,7 @@ int main(int argc, char *argv[]) {
 		("outputprefix,o",boost::program_options::value<std::string>(&outputprefix)->default_value("GenPeakFitterResults"),"file to output to fit info to")
 		("projectionindices,p",boost::program_options::value<std::vector<int>>(&indices)->multitoken(),"indices to project on if 2d histogram")
 		("quiet,q",boost::program_options::value<bool>(&quiet)->default_value(false),"quiet output")
+		("tolerance,r",boost::program_options::value<double>(&tol)->default_value(1.0e-6),"tolerance used to determine if we're too close to the limits")
 		("storechi2,s",boost::program_options::value<bool>(&storechi2)->default_value(true),"store chi2 plot")
 		("tpoints,t",boost::program_options::value<int>(&npoints)->default_value(15),"npoints in the uncertainty ellipse tcut")
 		("upperbound,u",boost::program_options::value<std::vector<double>>(&high)->multitoken(),"upper bound to perform fit, if 1 provided then Xhigh, if 2 then Xhigh,Yhigh")
@@ -417,6 +419,9 @@ int main(int argc, char *argv[]) {
 			rfile->Close();
 			auto outputfile = outputprefix+".root";
 			auto ofile = new TFile(outputfile.c_str(),"RECREATE");
+			auto IsWithinTol = [](double t,double a,double tol){
+				return std::abs(t-a) <= tol;
+			};
 			if( pfs1d.size() > 0 ){
 				for( const auto& f : pfs1d ){
 					f->WriteHistogram(storechi2);
@@ -430,12 +435,12 @@ int main(int argc, char *argv[]) {
 						}
 						auto bres = bounds.find(kv.first);
 						if( bres != bounds.end() ){
-							if( p.first <= bres->second.first ){
+							if( IsWithinTol(p.first,bres->second.first,tol) ){
 								spdlog::warn("{}: {} is at the lower limit of its bounds [{},{},{}]",
 										f->GetHisName(),
 										kv.first,bres->second.first,p.first,bres->second.second);
 							}
-							if( p.first >= bres->second.second ){
+							if( IsWithinTol(p.first,bres->second.second,tol) ){
 								spdlog::warn("{}: {} is at the upper limit of its bounds [{},{},{}]",
 										f->GetHisName(),
 										kv.first,bres->second.first,p.first,bres->second.second);
@@ -457,12 +462,12 @@ int main(int argc, char *argv[]) {
 						}
 						auto bres = bounds.find(kv.first);
 						if( bres != bounds.end() ){
-							if( p.first <= bres->second.first ){
+							if( IsWithinTol(p.first,bres->second.first,tol) ){
 								spdlog::warn("{}: {} is at the lower limit of its bounds [{},{},{}]",
 										f->GetHisName(),
 										kv.first,bres->second.first,p.first,bres->second.second);
 							}
-							if( p.first >= bres->second.second ){
+							if( IsWithinTol(p.first,bres->second.second,tol) ){
 								spdlog::warn("{}: {} is at the upper limit of its bounds [{},{},{}]",
 										f->GetHisName(),
 										kv.first,bres->second.first,p.first,bres->second.second);
