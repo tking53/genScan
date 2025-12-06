@@ -1,4 +1,4 @@
-../fitters/include/PeakFitter.hpp #ifndef __PEAK_FITTER_HPP__
+#ifndef __PEAK_FITTER_HPP__
 #define __PEAK_FITTER_HPP__
 
 #include <Rtypes.h>
