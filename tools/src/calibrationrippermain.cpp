@@ -40,6 +40,12 @@ YAML::Emitter& operator << (YAML::Emitter& out, const PolyCalibrator* pf) {
 	return out;
 }
 
+struct txtripper{
+	int crateid;
+	int modid;
+	int chanid;
+	std::vector<double> pars;
+};
 
 struct calibrationripper{
 	std::string filename;
@@ -109,24 +115,28 @@ int main(int argc, char *argv[]) {
 	std::string configfile;
 	std::string outputfile;
 	std::string logfile; 
+	std::string txtfile;
 	std::string parname;
 	int order;
 	bool fixcontstant;
 	bool usefiterror;
 	bool apply;
+	bool txtmode;
 
 	boost::program_options::options_description cmdline_options("Generic Options");
 	cmdline_options.add_options()
-		("help,h", "produce help message")
-		("fitpoints,f",boost::program_options::value<std::vector<std::string>>(&fitfiles)->multitoken(),"Add file:energy pair (e.g. fit.yaml:661.657:pkerr, pkerr is optional)")
-		("logfile,l",boost::program_options::value<std::string>(&logfile)->default_value("GenCalRipper.yaml"),"log file to output new calibration params to")
-		("namedparameter,n",boost::program_options::value<std::string>(&parname)->default_value("Mean"),"parameter name used to gen calibration for")
+		("apply,a",boost::program_options::value<bool>(&apply)->default_value(true),"apply to a configfile")
 		("configfile,c",boost::program_options::value<std::string>(&configfile),"configfile to read in and adjust")
+		("error,e",boost::program_options::value<bool>(&usefiterror)->default_value(true),"use the fit error from the file")
+		("fitpoints,f",boost::program_options::value<std::vector<std::string>>(&fitfiles)->multitoken(),"Add file:energy pair (e.g. fit.yaml:661.657:pkerr, pkerr is optional)")
+		("help,h", "produce help message")
+		("logfile,l",boost::program_options::value<std::string>(&logfile)->default_value("GenCalRipper.yaml"),"log file to output new calibration params to")
+		("mode,m",boost::program_options::value<bool>(&txtmode)->default_value(false),"operate in mode where we parse a txt file instead of yaml, see txtfile option for more info")
+		("namedparameter,n",boost::program_options::value<std::string>(&parname)->default_value("Mean"),"parameter name used to gen calibration for")
 		("outputfile,o",boost::program_options::value<std::string>(&outputfile),"configfile to output to")
 		("polyorder,p",boost::program_options::value<int>(&order)->default_value(1),"order to do calibration")
 		("scale,s",boost::program_options::value<bool>(&fixcontstant)->default_value(true),"fix the constant term in the fit")
-		("error,e",boost::program_options::value<bool>(&usefiterror)->default_value(true),"use the fit error from the file")
-		("apply,a",boost::program_options::value<bool>(&apply)->default_value(true),"apply to a configfile")
+		("txtfile,t",boost::program_options::value<std::string>(&txtfile)->default_value("CalMap.txt"),"txt file formatted as crate module channel pars")
 		;
 
 
@@ -141,131 +151,218 @@ int main(int argc, char *argv[]) {
 			exit(EXIT_SUCCESS);
 		}
 
-		std::set<int> CrateMax;
-		std::set<int> BoardMax;
-		std::set<int> ChannelMax;
-		for( const auto& f : fitfiles ){
-			calpoints.push_back(calibrationripper(f,usefiterror,parname));
-			auto i = calpoints.back().MaxCrates;
-			if( CrateMax.empty() ){
-				CrateMax.insert(i);
-			}else{
-				if( CrateMax.find(i) == CrateMax.end() ){
-					throw std::runtime_error("Found multiple crate settings");
+		if( not txtmode ){
+			std::set<int> CrateMax;
+			std::set<int> BoardMax;
+			std::set<int> ChannelMax;
+			for( const auto& f : fitfiles ){
+				calpoints.push_back(calibrationripper(f,usefiterror,parname));
+				auto i = calpoints.back().MaxCrates;
+				if( CrateMax.empty() ){
+					CrateMax.insert(i);
+				}else{
+					if( CrateMax.find(i) == CrateMax.end() ){
+						throw std::runtime_error("Found multiple crate settings");
+					}
 				}
-			}
-			auto j = calpoints.back().MaxCardsPerCrate;
-			if( BoardMax.empty() ){
-				BoardMax.insert(j);
-			}else{
-				if( BoardMax.find(j) == BoardMax.end() ){
-					throw std::runtime_error("Found multiple board settings");
+				auto j = calpoints.back().MaxCardsPerCrate;
+				if( BoardMax.empty() ){
+					BoardMax.insert(j);
+				}else{
+					if( BoardMax.find(j) == BoardMax.end() ){
+						throw std::runtime_error("Found multiple board settings");
+					}
 				}
-			}
-			auto k = calpoints.back().MaxChannelsPerBoard;
-			if( ChannelMax.empty() ){
-				ChannelMax.insert(k);
-			}else{
-				if( ChannelMax.find(k) == ChannelMax.end() ){
-					throw std::runtime_error("Found multiple channel settings");
+				auto k = calpoints.back().MaxChannelsPerBoard;
+				if( ChannelMax.empty() ){
+					ChannelMax.insert(k);
+				}else{
+					if( ChannelMax.find(k) == ChannelMax.end() ){
+						throw std::runtime_error("Found multiple channel settings");
+					}
 				}
+
+			}
+			auto j = (*BoardMax.begin());
+			auto k = (*ChannelMax.begin());
+
+			if( not vm.count("outputfile") and apply ){
+				outputfile = configfile+".calibrated";
 			}
 
-		}
-		auto j = (*BoardMax.begin());
-		auto k = (*ChannelMax.begin());
-
-		if( not vm.count("outputfile") and apply ){
-			outputfile = configfile+".calibrated";
-		}
-
-		std::set<std::string> names;
-		for( const auto& c : calpoints ){
-			for( const auto& kv : c.fitvals ){
-				names.insert(kv.first);
-			}
-		}
-
-		std::vector<std::unique_ptr<PolyCalibrator>> currcal;
-		YAML::Emitter doc;
-		doc << YAML::BeginMap << YAML::Key << "Calibration" << YAML::BeginSeq;
-		for( const auto& k : names ){
-			std::vector<calibrationpoint> fitpoints;
+			std::set<std::string> names;
 			for( const auto& c : calpoints ){
-				auto search = c.fitvals.find(k);
-				if( search != c.fitvals.end() ){
-					fitpoints.push_back({.energy=c.peakvalue,.channel=search->second});
+				for( const auto& kv : c.fitvals ){
+					names.insert(kv.first);
 				}
 			}
-			currcal.push_back(std::make_unique<PolyCalibrator>(fitpoints,fixcontstant,order,k));
-			doc << currcal.back().get();
-		}
-		doc << YAML::EndSeq << YAML::EndMap;
-		std::ofstream yfile(logfile);
-		yfile << doc.c_str() << std::endl;
-		yfile.close();
 
-		if( apply ){
-			pugi::xml_document inputconfig;
-			auto loadres = inputconfig.load_file(configfile.c_str());
-			if( not loadres ){
-				throw std::runtime_error(loadres.description());
+			std::vector<std::unique_ptr<PolyCalibrator>> currcal;
+			YAML::Emitter doc;
+			doc << YAML::BeginMap << YAML::Key << "Calibration" << YAML::BeginSeq;
+			for( const auto& k : names ){
+				std::vector<calibrationpoint> fitpoints;
+				for( const auto& c : calpoints ){
+					auto search = c.fitvals.find(k);
+					if( search != c.fitvals.end() ){
+						fitpoints.push_back({.energy=c.peakvalue,.channel=search->second});
+					}
+				}
+				currcal.push_back(std::make_unique<PolyCalibrator>(fitpoints,fixcontstant,order,k));
+				doc << currcal.back().get();
 			}
+			doc << YAML::EndSeq << YAML::EndMap;
+			std::ofstream yfile(logfile);
+			yfile << doc.c_str() << std::endl;
+			yfile.close();
 
-			pugi::xml_node Configuration = inputconfig.child("Configuration");
-			pugi::xml_node Map = Configuration.child("Map");
-			auto calc_gchid = [&j,&k](const int& a,const int& b, const int& c){
-				return a*j*k + b*k + c + 1;
-			};
-			for( pugi::xml_node Crate = Map.child("Crate"); Crate; Crate = Crate.next_sibling("Crate") ){
-				auto a = Crate.attribute("number").as_int();
-				for( pugi::xml_node Module = Crate.child("Module"); Module; Module = Module.next_sibling("Module") ){
-					auto b = Module.attribute("number").as_int();
-					for( pugi::xml_node Channel = Module.child("Channel"); Channel; Channel = Channel.next_sibling("Channel") ){
-						auto cid = Channel.attribute("number").as_int();
-						auto gchid = calc_gchid(a,b,cid);
-						for( const auto& c : currcal ){
-							std::size_t found = c->FitName.find_last_of("_x");
-							auto cgChID = std::stoi(c->FitName.substr(found+1));
-							if( gchid == cgChID ){
-								std::string newvalue = "";
-								for( const auto& kv : c->Results ){
-									if( kv.second == 0.0 ){
-										newvalue += fmt::format("{:.1f} ",kv.second);
-									}else if( std::abs(kv.second) < 1.0e-3 or std::abs(kv.second) > 1.0e3 ){
-										newvalue += fmt::format("{:.6e} ",kv.second);
-									}else{
-										newvalue += fmt::format("{:.6f} ",kv.second);
+			if( apply ){
+				pugi::xml_document inputconfig;
+				auto loadres = inputconfig.load_file(configfile.c_str());
+				if( not loadres ){
+					throw std::runtime_error(loadres.description());
+				}
+
+				pugi::xml_node Configuration = inputconfig.child("Configuration");
+				pugi::xml_node Map = Configuration.child("Map");
+				auto calc_gchid = [&j,&k](const int& a,const int& b, const int& c){
+					return a*j*k + b*k + c + 1;
+				};
+				for( pugi::xml_node Crate = Map.child("Crate"); Crate; Crate = Crate.next_sibling("Crate") ){
+					auto a = Crate.attribute("number").as_int();
+					for( pugi::xml_node Module = Crate.child("Module"); Module; Module = Module.next_sibling("Module") ){
+						auto b = Module.attribute("number").as_int();
+						for( pugi::xml_node Channel = Module.child("Channel"); Channel; Channel = Channel.next_sibling("Channel") ){
+							auto cid = Channel.attribute("number").as_int();
+							auto gchid = calc_gchid(a,b,cid);
+							for( const auto& c : currcal ){
+								std::size_t found = c->FitName.find_last_of("_x");
+								auto cgChID = std::stoi(c->FitName.substr(found+1));
+								if( gchid == cgChID ){
+									std::string newvalue = "";
+									for( const auto& kv : c->Results ){
+										if( kv.second == 0.0 ){
+											newvalue += fmt::format("{:.1f} ",kv.second);
+										}else if( std::abs(kv.second) < 1.0e-3 or std::abs(kv.second) > 1.0e3 ){
+											newvalue += fmt::format("{:.6e} ",kv.second);
+										}else{
+											newvalue += fmt::format("{:.6f} ",kv.second);
+										}
 									}
-								}
-								pugi::xml_node Calibration = Channel.child("Calibration");
-								if( Calibration ){
-									Calibration.text() = newvalue.c_str();
-									switch(c->Results.size()){
-										case 2:
-											Calibration.attribute("model") = "linear";
-											break;
-										case 3:
-											Calibration.attribute("model") = "quadratic";
-											break;
-										case 4:
-											Calibration.attribute("model") = "cubic";
-											break;
-										default:
-											Calibration.attribute("model") = "unknown";
-											break;
+									pugi::xml_node Calibration = Channel.child("Calibration");
+									if( Calibration ){
+										Calibration.text() = newvalue.c_str();
+										switch(c->Results.size()){
+											case 2:
+												Calibration.attribute("model") = "linear";
+												break;
+											case 3:
+												Calibration.attribute("model") = "quadratic";
+												break;
+											case 4:
+												Calibration.attribute("model") = "cubic";
+												break;
+											default:
+												Calibration.attribute("model") = "unknown";
+												break;
+										}
 									}
+									break;
 								}
-								break;
 							}
 						}
 					}
 				}
+				inputconfig.save_file(outputfile.c_str());
 			}
-			inputconfig.save_file(outputfile.c_str());
+		}else{
+			std::vector<txtripper> cals;
+
+			std::string line;
+			std::ifstream input(txtfile);
+			while( std::getline(input,line) ){
+				std::stringstream ss(line);
+				cals.push_back(txtripper());
+				ss >> cals.back().crateid;
+				ss >> cals.back().modid;
+				ss >> cals.back().chanid;
+
+				double val;
+				std::vector<double> data;
+				while( ss >> val ){
+					data.push_back(val);
+				}
+				cals.back().pars = data;		
+			}
+			input.close();
+
+			//for( const auto& e : cals ){
+			//	std::cout << e.crateid << " " << e.modid << " " << e.chanid << " ";
+			//	for( const auto& v : e.pars ){
+			//		std::cout << v << " ";
+			//	}
+			//	std::cout << std::endl;
+			//}
+
+			if( apply ){
+				pugi::xml_document inputconfig;
+				auto loadres = inputconfig.load_file(configfile.c_str());
+				if( not loadres ){
+					throw std::runtime_error(loadres.description());
+				}
+
+				auto IsCorrectChannel = [](int x,int y,int z,const txtripper& t){
+					return x == t.crateid and y == t.modid and z == t.chanid;
+				};
+
+				pugi::xml_node Configuration = inputconfig.child("Configuration");
+				pugi::xml_node Map = Configuration.child("Map");
+				for( pugi::xml_node Crate = Map.child("Crate"); Crate; Crate = Crate.next_sibling("Crate") ){
+					auto a = Crate.attribute("number").as_int();
+					for( pugi::xml_node Module = Crate.child("Module"); Module; Module = Module.next_sibling("Module") ){
+						auto b = Module.attribute("number").as_int();
+						for( pugi::xml_node Channel = Module.child("Channel"); Channel; Channel = Channel.next_sibling("Channel") ){
+							auto cid = Channel.attribute("number").as_int();
+							for( const auto& c : cals ){
+								if( IsCorrectChannel(a,b,cid,c) ){
+									std::string newvalue = "";
+									for( const auto& kv : c.pars ){
+										if( kv == 0.0 ){
+											newvalue += fmt::format("{:.1f} ",kv);
+										}else if( std::abs(kv) < 1.0e-3 or std::abs(kv) > 1.0e3 ){
+											newvalue += fmt::format("{:.6e} ",kv);
+										}else{
+											newvalue += fmt::format("{:.6f} ",kv);
+										}
+									}
+									pugi::xml_node Calibration = Channel.child("Calibration");
+									if( Calibration ){
+										Calibration.text() = newvalue.c_str();
+										switch(c.pars.size()){
+											case 2:
+												Calibration.attribute("model") = "linear";
+												break;
+											case 3:
+												Calibration.attribute("model") = "quadratic";
+												break;
+											case 4:
+												Calibration.attribute("model") = "cubic";
+												break;
+											default:
+												Calibration.attribute("model") = "unknown";
+												break;
+										}
+									}
+									break;
+								}
+							}
+						}
+					}
+				}
+				inputconfig.save_file(outputfile.c_str());
+			}
+
 		}
-
-
 	}catch( std::exception& e){
 		spdlog::error(e.what());
 		exit(EXIT_FAILURE);
