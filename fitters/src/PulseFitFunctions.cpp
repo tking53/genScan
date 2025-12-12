@@ -20,6 +20,17 @@ namespace PulseFit{
 		return c + pulse;
 	}
 
+	double DoubleTraceFit(double* x,double* par){
+		//Assume that pulses share the same rise and fall time
+		//0 -> Constant 
+		//1,2,3,4 -> Pulse 1 
+		//5,6,7,8 -> Pulse 2
+		double c = CommonFit::Constant(x,par);
+		double pulse1 = PulseFit::Pulse(x,par+1);
+		double pulse2 = PulseFit::Pulse(x,par+5);
+		return c + pulse1 + pulse2;
+	}
+
 	double BSMSingleTraceFit(double* x,double* par){
 		double c = CommonFit::Constant(x,par);
 		double pulse = PulseFit::Pulse(x,par+1);

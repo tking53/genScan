@@ -26,6 +26,7 @@
 
 #include "CommonFitFunctions.hpp"
 #include "PeakFitFunctions.hpp"
+#include "PulseFitFunctions.hpp"
 
 #include "StringManipFunctions.hpp"
 
@@ -42,6 +43,8 @@ namespace FitTypes{
 		NGaussNFit = 40,
 		NGaussNLinBkgFit = 41,
 		NGaussNErfBkgFit = 42,
+		SinglePlasticTrace = 200,
+		DoublePlasticTrace = 210,
 		SimpleImplantationCurveFit = 500,
 		SingleDaughterImplantationCurveFit = 510
 	};
@@ -53,6 +56,8 @@ namespace FitTypes{
 			NGaussNFit,
 			NGaussNLinBkgFit,
 			NGaussNErfBkgFit,
+			SinglePlasticTrace,
+			DoublePlasticTrace,
 			SimpleImplantationCurveFit,
 			SingleDaughterImplantationCurveFit
 			)
@@ -517,6 +522,10 @@ struct PeakFitter1D : public PeakFitter{
 			this->InitNGaussNErfBkgFit();
 		}else if( mode == FitTypes::OneDim::SimpleImplantationCurveFit ){
 			this->InitSimpleImplantationCurveFit();
+		}else if( mode == FitTypes::OneDim::SinglePlasticTrace ){
+			this->InitSinglePlasticTraceFit();
+		}else if( mode == FitTypes::OneDim::DoublePlasticTrace ){
+			this->InitDoublePlasticTraceFit();
 		}else if( mode == FitTypes::SingleDaughterImplantationCurveFit ){
 			this->InitSingleDaughterImplantationCurveFit();
 		}else{
@@ -1200,6 +1209,146 @@ struct PeakFitter1D : public PeakFitter{
 						this->Results["Mean"],0.75*(this->fithist->GetBinContent(this->fithist->FindBin(this->Results["Mean"]))));
 				gauss_centroid->SetLineColor(kAzure);
 				this->fithist->GetListOfFunctions()->Add(gauss_centroid);
+			}
+		}
+	}
+
+	void InitSinglePlasticTraceFit(){
+		this->fithist->SetLineColor(kBlack);
+
+		this->fitfunc = new TF1("SinglePlasticTrace",&PulseFit::SingleTraceFit,XFitRange.first,XFitRange.second,5);
+		this->fitfunc->SetNpx(this->fithist->GetNbinsX()*10);
+		this->fitfunc->SetLineColor(kRed);
+		this->components = {
+			new TF1("Offset",&CommonFit::Constant,XFitRange.first,XFitRange.second,1),
+			new TF1("Pulse",&PulseFit::Pulse,XFitRange.first,XFitRange.second,4)
+		};
+		this->components.at(0)->SetLineColor(kMagenta);
+		this->components.at(0)->SetNpx(this->fithist->GetNbinsX()*10);
+		this->components.at(1)->SetLineColor(kGreen);
+		this->components.at(1)->SetNpx(this->fithist->GetNbinsX()*10);
+		
+		auto minbin = this->fithist->FindBin(this->XFitRange.first);
+		auto maxbin = this->fithist->FindBin(this->XFitRange.second);
+
+		double width = this->XFitRange.second - this->XFitRange.first;
+		double offset = (this->XFitRange.second + this->XFitRange.first)/2.0;
+		double area = this->fithist->GetBinContent(this->fithist->FindBin(offset));
+		double tau = this->fithist->GetBinContent(maxbin) - this->fithist->GetBinContent(minbin);
+		double bkgoffset = 0.0;
+
+		this->keys = {{"Offset",{0,bkgoffset}},{"Amp",{1,area}},{"T0",{2,offset}},{"Rise",{3,width}},{"Fall",{4,tau}}};
+		AssignFitParNames();
+		VerifyFixedValues();
+		VerifyBoundedValues();
+		if( this->fvalues.find("T0") == this->fvalues.end() and this->bvalues.find("T0") == this->bvalues.end() ){
+			this->bvalues["T0"] = this->XFitRange; 
+		}
+
+		auto integral = this->fithist->Integral(minbin,maxbin);
+
+		FixAndBoundParameters();
+
+		if( integral > 0.0 ){
+			std::string option = "0SQWW";
+			if( this->loglikelihood ){
+				option+="L";
+			}
+			TFitResultPtr fitresult = this->fithist->Fit(this->fitfunc,option.c_str(),"",XFitRange.first,XFitRange.second);
+
+			if( not fitresult->IsEmpty() ){
+				AssignFitValuesErrors(fitresult);
+				AssignFitFuncParams();
+				this->fithist->GetListOfFunctions()->Add(this->fitfunc);
+				
+				this->components.at(0)->SetParameters(this->Results["Amp"],this->Results["T0"],this->Results["Rise"],this->Results["Fall"]);
+				this->fithist->GetListOfFunctions()->Add(this->components.at(0));
+
+				this->components.at(1)->SetParameters(this->Results["Offset"]);
+				this->fithist->GetListOfFunctions()->Add(this->components.at(1));
+
+				TLine* centroid = new TLine(this->Results["T0"],0,
+						this->Results["T0"],0.75*(this->fithist->GetBinContent(this->fithist->FindBin(this->Results["T0"]))));
+				centroid->SetLineColor(kAzure);
+				this->fithist->GetListOfFunctions()->Add(centroid);
+			}
+		}
+	}
+
+	void InitDoublePlasticTraceFit(){
+		this->fithist->SetLineColor(kBlack);
+
+		this->fitfunc = new TF1("DoublePlasticTrace",&PulseFit::DoubleTraceFit,XFitRange.first,XFitRange.second,9);
+		this->fitfunc->SetNpx(this->fithist->GetNbinsX()*10);
+		this->fitfunc->SetLineColor(kRed);
+		this->components = {
+			new TF1("Offset",&CommonFit::Constant,XFitRange.first,XFitRange.second,1),
+			new TF1("Pulse1",&PulseFit::Pulse,XFitRange.first,XFitRange.second,4),
+			new TF1("Pulse2",&PulseFit::Pulse,XFitRange.first,XFitRange.second,4)
+		};
+		this->components.at(0)->SetLineColor(kMagenta);
+		this->components.at(0)->SetNpx(this->fithist->GetNbinsX()*10);
+		this->components.at(1)->SetLineColor(kGreen);
+		this->components.at(1)->SetNpx(this->fithist->GetNbinsX()*10);
+		this->components.at(2)->SetLineColor(kGreen+1);
+		this->components.at(2)->SetNpx(this->fithist->GetNbinsX()*10);
+		
+		auto minbin = this->fithist->FindBin(this->XFitRange.first);
+		auto maxbin = this->fithist->FindBin(this->XFitRange.second);
+
+		double width = this->XFitRange.second - this->XFitRange.first;
+		double offset = (this->XFitRange.second + this->XFitRange.first)/2.0;
+		double area = this->fithist->GetBinContent(this->fithist->FindBin(offset));
+		double tau = this->fithist->GetBinContent(maxbin) - this->fithist->GetBinContent(minbin);
+		double bkgoffset = 0.0;
+
+		this->keys = {{"Offset",{0,bkgoffset}},{"Amp1",{1,area}},{"T01",{2,offset}},{"Rise1",{3,width}},{"Fall1",{4,tau}},{"Amp2",{5,area}},{"T02",{6,offset}},{"Rise2",{7,width}},{"Fall2",{8,tau}}};
+		AssignFitParNames();
+		VerifyFixedValues();
+		VerifyBoundedValues();
+		if( this->fvalues.find("T01") == this->fvalues.end() and this->bvalues.find("T01") == this->bvalues.end() ){
+			this->bvalues["T01"] = this->XFitRange; 
+		}
+		if( this->fvalues.find("T02") == this->fvalues.end() and this->bvalues.find("T02") == this->bvalues.end() ){
+			this->bvalues["T02"] = this->XFitRange; 
+		}
+
+		auto integral = this->fithist->Integral(minbin,maxbin);
+
+		FixAndBoundParameters();
+
+		if( integral > 0.0 ){
+			std::string option = "0SQWW";
+			if( this->loglikelihood ){
+				option+="L";
+			}
+			TFitResultPtr fitresult = this->fithist->Fit(this->fitfunc,option.c_str(),"",XFitRange.first,XFitRange.second);
+
+			if( not fitresult->IsEmpty() ){
+				AssignFitValuesErrors(fitresult);
+				AssignFitFuncParams();
+				this->fithist->GetListOfFunctions()->Add(this->fitfunc);
+				
+				this->components.at(0)->SetParameters(this->Results["Offset"]);
+				this->fithist->GetListOfFunctions()->Add(this->components.at(0));
+				
+				this->components.at(1)->SetParameters(this->Results["Amp1"],this->Results["T01"],this->Results["Rise1"],this->Results["Fall1"]);
+				this->fithist->GetListOfFunctions()->Add(this->components.at(1));
+
+				this->components.at(2)->SetParameters(this->Results["Amp2"],this->Results["T02"],this->Results["Rise1"],this->Results["Fall1"]);
+				this->fithist->GetListOfFunctions()->Add(this->components.at(2));
+
+				TLine* centroid1 = new TLine(this->Results["T01"],0,
+						this->Results["T01"],
+						0.75*(this->fithist->GetBinContent(this->fithist->FindBin(this->Results["T01"]))));
+				centroid1->SetLineColor(kAzure);
+				this->fithist->GetListOfFunctions()->Add(centroid1);
+
+				TLine* centroid2 = new TLine(this->Results["T02"],0,
+						this->Results["T02"],
+						0.75*(this->fithist->GetBinContent(this->fithist->FindBin(this->Results["T02"]))));
+				centroid2->SetLineColor(kAzure);
+				this->fithist->GetListOfFunctions()->Add(centroid2);
 			}
 		}
 	}

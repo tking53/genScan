@@ -6,6 +6,7 @@ namespace PulseFit{
 	//root
 	double Pulse(double*,double*);
 	double SingleTraceFit(double*,double*);
+	double DoubleTraceFit(double*,double*);
 	double BSMSingleTraceFit(double*,double*);
 	double BSMDoubleTraceFit(double*,double*);
 
