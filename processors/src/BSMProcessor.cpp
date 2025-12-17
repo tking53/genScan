@@ -58,7 +58,7 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 	this->fronttracefitvalues = ProcessorStruct::DEFAULT_BSM_TRACE_FIT_STRUCT;
 	this->backtracefitvalues = ProcessorStruct::DEFAULT_BSM_TRACE_FIT_STRUCT;
 
-	this->PMTDataVec = std::vector<ProcessorStruct::BSMSingle>(2,ProcessorStruct::DEFAULT_BSM_SINGLE_STRUCT);
+	//this->PMTDataVec = std::vector<ProcessorStruct::BSMSingle>(2,ProcessorStruct::DEFAULT_BSM_SINGLE_STRUCT);
 }
 
 [[maybe_unused]] bool BSMProcessor::PreProcess(EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
@@ -87,6 +87,33 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 		if( not foundfirstevt ){
 			foundfirstevt = true;
 			globalfirsttime = evt->GetTimeStamp();
+		}
+
+
+		//root things
+		//this needs to occur before we drop anything
+		if( detectorposition%2 == 0 ){
+			this->FrontPMTDataVec.push_back(ProcessorStruct::DEFAULT_BSM_SINGLE_STRUCT);
+			
+			auto trace = evt->GetRawTrace();
+			this->FrontPMTDataVec.back().trace = std::vector<unsigned int>(trace.begin(),trace.end());
+			this->FrontPMTDataVec.back().rawEnergy = evt->GetInternalIntegralRaw();
+			this->FrontPMTDataVec.back().energy = evt->GetInternalIntegralEnergy();
+			this->FrontPMTDataVec.back().time = evt->GetTimeStamp();
+			this->FrontPMTDataVec.back().pileup = evt->GetPileup();
+			this->FrontPMTDataVec.back().saturation = evt->GetSaturation();
+			this->FrontPMTDataVec.back().pmtid = detectorposition;
+		}else{
+			this->BackPMTDataVec.push_back(ProcessorStruct::DEFAULT_BSM_SINGLE_STRUCT);
+			
+			auto trace = evt->GetRawTrace();
+			this->BackPMTDataVec.back().trace = std::vector<unsigned int>(trace.begin(),trace.end());
+			this->BackPMTDataVec.back().rawEnergy = evt->GetInternalIntegralRaw();
+			this->BackPMTDataVec.back().energy = evt->GetInternalIntegralEnergy();
+			this->BackPMTDataVec.back().time = evt->GetTimeStamp();
+			this->BackPMTDataVec.back().pileup = evt->GetPileup();
+			this->BackPMTDataVec.back().saturation = evt->GetSaturation();
+			this->BackPMTDataVec.back().pmtid = detectorposition;
 		}
 
 		if( evt->GetPileup() or evt->GetSaturation() ){
@@ -238,15 +265,6 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 			this->HitTimeStamps[detectorposition] = evt->GetTimeStamp();
 			this->TimeStamps.push_back(evt->GetTimeStamp());
 			this->RawBSM[detectorposition] = evt->GetInternalIntegralRaw();
-
-			//root things
-			this->PMTDataVec[detectorposition].trace = std::vector<unsigned int>(trace.begin(),trace.end());
-			this->PMTDataVec[detectorposition].rawEnergy = evt->GetInternalIntegralRaw();
-			this->PMTDataVec[detectorposition].energy = evt->GetInternalIntegralEnergy();
-			this->PMTDataVec[detectorposition].time = evt->GetTimeStamp();
-			this->PMTDataVec[detectorposition].pileup = evt->GetPileup();
-			this->PMTDataVec[detectorposition].saturation = evt->GetSaturation();
-
 			++this->BSMHits[detectorposition];
 		}else{
 			++this->BSMHits[detectorposition];
@@ -715,20 +733,24 @@ void BSMProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 
 void BSMProcessor::RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>& outputtrees){
 	this->OutputTree = new TTree("BSMTraceFit","BSM Processor output");
-	this->OutputTree->Branch("fronttracefit",&(this->fronttracefitvalues));
-	this->OutputTree->Branch("backtracefit",&(this->backtracefitvalues));
+	//this->OutputTree->Branch("fronttracefit",&(this->fronttracefitvalues));
+	//this->OutputTree->Branch("backtracefit",&(this->backtracefitvalues));
 
-	this->OutputTree->Branch("front",&(this->PMTDataVec.at(0)));
-	this->OutputTree->Branch("back",&(this->PMTDataVec.at(1)));
+	//this->OutputTree->Branch("front",&(this->PMTDataVec.at(0)));
+	//this->OutputTree->Branch("back",&(this->PMTDataVec.at(1)));
+	this->OutputTree->Branch("front",&(this->FrontPMTDataVec));
+	this->OutputTree->Branch("back",&(this->BackPMTDataVec));
 	outputtrees[this->ProcessorName] = this->OutputTree;
 }
 
 void BSMProcessor::CleanupTree(){
 	this->fronttracefitvalues = ProcessorStruct::DEFAULT_BSM_TRACE_FIT_STRUCT;
 	this->backtracefitvalues = ProcessorStruct::DEFAULT_BSM_TRACE_FIT_STRUCT;
-	for( auto& e : this->PMTDataVec ){
-		e = ProcessorStruct::DEFAULT_BSM_SINGLE_STRUCT;
-	}
+	this->FrontPMTDataVec.clear();
+	this->BackPMTDataVec.clear();
+	//for( auto& e : this->PMTDataVec ){
+	//	e = ProcessorStruct::DEFAULT_BSM_SINGLE_STRUCT;
+	//}
 }
 
 void BSMProcessor::Reset(){

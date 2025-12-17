@@ -82,7 +82,8 @@ class BSMProcessor : public Processor{
 		ProcessorStruct::BSMTraceFit fronttracefitvalues;
 		ProcessorStruct::BSMTraceFit backtracefitvalues;
 
-		std::vector<ProcessorStruct::BSMSingle> PMTDataVec;
+		std::vector<ProcessorStruct::BSMSingle> FrontPMTDataVec;
+		std::vector<ProcessorStruct::BSMSingle> BackPMTDataVec;
 
 		double AverageTotalEnergy;
 		double GeometricTotalEnergy;

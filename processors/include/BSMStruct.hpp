@@ -19,6 +19,7 @@ namespace ProcessorStruct{
 	static const BSMTraceFit DEFAULT_BSM_TRACE_FIT_STRUCT;
 
 	struct BSMSingle{
+		int pmtid = -1;
 		double rawEnergy = -999;
 		double energy = -999;
 		double time = -999;
