@@ -69,6 +69,7 @@ void BSMPileupTraceStripper(const std::string& filename,const std::string& oup,c
 
 	std::filesystem::path outputprefix(oup);
 	std::filesystem::path op = outputprefix.parent_path().string()+outputprefix.stem().string()+"_idlist.txt";
+	std::filesystem::path opr = outputprefix.parent_path().string()+outputprefix.stem().string()+".root";
 
 	std::sort(idlist.begin(),idlist.end());
 	
@@ -77,6 +78,23 @@ void BSMPileupTraceStripper(const std::string& filename,const std::string& oup,c
 		ouf << id << std::endl;
 	}
 	ouf.close();
+
+	auto ofile = TFile::Open(opr.c_str(),"RECREATE");
+	TTree* cloned_bsm = bsm->CloneTree(0);
+	TTree* cloned_mtas = mtas->CloneTree(0);
+
+	for( const auto& id : idlist ){
+		bsm->GetEntry(id);
+		mtas->GetEntry(id);
+
+		cloned_bsm->Fill();
+		cloned_mtas->Fill();
+	}
+
+	cloned_bsm->AutoSave();
+	cloned_mtas->AutoSave();
+	ofile->Close();
+	file->Close();
 
 	std::chrono::time_point<std::chrono::high_resolution_clock> global_stop_time = std::chrono::high_resolution_clock::now();
 	auto global_run_time = global_stop_time - global_start_time;
