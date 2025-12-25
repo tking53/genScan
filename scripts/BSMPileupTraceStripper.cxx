@@ -18,6 +18,19 @@
 #include "BSMStruct.hpp"
 #include "MtasStruct.hpp"
 
+// This whole thing could be simplified to 
+//
+// auto df = ROOT::RDataFrame(bsm);
+// auto df_filtered = df.Filter();
+// //this takes a third param: vector of branch names to retain
+// df_filtered.Snapshot("newtree","output.root");
+//
+// The below code is still equivalent though, and leaves room for manipulating the trace
+// the dataframe option fails to allow for creating something of the type 
+// ROOT::RVec<ROOT::RVec<unsigned int>> fails to compile 
+// ROOT::RVec<std::vector<unsigned int>> compiles but gives nonsense for the size
+// may need to ask in forum how the hell do you bind this leaf of a branch and access it appropriately
+
 void BSMPileupTraceStripper(const std::string& filename,const std::string& oup,const int& nthreads){
 	std::chrono::time_point<std::chrono::high_resolution_clock> global_start_time = std::chrono::high_resolution_clock::now();
 
