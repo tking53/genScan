@@ -4,6 +4,7 @@
 
 #pragma link C++ struct ProcessorStruct::Veto+;
 #pragma link C++ class std::vector<ProcessorStruct::Veto>+;
+#pragma link C++ class ROOT::VecOps::RVec<ProcessorStruct::Veto>+;
 
 #endif
 #endif //PAASS_LINKDEF_HPP

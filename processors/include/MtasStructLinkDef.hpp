@@ -4,9 +4,11 @@
 
 #pragma link C++ struct ProcessorStruct::MtasSegment+;
 #pragma link C++ class std::vector<ProcessorStruct::MtasSegment>+;
+#pragma link C++ class ROOT::VecOps::RVec<ProcessorStruct::MtasSegment>+;
 
 #pragma link C++ struct ProcessorStruct::MtasTotal+;
 #pragma link C++ class std::vector<ProcessorStruct::MtasTotal>+;
+#pragma link C++ class ROOT::VecOps::RVec<ProcessorStruct::MtasTotal>+;
 
 #endif
 #endif //PAASS_LINKDEF_HPP

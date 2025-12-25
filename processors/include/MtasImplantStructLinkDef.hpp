@@ -4,6 +4,7 @@
 
 #pragma link C++ struct ProcessorStruct::MtasImplant+;
 #pragma link C++ class std::vector<ProcessorStruct::MtasImplant>+;
+#pragma link C++ class ROOT::VecOps::RVec<ProcessorStruct::MtasImplant>+;
 
 #endif
 #endif //PAASS_LINKDEF_HPP
