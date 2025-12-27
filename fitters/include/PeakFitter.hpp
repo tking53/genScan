@@ -159,7 +159,7 @@ struct PeakFitter2D : public PeakFitter{
 
 	PeakFitter2D(double xl,double xu,double yl,double yu,bool chi2,bool dbg,int mode,TH2* hist,
 			const std::map<std::string,double>& fixedvalues,const std::map<std::string,std::pair<double,double>>& boundedvalues,double ellipse,int npts) 
-		: XFitRange(xl,xu), YFitRange(yl,yu), fithist(hist), PeakFitter(chi2,dbg,fixedvalues,boundedvalues){
+		: PeakFitter(chi2,dbg,fixedvalues,boundedvalues), XFitRange(xl,xu), YFitRange(yl,yu), fithist(hist){
 		for( const auto& kv : fvalues ){
 			if( bvalues.find(kv.first) != bvalues.end() ){
 				throw std::runtime_error("Parameter is both fixed and bounded");
@@ -490,7 +490,7 @@ struct PeakFitter1D : public PeakFitter{
 
 	PeakFitter1D(double l,double u,bool chi2,bool dbg,int mode,TH1* hist,
 			const std::map<std::string,double>& fixedvalues,const std::map<std::string,std::pair<double,double>>& boundedvalues) 
-		: XFitRange(l,u),fithist(hist),PeakFitter(chi2,dbg,fixedvalues,boundedvalues){
+		: PeakFitter(chi2,dbg,fixedvalues,boundedvalues),XFitRange(l,u),fithist(hist){
 		for( const auto& kv : fvalues ){
 			if( bvalues.find(kv.first) != bvalues.end() ){
 				throw std::runtime_error("Parameter is both fixed and bounded");
