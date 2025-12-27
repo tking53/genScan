@@ -76,7 +76,12 @@ void BSMPileupTraceFitter(const std::string& filename,const std::string& oup,con
 					//roughly ok
 					histos[thread_id]->SetBinError(ii,1.0);
 				}
-				fitters[thread_id] = new PeakFitter1D(lb,ub,chi2,false,mode,histos[thread_id],fixed_values,bounded_values);
+				//be smart and don't recreate resources unless absolutely necessary
+				if( fitters[thread_id] == nullptr ){
+					fitters[thread_id] = new PeakFitter1D(lb,ub,chi2,false,mode,histos[thread_id],fixed_values,bounded_values);
+				}else{
+					fitters[thread_id]->InitDoublePlasticTraceFit();
+				}
 				std::vector<double> ergs = { 
 					(*(fitters[thread_id]))["Amp1"].first, 
 					(*(fitters[thread_id]))["Amp2"].first 
