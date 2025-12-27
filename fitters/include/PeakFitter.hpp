@@ -73,14 +73,15 @@ namespace FitTypes{
 
 struct PeakFitter{
 	bool loglikelihood;
+	bool debug;
 	std::map<std::string,double> fvalues;
 	std::map<std::string,std::pair<double,double>> bvalues;
 	std::map<std::string,std::pair<int,double>> keys;
 	std::map<std::string,double> Results;
 	std::map<std::string,double> Errors;
 
-	PeakFitter(bool chi2,const std::map<std::string,double>& fixedvalues,const std::map<std::string,std::pair<double,double>>& boundedvalues) 
-		: loglikelihood(!chi2),fvalues(fixedvalues),bvalues(boundedvalues)
+	PeakFitter(bool chi2,bool dbg,const std::map<std::string,double>& fixedvalues,const std::map<std::string,std::pair<double,double>>& boundedvalues) 
+		: loglikelihood(!chi2),debug(dbg),fvalues(fixedvalues),bvalues(boundedvalues)
 	{
 	}
 	
@@ -156,9 +157,9 @@ struct PeakFitter2D : public PeakFitter{
 		return std::string(this->fithist->GetName());
 	}
 
-	PeakFitter2D(double xl,double xu,double yl,double yu,bool chi2,int mode,TH2* hist,
+	PeakFitter2D(double xl,double xu,double yl,double yu,bool chi2,bool dbg,int mode,TH2* hist,
 			const std::map<std::string,double>& fixedvalues,const std::map<std::string,std::pair<double,double>>& boundedvalues,double ellipse,int npts) 
-		: XFitRange(xl,xu), YFitRange(yl,yu), fithist(hist), PeakFitter(chi2,fixedvalues,boundedvalues){
+		: XFitRange(xl,xu), YFitRange(yl,yu), fithist(hist), PeakFitter(chi2,dbg,fixedvalues,boundedvalues){
 		for( const auto& kv : fvalues ){
 			if( bvalues.find(kv.first) != bvalues.end() ){
 				throw std::runtime_error("Parameter is both fixed and bounded");
@@ -487,9 +488,9 @@ struct PeakFitter1D : public PeakFitter{
 		return std::string(this->fithist->GetName());
 	}
 
-	PeakFitter1D(double l,double u,bool chi2,int mode,TH1* hist,
+	PeakFitter1D(double l,double u,bool chi2,bool dbg,int mode,TH1* hist,
 			const std::map<std::string,double>& fixedvalues,const std::map<std::string,std::pair<double,double>>& boundedvalues) 
-		: XFitRange(l,u),fithist(hist),PeakFitter(chi2,fixedvalues,boundedvalues){
+		: XFitRange(l,u),fithist(hist),PeakFitter(chi2,dbg,fixedvalues,boundedvalues){
 		for( const auto& kv : fvalues ){
 			if( bvalues.find(kv.first) != bvalues.end() ){
 				throw std::runtime_error("Parameter is both fixed and bounded");
@@ -1279,19 +1280,21 @@ struct PeakFitter1D : public PeakFitter{
 		this->fithist->SetLineColor(kBlack);
 
 		this->fitfunc = new TF1("DoublePlasticTrace",&PulseFit::DoubleTraceFit,XFitRange.first,XFitRange.second,9);
-		this->fitfunc->SetNpx(this->fithist->GetNbinsX()*10);
-		this->fitfunc->SetLineColor(kRed);
-		this->components = {
-			new TF1("Offset",&CommonFit::Constant,XFitRange.first,XFitRange.second,1),
-			new TF1("Pulse1",&PulseFit::Pulse,XFitRange.first,XFitRange.second,4),
-			new TF1("Pulse2",&PulseFit::Pulse,XFitRange.first,XFitRange.second,4)
-		};
-		this->components.at(0)->SetLineColor(kMagenta);
-		this->components.at(0)->SetNpx(this->fithist->GetNbinsX()*10);
-		this->components.at(1)->SetLineColor(kGreen);
-		this->components.at(1)->SetNpx(this->fithist->GetNbinsX()*10);
-		this->components.at(2)->SetLineColor(kGreen+1);
-		this->components.at(2)->SetNpx(this->fithist->GetNbinsX()*10);
+		if( this->debug) {
+			this->fitfunc->SetNpx(this->fithist->GetNbinsX()*10);
+			this->fitfunc->SetLineColor(kRed);
+			this->components = {
+				new TF1("Offset",&CommonFit::Constant,XFitRange.first,XFitRange.second,1),
+				new TF1("Pulse1",&PulseFit::Pulse,XFitRange.first,XFitRange.second,4),
+				new TF1("Pulse2",&PulseFit::Pulse,XFitRange.first,XFitRange.second,4)
+			};
+			this->components.at(0)->SetLineColor(kMagenta);
+			this->components.at(0)->SetNpx(this->fithist->GetNbinsX()*10);
+			this->components.at(1)->SetLineColor(kGreen);
+			this->components.at(1)->SetNpx(this->fithist->GetNbinsX()*10);
+			this->components.at(2)->SetLineColor(kGreen+1);
+			this->components.at(2)->SetNpx(this->fithist->GetNbinsX()*10);
+		}
 		
 		auto minbin = this->fithist->FindBin(this->XFitRange.first);
 		auto maxbin = this->fithist->FindBin(this->XFitRange.second);
@@ -1327,28 +1330,30 @@ struct PeakFitter1D : public PeakFitter{
 			if( not fitresult->IsEmpty() ){
 				AssignFitValuesErrors(fitresult);
 				AssignFitFuncParams();
-				this->fithist->GetListOfFunctions()->Add(this->fitfunc);
-				
-				this->components.at(0)->SetParameters(this->Results["Offset"]);
-				this->fithist->GetListOfFunctions()->Add(this->components.at(0));
-				
-				this->components.at(1)->SetParameters(this->Results["Amp1"],this->Results["T01"],this->Results["Rise1"],this->Results["Fall1"]);
-				this->fithist->GetListOfFunctions()->Add(this->components.at(1));
+				if( this->debug ){
+					this->fithist->GetListOfFunctions()->Add(this->fitfunc);
 
-				this->components.at(2)->SetParameters(this->Results["Amp2"],this->Results["T02"],this->Results["Rise1"],this->Results["Fall1"]);
-				this->fithist->GetListOfFunctions()->Add(this->components.at(2));
+					this->components.at(0)->SetParameters(this->Results["Offset"]);
+					this->fithist->GetListOfFunctions()->Add(this->components.at(0));
 
-				TLine* centroid1 = new TLine(this->Results["T01"],0,
-						this->Results["T01"],
-						0.75*(this->fithist->GetBinContent(this->fithist->FindBin(this->Results["T01"]))));
-				centroid1->SetLineColor(kAzure);
-				this->fithist->GetListOfFunctions()->Add(centroid1);
+					this->components.at(1)->SetParameters(this->Results["Amp1"],this->Results["T01"],this->Results["Rise1"],this->Results["Fall1"]);
+					this->fithist->GetListOfFunctions()->Add(this->components.at(1));
 
-				TLine* centroid2 = new TLine(this->Results["T02"],0,
-						this->Results["T02"],
-						0.75*(this->fithist->GetBinContent(this->fithist->FindBin(this->Results["T02"]))));
-				centroid2->SetLineColor(kAzure);
-				this->fithist->GetListOfFunctions()->Add(centroid2);
+					this->components.at(2)->SetParameters(this->Results["Amp2"],this->Results["T02"],this->Results["Rise1"],this->Results["Fall1"]);
+					this->fithist->GetListOfFunctions()->Add(this->components.at(2));
+
+					TLine* centroid1 = new TLine(this->Results["T01"],0,
+							this->Results["T01"],
+							0.75*(this->fithist->GetBinContent(this->fithist->FindBin(this->Results["T01"]))));
+					centroid1->SetLineColor(kAzure);
+					this->fithist->GetListOfFunctions()->Add(centroid1);
+
+					TLine* centroid2 = new TLine(this->Results["T02"],0,
+							this->Results["T02"],
+							0.75*(this->fithist->GetBinContent(this->fithist->FindBin(this->Results["T02"]))));
+					centroid2->SetLineColor(kAzure);
+					this->fithist->GetListOfFunctions()->Add(centroid2);
+				}
 			}
 		}
 	}

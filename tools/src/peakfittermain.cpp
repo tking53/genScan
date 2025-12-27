@@ -374,7 +374,7 @@ int main(int argc, char *argv[]) {
 						if( xrebin > 0 ){
 							histofit->RebinX(xrebin);
 						}
-						pfs1d.push_back(new PeakFitter1D(low[0],high[0],chi2,mode,histofit,fixedvalues,boundedvalues));
+						pfs1d.push_back(new PeakFitter1D(low[0],high[0],chi2,true,mode,histofit,fixedvalues,boundedvalues));
 					}
 					int idx = 0;
 					for( const auto& g : gatevalues ){
@@ -392,7 +392,7 @@ int main(int argc, char *argv[]) {
 						if( xrebin > 0 ){
 							histofit->RebinX(xrebin);
 						}
-						pfs1d.push_back(new PeakFitter1D(low[0],high[0],chi2,mode,histofit,fixedvalues,boundedvalues));
+						pfs1d.push_back(new PeakFitter1D(low[0],high[0],true,chi2,mode,histofit,fixedvalues,boundedvalues));
 						++idx;
 					}
 				}else{
@@ -404,12 +404,12 @@ int main(int argc, char *argv[]) {
 					if( yrebin > 0 ){
 						histofit2d->RebinY(yrebin);
 					}
-					pfs2d.push_back(new PeakFitter2D(low[0],high[0],low[1],high[1],chi2,mode,histofit2d,fixedvalues,boundedvalues,ellipse,npoints));
+					pfs2d.push_back(new PeakFitter2D(low[0],high[0],low[1],high[1],chi2,true,mode,histofit2d,fixedvalues,boundedvalues,ellipse,npoints));
 				}
 			}else if( boost::regex_search(histype,re1d) ){
 				histofit = dynamic_cast<TH1*>(mainhis);
 				histofit->SetDirectory(0);
-				pfs1d.push_back(new PeakFitter1D(low[0],high[0],chi2,mode,histofit,fixedvalues,boundedvalues));
+				pfs1d.push_back(new PeakFitter1D(low[0],high[0],chi2,true,mode,histofit,fixedvalues,boundedvalues));
 			}else{
 				throw std::runtime_error("not passed a TH1 or TH2 histogram");
 			}
