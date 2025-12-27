@@ -50,7 +50,7 @@ void BSMPileupTraceFitter(const std::string& filename,const std::string& oup,con
 	std::vector<double> cal_scale = { 1.0, 1.0 }; 
 	double lb = 10.0;
 	double ub = 200.0;
-	bool chi2 = false;
+	bool chi2 = true;
 	auto mode = FitTypes::OneDim::DoublePlasticTrace;
 	std::map<std::string,double> fixed_values = {
 	};
