@@ -56,8 +56,8 @@ void BSMPileupTraceFitter(const std::string& filename,const std::string& oup,con
 	};
 	std::map<std::string,std::pair<double,double>> bounded_values{
 		{"Offset",{2600.0,18800.0}},
-		{"Amp1",{0.0,65536.0}},
-		{"Amp2",{0.0,65536.0}},
+		{"Amp1",{0.0,165536.0}},
+		{"Amp2",{0.0,165536.0}},
 		{"Rise1",{1.0e-1,2.0}},
 		{"Fall1",{3.0,5.0}},
 		{"Rise2",{1.0e-1,2.0}},
