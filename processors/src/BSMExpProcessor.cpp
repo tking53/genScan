@@ -95,9 +95,9 @@ BSMExpProcessor::BSMExpProcessor(const std::string& log) : Processor(log,"BSMExp
 	//		this->console->info("Previous mtas event registered as muon, current evt count : {}",currevtcount);
 	//	}
 	//}
-	this->SetEventIdx(eventhistory->GetEventCount());
-	this->MtasProc->SetEventIdx(eventhistory->GetEventCount());
-	this->BSMProc->SetEventIdx(eventhistory->GetEventCount());
+	//this->SetEventIdx(eventhistory->GetEventCount());
+	//this->MtasProc->SetEventIdx(eventhistory->GetEventCount());
+	//this->BSMProc->SetEventIdx(eventhistory->GetEventCount());
 
 	if( this->HasMTAS ){
 		this->MtasProc->PreProcess(eventhistory,hismanager,cutmanager);
