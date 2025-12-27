@@ -44,17 +44,27 @@ void BSMPileupTraceFitter(const std::string& filename,const std::string& oup,con
 	bsm->AddFriend(mtas);
 
 	std::vector<TH1*> histos(numThreads,nullptr);
-	std::vector<PeakFitter1D*> fitters(numThreads,nullptr);
+	std::vector<PeakFitter1D*> single_fitters(numThreads,nullptr);
+	std::vector<PeakFitter1D*> double_fitters(numThreads,nullptr);
 
 	double ns_per_tick = 4.0;
-	std::vector<double> cal_scale = { 1.0, 1.0 }; 
+	std::vector<double> cal_scale = { 0.1, 0.1 }; 
 	double lb = 10.0;
 	double ub = 200.0;
 	bool chi2 = true;
-	auto mode = FitTypes::OneDim::DoublePlasticTrace;
+	auto mode1 = FitTypes::OneDim::SinglePlasticTrace;
+	auto mode2 = FitTypes::OneDim::DoublePlasticTrace;
 	std::map<std::string,double> fixed_values = {
 	};
-	std::map<std::string,std::pair<double,double>> bounded_values{
+
+	std::map<std::string,std::pair<double,double>> single_bounded_values{
+		{"Offset",{2600.0,18800.0}},
+		{"Amp",{0.0,165536.0}},
+		{"Rise",{1.0e-1,2.0}},
+		{"Fall",{3.0,5.0}}
+	};
+
+	std::map<std::string,std::pair<double,double>> double_bounded_values{
 		{"Offset",{2600.0,18800.0}},
 		{"Amp1",{0.0,165536.0}},
 		{"Amp2",{0.0,165536.0}},
@@ -73,83 +83,114 @@ void BSMPileupTraceFitter(const std::string& filename,const std::string& oup,con
 				}
 				for( size_t ii = 0; ii < f[0].trace.size(); ++ii ){
 					histos[thread_id]->SetBinContent(ii,f[0].trace[ii]);
-					//roughly ok
+					//roughly ok, is what the uncertainty is on the lsb
+					//but does not contain info about the baseline
 					histos[thread_id]->SetBinError(ii,1.0);
 				}
+
+				//if( single_fitters[thread_id] == nullptr ){
+				//	single_fitters[thread_id] = new PeakFitter1D(lb,ub,chi2,false,mode1,
+				//			histos[thread_id],fixed_values,single_bounded_values);
+				//}else{
+				//	single_fitters[thread_id]->InitSinglePlasticTraceFit();
+				//}
+
 				//be smart and don't recreate resources unless absolutely necessary
-				if( fitters[thread_id] == nullptr ){
-					fitters[thread_id] = new PeakFitter1D(lb,ub,chi2,false,mode,histos[thread_id],fixed_values,bounded_values);
+				if( double_fitters[thread_id] == nullptr ){
+					double_fitters[thread_id] = new PeakFitter1D(lb,ub,chi2,false,mode2,
+							histos[thread_id],fixed_values,double_bounded_values);
 				}else{
-					fitters[thread_id]->InitDoublePlasticTraceFit();
+					double_fitters[thread_id]->InitDoublePlasticTraceFit();
 				}
+
+				//auto chi2_1 = single_fitters[thread_id]->Results.at("Chi2")/single_fitters[thread_id]->Errors.at("NDF");
+				auto chi2_2 = double_fitters[thread_id]->Results.at("Chi2")/double_fitters[thread_id]->Errors.at("NDF");
+
 				std::vector<double> ergs = { 
-					(*(fitters[thread_id]))["Amp1"].first, 
-					(*(fitters[thread_id]))["Amp2"].first 
+					(*(double_fitters[thread_id]))["Amp1"].first, 
+					(*(double_fitters[thread_id]))["Amp2"].first 
 				};
 
 				std::vector<double> toff = {
-					(*(fitters[thread_id]))["T01"].first, 
-					(*(fitters[thread_id]))["T02"].first 
+					(*(double_fitters[thread_id]))["T01"].first, 
+					(*(double_fitters[thread_id]))["T02"].first 
 				};
 
 				std::vector<double> rise = {
-					(*(fitters[thread_id]))["Rise1"].first, 
-					(*(fitters[thread_id]))["Rise2"].first 
+					(*(double_fitters[thread_id]))["Rise1"].first, 
+					(*(double_fitters[thread_id]))["Rise2"].first 
 				};
 
 				std::vector<double> fall = {
-					(*(fitters[thread_id]))["Fall1"].first, 
-					(*(fitters[thread_id]))["Fall2"].first 
+					(*(double_fitters[thread_id]))["Fall1"].first, 
+					(*(double_fitters[thread_id]))["Fall2"].first 
 				};
 
-				double offset = (*(fitters[thread_id]))["Offset"].first;
-				
-				delete fitters[thread_id];
-				fitters[thread_id] = nullptr;
+				double offset = (*(double_fitters[thread_id]))["Offset"].first;
 				
 				if( toff[0] <= toff[1] ){ 
-					ROOT::RVecD data{toff[0],toff[1],ergs[0],ergs[1],rise[0],rise[1],fall[0],fall[1],offset};
+					ROOT::RVecD data{
+						static_cast<double>(mode2),
+						toff[0],toff[1],
+						ergs[0],ergs[1],
+						rise[0],rise[1],
+						fall[0],fall[1],
+						offset,
+						chi2_2
+					};
 					return data;
 				}else{
-					ROOT::RVecD data{toff[1],toff[0],ergs[1],ergs[0],rise[1],rise[0],fall[1],fall[0],offset};
+					ROOT::RVecD data{
+						static_cast<double>(mode2),
+						toff[1],toff[0],
+						ergs[1],ergs[0],
+						rise[1],rise[0],
+						fall[1],fall[0],
+						offset,
+						chi2_2
+					};
 					return data;
 				}
 			};
 
 	auto t01 = [&](const ROOT::RVecD& f){
-		return f[0]*ns_per_tick;
-	};
-
-	auto t02 = [&](const ROOT::RVecD& f){
 		return f[1]*ns_per_tick;
 	};
 
+	auto t02 = [&](const ROOT::RVecD& f){
+		return f[2]*ns_per_tick;
+	};
+
 	auto e01 = [&](const ROOT::RVecD& f){
-		return f[2]*cal_scale[0];
+		return f[3]*cal_scale[0];
 	};
 
 	auto e02 = [&](const ROOT::RVecD& f){
-		return f[3]*cal_scale[1];
+		return f[4]*cal_scale[1];
 	};
 
 	auto r01 = [&](const ROOT::RVecD& f){
-		return f[4];
-	};
-
-	auto r02 = [&](const ROOT::RVecD& f){
 		return f[5];
 	};
 
-	auto f01 = [&](const ROOT::RVecD& f){
+	auto r02 = [&](const ROOT::RVecD& f){
 		return f[6];
 	};
 
-	auto f02 = [&](const ROOT::RVecD& f){
+	auto f01 = [&](const ROOT::RVecD& f){
 		return f[7];
 	};
 
-	auto off = [&](const ROOT::RVecD& f){
+	auto f02 = [&](const ROOT::RVecD& f){
 		return f[8];
+	};
+
+	auto off = [&](const ROOT::RVecD& f){
+		return f[9];
+	};
+
+	auto rchi2 = [&](const ROOT::RVecD& f){
+		return f[10];
 	};
 
 	auto tdiff = [](const double& t0,const double& t1){
@@ -168,8 +209,15 @@ void BSMPileupTraceFitter(const std::string& filename,const std::string& oup,con
 		return x+y;
 	};
 
-	auto front_df = df
-		.DefineSlot("front_fit_info",fit_pulse,{"front"})
+	//need this filtering for if we run on the full data set rather than trying to 
+	//use just the partial ones, probably need to actually include all the other logic 
+	//too
+	auto df_filtered = df.Filter("front[0].energy>0.0&&back[0].energy>0.0");
+
+	auto front_df = df_filtered.DefineSlot("front_fit_info",fit_pulse,{"front"});
+	auto back_df = front_df.DefineSlot("back_fit_info",fit_pulse,{"back"});
+
+	auto double_pulse_df = back_df.Filter("front_fit_info[0] > 209 && back_fit_info[0] > 209")
 		.Define("front_fit_t01",t01,{"front_fit_info"})
 		.Define("front_fit_t02",t02,{"front_fit_info"})
 		.Define("front_fit_e01",e01,{"front_fit_info"})
@@ -179,11 +227,9 @@ void BSMPileupTraceFitter(const std::string& filename,const std::string& oup,con
 		.Define("front_fit_f01",f01,{"front_fit_info"})
 		.Define("front_fit_f02",f02,{"front_fit_info"})
 		.Define("front_fit_off",off,{"front_fit_info"})
+		.Define("front_fit_chi2",rchi2,{"front_fit_info"})
 		.Define("front_tdiff",tdiff,{"front_fit_t01","front_fit_t02"})
-		.Define("front_sum_e",sum,{"front_fit_e01","front_fit_e02"});
-
-	auto back_df = front_df
-		.DefineSlot("back_fit_info",fit_pulse,{"back"})
+		.Define("front_sum_e",sum,{"front_fit_e01","front_fit_e02"})
 		.Define("back_fit_t01",t01,{"back_fit_info"})
 		.Define("back_fit_t02",t02,{"back_fit_info"})
 		.Define("back_fit_e01",e01,{"back_fit_info"})
@@ -193,10 +239,11 @@ void BSMPileupTraceFitter(const std::string& filename,const std::string& oup,con
 		.Define("back_fit_f01",f01,{"back_fit_info"})
 		.Define("back_fit_f02",f02,{"back_fit_info"})
 		.Define("back_fit_off",off,{"back_fit_info"})
+		.Define("back_fit_chi2",rchi2,{"back_fit_info"})
 		.Define("back_tdiff",tdiff,{"back_fit_t01","back_fit_t02"})
 		.Define("back_sum_e",sum,{"back_fit_e01","back_fit_e02"});
 
-	auto augmented_df = back_df
+	auto augmented_df = double_pulse_df
 		.Define("e1_total",total,{"front_fit_e01","back_fit_e01"})
 		.Define("e2_total",total,{"front_fit_e02","back_fit_e02"})
 		.Define("e_total",sum,{"e1_total","e2_total"})

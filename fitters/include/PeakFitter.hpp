@@ -1229,16 +1229,18 @@ struct PeakFitter1D : public PeakFitter{
 	}
 
 	void InitSinglePlasticTraceFit(){
-		this->fitfunc->SetNpx(this->fithist->GetNbinsX()*10);
-		this->fitfunc->SetLineColor(kRed);
-		this->components = {
-			new TF1("Offset",&CommonFit::Constant,XFitRange.first,XFitRange.second,1),
-			new TF1("Pulse",&PulseFit::Pulse,XFitRange.first,XFitRange.second,4)
-		};
-		this->components.at(0)->SetLineColor(kMagenta);
-		this->components.at(0)->SetNpx(this->fithist->GetNbinsX()*10);
-		this->components.at(1)->SetLineColor(kGreen);
-		this->components.at(1)->SetNpx(this->fithist->GetNbinsX()*10);
+		if( this->debug ){
+			this->fitfunc->SetNpx(this->fithist->GetNbinsX()*10);
+			this->fitfunc->SetLineColor(kRed);
+			this->components = {
+				new TF1("Offset",&CommonFit::Constant,XFitRange.first,XFitRange.second,1),
+				new TF1("Pulse",&PulseFit::Pulse,XFitRange.first,XFitRange.second,4)
+			};
+			this->components.at(0)->SetLineColor(kMagenta);
+			this->components.at(0)->SetNpx(this->fithist->GetNbinsX()*10);
+			this->components.at(1)->SetLineColor(kGreen);
+			this->components.at(1)->SetNpx(this->fithist->GetNbinsX()*10);
+		}
 		
 		auto minbin = this->fithist->FindBin(this->XFitRange.first);
 		auto maxbin = this->fithist->FindBin(this->XFitRange.second);
@@ -1271,18 +1273,20 @@ struct PeakFitter1D : public PeakFitter{
 			if( not fitresult->IsEmpty() ){
 				AssignFitValuesErrors(fitresult);
 				AssignFitFuncParams();
-				this->fithist->GetListOfFunctions()->Add(this->fitfunc);
-				
-				this->components.at(0)->SetParameters(this->Results["Amp"],this->Results["T0"],this->Results["Rise"],this->Results["Fall"]);
-				this->fithist->GetListOfFunctions()->Add(this->components.at(0));
+				if( this->debug ){
+					this->fithist->GetListOfFunctions()->Add(this->fitfunc);
 
-				this->components.at(1)->SetParameters(this->Results["Offset"]);
-				this->fithist->GetListOfFunctions()->Add(this->components.at(1));
+					this->components.at(0)->SetParameters(this->Results["Amp"],this->Results["T0"],this->Results["Rise"],this->Results["Fall"]);
+					this->fithist->GetListOfFunctions()->Add(this->components.at(0));
 
-				TLine* centroid = new TLine(this->Results["T0"],0,
-						this->Results["T0"],0.75*(this->fithist->GetBinContent(this->fithist->FindBin(this->Results["T0"]))));
-				centroid->SetLineColor(kAzure);
-				this->fithist->GetListOfFunctions()->Add(centroid);
+					this->components.at(1)->SetParameters(this->Results["Offset"]);
+					this->fithist->GetListOfFunctions()->Add(this->components.at(1));
+
+					TLine* centroid = new TLine(this->Results["T0"],0,
+							this->Results["T0"],0.75*(this->fithist->GetBinContent(this->fithist->FindBin(this->Results["T0"]))));
+					centroid->SetLineColor(kAzure);
+					this->fithist->GetListOfFunctions()->Add(centroid);
+				}
 			}
 		}
 	}
