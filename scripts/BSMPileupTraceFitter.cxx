@@ -61,8 +61,8 @@ void BSMPileupTraceFitter(const std::string& filename,const std::string& oup,con
 		{"Rise1",{1.0e-1,2.0}},
 		{"Fall1",{3.0,5.0}},
 		{"Rise2",{1.0e-1,2.0}},
-		{"Fall2",{3.0,5.0}},
-		{"T01",{110.0,120.0}}
+		{"Fall2",{3.0,5.0}}
+		//{"T01",{110.0,120.0}}
 	};
 
 	auto df = ROOT::RDataFrame(*bsm);
