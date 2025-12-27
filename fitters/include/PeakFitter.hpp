@@ -503,17 +503,36 @@ struct PeakFitter1D : public PeakFitter{
 			}
 		}
 
+		this->fithist->SetLineColor(kBlack);
 		if( mode == FitTypes::OneDim::GaussNLinBkgFit ){
+			this->fitfunc = new TF1("GaussNLinBkg",
+					&PeakFit::GaussNLinBkg,
+					XFitRange.first,XFitRange.second,5);
 			this->InitGaussNLinBkgFit();
 		}else if( mode == FitTypes::OneDim::GaussNErfBkgFit ){
+			this->fitfunc = new TF1("GaussNErfBkg",
+					&PeakFit::GaussNErfBkg,
+					XFitRange.first,XFitRange.second,6);
 			this->InitGaussNErfBkgFit();
 		}else if( mode == FitTypes::OneDim::SingleTailingGaussNFit ){
+			this->fitfunc = new TF1("SingleTailingGaussN",
+					&PeakFit::SingleTailingGaussN,
+					XFitRange.first,XFitRange.second,4);
 			this->InitSingleTailingGaussNFit();
 		}else if( mode == FitTypes::OneDim::DoubleTailingGaussNFit ){
+			this->fitfunc = new TF1("DoubleTailingGaussN",
+					&PeakFit::DoubleTailingGaussN,
+					XFitRange.first,XFitRange.second,8);
 			this->InitDoubleTailingGaussNFit();
 		}else if( mode == FitTypes::OneDim::SingleTailingGaussNLinBkgFit ){
+			this->fitfunc = new TF1("SingleTailingGaussNLinBkg",
+					&PeakFit::SingleTailingGaussNLinBkg,
+					XFitRange.first,XFitRange.second,6);
 			this->InitSingleTailingGaussNLinBkgFit();
 		}else if( mode == FitTypes::OneDim::ErfFit ){
+			this->fitfunc = new TF1("Erf",
+					&PeakFit::Erf,
+					XFitRange.first,XFitRange.second,3);
 			this->InitErfFit();
 		}else if( mode == FitTypes::OneDim::NGaussNFit ){
 			this->InitNGaussNFit();
@@ -522,12 +541,24 @@ struct PeakFitter1D : public PeakFitter{
 		}else if( mode == FitTypes::OneDim::NGaussNErfBkgFit ){
 			this->InitNGaussNErfBkgFit();
 		}else if( mode == FitTypes::OneDim::SimpleImplantationCurveFit ){
+			this->fitfunc = new TF1("SimpleImplantationCurve",
+					&PeakFit::SimpleImplantationCurve,
+					XFitRange.first,XFitRange.second,3);
 			this->InitSimpleImplantationCurveFit();
 		}else if( mode == FitTypes::OneDim::SinglePlasticTrace ){
+			this->fitfunc = new TF1("SinglePlasticTrace",
+					&PulseFit::SingleTraceFit,
+					XFitRange.first,XFitRange.second,5);
 			this->InitSinglePlasticTraceFit();
 		}else if( mode == FitTypes::OneDim::DoublePlasticTrace ){
+			this->fitfunc = new TF1("DoublePlasticTrace",
+					&PulseFit::DoubleTraceFit,
+					XFitRange.first,XFitRange.second,9);
 			this->InitDoublePlasticTraceFit();
 		}else if( mode == FitTypes::SingleDaughterImplantationCurveFit ){
+			this->fitfunc = new TF1("SingleDaughterPairImplantationCurve",
+					&PeakFit::SingleDaughterPairImplantationCurve,
+					XFitRange.first,XFitRange.second,6);
 			this->InitSingleDaughterImplantationCurveFit();
 		}else{
 			throw std::runtime_error("Unknown peak fitting mode");
@@ -535,9 +566,6 @@ struct PeakFitter1D : public PeakFitter{
 	}
 
 	void InitSimpleImplantationCurveFit(){
-		this->fithist->SetLineColor(kBlack);
-
-		this->fitfunc = new TF1("SimpleImplantationCurve",&PeakFit::SimpleImplantationCurve,XFitRange.first,XFitRange.second,3);
 		this->fitfunc->SetNpx(this->fithist->GetNbinsX()*10);
 		this->fitfunc->SetLineColor(kRed);
 		this->components = {
@@ -596,9 +624,6 @@ struct PeakFitter1D : public PeakFitter{
 	}
 	
 	void InitSingleDaughterImplantationCurveFit(){
-		this->fithist->SetLineColor(kBlack);
-
-		this->fitfunc = new TF1("SingleDaughterPairImplantationCurve",&PeakFit::SingleDaughterPairImplantationCurve,XFitRange.first,XFitRange.second,6);
 		this->fitfunc->SetNpx(this->fithist->GetNbinsX()*10);
 		this->fitfunc->SetLineColor(kRed);
 		//there are 4 components, bkg, parent decay, beta-daughter, beta-n-daughter
@@ -674,6 +699,7 @@ struct PeakFitter1D : public PeakFitter{
 
 	}
 	
+	//this one is weird and must live here
 	void InitNGaussNFit(){
 		this->fithist->SetLineColor(kBlack);
 		int npeaks = -1;
@@ -747,6 +773,7 @@ struct PeakFitter1D : public PeakFitter{
 		}
 	}
 	
+	//same for here
 	void InitNGaussNLinBkgFit(){
 		this->fithist->SetLineColor(kBlack);
 		int npeaks = -1;
@@ -828,6 +855,7 @@ struct PeakFitter1D : public PeakFitter{
 		}
 	}
 
+	//must also exist as defined here until I come up with a better way -tjr
 	void InitNGaussNErfBkgFit(){
 		this->fithist->SetLineColor(kBlack);
 		int npeaks = -1;
@@ -921,10 +949,8 @@ struct PeakFitter1D : public PeakFitter{
 			}
 		}
 	}
-	void InitGaussNLinBkgFit(){
-		this->fithist->SetLineColor(kBlack);
 
-		this->fitfunc = new TF1("GaussNLinBkg",&PeakFit::GaussNLinBkg,XFitRange.first,XFitRange.second,5);
+	void InitGaussNLinBkgFit(){
 		this->fitfunc->SetLineColor(kRed);
 		this->components = {
 			new TF1("GaussN",&PeakFit::GaussN,XFitRange.first,XFitRange.second,3),
@@ -979,9 +1005,6 @@ struct PeakFitter1D : public PeakFitter{
 	}
 	
 	void InitGaussNErfBkgFit(){
-		this->fithist->SetLineColor(kBlack);
-
-		this->fitfunc = new TF1("GaussNErfBkg",&PeakFit::GaussNErfBkg,XFitRange.first,XFitRange.second,6);
 		this->fitfunc->SetLineColor(kRed);
 		this->components = {
 			new TF1("GaussN",&PeakFit::GaussN,XFitRange.first,XFitRange.second,3),
@@ -1041,9 +1064,6 @@ struct PeakFitter1D : public PeakFitter{
 	}
 
 	void InitSingleTailingGaussNFit(){
-		this->fithist->SetLineColor(kBlack);
-
-		this->fitfunc = new TF1("SingleTailingGaussN",&PeakFit::SingleTailingGaussN,XFitRange.first,XFitRange.second,4);
 		this->fitfunc->SetLineColor(kRed);
 		this->components = {
 		};
@@ -1089,9 +1109,6 @@ struct PeakFitter1D : public PeakFitter{
 	}
 	
 	void InitDoubleTailingGaussNFit(){
-		this->fithist->SetLineColor(kBlack);
-
-		this->fitfunc = new TF1("DoubleTailingGaussN",&PeakFit::DoubleTailingGaussN,XFitRange.first,XFitRange.second,8);
 		this->fitfunc->SetLineColor(kRed);
 		this->components = {
 			new TF1("TailingGaussN1",&PeakFit::SingleTailingGaussN,XFitRange.first,XFitRange.second,4),
@@ -1155,9 +1172,6 @@ struct PeakFitter1D : public PeakFitter{
 	}
 	
 	void InitSingleTailingGaussNLinBkgFit(){
-		this->fithist->SetLineColor(kBlack);
-
-		this->fitfunc = new TF1("SingleTailingGaussNLinBkg",&PeakFit::SingleTailingGaussNLinBkg,XFitRange.first,XFitRange.second,6);
 		this->fitfunc->SetLineColor(kRed);
 		this->components = {
 			new TF1("TailingGaussN1",&PeakFit::SingleTailingGaussN,XFitRange.first,XFitRange.second,4),
@@ -1215,9 +1229,6 @@ struct PeakFitter1D : public PeakFitter{
 	}
 
 	void InitSinglePlasticTraceFit(){
-		this->fithist->SetLineColor(kBlack);
-
-		this->fitfunc = new TF1("SinglePlasticTrace",&PulseFit::SingleTraceFit,XFitRange.first,XFitRange.second,5);
 		this->fitfunc->SetNpx(this->fithist->GetNbinsX()*10);
 		this->fitfunc->SetLineColor(kRed);
 		this->components = {
@@ -1277,9 +1288,6 @@ struct PeakFitter1D : public PeakFitter{
 	}
 
 	void InitDoublePlasticTraceFit(){
-		this->fithist->SetLineColor(kBlack);
-
-		this->fitfunc = new TF1("DoublePlasticTrace",&PulseFit::DoubleTraceFit,XFitRange.first,XFitRange.second,9);
 		if( this->debug) {
 			this->fitfunc->SetNpx(this->fithist->GetNbinsX()*10);
 			this->fitfunc->SetLineColor(kRed);
@@ -1359,10 +1367,6 @@ struct PeakFitter1D : public PeakFitter{
 	}
 
 	void InitErfFit(){
-		this->fithist->SetLineColor(kBlack);
-
-		this->fitfunc = new TF1("Erf",&PeakFit::Erf,XFitRange.first,XFitRange.second,3);
-		this->fitfunc->SetLineColor(kRed);
 		this->components = {
 		};
 		
