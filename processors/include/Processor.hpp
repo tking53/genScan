@@ -67,6 +67,8 @@ class Processor : public std::enable_shared_from_this<Processor> {
 		
 		[[nodiscard]] virtual PLOTS::HisHelper1D Get1DSetting(int) const final;
 		[[nodiscard]] virtual PLOTS::HisHelper2D Get2DSetting(int) const final;
+
+		virtual void SetEventIdx(unsigned long long) final;
 		
 	protected:
 		virtual void LoadHistogramSettings(const pugi::xml_node&) final;
@@ -105,6 +107,7 @@ class Processor : public std::enable_shared_from_this<Processor> {
 		
 		std::vector<PhysicsData*> SummaryData;
 
+		unsigned long long Eventidx;
 		TTree* OutputTree;
 
 		std::map<int,PLOTS::HisHelper1D> h1dsettings;

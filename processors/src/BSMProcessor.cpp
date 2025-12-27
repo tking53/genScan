@@ -64,6 +64,7 @@ BSMProcessor::BSMProcessor(const std::string& log) : Processor(log,"BSMProcessor
 [[maybe_unused]] bool BSMProcessor::PreProcess(EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	Processor::PreProcess();
 
+	this->SetEventIdx(eventhistory->GetEventCount());
 	eventhistory->GetCurrentEventSummary()->GetDetectorSummary(this->AllDefaultRegex["bsm"],this->SummaryData);
 	for( const auto& evt : this->SummaryData ){
 		auto subtype = evt->GetSubType();
@@ -740,6 +741,8 @@ void BSMProcessor::RegisterTree([[maybe_unused]] std::unordered_map<std::string,
 	//this->OutputTree->Branch("back",&(this->PMTDataVec.at(1)));
 	this->OutputTree->Branch("front",&(this->FrontPMTDataVec));
 	this->OutputTree->Branch("back",&(this->BackPMTDataVec));
+	this->OutputTree->Branch("EventIdx",&(this->Eventidx));
+
 	outputtrees[this->ProcessorName] = this->OutputTree;
 }
 

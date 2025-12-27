@@ -302,6 +302,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 [[maybe_unused]] bool MtasProcessor::PreProcess(EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	Processor::PreProcess();
 
+	this->SetEventIdx(eventhistory->GetEventCount());
 	auto summary = eventhistory->GetCurrentEventSummary();
 	summary->GetDetectorSummary(this->AllDefaultRegex["mtas"],this->SummaryData);
 	for( const auto& evt : this->SummaryData ){
@@ -1288,6 +1289,8 @@ void MtasProcessor::RegisterTree([[maybe_unused]] std::unordered_map<std::string
 	this->OutputTree->Branch("O5",&(this->SegmentDataVec.at(22)));
 	this->OutputTree->Branch("O6",&(this->SegmentDataVec.at(23)));
 	this->OutputTree->Branch("OuterRing",&(this->TotalDataVec.at(4)));
+
+	this->OutputTree->Branch("EventIdx",&(this->Eventidx));
 	
 	outputtrees[this->ProcessorName] = this->OutputTree;
 }

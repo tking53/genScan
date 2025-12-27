@@ -240,3 +240,7 @@ void Processor::LoadCustomCuts(const pugi::xml_node& config){
 [[nodiscard]] PLOTS::HisHelper2D Processor::Get2DSetting(int idx) const{
 	return this->h2dsettings.at(idx);
 }
+
+void Processor::SetEventIdx(unsigned long long idx){
+	this->Eventidx = idx;
+}
