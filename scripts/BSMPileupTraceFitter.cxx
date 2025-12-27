@@ -100,6 +100,7 @@ void BSMPileupTraceFitter(const std::string& filename,const std::string& oup,con
 				double offset = (*(fitters[thread_id]))["Offset"].first;
 				
 				delete fitters[thread_id];
+				fitters[thread_id] = nullptr;
 				
 				if( toff[0] <= toff[1] ){ 
 					ROOT::RVecD data{toff[0],toff[1],ergs[0],ergs[1],rise[0],rise[1],fall[0],fall[1],offset};
