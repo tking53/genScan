@@ -229,7 +229,12 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		{52028, {2048,0.0,16384.0,2048,0.0,16384.0}},
 		{53008, {2048,0.0,16384.0,2048,0.0,16384.0}},
 		{53018, {2048,0.0,16384.0,2048,0.0,16384.0}},
-		{53028, {2048,0.0,16384.0,2048,0.0,16384.0}}
+		{53028, {2048,0.0,16384.0,2048,0.0,16384.0}},
+
+		//Center numfire vs energy before applying zeroing logic
+		{5510, {16384,0.0,16384.0,12,0,12}},
+		{5520, {16384,0.0,16384.0,12,0,12}},
+		{5530, {16384,0.0,16384.0,12,0,12}}
 	};
 
 	this->Position = std::vector<double>(24,0.0);
@@ -258,7 +263,12 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 	this->OuterHits = std::vector<int>(12,0);
 
 	this->CrystalEnergy = std::vector<double>(24,0.0);
-	this->TotalEnergy = std::vector<double>(5,0.0);
+	//this seems weird, but for compliance with the old center and new center,
+	//we will store the old center calculation before zeroing in [5] along with it's 
+	//numfire, so we can use it later after we have zeroed it. either way
+	//[1] will still store the total like normal and is the value that 
+	//should be used by users
+	this->TotalEnergy = std::vector<double>(6,0.0);
 
 	this->IndividualPMTPileup = std::vector<bool>(48,false);
 	this->CenterPileup = false;
@@ -274,7 +284,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 	this->OuterSaturate = false;
 	this->AnySaturate = false;
 
-	this->NumFire = std::vector<int>(5,0);
+	this->NumFire = std::vector<int>(6,0);
 	this->CenterFire = false;
 	this->InnerFire = false;
 	this->MiddleFire = false;
@@ -511,7 +521,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 	}
 
 	if( this->UseOldCenter ){
-		this->OldCenterCalculation();
+		this->OldCenterCalculation(hismanager);
 	}else{
 		this->NewCenterCalculation();
 	}
@@ -823,32 +833,44 @@ void MtasProcessor::NewCenterCalculation(){
 	}
 }
 
-void MtasProcessor::OldCenterCalculation(){
+void MtasProcessor::OldCenterCalculation(PLOTS::PlotRegistry* hismanager){
+	//this is the super old method but it allows us to check if we need to lower the requirement
+	//of how many centers are needed to fire to call it a valid center event
+	for( int ii = 0; ii < 12; ++ii ){
+		if( this->CenterHits[ii] ){
+			this->NumFire[5] += 1;
+			this->TotalEnergy[5] += this->Center[ii];
+		}
+	}
+	this->TotalEnergy[5] /= this->NumFire[5];
+
+	//likely need to change the constraint below based on this plot
+	hismanager->Fill("MTAS_5520",this->TotalEnergy[5],this->NumFire[5]);
+	if( this->NumFire[1] != 12 ){
+		this->TotalEnergy[1] = 0.0;
+	}else{
+		this->TotalEnergy[1] = this->TotalEnergy[5];
+		this->TotalEnergy[0] += this->TotalEnergy[1];
+		this->CenterFire = true;
+		this->AnyFire = true;
+	}
+
 	for( int ii = 0; ii < 6; ++ii ){
 		if( this->CenterHits[2*ii] and this->CenterHits[2*ii + 1] ){
 			this->CrystalEnergy[ii] = (this->Center[2*ii] + this->Center[2*ii + 1])/2.0;
 			this->SegmentDataVec[ii].sumenergy = this->CrystalEnergy[ii];
 			this->SegmentDataVec[ii].avgtimestamp = (this->SegmentDataVec[ii].fronttimestamp+this->SegmentDataVec[ii].backtimestamp)/2.0;
 			this->Position[ii] = this->CalcPosition(this->RawCenter[2*ii],this->RawCenter[2*ii + 1]);
-			this->CenterFire = true;
-			this->AnyFire = true;
 			this->NumFire[0] += 1;
 			this->NumFire[1] += 1;
 		}
 	}
+
 	for( int ii = 0; ii < 6; ++ii ){
-		//already requiring pairs, so if we have 1 pair we divide by 1, 2 we divide by 2 which was supposed to be each chunk by 4
-		//therefore 6 pairs is 12
-		if( this->NumFire[1] == 6 ){
-			this->TotalEnergy[0] += this->CrystalEnergy[ii]/this->NumFire[1];
-		}
 		this->TotalEnergy[0] += this->CrystalEnergy[ii+6];
 		this->TotalEnergy[0] += this->CrystalEnergy[ii+12];
 		this->TotalEnergy[0] += this->CrystalEnergy[ii+18];
 
-		if( this->NumFire[1] == 6 ){
-			this->TotalEnergy[1] += this->CrystalEnergy[ii]/this->NumFire[1];
-		}
 		this->TotalEnergy[2] += this->CrystalEnergy[ii+6];
 		this->TotalEnergy[3] += this->CrystalEnergy[ii+12];
 		this->TotalEnergy[4] += this->CrystalEnergy[ii+18];
@@ -1009,6 +1031,10 @@ void MtasProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH2F>("MTAS_52008","I,M,O, Gamma-Gamma Matrix; Energy (keV); Energy (keV)",this->h2dsettings.at(52008));
 	hismanager->RegisterPlot<TH2F>("MTAS_52018","C Gamma-Gamma Matrix; Energy (keV); Energy (keV)",this->h2dsettings.at(52018));
 	hismanager->RegisterPlot<TH2F>("MTAS_52028","C,I,M,O, Gamma-Gamma Matrix; Energy (keV); Energy (keV)",this->h2dsettings.at(52028));
+	
+	if( this->UseOldCenter ){
+		hismanager->RegisterPlot<TH2F>("MTAS_5520","Num Center PMT Fire vs Center Sum Before Zero; Energy (keV); count (arb.)",this->h2dsettings.at(5520));
+	}
 
 	//declare the beta gated and not-beta histograms, but we don't fill them until parent processor has told which we are
 	this->DeclareBetaPlots(hismanager);
@@ -1176,6 +1202,10 @@ void MtasProcessor::DeclareBetaPlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH2F>("MTAS_53008","I,M,O, Gamma-Gamma Matrix #beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(53008));
 	hismanager->RegisterPlot<TH2F>("MTAS_53018","C Gamma-Gamma Matrix #beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(53018));
 	hismanager->RegisterPlot<TH2F>("MTAS_53028","C,I,M,O, Gamma-Gamma Matrix #beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(53028));
+
+	if( this->UseOldCenter ){
+		hismanager->RegisterPlot<TH2F>("MTAS_5530","Num Center PMT Fire vs Center Sum Before Zero #beta-gated; Energy (keV); count (arb.)",this->h2dsettings.at(5530));
+	}
 }
 
 void MtasProcessor::DeclareAntiBetaPlots(PLOTS::PlotRegistry* hismanager){
@@ -1252,6 +1282,10 @@ void MtasProcessor::DeclareAntiBetaPlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH2F>("MTAS_51008","I,M,O, Gamma-Gamma Matrix anti-#beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(51008));
 	hismanager->RegisterPlot<TH2F>("MTAS_51018","C Gamma-Gamma Matrix anti-#beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(51018));
 	hismanager->RegisterPlot<TH2F>("MTAS_51028","C,I,M,O, Gamma-Gamma Matrix anti-#beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(51028));
+	
+	if( this->UseOldCenter ){
+		hismanager->RegisterPlot<TH2F>("MTAS_5510","Num Center PMT Fire vs Center Sum Before Zero anti-#beta-gated; Energy (keV); count (arb.)",this->h2dsettings.at(5510));
+	}
 }
 
 void MtasProcessor::RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>& outputtrees){
@@ -1313,7 +1347,7 @@ void MtasProcessor::Reset(){
 		this->IndividualPMTSaturate[24+ii] = false;
 		this->Position[ii] = 0.0;
 	}
-	for( size_t ii = 0; ii < 5; ++ii ){
+	for( size_t ii = 0; ii < 6; ++ii ){
 		this->TotalEnergy[ii] = 0.0;
 		this->NumFire[ii] = 0;
 	}
@@ -1552,6 +1586,9 @@ void MtasProcessor::GenerateHexagonShapes(){
 
 void MtasProcessor::FillBetaPlots(PLOTS::PlotRegistry* hismanager){
 	if( (not this->AnySaturate) and (not this->AnyPileup) ){
+		if( this->UseOldCenter ){
+			hismanager->Fill("MTAS_5530",this->TotalEnergy[5],this->NumFire[5]);
+		}
 		hismanager->Fill("MTAS_3370",this->currevttime);
 		hismanager->Fill("MTAS_3371",this->currevttime/60.0);
 		hismanager->Fill("MTAS_3372",this->currevttime/(60.0*60.0));
@@ -1786,6 +1823,9 @@ void MtasProcessor::FillNoLogicBetaPlots(PLOTS::PlotRegistry* hismanager){
 
 void MtasProcessor::FillNonBetaPlots(PLOTS::PlotRegistry* hismanager){
 	if( (not this->AnySaturate) and (not this->AnyPileup) ){
+		if( this->UseOldCenter ){
+			hismanager->Fill("MTAS_5510",this->TotalEnergy[5],this->NumFire[5]);
+		}
 		hismanager->Fill("MTAS_3170",this->currevttime);
 		hismanager->Fill("MTAS_3171",this->currevttime/60.0);
 		hismanager->Fill("MTAS_3172",this->currevttime/(60.0*60.0));

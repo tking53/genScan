@@ -294,21 +294,21 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 					hismanager->Fill("EARLY_3300",erg);
 					hismanager->Fill("EARLY_3351",erg,cerg);
 					for( size_t ii = 6; ii < 24; ++ii ){
-						hismanager->Fill("EARLY_3350",MtasProc->GetCrystalEnergy(ii),erg);
+						hismanager->Fill("EARLY_3350",erg,MtasProc->GetCrystalEnergy(ii));
 					}
 				}
 				if( this->MidCycle.IsWithin(cycletime) ){
 					hismanager->Fill("MID_3300",erg);
 					hismanager->Fill("MID_3351",erg,cerg);
 					for( size_t ii = 6; ii < 24; ++ii ){
-						hismanager->Fill("MID_3350",MtasProc->GetCrystalEnergy(ii),erg);
+						hismanager->Fill("MID_3350",erg,MtasProc->GetCrystalEnergy(ii));
 					}
 				}
 				if( this->LateCycle.IsWithin(cycletime) ){
 					hismanager->Fill("LATE_3300",erg);
 					hismanager->Fill("LATE_3351",erg,cerg);
 					for( size_t ii = 6; ii < 24; ++ii ){
-						hismanager->Fill("LATE_3350",MtasProc->GetCrystalEnergy(ii),erg);
+						hismanager->Fill("LATE_3350",erg,MtasProc->GetCrystalEnergy(ii));
 					}
 				}
 				this->MtasProc->FillBetaPlots(hismanager);

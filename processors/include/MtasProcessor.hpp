@@ -86,7 +86,7 @@ class MtasProcessor : public Processor{
 
 		bool UseOldCenter;
 		void NewCenterCalculation();
-		void OldCenterCalculation();
+		void OldCenterCalculation(PLOTS::PlotRegistry*);
 
 		std::vector<double> Position;
 
