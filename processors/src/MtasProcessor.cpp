@@ -232,9 +232,9 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		{53028, {2048,0.0,16384.0,2048,0.0,16384.0}},
 
 		//Center numfire vs energy before applying zeroing logic
-		{5510, {16384,0.0,16384.0,12,0,12}},
-		{5520, {16384,0.0,16384.0,12,0,12}},
-		{5530, {16384,0.0,16384.0,12,0,12}}
+		{5510, {16384,0.0,16384.0,12,1,13}},
+		{5520, {16384,0.0,16384.0,12,1,13}},
+		{5530, {16384,0.0,16384.0,12,1,13}}
 	};
 
 	this->Position = std::vector<double>(24,0.0);
@@ -846,7 +846,7 @@ void MtasProcessor::OldCenterCalculation(PLOTS::PlotRegistry* hismanager){
 
 	//likely need to change the constraint below based on this plot
 	hismanager->Fill("MTAS_5520",this->TotalEnergy[5],this->NumFire[5]);
-	if( this->NumFire[1] != 12 ){
+	if( this->NumFire[5] != 12 ){
 		this->TotalEnergy[1] = 0.0;
 	}else{
 		this->TotalEnergy[1] = this->TotalEnergy[5];
