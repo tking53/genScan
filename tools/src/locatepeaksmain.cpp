@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <numeric>
+#include <stdexcept>
 #include <vector>
 #include <fstream>
 
@@ -15,6 +16,19 @@
 
 #include <boost/program_options.hpp>
 #include <boost/circular_buffer.hpp>
+#include <boost/regex.hpp>
+#include <boost/algorithm/string.hpp>
+
+#include "yaml-cpp/emitter.h"
+#include <yaml-cpp/emittermanip.h>
+#include <yaml-cpp/node/node.h>
+#include <yaml-cpp/yaml.h>
+
+#include "TFile.h"
+#include "TH1.h"
+#include "TH2.h"
+
+#include "StringManipFunctions.hpp"
 
 template<class T>
 struct Kernel{
@@ -84,102 +98,50 @@ struct SNIP{
 
 };
 
-//template<class T>
-//struct PeakLocator{
-//	std::vector<T> datavalues;
-//	boost::circular_buffer<T> predistance;
-//	boost::circular_buffer<T> postdistance;
-//	PeakLocator(const std::vector<T>& v,size_t k){
-//	}
-//
-//	T& operator[](size_t idx){
-//		return datavalues[idx];
-//	}
-//
-//	const T& operator[](size_t idx) const{
-//		return datavalues.at(idx);
-//	}
-//
-//	size_t size() const{
-//		return datavalues.size();
-//	}
-//};
+std::pair<double,double> ParseGate(const std::string& value){
+	std::vector<std::string> strs;
+	boost::split(strs,value,boost::is_any_of(":"));
+	boost::regex number("^(?!-0(\\.0+)?(e|$))-?(0|[1-9]\\d*)(\\.\\d+)?(e-?(0|[1-9]\\d*))?");
 
-//std::vector<int> smoothedZScore(std::vector<float> input){
-//	//lag 5 for the smoothing functions
-//	int lag = 20;
-//	//3.5 standard deviations for signal
-//	float threshold = 3.5;
-//	//between 0 and 1, where 1 is normal influence, 0.5 is half
-//	float influence = .5;
-//
-//	if (input.size() <= lag + 2)
-//	{
-//		std::vector<int> emptyVec;
-//		return emptyVec;
-//	}
-//
-//	auto mean = [](const std::vector<float>& data){
-//		return std::accumulate(data.begin(),data.end(),0.0)/static_cast<float>(data.size());
-//	};
-//
-//	auto stdDev = [=](const std::vector<float>& data){
-//		auto avg = mean(data);
-//		size_t sz = data.size();
-//		auto devfunc = [&avg,&sz](float accumulator,const float& val){
-//			return accumulator + ((val - avg)*(val - avg))/static_cast<float>(sz - 1);
-//		};
-//		return std::sqrt(std::accumulate(data.begin(),data.end(),0.0,devfunc));
-//	};
-//
-//	//Initialise variables
-//	std::vector<int> signals(input.size(), 0.0);
-//	std::vector<float> filteredY(input.size(), 0.0);
-//	std::vector<float> avgFilter(input.size(), 0.0);
-//	std::vector<float> stdFilter(input.size(), 0.0);
-//	std::vector<float> subVecStart(input.begin(), input.begin() + lag);
-//	avgFilter[lag] = mean(subVecStart);
-//	stdFilter[lag] = stdDev(subVecStart);
-//
-//	for (size_t i = lag + 1; i < input.size(); i++)
-//	{
-//		if (std::abs(input[i] - avgFilter[i - 1]) > threshold * stdFilter[i - 1])
-//		{
-//			if (input[i] > avgFilter[i - 1])
-//			{
-//				signals[i] = 1; //# Positive signal
-//			}
-//			else
-//			{
-//				signals[i] = -1; //# Negative signal
-//			}
-//			//Make influence lower
-//			filteredY[i] = influence* input[i] + (1 - influence) * filteredY[i - 1];
-//		}
-//		else
-//		{
-//			signals[i] = 0; //# No signal
-//			filteredY[i] = input[i];
-//		}
-//		//Adjust the filters
-//		std::vector<float> subVec(filteredY.begin() + i - lag, filteredY.begin() + i);
-//		avgFilter[i] = mean(subVec);
-//		stdFilter[i] = stdDev(subVec);
-//	}
-//	return signals;
-//}
+	if( strs.size() == 2 ){
+		boost::smatch lmatch;
+		boost::smatch umatch;
+		if( boost::regex_match(strs[0],lmatch,number) and boost::regex_match(strs[1],lmatch,number) ){
+			return {std::stod(strs[0]),std::stod(strs[1])};
+		}else{
+			throw std::runtime_error("Invalid bounded pair, not two numbers");
+		}
+	}else{
+		throw std::runtime_error("Unable to parse input");
+	}
+}
 
 int main(int argc, char *argv[]) {
+	std::string axis;
+	std::string hisname;
 	std::string inputfile;
 	std::string outputfile;
-	int width;
+	int length;
+	int sigma;
+	float threshold;
+	int index;
+	int dimensionality;
+	std::pair<double,double> gatevalue;
+	std::string gate;
 
 	boost::program_options::options_description cmdline_options("Generic Options");
 	cmdline_options.add_options()
+		("axis,a",boost::program_options::value<std::string>(&axis)->default_value("x"),"axis to project onto (x,y,X,Y) if 2D")
+		("data,d",boost::program_options::value<std::string>(&hisname),"histogram to manipulate")
+		("gate,g",boost::program_options::value<std::string>(&gate)->default_value(""),"values to gate within in 2d histogram")
 		("help,h", "produce help message")
-		("inputfile,i",boost::program_options::value<std::string>(&inputfile)->default_value("histo.txt"),"file to read the histo data in formatted as x y_i")
-		("outputfile,o",boost::program_options::value<std::string>(&outputfile)->default_value("peaks.txt"),"file to write the histo trapezoid in formatted as x y_i t_i")
-		("length,l",boost::program_options::value<int>(&width)->default_value(10),"width of filter in bins")
+		("inputfile,i",boost::program_options::value<std::string>(&inputfile),"root file to pull data from")
+		("length,l",boost::program_options::value<int>(&length)->default_value(10),"length of filter in bins")
+		("numdimension,n",boost::program_options::value<int>(&dimensionality)->default_value(1),"dimensionality of histogram (1,2)")
+		("outputfile,o",boost::program_options::value<std::string>(&outputfile)->default_value("Peaks.yaml"),"yaml outputfile")
+		("projectionindex,p",boost::program_options::value<int>(&index)->default_value(-1),"index to project on if 2d histogram")
+		("sigma,s",boost::program_options::value<int>(&sigma)->default_value(10),"rough sigma of peak in bins")
+		("threshold,t",boost::program_options::value<float>(&threshold)->default_value(0.05),"fraction [0,1] of max peak to include when dumping peaks")
 		;
 
 	boost::program_options::positional_options_description pos;
@@ -193,39 +155,172 @@ int main(int argc, char *argv[]) {
 			exit(EXIT_SUCCESS);
 		}
 
-		float currx,curry;
-		std::vector<float> histoxvals;
-		std::vector<float> histoyvals;
-		std::ifstream input(inputfile);
-		while( input >> currx >> curry ){
-			histoxvals.push_back(currx);
-			histoyvals.push_back(curry);
+		if( not gate.empty() ){
+			gatevalue = ParseGate(gate);
 		}
-		input.close();
-
-		if( histoyvals.size() <= (3*width) ){
-			spdlog::error("Inappropriate width choice 3*{} exceeds total histo length: {}",width,histoyvals.size());
+		
+		if( dimensionality == 2 and index < 0 and gate.empty() ){
+			spdlog::error("dimensionality is 2, but no projections or gates given, and not fitting a 2D dataset");
 			exit(EXIT_FAILURE);
 		}
 
-		//Kernel<float> preregion(histoyvals,0,width,1.0);
-		//Kernel<float> midregion(histoyvals,width,width,2.0);
-		//Kernel<float> postregion(histoyvals,2*width,width,1.0);
-
-		//std::vector<float> filter(width+(width-1)/2,0.0);
-		//for( size_t ii = 0; ii < std::min({preregion.datavalues.size(),midregion.datavalues.size(),postregion.datavalues.size()}); ++ii ){
-		//	filter.push_back(midregion[ii] - (preregion[ii]+postregion[ii]));
-		//}
-		//for( size_t ii = 0; ii < (width+width/2); ++ii ){
-		//	filter.push_back(0.0);
-		//}
-
-		SNIP<float> filter(histoyvals,width);
-		std::ofstream out(outputfile);
-		for( size_t ii = 0; ii < histoxvals.size(); ++ii ){
-			out << histoxvals[ii] << ' ' << histoyvals[ii] << ' ' << filter[ii] << ' ' << histoyvals[ii] - filter[ii] << std::endl;
+		axis = StringManip::tolower(axis);
+		if( axis.compare("x") != 0 and axis.compare("y") != 0 ){
+			spdlog::error("unknown axis projection : {}",axis);
+			exit(EXIT_FAILURE);
 		}
-		out.close();
+
+		if( not vm.count("data") ){
+			spdlog::error("Not provided histogram to fit");
+			exit(EXIT_FAILURE);
+		}
+
+		if( not vm.count("inputfile") ){
+			spdlog::error("Not provided inputfile containing histogram to fit");
+			exit(EXIT_FAILURE);
+		}
+
+	}catch( std::exception& e){
+		spdlog::error(e.what());
+		exit(EXIT_FAILURE);
+	}
+
+	try{
+		auto rfile = new TFile(inputfile.c_str(),"READ");
+		auto mainhis = rfile->Get(hisname.c_str()); 
+		std::vector<float> histoxvals;
+		std::vector<float> histoyvals;
+		if( mainhis != nullptr ){
+			auto histype = std::string(mainhis->ClassName());
+			boost::regex re2d("TH2");
+			boost::regex re1d("TH1");
+			TH1* hist;
+			if( boost::regex_search(histype, re2d) ){
+				if( index > 0 ){
+					auto name = std::string(mainhis->GetName())+"_proj_"+axis+std::to_string(index);
+					if( axis.compare("x") == 0 ){
+						hist = dynamic_cast<TH2*>(mainhis)->ProjectionX(name.c_str(),index,index);
+					}else{
+						hist = dynamic_cast<TH2*>(mainhis)->ProjectionY(name.c_str(),index,index);
+					}	
+					hist->SetDirectory(0);
+				}else{
+					auto name = std::string(mainhis->GetName())+"_gate_"+axis+std::to_string(0);
+					if( axis.compare("x") == 0 ){
+						auto minbin = dynamic_cast<TH2*>(mainhis)->GetYaxis()->FindBin(gatevalue.first);
+						auto maxbin = dynamic_cast<TH2*>(mainhis)->GetYaxis()->FindBin(gatevalue.second);
+						hist = dynamic_cast<TH2*>(mainhis)->ProjectionY(name.c_str(),minbin,maxbin);
+					}else{
+						auto minbin = dynamic_cast<TH2*>(mainhis)->GetXaxis()->FindBin(gatevalue.first);
+						auto maxbin = dynamic_cast<TH2*>(mainhis)->GetXaxis()->FindBin(gatevalue.second);
+						hist = dynamic_cast<TH2*>(mainhis)->ProjectionX(name.c_str(),minbin,maxbin);
+					}
+					hist->SetDirectory(0);
+				}
+			}else if( boost::regex_search(histype,re1d) ){
+				hist = dynamic_cast<TH1*>(mainhis);
+				hist->SetDirectory(0);
+			}else{
+				throw std::runtime_error("not passed a TH1 or TH2 histogram");
+			}
+			for( int ii = 1; ii < hist->GetNbinsX()+1; ++ii ){
+				histoxvals.push_back(hist->GetBinCenter(ii));
+				histoyvals.push_back(hist->GetBinContent(ii));
+			}
+
+			if( histoyvals.size() <= (3*length) ){
+				spdlog::error("Inappropriate length choice 3*{} exceeds total histo length: {}",length,histoyvals.size());
+				exit(EXIT_FAILURE);
+			}
+
+			SNIP<float> filter(histoyvals,length);
+			std::vector<float> clipped_spectrum(histoxvals.size(),0.0);
+			for( size_t ii = 0; ii < histoxvals.size(); ++ii ){
+				clipped_spectrum[ii] = histoyvals[ii] - filter[ii];
+			}
+
+			Kernel<float> preregion(clipped_spectrum,0,sigma,1.0);
+			Kernel<float> midregion(clipped_spectrum,sigma,sigma,2.0);
+			Kernel<float> postregion(clipped_spectrum,2*sigma,sigma,1.0);
+
+			std::vector<float> cfar(sigma+(sigma-1)/2,0.0);
+			for( size_t ii = 0; ii < std::min({preregion.datavalues.size(),midregion.datavalues.size(),postregion.datavalues.size()}); ++ii ){
+				cfar.push_back(midregion[ii] - (preregion[ii]+postregion[ii]));
+			}
+			for( size_t ii = 0; ii < (sigma+sigma/2); ++ii ){
+				cfar.push_back(0.0);
+			}
+
+			std::vector<bool> mask;
+			for( const auto& e : cfar ){
+				mask.push_back(e > 0.0);
+			}
+
+			std::vector<std::pair<float,float>> peak_locations;
+			std::vector<size_t> current_peak;
+			for( size_t ii = 0; ii < cfar.size(); ++ii ){
+				if( mask[ii] ){
+					current_peak.push_back(ii);
+				}else{
+					if( current_peak.size() > 0 ){
+						float pk = 0.0;
+						float pk_height = 0.0;
+						for( const auto& jj : current_peak ){
+							pk_height += cfar[jj];
+							pk += histoxvals[jj];
+						}
+						pk /= static_cast<float>(current_peak.size());
+						pk_height /= static_cast<float>(current_peak.size());
+						peak_locations.push_back({pk,pk_height});
+						current_peak.clear();
+					}
+				}
+			}
+			if( current_peak.size() > 0 ){
+				float pk = 0.0;
+				float pk_height = 0.0;
+				for( const auto& jj : current_peak ){
+					pk_height += cfar[jj];
+					pk += histoxvals[jj];
+				}
+				pk /= static_cast<float>(current_peak.size());
+				pk_height /= static_cast<float>(current_peak.size());
+				peak_locations.push_back({pk,pk_height});
+				current_peak.clear();
+			}
+
+			if( peak_locations.size() < 1 ){
+				throw std::runtime_error("No Peaks Found");
+			}
+
+			std::sort(peak_locations.begin(),peak_locations.end(),
+					[](const std::pair<float,float>& a,const std::pair<float,float>& b){
+					return a.second > b.second;
+					});
+
+			YAML::Node node;
+			for( const auto& e : peak_locations ){
+				if( e.second > threshold*peak_locations[0].second ){
+					node.push_back(e.first);
+				}
+			}
+			YAML::Emitter doc;
+
+			doc << YAML::BeginMap;
+			doc << YAML::Key << "InputFile" << YAML::Value << inputfile;
+			doc << YAML::Key << "InputHistogram" << YAML::Value << hisname;
+			doc << YAML::Key << "Peaks";
+			doc << YAML::Value << node;
+			doc << YAML::EndMap;
+
+			std::ofstream out(outputfile);
+			out << doc.c_str() << std::endl;
+			out.close();
+
+		}else{
+			throw std::runtime_error("histogram does not exist");
+		}
+
 	}catch( std::exception& e){
 		spdlog::error(e.what());
 		exit(EXIT_FAILURE);

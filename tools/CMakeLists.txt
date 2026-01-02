@@ -80,9 +80,9 @@ if(GS_ALL_TOOLS)
 	list(APPEND EXE_LIST GenDeviceInfo)
 endif()
 
-#add_executable(GenPeakLocator src/locatepeaksmain.cpp)
-#target_link_libraries(GenPeakLocator PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES})
-#list(APPEND EXE_LIST GenPeakLocator)
+add_executable(GenPeakLocator src/locatepeaksmain.cpp)
+target_link_libraries(GenPeakLocator PRIVATE GenScanUtility ${ROOT_LIBRARIES} yaml-cpp::yaml-cpp)
+list(APPEND EXE_LIST GenPeakLocator)
 
 if( EXTERNAL_DEPS )
 	foreach(CURREXE ${EXE_LIST})
