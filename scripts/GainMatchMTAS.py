@@ -91,8 +91,7 @@ def DoSingleFit(file: str,data: str,idx: int,prefix: str,area: list,compton: lis
         AddBound(full_command,slope,"BkgSlope")
         AddBound(full_command,offset,"BkgOffset")
         result = subprocess.run(full_command,capture_output=True)
-        res = result.stdout.decode()
-        if res:
+        if result.stdout:
             print(result.stdout.decode())
 
         with open(yfile,'r') as f:
@@ -238,6 +237,48 @@ if __name__ == "__main__":
         else:
             print(f"Outer PMT: {idx} within delta limit [{args.volt_delta_limit}], shifting it by {delta}")
         od.append(delta)
+
+    hadd_command = ["hadd","-f","CompleteFit.root"]
+    yfiles = []
+    for idx in center_indices:
+        hadd_command.append(f"Center_{idx}.root")
+        yfiles.append(f"Center_{idx}Report.yaml")
+    for idx in inner_indices:
+        hadd_command.append(f"Inner_{idx}.root")
+        yfiles.append(f"Inner_{idx}Report.yaml")
+    for idx in middle_indices:
+        hadd_command.append(f"Middle_{idx}.root")
+        yfiles.append(f"Middle_{idx}Report.yaml")
+    for idx in outer_indices:
+        hadd_command.append(f"Outer_{idx}.root")
+        yfiles.append(f"Outer_{idx}Report.yaml")
+    
+    result = subprocess.run(hadd_command,capture_output=True)
+    if result.stdout:
+        print(result.stdout.decode())
+    print('To view total result run the following command root \"$GENSCANSYS/scripts/DumpAllDrawable.cxx(\\\"CompleteFit.root\\\",\\\"^.*_proj_x[0-9]{1,2}$\\\",\\\"\\\",1.0,4000.0)\"')
+
+    for f in hadd_command[3:]:
+        cmd = ["rm","-f",f"{f}"]
+        result = subprocess.run(cmd,capture_output=True)
+        if result.stdout:
+            print(result.stdout.decode())
+
+    total_y = ""
+    for idx,f in enumerate(yfiles):
+        if idx == 0:
+            cmd = ["cat",f"{f}"]
+        else:
+            cmd = ["tail","-n","+9",f"{f}"]
+        result = subprocess.run(cmd,capture_output=True)
+        total_y += result.stdout.decode()
+        cmd = ["rm","-f",f"{f}"]
+        result = subprocess.run(cmd,capture_output=True)
+        if result.stdout:
+            print(result.stdout.decode())
+
+    with open('CompleteFitReport.yaml','w') as f:
+        f.write(total_y)
 
     yesno = None
     while yesno not in ['Y','y','N','n']:
