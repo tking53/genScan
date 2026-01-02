@@ -233,7 +233,7 @@ int main(int argc, char *argv[]) {
 		("mode,m",boost::program_options::value<int>(&mode)->default_value(0),FittingMessage.c_str())
 		("numdimension,n",boost::program_options::value<int>(&dimensionality)->default_value(1),"dimensionality of histogram (1,2)")
 		("outputprefix,o",boost::program_options::value<std::string>(&outputprefix)->default_value("GenPeakFitterResults"),"file to output to fit info to")
-		("projectionindices,p",boost::program_options::value<std::vector<int>>(&indices)->multitoken(),"indices to project on if 2d histogram")
+		("projectionindex,p",boost::program_options::value<std::vector<int>>(&indices)->multitoken(),"index to project on if 2d histogram")
 		("quiet,q",boost::program_options::value<bool>(&quiet)->default_value(false),"quiet output")
 		("tolerance,r",boost::program_options::value<double>(&tol)->default_value(1.0e-6),"tolerance used to determine if we're too close to the limits")
 		("storechi2,s",boost::program_options::value<bool>(&storechi2)->default_value(true),"store chi2 plot")
