@@ -30,6 +30,10 @@ add_executable(GenPeakFit src/peakfittermain.cpp)
 target_link_libraries(GenPeakFit PRIVATE Eigen3::Eigen GenScanFitters GenScanUtility ${ROOT_LIBRARIES} yaml-cpp::yaml-cpp)
 list(APPEND EXE_LIST GenPeakFit)
 
+add_executable(GenKeyPrint src/keyprint.cpp)
+target_link_libraries(GenKeyPrint PRIVATE ${ROOT_LIBRARIES})
+list(APPEND EXE_LIST GenKeyPrint)
+
 add_executable(GenCalRipper src/calibrationrippermain.cpp)
 target_link_libraries(GenCalRipper PRIVATE pugixml GenScanFitters GenScanUtility ${ROOT_LIBRARIES} yaml-cpp::yaml-cpp)
 list(APPEND EXE_LIST GenCalRipper)
