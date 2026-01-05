@@ -335,16 +335,16 @@ if __name__ == "__main__":
         Proj = dict()
         for idx,delta in zip(center_indices,cd):
             Deltas[idx-center_indices[0]] = delta
-            Proj[idx-center_indices[0]] = f"{args.data}_proj_x{center_indices[idx]}"
+            Proj[idx-center_indices[0]] = f"{args.data}_proj_x{idx}"
         for idx,delta in zip(inner_indices,id):
             Deltas[idx-center_indices[0]] = delta
-            Proj[idx-center_indices[0]] = f"{args.data}_proj_x{inner_indices[idx]}"
+            Proj[idx-center_indices[0]] = f"{args.data}_proj_x{idx}"
         for idx,delta in zip(middle_indices,md):
             Deltas[idx-center_indices[0]] = delta
-            Proj[idx-center_indices[0]] = f"{args.data}_proj_x{middle_indices[idx]}"
+            Proj[idx-center_indices[0]] = f"{args.data}_proj_x{idx}"
         for idx,delta in zip(outer_indices,od):
             Deltas[idx-center_indices[0]] = delta
-            Proj[idx-center_indices[0]] = f"{args.data}_proj_x{outer_indices[idx]}"
+            Proj[idx-center_indices[0]] = f"{args.data}_proj_x{idx}"
 
         for k,v in Deltas.items():
             curruid = his_uid_map[k]
