@@ -332,14 +332,19 @@ if __name__ == "__main__":
             reverse_pmt_uid_map[v] = k
 
         Deltas = dict()
+        Proj = dict()
         for idx,delta in zip(center_indices,cd):
             Deltas[idx-center_indices[0]] = delta
+            Proj[idx-center_indices[0]] = f"Proj_x_{center_indices[idx]}"
         for idx,delta in zip(inner_indices,id):
             Deltas[idx-center_indices[0]] = delta
+            Proj[idx-center_indices[0]] = f"Proj_x_{inner_indices[idx]}"
         for idx,delta in zip(middle_indices,md):
             Deltas[idx-center_indices[0]] = delta
+            Proj[idx-center_indices[0]] = f"Proj_x_{middle_indices[idx]}"
         for idx,delta in zip(outer_indices,od):
             Deltas[idx-center_indices[0]] = delta
+            Proj[idx-center_indices[0]] = f"Proj_x_{outer_indices[idx]}"
 
         for k,v in Deltas.items():
             curruid = his_uid_map[k]
@@ -349,12 +354,12 @@ if __name__ == "__main__":
             if( abs(v) > 0.5 ):
                 newvolt = currvolt+v
                 if( v < 0 ):
-                    print(f'{currpmt}: {currvolt}{v} -> {newvolt}')
+                    print(f'{Proj[k]} : {currpmt}: {currvolt}{v} -> {newvolt}')
                 else:
-                    print(f'{currpmt}: {currvolt}+{v} -> {newvolt}')
+                    print(f'{Proj[k]} : {currpmt}: {currvolt}+{v} -> {newvolt}')
                 datadict[curruid]['voltage'] = newvolt
             else:
-                print(f'{currpmt} does not need to change')
+                print(f'{Proj[k]} : {currpmt} does not need to change')
         
         with open(args.output,'w') as ouf:
             ouf.write("## MPOD id , Module Number , Channel Number , Set Voltage , Set Current Limit , Set Ramp Rate (per module)\n")
