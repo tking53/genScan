@@ -119,7 +119,8 @@ def DoSingleFit(file: str,data: str,idx: int,prefix: str,area: list,compton: lis
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Script to generate fits and update the voltage file for MTAS')
+    parser = argparse.ArgumentParser(description='Script to generate fits and update the voltage file for MTAS',\
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('--area',type=float,nargs=2,default=[1.0,1.0e7],help='bounds for the Area')
     parser.add_argument('--compton-area',type=float,nargs=2,default=[1.0,1.0e7],help='bounds for the Area of the Compton')
@@ -129,6 +130,8 @@ if __name__ == "__main__":
 
     parser.add_argument('--chan-per-volt',type=int,default=10,help='number of channels per volt')
     parser.add_argument('--volt-delta-limit',type=int,default=50,help='maxmium voltage allowed to change, if exceed move by half')
+    #parser.add_argument('--imo-volt-limit',type=float,default=1450.0,help='upper limit for inner, middle, outer pmts')
+    #parser.add_argument('--c-volt-limit',type=float,default=1250.0,help='upper limit for center pmts')
 
     parser.add_argument('-d','--data',type=str,default='Raw',help='2D histogram used to project the individual portions out of')
     parser.add_argument('-f','--facility',type=str,required=True,help='facility configuration FRIB/ANL')
