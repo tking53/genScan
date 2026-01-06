@@ -59,7 +59,7 @@ def LocatePeaks(file: str,data: str,indices: list,prefix: str,length: int,sigma:
                     print(f"unable to find any peaks for projection: {idx}")
                     return None
             
-def DoSingleFit(file: str,data: str,idx: int,prefix: str,area: list,compton: list,pk: float,sigma: list,slope: list,offset: list,r: list):
+def DoSingleFit(file: str,data: str,idx: int,prefix: str,area: list,compton: list,pk: float,sigma: list,slope: list,offset: list,r: list,nfails: int):
     #for a good 1460, usually fit from 1200 to 1650
     #let's just try 10% left and right to begin with
     fit_range = []
@@ -80,6 +80,7 @@ def DoSingleFit(file: str,data: str,idx: int,prefix: str,area: list,compton: lis
 
     yfile = f"{prefix}_{idx}Report.yaml"
 
+    currfails = 0
     while True:
         full_command = ["GenPeakFit","-m","2","-d",f"{data}","-l",f"{fit_range[0]}","-u",f"{fit_range[1]}","-o",f"{prefix}_{idx}","-i",f"{file}"]
         full_command.append("-p")
@@ -99,7 +100,13 @@ def DoSingleFit(file: str,data: str,idx: int,prefix: str,area: list,compton: lis
 
         red_chi2 = y['FitResults'][0]['ReducedChi2']
         if red_chi2 < 0.5 or red_chi2 > 2:
-            print(f"projection: {idx} has issues fitting, trying again")
+            currfails += 1
+            print(f"projection: {idx} has issues fitting ReducedChi2: {red_chi2}, trying again")
+            if currfails > nfails:
+                print(f"projection: {idx} has exceeded acceptable number of fails")
+                print(f"Bailing now on it, not changing the voltage")
+                r.append(None)
+                return
             fit_compton = y['FitResults'][0]['Values']['ComptonArea']
             if abs(fit_compton-compton[0]) < 1.0e-3:
                 compton[0] *= 1.1
@@ -130,6 +137,7 @@ if __name__ == "__main__":
 
     parser.add_argument('--chan-per-volt',type=int,default=10,help='number of channels per volt')
     parser.add_argument('--volt-delta-limit',type=int,default=50,help='maxmium voltage allowed to change, if exceed move by half')
+    parser.add_argument('--num-fails',type=int,default=5,help='how many fails are allowed on a fit before it bails')
     #parser.add_argument('--imo-volt-limit',type=float,default=1450.0,help='upper limit for inner, middle, outer pmts')
     #parser.add_argument('--c-volt-limit',type=float,default=1250.0,help='upper limit for center pmts')
 
@@ -190,16 +198,37 @@ if __name__ == "__main__":
 
     c = []
     for idx,pk in zip(center_indices,cpeaks):
-        DoSingleFit(args.root_file,args.data,idx,'Center',args.area,args.compton_area,pk,args.sigma,args.bkg_slope,args.bkg_offset,c)
+        DoSingleFit(args.root_file,args.data,idx,'Center',args.area,args.compton_area,pk,args.sigma,args.bkg_slope,args.bkg_offset,c,args.num_fails)
     i = []
     for idx,pk in zip(inner_indices,ipeaks):
-        DoSingleFit(args.root_file,args.data,idx,'Inner',args.area,args.compton_area,pk,args.sigma,args.bkg_slope,args.bkg_offset,i)
+        DoSingleFit(args.root_file,args.data,idx,'Inner',args.area,args.compton_area,pk,args.sigma,args.bkg_slope,args.bkg_offset,i,args.num_fails)
     m = []
     for idx,pk in zip(middle_indices,mpeaks):
-        DoSingleFit(args.root_file,args.data,idx,'Middle',args.area,args.compton_area,pk,args.sigma,args.bkg_slope,args.bkg_offset,m)
+        DoSingleFit(args.root_file,args.data,idx,'Middle',args.area,args.compton_area,pk,args.sigma,args.bkg_slope,args.bkg_offset,m,args.num_fails)
     o = []
     for idx,pk in zip(outer_indices,opeaks):
-        DoSingleFit(args.root_file,args.data,idx,'Outer',args.area,args.compton_area,pk,args.sigma,args.bkg_slope,args.bkg_offset,o)
+        DoSingleFit(args.root_file,args.data,idx,'Outer',args.area,args.compton_area,pk,args.sigma,args.bkg_slope,args.bkg_offset,o,args.num_fails)
+
+    failed_indices = []
+    for idx,pk in enumerate(c):
+        if pk is None:
+            c[idx] = args.peak
+            failed_indices.append(center_indices[idx])
+
+    for idx,pk in enumerate(i):
+        if pk is None:
+            i[idx] = args.peak
+            failed_indices.append(inner_indices[idx])
+
+    for idx,pk in enumerate(m):
+        if pk is None:
+            m[idx] = args.peak
+            failed_indices.append(middle_indices[idx])
+
+    for idx,pk in enumerate(o):
+        if pk is None:
+            o[idx] = args.peak
+            failed_indices.append(outer_indices[idx])
 
     cd = []
     for idx,pk in zip(center_indices,c):
@@ -260,6 +289,7 @@ if __name__ == "__main__":
     if result.stdout:
         print(result.stdout.decode())
     print('To view total result run the following command root \"$GENSCANSYS/scripts/DumpAllDrawable.cxx(\\\"CompleteFit.root\\\",\\\"^.*_proj_x[0-9]{1,2}$\\\",\\\"\\\",1.0,4000.0)\"')
+    print(f'These are the following indices that failed to fit: {failed_indices}')
 
     for f in hadd_command[3:]:
         cmd = ["rm","-f",f"{f}"]
