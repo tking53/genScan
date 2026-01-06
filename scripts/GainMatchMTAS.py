@@ -99,7 +99,9 @@ def DoSingleFit(file: str,data: str,idx: int,prefix: str,area: list,compton: lis
             y = yaml.safe_load(f)
 
         red_chi2 = y['FitResults'][0]['ReducedChi2']
-        if red_chi2 < 0.5 or red_chi2 > 2:
+        lower_chi2 = 0.5
+        upper_chi2 = 2
+        if red_chi2 < lower_chi2 or red_chi2 > upper_chi2:
             currfails += 1
             print(f"projection: {idx} has issues fitting ReducedChi2: {red_chi2}, trying again")
             if currfails > nfails:
@@ -124,6 +126,11 @@ def DoSingleFit(file: str,data: str,idx: int,prefix: str,area: list,compton: lis
             r.append(y['FitResults'][0]['Values']['Mean'])
             return
 
+def CorrectMaskedPeaks(pks: list,indices: list,pk: float,failed_indices: list):
+    for idx,cpk in enumerate(pks):
+        if cpk is None:
+            pks[idx] = pk
+            failed_indices.append(indices[idx])
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Script to generate fits and update the voltage file for MTAS',\
@@ -164,6 +171,47 @@ if __name__ == "__main__":
     num_crates = GetNamedValue(args.root_file,'MAX_CRATES')
     num_cards_per_crate = GetNamedValue(args.root_file,'MAX_CARDS_PER_CRATE')
     num_channels_per_board = GetNamedValue(args.root_file,'MAX_CHANNELS_PER_BOARD')
+
+    his_uid_map = { 0 :   'u0',  1:  'u1',   2:   'u2',  3:  'u3',   4:   'u4',   5:  'u5',
+                        6 :   'u6',  7:  'u7',   8:   'u8',  9:  'u9',  10:  'u10',  11:  'u11',
+                        12:  'u12', 13:  'u13', 14:  'u14', 15: 'u15',  16: 'u100',  17: 'u101',
+                        18: 'u102', 19: 'u103', 20: 'u104', 21: 'u105', 22: 'u106',  23: 'u107',
+                        24: 'u108', 25: 'u109', 26: 'u110', 27: 'u111', 28: 'u112',  29: 'u113',
+                        30: 'u114', 31: 'u115', 32: 'u200', 33: 'u201', 34: 'u202',  35: 'u203',
+                        36: 'u204', 37: 'u205', 38: 'u206', 39: 'u207', 40: 'u208',  41: 'u209',
+                        42: 'u210', 43: 'u211', 44: 'u212', 45: 'u213', 46: 'u214',  47: 'u215'
+                       }
+        
+    pmt_uid_map = { 
+                       'C1F':   'u0', 'C1B':  'u1', 
+                       'C2F':   'u2', 'C2B':  'u3',
+                       'C3F':   'u4', 'C3B':  'u5',
+                       'C4F':   'u6', 'C4B':  'u7',
+                       'C5F':   'u8', 'C5B':  'u9',
+                       'C6F':  'u10', 'C6B':  'u11',
+                       'I1F':  'u12', 'I1B':  'u13', 
+                       'I2F':  'u14', 'I2B':  'u15',
+                       'I3F': 'u100', 'I3B': 'u101',
+                       'I4F': 'u102', 'I4B': 'u103',
+                       'I5F': 'u104', 'I5B': 'u105',
+                       'I6F': 'u106', 'I6B': 'u107',
+                       'M1F': 'u108', 'M1B': 'u109', 
+                       'M2F': 'u110', 'M2B': 'u111',
+                       'M3F': 'u112', 'M3B': 'u113',
+                       'M4F': 'u114', 'M4B': 'u115',
+                       'M5F': 'u200', 'M5B': 'u201',
+                       'M6F': 'u202', 'M6B': 'u203',
+                       'O1F': 'u204', 'O1B': 'u205', 
+                       'O2F': 'u206', 'O2B': 'u207',
+                       'O3F': 'u208', 'O3B': 'u209',
+                       'O4F': 'u210', 'O4B': 'u211',
+                       'O5F': 'u212', 'O5B': 'u213',
+                       'O6F': 'u214', 'O6B': 'u215'
+                       }
+
+    reverse_pmt_uid_map = dict()
+    for k,v in pmt_uid_map.items():
+        reverse_pmt_uid_map[v] = k
 
     center_indices = []
     inner_indices = []
@@ -210,25 +258,10 @@ if __name__ == "__main__":
         DoSingleFit(args.root_file,args.data,idx,'Outer',args.area,args.compton_area,pk,args.sigma,args.bkg_slope,args.bkg_offset,o,args.num_fails)
 
     failed_indices = []
-    for idx,pk in enumerate(c):
-        if pk is None:
-            c[idx] = args.peak
-            failed_indices.append(center_indices[idx])
-
-    for idx,pk in enumerate(i):
-        if pk is None:
-            i[idx] = args.peak
-            failed_indices.append(inner_indices[idx])
-
-    for idx,pk in enumerate(m):
-        if pk is None:
-            m[idx] = args.peak
-            failed_indices.append(middle_indices[idx])
-
-    for idx,pk in enumerate(o):
-        if pk is None:
-            o[idx] = args.peak
-            failed_indices.append(outer_indices[idx])
+    CorrectMaskedPeaks(c,center_indices,args.peak,failed_indices)
+    CorrectMaskedPeaks(i,inner_indices,args.peak,failed_indices)
+    CorrectMaskedPeaks(m,middle_indices,args.peak,failed_indices)
+    CorrectMaskedPeaks(o,outer_indices,args.peak,failed_indices)
 
     cd = []
     for idx,pk in zip(center_indices,c):
@@ -288,14 +321,21 @@ if __name__ == "__main__":
     result = subprocess.run(hadd_command,capture_output=True)
     if result.stdout:
         print(result.stdout.decode())
-    print('To view total result run the following command root \"$GENSCANSYS/scripts/DumpAllDrawable.cxx(\\\"CompleteFit.root\\\",\\\"^.*_proj_x[0-9]{1,2}$\\\",\\\"\\\",1.0,4000.0)\"')
-    print(f'These are the following indices that failed to fit: {failed_indices}')
 
     for f in hadd_command[3:]:
         cmd = ["rm","-f",f"{f}"]
         result = subprocess.run(cmd,capture_output=True)
         if result.stdout:
             print(result.stdout.decode())
+
+    print('To view total result run the following command root \"$GENSCANSYS/scripts/DumpAllDrawable.cxx(\\\"CompleteFit.root\\\",\\\"^.*_proj_x[0-9]{1,2}$\\\",\\\"\\\",1.0,4000.0)\"')
+    if len(failed_indices) > 0 :
+        print(f'These are the following indices that failed to fit: {failed_indices}')
+        print(f'it is likely that they are well within the fit and are just wet crystals which we have too')
+        print(f'tight of a reduced chi2 bound on')
+        print(f'Fit them with the following commands:')
+        for idx in failed_indices:
+            print(f'GenPeakFit -m 2 -p {idx} -l 1300.0 -u 1600.0 -i {args.root_file} -b "Mean:1400.0:1500.0" -b "Area:0.0:1.0e6" -b "Sigma:1.0:100.0" -b "ComptonArea:0.0:1.0e6" -b "BkgSlop:-10.0:0.0" -b "BkgOffset:0.0:1.0e6"')
 
     total_y = ""
     for idx,f in enumerate(yfiles):
@@ -322,47 +362,6 @@ if __name__ == "__main__":
         datadict = {}
         for item in data:
             datadict[item[0]] = {'modid':int(item[1]),'chanid':int(item[2]),'voltage':float(item[3]),'current':float(item[4]),'ramp':float(item[5])}
-
-        his_uid_map = { 0 :   'u0',  1:  'u1',   2:   'u2',  3:  'u3',   4:   'u4',   5:  'u5',
-                        6 :   'u6',  7:  'u7',   8:   'u8',  9:  'u9',  10:  'u10',  11:  'u11',
-                        12:  'u12', 13:  'u13', 14:  'u14', 15: 'u15',  16: 'u100',  17: 'u101',
-                        18: 'u102', 19: 'u103', 20: 'u104', 21: 'u105', 22: 'u106',  23: 'u107',
-                        24: 'u108', 25: 'u109', 26: 'u110', 27: 'u111', 28: 'u112',  29: 'u113',
-                        30: 'u114', 31: 'u115', 32: 'u200', 33: 'u201', 34: 'u202',  35: 'u203',
-                        36: 'u204', 37: 'u205', 38: 'u206', 39: 'u207', 40: 'u208',  41: 'u209',
-                        42: 'u210', 43: 'u211', 44: 'u212', 45: 'u213', 46: 'u214',  47: 'u215'
-                       }
-        
-        pmt_uid_map = { 
-                       'C1F':   'u0', 'C1B':  'u1', 
-                       'C2F':   'u2', 'C2B':  'u3',
-                       'C3F':   'u4', 'C3B':  'u5',
-                       'C4F':   'u6', 'C4B':  'u7',
-                       'C5F':   'u8', 'C5B':  'u9',
-                       'C6F':  'u10', 'C6B':  'u11',
-                       'I1F':  'u12', 'I1B':  'u13', 
-                       'I2F':  'u14', 'I2B':  'u15',
-                       'I3F': 'u100', 'I3B': 'u101',
-                       'I4F': 'u102', 'I4B': 'u103',
-                       'I5F': 'u104', 'I5B': 'u105',
-                       'I6F': 'u106', 'I6B': 'u107',
-                       'M1F': 'u108', 'M1B': 'u109', 
-                       'M2F': 'u110', 'M2B': 'u111',
-                       'M3F': 'u112', 'M3B': 'u113',
-                       'M4F': 'u114', 'M4B': 'u115',
-                       'M5F': 'u200', 'M5B': 'u201',
-                       'M6F': 'u202', 'M6B': 'u203',
-                       'O1F': 'u204', 'O1B': 'u205', 
-                       'O2F': 'u206', 'O2B': 'u207',
-                       'O3F': 'u208', 'O3B': 'u209',
-                       'O4F': 'u210', 'O4B': 'u211',
-                       'O5F': 'u212', 'O5B': 'u213',
-                       'O6F': 'u214', 'O6B': 'u215'
-                       }
-        
-        reverse_pmt_uid_map = dict()
-        for k,v in pmt_uid_map.items():
-            reverse_pmt_uid_map[v] = k
 
         Deltas = dict()
         Proj = dict()
