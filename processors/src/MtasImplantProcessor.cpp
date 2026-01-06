@@ -86,6 +86,7 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 	for( size_t ii = 0; ii < 8; ++ii ){
 		for( size_t jj = 0; jj < 8; ++jj ){
 			this->PositionMap.push_back({-3.5+jj,3.5-ii});
+			this->console->debug("PositionMap[{}] : ({},{})",ii*8+jj,-3.5+jj,3.5-ii);
 		}
 	}
 

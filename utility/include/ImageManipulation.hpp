@@ -44,8 +44,8 @@ namespace SIPMIMP {
 	struct Image{
 		double dynode;
 		double DynodeTimeStamp;
-		std::pair<unsigned int, unsigned int> lowResPosition;
-		std::pair<unsigned int, unsigned int> secondarylowResPosition;
+		std::pair<int, int> lowResPosition;
+		std::pair<int, int> secondarylowResPosition;
 		std::pair<double,double> highResPosition;
 		std::pair<double,double> highResStdDev;
 		double anodesum;
@@ -63,11 +63,11 @@ namespace SIPMIMP {
 			highResPosition.first = x;
 			highResPosition.second = y;
 		}
-		void ResetLowResPosition(unsigned int x = -1,unsigned int y = -1){
+		void ResetLowResPosition(int x = -1,int y = -1){
 			lowResPosition.first = x;
 			lowResPosition.second = y;
 		}
-		void ResetSecondaryLowResPosition(unsigned int x = -1,unsigned int y = -1){
+		void ResetSecondaryLowResPosition(int x = -1,int y = -1){
 			secondarylowResPosition.first = x;
 			secondarylowResPosition.second = y;
 		}
