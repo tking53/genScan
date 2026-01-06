@@ -2,6 +2,7 @@
 #define __TRACE_HELPER_HPP__
 
 #include <algorithm>
+#include <stdexcept>
 #include <vector>
 #include <string>
 #include <initializer_list>
@@ -119,42 +120,42 @@ class TraceHelper final{
 
 		void AnalyzeWaveform(const std::pair<size_t,size_t>& PreTrigRegion,const std::pair<size_t,size_t>& PostTrigRegion,const std::vector<size_t>& QDCBounds){
 			if( PreTrigRegion.first >= PreTrigRegion.second ){
-				throw "TraceHelper::AnalyzeWaveform(const std::pair<size_t,size_t>& PreTrigRegion,const std::pair<size_t,size_t>& PostTrigRegion,const std::vector<size_t>& QDCBounds) PreTrigRegion.first > PreTrigRegion.second";
+				throw std::runtime_error("TraceHelper::AnalyzeWaveform(const std::pair<size_t,size_t>& PreTrigRegion,const std::pair<size_t,size_t>& PostTrigRegion,const std::vector<size_t>& QDCBounds) PreTrigRegion.first > PreTrigRegion.second");
 			}
 
 			if( PreTrigRegion.first > data.size() ){
-				throw "TraceHelper::AnalyzeWaveform(const std::pair<size_t,size_t>& PreTrigRegion,const std::pair<size_t,size_t>& PostTrigRegion,const std::vector<size_t>& QDCBounds) PreTrigRegion.first >= data.size()";
+				throw std::runtime_error("TraceHelper::AnalyzeWaveform(const std::pair<size_t,size_t>& PreTrigRegion,const std::pair<size_t,size_t>& PostTrigRegion,const std::vector<size_t>& QDCBounds) PreTrigRegion.first >= data.size()");
 			}
 
 			if( PreTrigRegion.second > data.size() ){
-				throw "TraceHelper::AnalyzeWaveform(const std::pair<size_t,size_t>& PreTrigRegion,const std::pair<size_t,size_t>& PostTrigRegion,const std::vector<size_t>& QDCBounds) PreTrigRegion.second >= data.size()";
+				throw std::runtime_error("TraceHelper::AnalyzeWaveform(const std::pair<size_t,size_t>& PreTrigRegion,const std::pair<size_t,size_t>& PostTrigRegion,const std::vector<size_t>& QDCBounds) PreTrigRegion.second >= data.size()");
 			}
 
 
 			if( PostTrigRegion.first >= PostTrigRegion.second ){
-				throw "TraceHelper::AnalyzeWaveform(const std::pair<size_t,size_t>& PostTrigRegion,const std::pair<size_t,size_t>& PostTrigRegion,const std::vector<size_t>& QDCBounds) PostTrigRegion.first > PostTrigRegion.second";
+				throw std::runtime_error("TraceHelper::AnalyzeWaveform(const std::pair<size_t,size_t>& PostTrigRegion,const std::pair<size_t,size_t>& PostTrigRegion,const std::vector<size_t>& QDCBounds) PostTrigRegion.first > PostTrigRegion.second");
 			}
 
 			if( PostTrigRegion.first > data.size() ){
-				throw "TraceHelper::AnalyzeWaveform(const std::pair<size_t,size_t>& PostTrigRegion,const std::pair<size_t,size_t>& PostTrigRegion,const std::vector<size_t>& QDCBounds) PostTrigRegion.first >= data.size()";
+				throw std::runtime_error("TraceHelper::AnalyzeWaveform(const std::pair<size_t,size_t>& PostTrigRegion,const std::pair<size_t,size_t>& PostTrigRegion,const std::vector<size_t>& QDCBounds) PostTrigRegion.first >= data.size()");
 			}
 
 			if( PostTrigRegion.second > data.size() ){
-				throw "TraceHelper::AnalyzeWaveform(const std::pair<size_t,size_t>& PostTrigRegion,const std::pair<size_t,size_t>& PostTrigRegion,const std::vector<size_t>& QDCBounds) PostTrigRegion.second >= data.size()";
+				throw std::runtime_error("TraceHelper::AnalyzeWaveform(const std::pair<size_t,size_t>& PostTrigRegion,const std::pair<size_t,size_t>& PostTrigRegion,const std::vector<size_t>& QDCBounds) PostTrigRegion.second >= data.size()");
 			}
 
 
 			for( size_t ii = 0; ii < QDCBounds.size(); ++ii ){
 				if( QDCBounds.at(ii) > data.size() ){
 					std::string mess = "TraceHelper::AnalyzeWaveform(const std::pair<size_t,size_t>& PostTrigRegion,const std::pair<size_t,size_t>& PostTrigRegion,const std::vector<size_t>& QDCBounds) QDCBounds["+std::to_string(ii)+"] >= data.size()";
-					throw mess;
+					throw std::runtime_error(mess);
 				}
 			}
 
 			for( size_t ii = 1; ii < QDCBounds.size(); ++ii ){
 				if( QDCBounds.at(ii) <= QDCBounds.at(ii-1) ){
 					std::string mess = "TraceHelper::AnalyzeWaveform(const std::pair<size_t,size_t>& PostTrigRegion,const std::pair<size_t,size_t>& PostTrigRegion,const std::vector<size_t>& QDCBounds) QDCBounds["+std::to_string(ii)+"] <= QDCBounds["+std::to_string(ii-1)+"]";
-					throw mess;
+					throw std::runtime_error(mess);
 				}
 			}
 

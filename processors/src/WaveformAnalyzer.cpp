@@ -27,6 +27,9 @@ WaveformAnalyzer::WaveformAnalyzer(const std::string& log) : Analyzer(log,"Wavef
 
 WaveformAnalyzer::~WaveformAnalyzer(){
 	this->console->info("Number of traces fit : {}, total time spent fitting {:.3f}s",this->NumTraceFits,this->fittime/1000.0);
+	for( const auto& e : this->BannedGCID ){
+		this->console->error("Found Banned Global Channel ID : {}",e);
+	}
 }
 
 [[maybe_unused]] bool WaveformAnalyzer::PreProcess([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
@@ -39,7 +42,27 @@ WaveformAnalyzer::~WaveformAnalyzer(){
 			for( const auto& s : this->WaveSettings ){
 				boost::smatch cmapmatch;
 				if( boost::regex_match(evt->GetCMapID(),cmapmatch,s.first,boost::regex_constants::match_continuous) ){
-					evt->AnalyzeWaveform(s.second.PreTriggerBounds,s.second.PostTriggerBounds,s.second.QDCBounds);
+					try{
+						if( this->BannedGCID.find(evt->GetGlobalChannelID()) == this->BannedGCID.end() ){ 
+							evt->AnalyzeWaveform(s.second.PreTriggerBounds,s.second.PostTriggerBounds,s.second.QDCBounds);
+						}else{
+							continue;
+						}
+					}catch(std::runtime_error const& e){
+						this->console->error(e.what());
+						this->BannedGCID.insert(evt->GetGlobalChannelID());
+						this->console->error("Adding this channel to the banned list");
+						this->console->error("Issue in config settings for evt with info: {}",*evt);
+						this->console->error("Here is the trace size: {}",evt->GetRawTrace().size());
+						this->console->error("Here is the PreTriggerBounds: {} {}",
+								s.second.PreTriggerBounds.first,s.second.PreTriggerBounds.second);
+						this->console->error("Here is the PostTriggerBounds: {} {}",
+								s.second.PostTriggerBounds.first,s.second.PostTriggerBounds.second);
+						for( const auto& q : s.second.QDCBounds ){
+							this->console->error("QDCBound: {}",q);
+						}
+						continue;
+					}
 					if( s.second.CalcDerivative ){
 						evt->CalculateTraceDerivatives();
 					}

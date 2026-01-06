@@ -29,6 +29,7 @@ class WaveformAnalyzer : public Analyzer {
 
 		void InsertAdditionalTypes(const std::string&);
 
+		std::set<int> BannedGCID;
 		std::set<boost::regex> KnownWaveSettings;
 		std::set<boost::regex> KnownTraceSettings;
 		std::vector<std::pair<boost::regex,PSDCalculator>> WaveSettings;
