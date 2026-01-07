@@ -7,8 +7,9 @@
 	<Global EventWidth="5.0e-7" EventWidthUnit="s" CorrelationType="rolling-window" />
 	<DetectorDriver>
 		<Processor name="RootDevProcessor" included_types="mtasimplant,veto" />
-		<Analyzer name="WaveformAnalyzer" included_types="mtasimplant" >
-			<settings Crate="[0]" Module="([0,5-8])" Channel="(0|[0-9]|1[0-5])" CalcDerivative="true" >
+		<Analyzer name="WaveformAnalyzer" included_types="mtasimplant:dynode" >
+			<!-- <settings Crate="[0]" Module="([0,5-8])" Channel="(0|[0-9]|1[0-5])" CalcDerivative="true" > -->
+			<settings Crate="[0]" Module="0" Channel="(0|[0-9]|1[0-5])" CalcDerivative="true" >
 				<PreTrigger min="5" max="43" />
 				<PostTrigger min="200" max="249" />
 				<QDC bounds="0,10,20,30,40,50,60" />
