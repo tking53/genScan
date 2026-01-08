@@ -237,6 +237,7 @@ int main(int argc, char *argv[]) {
 	std::vector<std::string> opcodes;
 	std::vector<manipulator::operation*> operations;
 	std::string name;
+	std::string searchpath;
 
 	std::string operation_message = "operation to perform, they are done in order they are passed to the program";
 	operation_message += "\ncurrently supported operations";
@@ -257,6 +258,8 @@ int main(int argc, char *argv[]) {
 		("outputfile,o",boost::program_options::value<std::string>(&outputfile),"filename to output to, will be a cxx")
 		("operation,v",boost::program_options::value<std::vector<std::string>>(&opcodes)->multitoken(),operation_message.c_str())
 		("name,n",boost::program_options::value<std::string>(&name)->default_value("dump"),"name that the cut will have when saved")
+		("searchpath,s",boost::program_options::value<std::string>(&searchpath)->default_value(""),
+		 		"path list used to search for things formatted as path_1:path2:path_3, with current_dir as final")
 		;
 
 
@@ -271,7 +274,7 @@ int main(int argc, char *argv[]) {
 			exit(EXIT_SUCCESS);
 		}
 
-		std::shared_ptr<CUTS::CutRegistry> CutManager(new CUTS::CutRegistry(""));
+		std::shared_ptr<CUTS::CutRegistry> CutManager(new CUTS::CutRegistry("",searchpath));
 		CutManager->AddCut("dump",tcutfile);
 		auto cut = CutManager->GetCut("dump");
 		double xcom;

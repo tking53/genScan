@@ -19,7 +19,7 @@
 namespace CUTS{
 	class CutRegistry{
 		public:
-			CutRegistry(const std::string&);
+			CutRegistry(const std::string&,const std::string&);
 			~CutRegistry() = default;
 			void AddCut(const std::string&,const std::string&);
 			void AddCut(const std::string&,const std::vector<double>&,const std::vector<double>&);
@@ -29,6 +29,8 @@ namespace CUTS{
 		private:
 			bool CutIDExists(const std::string&) const;
 			std::vector<std::string> CutIDs;
+			std::vector<std::string> Paths;
+			std::string PathList;
 			std::unordered_map<std::string,TCutG*> Cuts;
 			std::string LogName;
 			std::string RegistryName;

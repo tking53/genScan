@@ -38,6 +38,7 @@ int main(int argc, char *argv[]) {
 	int kmeans;
 	int maxiter;
 	double tol;
+	std::string searchpath;
 
 	boost::program_options::options_description cmdline_options("Generic Options");
 	cmdline_options.add_options()
@@ -48,6 +49,8 @@ int main(int argc, char *argv[]) {
 		("nummeans,n",boost::program_options::value<int>(&kmeans),"number of means to cluster into")
 		("maxiters,m",boost::program_options::value<int>(&maxiter),"maximum number of iterations")
 		("tolerance,t",boost::program_options::value<double>(&tol),"tolerance for early exiting")
+		("searchpath,s",boost::program_options::value<std::string>(&searchpath)->default_value(""),
+		 		"path list used to search for things formatted as path_1:path2:path_3, with current_dir as final")
 		;
 
 
@@ -74,7 +77,7 @@ int main(int argc, char *argv[]) {
 			auto histype = std::string(mainhis->ClassName());
 			boost::regex re2d("TH2");
 
-			std::shared_ptr<CUTS::CutRegistry> CutManager(new CUTS::CutRegistry(""));
+			std::shared_ptr<CUTS::CutRegistry> CutManager(new CUTS::CutRegistry("",searchpath));
 			if( boost::regex_search(histype, re2d) ){
 				std::vector<Point2D<double>> data;
 				TH2* his = reinterpret_cast<TH2*>(mainhis);

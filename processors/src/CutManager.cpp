@@ -1,17 +1,33 @@
+#include <filesystem>
 #include <fstream>
 #include <stdexcept>
 #include <string>
 
+#include <boost/algorithm/string.hpp>
+
 #include "CutManager.hpp"
 
 namespace CUTS{
-	CutRegistry::CutRegistry(const std::string& log){
+	CutRegistry::CutRegistry(const std::string& log,const std::string& pathlist){
 		this->LogName = log;
 		this->RegistryName = "CutRegistry";
 		this->console = spdlog::get(this->LogName)->clone(this->RegistryName);
 		this->console->info("Created CutRegistry [{}]",this->RegistryName);
 		this->SetPointRegex = std::regex("SetPoint\\(([^)]+)\\)");
 		this->NumberPattern = std::regex("-?\\d+(\\.\\d+)?");
+		if( not pathlist.empty() ){
+			std::vector<std::string> strs;
+			boost::split(strs,pathlist,boost::is_any_of(":"));
+			for( const auto& p : strs ){
+				this->Paths.push_back(p);
+				this->PathList += p+":";
+				this->console->info("Adding {} to searchpath",p);
+			}
+		}
+		this->Paths.push_back(std::filesystem::current_path());
+		this->console->info("Adding {} to searchpath",this->Paths.back());
+		this->PathList += this->Paths.back();
+		this->console->info("Full Search Path is: {}",this->PathList);
 	}
 
 	void CutRegistry::AddCut(const std::string& cutid,const std::string& filename){
@@ -19,7 +35,29 @@ namespace CUTS{
 			this->console->error("CutRegistry::AddCut(string,string) : Unable to add cut : {} as it already exists",cutid);
 			throw std::runtime_error("CutRegistry::AddCut(string,string) : Unable to add cut "+cutid+" as it already exists");
 		}
-		std::ifstream input(filename);
+		std::filesystem::path filepath(filename);
+		bool Exists = true;
+		if( filepath.is_relative() ){ //have relative path that we need to turn into an absolute one
+			Exists = false;
+			for( size_t ii = 0; ii < this->Paths.size(); ++ii ){
+				std::filesystem::path currpath(std::filesystem::absolute(this->Paths[ii]+"/"+filename));
+				if( std::filesystem::exists(currpath) ){
+					Exists = true;
+					filepath = currpath;
+					this->console->info("Found Cut: {} at {}",cutid,currpath);
+					break;
+				}
+			}	
+		}else{
+			Exists = std::filesystem::exists(filepath);
+		}
+
+		if( not Exists ){
+			this->console->error("{} does not exist in the search path: {}",filename,this->PathList);
+			throw std::runtime_error("CutRegistry::AddCut(string,string) : Unable to add cut "+
+					cutid+" as it does not exist in the search path");
+		}
+		std::ifstream input(filepath);
 		std::string line;
 		std::vector<std::tuple<int,double,double>> vals;
 		this->console->info("Attempting to Load Cut {} from {}",cutid,filename);

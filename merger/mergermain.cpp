@@ -51,6 +51,7 @@ int main(int argc, char *argv[]) {
 	std::string configfile;
 	std::string outputprefix;
 	std::vector<std::string> inputfiles;
+	std::string searchpath;
 
 	boost::program_options::options_description cmdline_options("Generic Options");
 	cmdline_options.add_options()
@@ -59,6 +60,8 @@ int main(int argc, char *argv[]) {
 		("configfile,c",boost::program_options::value<std::string>(&configfile),"yaml config file to read in settings")
 		("outputprefix,o",boost::program_options::value<std::string>(&outputprefix),"output prefix to dump the histograms/trimmed root tree to")
 		("port,p",boost::program_options::value<int>(&port)->default_value(9090),"[portid] port to listen/send on for the live histogramming, -1 disables for batch scanning")
+		("searchpath,s",boost::program_options::value<std::string>(&searchpath)->default_value(""),
+		 		"path list used to search for things formatted as path_1:path2:path_3, with current_dir as final")
 		;
 
 
@@ -104,7 +107,7 @@ int main(int argc, char *argv[]) {
 
 		YAML::Node doc = YAML::LoadFile(configfile);
 
-		std::shared_ptr<CUTS::CutRegistry> CutManager(new CUTS::CutRegistry(logname));
+		std::shared_ptr<CUTS::CutRegistry> CutManager(new CUTS::CutRegistry(logname,searchpath));
 		std::string pid_filename = doc["PID"].as<std::string>(); 
 		CutManager->AddCut("PID",pid_filename);
 		console->critical("Using {} as PID file",pid_filename);

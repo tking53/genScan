@@ -69,6 +69,7 @@ int main(int argc, char *argv[]) {
 	int port;
 	int limit;
 	std::string dataformat;
+	std::string searchpath;
 	
 	int MAX_CRATES = 2;
 	int MAX_CARDS_PER_CRATE = 13;
@@ -79,17 +80,30 @@ int main(int argc, char *argv[]) {
 
 	boost::program_options::options_description cmdline_options("Generic Options");
 	cmdline_options.add_options()
+		("configfile,c",boost::program_options::value<std::string>(&configfile)->default_value("config.xml"),
+		 		"[filename] filename for channel map")
+		("file,f",boost::program_options::value<std::vector<std::string>>(&FileNames),
+		 		"[file1 file2 file3 ...] list of files used for input")
 		("help,h","produce this message")
-		("configfile,c",boost::program_options::value<std::string>(&configfile)->default_value("config.xml"),"[filename] filename for channel map")
-		("outputfile,o",boost::program_options::value<std::string>(&outputfile)->default_value("out"),"[filename] filename for output")
-		("enabletree,t",boost::program_options::value<bool>(&enabletree)->default_value(true),"enable root tree output or disable it and only generate histograms")
-		("file,f",boost::program_options::value<std::vector<std::string>>(&FileNames),"[file1 file2 file3 ...] list of files used for input")
-		("limit,l",boost::program_options::value<int>(&limit)->default_value(10),"number of events to keep in history [0 -> current, 1 -> prev., ... N-1]")
-		("format,x",boost::program_options::value<std::string>(&dataformat)->default_value("null"),"[file_format] format of the data file (evt,evt-presort,ldf,pacman_ldf,pld,caen_root,caen_bin)")
-		("port,p",boost::program_options::value<int>(&port)->default_value(9090),"[portid] port to listen/send on for the live histogramming, -1 disables for batch scanning")
-		("max_crates,i",boost::program_options::value<int>(&MAX_CRATES)->default_value(1),"[MAX_CRATES] Number of crates to expect in data stream")
-		("max_slots,j",boost::program_options::value<int>(&MAX_CARDS_PER_CRATE)->default_value(13),"[MAX_CARDS_PER_CRATE] Number of cards per crate to expect in data stream")
-		("max_channels,k",boost::program_options::value<int>(&MAX_CHANNELS_PER_BOARD)->default_value(16),"[MAX_CHANNELS_PER_BOARD] Number of channels per board to expect in data stream")
+		("max_crates,i",boost::program_options::value<int>(&MAX_CRATES)->default_value(1),
+		 		"[MAX_CRATES] Number of crates to expect in data stream")
+		("max_slots,j",boost::program_options::value<int>(&MAX_CARDS_PER_CRATE)->default_value(13),
+		 		"[MAX_CARDS_PER_CRATE] Number of cards per crate to expect in data stream")
+		("max_channels,k",boost::program_options::value<int>(&MAX_CHANNELS_PER_BOARD)->default_value(16),
+		 		"[MAX_CHANNELS_PER_BOARD] Number of channels per board to expect in data stream")
+		("limit,l",boost::program_options::value<int>(&limit)->default_value(10),
+		 		"number of events to keep in history [0 -> current, 1 -> prev., ... N-1]")
+		("outputfile,o",boost::program_options::value<std::string>(&outputfile)->default_value("out"),
+		 		"[filename] filename for output")
+		("port,p",boost::program_options::value<int>(&port)->default_value(9090),
+		 		"[portid] port to listen/send on for the live histogramming, -1 disables for batch scanning")
+		("searchpath,s",boost::program_options::value<std::string>(&searchpath)->default_value(""),
+		 		"path list used to search for things formatted as path_1:path2:path_3, with current_dir as final")
+		("enabletree,t",boost::program_options::value<bool>(&enabletree)->default_value(true),
+		 		"enable root tree output or disable it and only generate histograms")
+		("format,x",boost::program_options::value<std::string>(&dataformat)->default_value("null"),
+		 		"[file_format] format of the data file (evt,evt-presort,ldf,pacman_ldf,pld,caen_root,caen_bin)")
+
 		("version","print version number and exit")
 		("cmake-info","print info about the cmake used")
 		("compiler-info","print info about the compiler used")
@@ -273,7 +287,7 @@ int main(int argc, char *argv[]) {
 	console->info("event width : {:.0f} ns Correlation type : {}",cfgparser->GetGlobalEventWidthInNS(),(*(cfgparser->GetCorrelationType())));
 
 	console->info("Generating CutRegistry if any cuts listed within the config file");
-	std::shared_ptr<CUTS::CutRegistry> CutManager(new CUTS::CutRegistry(logname));
+	std::shared_ptr<CUTS::CutRegistry> CutManager(new CUTS::CutRegistry(logname,searchpath));
 	try{
 		for( const auto& details : cfgparser->GetCutDetails() ){
 			CutManager->AddCut(details.first,details.second);
