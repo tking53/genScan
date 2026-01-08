@@ -678,28 +678,38 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 
 		//gamma-gamma matrices
 		if( this->gammagammaplots ){
+			//if this is included it only drags it up by 40 seconds
+			//prefetch these histograms which are filled a combined total of 4608 times
+			//every single PreProcess call, could get rid of the 5200 since it's the sum 
+			//of 5201 and 5202, but for laziness having it in there is nice to draw immediately
+			auto MTAS_5200  = hismanager->GetPlot<TH2*>("MTAS_5200");
+			auto MTAS_5201  = hismanager->GetPlot<TH2*>("MTAS_5201");
+			auto MTAS_5202  = hismanager->GetPlot<TH2*>("MTAS_5202");
+			auto MTAS_52008 = hismanager->GetPlot<TH2*>("MTAS_52008");
+			auto MTAS_52018 = hismanager->GetPlot<TH2*>("MTAS_52018");
+			auto MTAS_52028 = hismanager->GetPlot<TH2*>("MTAS_52028");
 			for( int ii = 0; ii < 6; ++ii ){
 				for( int jj = ii+1; jj < 6; ++jj ){
-					hismanager->Fill("MTAS_5201",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-					hismanager->Fill("MTAS_5201",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
-					hismanager->Fill("MTAS_5202",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-					hismanager->Fill("MTAS_5202",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
-					hismanager->Fill("MTAS_52018",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-					hismanager->Fill("MTAS_52018",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
-					hismanager->Fill("MTAS_52028",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-					hismanager->Fill("MTAS_52028",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					MTAS_5201->Fill(this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					MTAS_5201->Fill(this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					MTAS_5202->Fill(this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					MTAS_5202->Fill(this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					MTAS_52018->Fill(this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					MTAS_52018->Fill(this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					MTAS_52028->Fill(this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					MTAS_52028->Fill(this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
 				}	
 			}
 			for( int ii = 6; ii < 24; ++ii ){
 				for( int jj = ii+1; jj < 24; ++jj ){
-					hismanager->Fill("MTAS_5200",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-					hismanager->Fill("MTAS_5200",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
-					hismanager->Fill("MTAS_5202",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-					hismanager->Fill("MTAS_5202",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
-					hismanager->Fill("MTAS_52008",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-					hismanager->Fill("MTAS_52008",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
-					hismanager->Fill("MTAS_52028",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-					hismanager->Fill("MTAS_52028",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					MTAS_5200->Fill(this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					MTAS_5200->Fill(this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					MTAS_5202->Fill(this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					MTAS_5202->Fill(this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					MTAS_52008->Fill(this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					MTAS_52008->Fill(this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					MTAS_52028->Fill(this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					MTAS_52028->Fill(this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
 				}
 			}
 		}
