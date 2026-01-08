@@ -245,6 +245,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 
 	this->diagnosticplots = false;
 	this->logictimeplots = false;
+	this->gammagammaplots = false;
 
 	this->RawCenter = std::vector<double>(12,0.0);
 	this->RawInner = std::vector<double>(12,0.0);
@@ -676,28 +677,30 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		}
 
 		//gamma-gamma matrices
-		for( int ii = 0; ii < 6; ++ii ){
-			for( int jj = ii+1; jj < 6; ++jj ){
-				hismanager->Fill("MTAS_5201",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-				hismanager->Fill("MTAS_5201",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
-				hismanager->Fill("MTAS_5202",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-				hismanager->Fill("MTAS_5202",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
-				hismanager->Fill("MTAS_52018",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-				hismanager->Fill("MTAS_52018",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
-				hismanager->Fill("MTAS_52028",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-				hismanager->Fill("MTAS_52028",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
-			}	
-		}
-		for( int ii = 6; ii < 24; ++ii ){
-			for( int jj = ii+1; jj < 24; ++jj ){
-				hismanager->Fill("MTAS_5200",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-				hismanager->Fill("MTAS_5200",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
-				hismanager->Fill("MTAS_5202",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-				hismanager->Fill("MTAS_5202",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
-				hismanager->Fill("MTAS_52008",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-				hismanager->Fill("MTAS_52008",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
-				hismanager->Fill("MTAS_52028",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-				hismanager->Fill("MTAS_52028",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+		if( this->gammagammaplots ){
+			for( int ii = 0; ii < 6; ++ii ){
+				for( int jj = ii+1; jj < 6; ++jj ){
+					hismanager->Fill("MTAS_5201",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					hismanager->Fill("MTAS_5201",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					hismanager->Fill("MTAS_5202",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					hismanager->Fill("MTAS_5202",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					hismanager->Fill("MTAS_52018",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					hismanager->Fill("MTAS_52018",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					hismanager->Fill("MTAS_52028",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					hismanager->Fill("MTAS_52028",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+				}	
+			}
+			for( int ii = 6; ii < 24; ++ii ){
+				for( int jj = ii+1; jj < 24; ++jj ){
+					hismanager->Fill("MTAS_5200",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					hismanager->Fill("MTAS_5200",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					hismanager->Fill("MTAS_5202",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					hismanager->Fill("MTAS_5202",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					hismanager->Fill("MTAS_52008",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					hismanager->Fill("MTAS_52008",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					hismanager->Fill("MTAS_52028",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					hismanager->Fill("MTAS_52028",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+				}
 			}
 		}
 
@@ -908,6 +911,7 @@ void MtasProcessor::Init(const pugi::xml_node& config){
 
 	this->diagnosticplots = config.attribute("diagnostic").as_bool(false);
 	this->logictimeplots = config.attribute("logic").as_bool(false);
+	this->gammagammaplots = config.attribute("gamma-gamma").as_bool(false);
 	this->UseOldCenter = config.attribute("oldcenter").as_bool(false);
 
 	this->LoadHistogramSettings(config);
@@ -1025,12 +1029,14 @@ void MtasProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3260));
 	}
 
-	hismanager->RegisterPlot<TH2F>("MTAS_5200","I,M,O, Gamma-Gamma Matrix; Energy (keV); Energy (keV)",this->h2dsettings.at(5200));
-	hismanager->RegisterPlot<TH2F>("MTAS_5201","C Gamma-Gamma Matrix; Energy (keV); Energy (keV)",this->h2dsettings.at(5201));
-	hismanager->RegisterPlot<TH2F>("MTAS_5202","C,I,M,O, Gamma-Gamma Matrix; Energy (keV); Energy (keV)",this->h2dsettings.at(5202));
-	hismanager->RegisterPlot<TH2F>("MTAS_52008","I,M,O, Gamma-Gamma Matrix; Energy (keV); Energy (keV)",this->h2dsettings.at(52008));
-	hismanager->RegisterPlot<TH2F>("MTAS_52018","C Gamma-Gamma Matrix; Energy (keV); Energy (keV)",this->h2dsettings.at(52018));
-	hismanager->RegisterPlot<TH2F>("MTAS_52028","C,I,M,O, Gamma-Gamma Matrix; Energy (keV); Energy (keV)",this->h2dsettings.at(52028));
+	if( this->gammagammaplots ){
+		hismanager->RegisterPlot<TH2F>("MTAS_5200","I,M,O, Gamma-Gamma Matrix; Energy (keV); Energy (keV)",this->h2dsettings.at(5200));
+		hismanager->RegisterPlot<TH2F>("MTAS_5201","C Gamma-Gamma Matrix; Energy (keV); Energy (keV)",this->h2dsettings.at(5201));
+		hismanager->RegisterPlot<TH2F>("MTAS_5202","C,I,M,O, Gamma-Gamma Matrix; Energy (keV); Energy (keV)",this->h2dsettings.at(5202));
+		hismanager->RegisterPlot<TH2F>("MTAS_52008","I,M,O, Gamma-Gamma Matrix; Energy (keV); Energy (keV)",this->h2dsettings.at(52008));
+		hismanager->RegisterPlot<TH2F>("MTAS_52018","C Gamma-Gamma Matrix; Energy (keV); Energy (keV)",this->h2dsettings.at(52018));
+		hismanager->RegisterPlot<TH2F>("MTAS_52028","C,I,M,O, Gamma-Gamma Matrix; Energy (keV); Energy (keV)",this->h2dsettings.at(52028));
+	}
 	
 	if( this->UseOldCenter ){
 		hismanager->RegisterPlot<TH2F>("MTAS_5520","Num Center PMT Fire vs Center Sum Before Zero; Energy (keV); count (arb.)",this->h2dsettings.at(5520));
@@ -1196,12 +1202,14 @@ void MtasProcessor::DeclareBetaPlots(PLOTS::PlotRegistry* hismanager){
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3360));
 	}
 
-	hismanager->RegisterPlot<TH2F>("MTAS_5300","I,M,O, Gamma-Gamma Matrix #beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(5300));
-	hismanager->RegisterPlot<TH2F>("MTAS_5301","C Gamma-Gamma Matrix #beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(5301));
-	hismanager->RegisterPlot<TH2F>("MTAS_5302","C,I,M,O, Gamma-Gamma Matrix #beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(5302));
-	hismanager->RegisterPlot<TH2F>("MTAS_53008","I,M,O, Gamma-Gamma Matrix #beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(53008));
-	hismanager->RegisterPlot<TH2F>("MTAS_53018","C Gamma-Gamma Matrix #beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(53018));
-	hismanager->RegisterPlot<TH2F>("MTAS_53028","C,I,M,O, Gamma-Gamma Matrix #beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(53028));
+	if( this->gammagammaplots ){
+		hismanager->RegisterPlot<TH2F>("MTAS_5300","I,M,O, Gamma-Gamma Matrix #beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(5300));
+		hismanager->RegisterPlot<TH2F>("MTAS_5301","C Gamma-Gamma Matrix #beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(5301));
+		hismanager->RegisterPlot<TH2F>("MTAS_5302","C,I,M,O, Gamma-Gamma Matrix #beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(5302));
+		hismanager->RegisterPlot<TH2F>("MTAS_53008","I,M,O, Gamma-Gamma Matrix #beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(53008));
+		hismanager->RegisterPlot<TH2F>("MTAS_53018","C Gamma-Gamma Matrix #beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(53018));
+		hismanager->RegisterPlot<TH2F>("MTAS_53028","C,I,M,O, Gamma-Gamma Matrix #beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(53028));
+	}
 
 	if( this->UseOldCenter ){
 		hismanager->RegisterPlot<TH2F>("MTAS_5530","Num Center PMT Fire vs Center Sum Before Zero #beta-gated; Energy (keV); count (arb.)",this->h2dsettings.at(5530));
@@ -1276,12 +1284,14 @@ void MtasProcessor::DeclareAntiBetaPlots(PLOTS::PlotRegistry* hismanager){
 		hismanager->RegisterPlot<TH2F>(name,title,this->h2dsettings.at(3160));
 	}
 
-	hismanager->RegisterPlot<TH2F>("MTAS_5100","I,M,O, Gamma-Gamma Matrix anti-#beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(5100));
-	hismanager->RegisterPlot<TH2F>("MTAS_5101","C Gamma-Gamma Matrix anti-#beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(5101));
-	hismanager->RegisterPlot<TH2F>("MTAS_5102","C,I,M,O, Gamma-Gamma Matrix anti-#beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(5102));
-	hismanager->RegisterPlot<TH2F>("MTAS_51008","I,M,O, Gamma-Gamma Matrix anti-#beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(51008));
-	hismanager->RegisterPlot<TH2F>("MTAS_51018","C Gamma-Gamma Matrix anti-#beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(51018));
-	hismanager->RegisterPlot<TH2F>("MTAS_51028","C,I,M,O, Gamma-Gamma Matrix anti-#beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(51028));
+	if( this->gammagammaplots ){
+		hismanager->RegisterPlot<TH2F>("MTAS_5100","I,M,O, Gamma-Gamma Matrix anti-#beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(5100));
+		hismanager->RegisterPlot<TH2F>("MTAS_5101","C Gamma-Gamma Matrix anti-#beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(5101));
+		hismanager->RegisterPlot<TH2F>("MTAS_5102","C,I,M,O, Gamma-Gamma Matrix anti-#beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(5102));
+		hismanager->RegisterPlot<TH2F>("MTAS_51008","I,M,O, Gamma-Gamma Matrix anti-#beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(51008));
+		hismanager->RegisterPlot<TH2F>("MTAS_51018","C Gamma-Gamma Matrix anti-#beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(51018));
+		hismanager->RegisterPlot<TH2F>("MTAS_51028","C,I,M,O, Gamma-Gamma Matrix anti-#beta-gated; Energy (keV); Energy (keV)",this->h2dsettings.at(51028));
+	}
 	
 	if( this->UseOldCenter ){
 		hismanager->RegisterPlot<TH2F>("MTAS_5510","Num Center PMT Fire vs Center Sum Before Zero anti-#beta-gated; Energy (keV); count (arb.)",this->h2dsettings.at(5510));
@@ -1682,28 +1692,30 @@ void MtasProcessor::FillBetaPlots(PLOTS::PlotRegistry* hismanager){
 		}
 
 		//these are the gamma-gamma matrices
-		for( int ii = 0; ii < 6; ++ii ){
-			for( int jj = ii+1; jj < 6; ++jj ){
-				hismanager->Fill("MTAS_5301",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-				hismanager->Fill("MTAS_5301",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
-				hismanager->Fill("MTAS_5302",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-				hismanager->Fill("MTAS_5302",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
-				hismanager->Fill("MTAS_53018",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-				hismanager->Fill("MTAS_53018",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
-				hismanager->Fill("MTAS_53028",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-				hismanager->Fill("MTAS_53028",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
-			}	
-		}
-		for( int ii = 6; ii < 24; ++ii ){
-			for( int jj = ii+1; jj < 24; ++jj ){
-				hismanager->Fill("MTAS_5300",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-				hismanager->Fill("MTAS_5300",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
-				hismanager->Fill("MTAS_5302",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-				hismanager->Fill("MTAS_5302",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
-				hismanager->Fill("MTAS_53008",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-				hismanager->Fill("MTAS_53008",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
-				hismanager->Fill("MTAS_53028",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-				hismanager->Fill("MTAS_53028",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+		if( this->gammagammaplots ){
+			for( int ii = 0; ii < 6; ++ii ){
+				for( int jj = ii+1; jj < 6; ++jj ){
+					hismanager->Fill("MTAS_5301",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					hismanager->Fill("MTAS_5301",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					hismanager->Fill("MTAS_5302",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					hismanager->Fill("MTAS_5302",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					hismanager->Fill("MTAS_53018",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					hismanager->Fill("MTAS_53018",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					hismanager->Fill("MTAS_53028",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					hismanager->Fill("MTAS_53028",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+				}	
+			}
+			for( int ii = 6; ii < 24; ++ii ){
+				for( int jj = ii+1; jj < 24; ++jj ){
+					hismanager->Fill("MTAS_5300",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					hismanager->Fill("MTAS_5300",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					hismanager->Fill("MTAS_5302",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					hismanager->Fill("MTAS_5302",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					hismanager->Fill("MTAS_53008",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					hismanager->Fill("MTAS_53008",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					hismanager->Fill("MTAS_53028",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					hismanager->Fill("MTAS_53028",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+				}
 			}
 		}
 
@@ -1919,28 +1931,30 @@ void MtasProcessor::FillNonBetaPlots(PLOTS::PlotRegistry* hismanager){
 		}
 
 		//these are the gamma-gamma matrices
-		for( int ii = 0; ii < 6; ++ii ){
-			for( int jj = ii+1; jj < 6; ++jj ){
-				hismanager->Fill("MTAS_5101",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-				hismanager->Fill("MTAS_5101",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
-				hismanager->Fill("MTAS_5102",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-				hismanager->Fill("MTAS_5102",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
-				hismanager->Fill("MTAS_51018",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-				hismanager->Fill("MTAS_51018",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
-				hismanager->Fill("MTAS_51028",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-				hismanager->Fill("MTAS_51028",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
-			}	
-		}
-		for( int ii = 6; ii < 24; ++ii ){
-			for( int jj = ii+1; jj < 24; ++jj ){
-				hismanager->Fill("MTAS_5100",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-				hismanager->Fill("MTAS_5100",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
-				hismanager->Fill("MTAS_5102",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-				hismanager->Fill("MTAS_5102",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
-				hismanager->Fill("MTAS_51008",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-				hismanager->Fill("MTAS_51008",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
-				hismanager->Fill("MTAS_51028",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-				hismanager->Fill("MTAS_51028",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+		if( this->gammagammaplots ){
+			for( int ii = 0; ii < 6; ++ii ){
+				for( int jj = ii+1; jj < 6; ++jj ){
+					hismanager->Fill("MTAS_5101",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					hismanager->Fill("MTAS_5101",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					hismanager->Fill("MTAS_5102",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					hismanager->Fill("MTAS_5102",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					hismanager->Fill("MTAS_51018",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					hismanager->Fill("MTAS_51018",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					hismanager->Fill("MTAS_51028",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					hismanager->Fill("MTAS_51028",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+				}	
+			}
+			for( int ii = 6; ii < 24; ++ii ){
+				for( int jj = ii+1; jj < 24; ++jj ){
+					hismanager->Fill("MTAS_5100",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					hismanager->Fill("MTAS_5100",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					hismanager->Fill("MTAS_5102",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					hismanager->Fill("MTAS_5102",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					hismanager->Fill("MTAS_51008",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					hismanager->Fill("MTAS_51008",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					hismanager->Fill("MTAS_51028",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					hismanager->Fill("MTAS_51028",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+				}
 			}
 		}
 

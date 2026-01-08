@@ -167,6 +167,7 @@ class MtasProcessor : public Processor{
 
 		bool diagnosticplots;
 		bool logictimeplots;
+		bool gammagammaplots;
 
 		std::vector<std::unique_ptr<Correction::ExpoPosCorrection>> PosCorrectionMap;
 
