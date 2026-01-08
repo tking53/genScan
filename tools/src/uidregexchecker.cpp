@@ -1,4 +1,5 @@
 #include <memory>
+#include <random>
 #include <set>
 #include <stdexcept>
 #include <string>
@@ -33,16 +34,35 @@ struct ReInfo{
 
 };
 
+template<class T>
+void TimeCost(const std::vector<ReInfo>& g,const std::vector<ReInfo>& b,const std::vector<ReInfo>& a,boost::regex& r,int ntimes,std::vector<int> indices,T func){
+	std::chrono::time_point<std::chrono::high_resolution_clock> global_start_time = std::chrono::high_resolution_clock::now();
+	for( int ii = 0; ii < ntimes; ++ii ){
+		auto uid = func(g,b,a,indices[ii],r);
+	}
+	std::chrono::time_point<std::chrono::high_resolution_clock> global_stop_time = std::chrono::high_resolution_clock::now();
+	auto global_run_time = global_stop_time - global_start_time;
+
+	const auto hrs = std::chrono::duration_cast<std::chrono::hours>(global_run_time);
+	const auto mins = std::chrono::duration_cast<std::chrono::minutes>(global_run_time - hrs);
+	const auto secs = std::chrono::duration_cast<std::chrono::seconds>(global_run_time - hrs - mins);
+	const auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(global_run_time - hrs - mins - secs);
+	spdlog::info("Finished running in {} hours {} minutes {} seconds {} milliseconds",
+			hrs.count(),mins.count(),secs.count(),ms.count());
+}
+
 int main(int argc, char *argv[]) {
 
 	std::string restr;
 	std::string configfile;
+	int ntimes;
 
 	boost::program_options::options_description cmdline_options("Generic Options");
 	cmdline_options.add_options()
 		("help,h", "produce help message")
 		("regex,r",boost::program_options::value<std::string>(&restr),"input regex")
 		("configfile,c",boost::program_options::value<std::string>(&configfile),"config file to run the regex checks on")
+		("ntimes,n",boost::program_options::value<int>(&ntimes)->default_value(0),"number of times to test for timing purposes")
 		;
 
 
@@ -74,6 +94,7 @@ int main(int argc, char *argv[]) {
 
 		std::vector<ReInfo> Good;
 		std::vector<ReInfo> Bad;
+		std::vector<ReInfo> All;
 		auto Configuration = inputfile.child("Configuration");
 		auto Map = Configuration.child("Map");
 		for( auto Crate = Map.child("Crate"); Crate; Crate = Crate.next_sibling("Crate") ){
@@ -103,6 +124,7 @@ int main(int argc, char *argv[]) {
 						}else{
 							Bad.push_back({crid,bid,cid,uid});
 						}
+						All.push_back({crid,bid,cid,uid});
 				}
 			}	
 		}
@@ -116,6 +138,62 @@ int main(int argc, char *argv[]) {
 			spdlog::error("{}",b);
 		}
 		spdlog::error("===========================NOT SUCCESSFUL=============================");
+		if( ntimes > 0 ){
+			std::random_device rd;  // a seed source for the random number engine
+			std::mt19937 gen(rd()); // mersenne_twister_engine seeded with rd()
+
+			if( not Good.empty() ){
+				std::vector<int> successindices;
+				std::uniform_int_distribution<> g(0,Good.size()-1);
+				for( int ii = 0; ii < ntimes; ++ii ){
+					successindices.push_back(g(gen));
+				}
+
+				TimeCost(Good,Bad,All,re,ntimes,successindices,
+						[](const std::vector<ReInfo>& g,const std::vector<ReInfo>& b,const std::vector<ReInfo>& a,int idx,boost::regex& re){
+						boost::smatch type_match;
+						if( boost::regex_match(g[idx].UIDs,type_match,re,boost::regex_constants::match_continuous) ){
+						return g[idx].UIDs;
+
+						}
+						return std::string();
+						});
+			}
+
+			if( not Bad.empty() ){
+				std::vector<int> failindices;
+				std::uniform_int_distribution<> g(0,Bad.size()-1);
+				for( int ii = 0; ii < ntimes; ++ii ){
+					failindices.push_back(g(gen));
+				}
+
+				TimeCost(Good,Bad,All,re,ntimes,failindices,
+						[](const std::vector<ReInfo>& g,const std::vector<ReInfo>& b,const std::vector<ReInfo>& a,int idx,boost::regex& re){
+						boost::smatch type_match;
+						if( boost::regex_match(b[idx].UIDs,type_match,re,boost::regex_constants::match_continuous) ){
+						return b[idx].UIDs;
+
+						}
+						return std::string();
+						});
+			}
+
+			std::vector<int> mixedindices;
+			std::uniform_int_distribution<> g(0,All.size()-1);
+			for( int ii = 0; ii < ntimes; ++ii ){
+				mixedindices.push_back(g(gen));
+			}
+
+			TimeCost(Good,Bad,All,re,ntimes,mixedindices,
+					[](const std::vector<ReInfo>& g,const std::vector<ReInfo>& b,const std::vector<ReInfo>& a,int idx,boost::regex& re){
+					boost::smatch type_match;
+					if( boost::regex_match(a[idx].UIDs,type_match,re,boost::regex_constants::match_continuous) ){
+					return a[idx].UIDs;
+
+					}
+					return std::string();
+					});
+		}
 
 	}catch( std::exception& e){
 		spdlog::error(e.what());
