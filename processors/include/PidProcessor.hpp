@@ -92,6 +92,8 @@ class PidProcessor : public Processor{
 		std::vector<std::string> isotopetags;
 
 		int PIDPLOT;
+		bool TOFFLIP;
+		
 
 };
 

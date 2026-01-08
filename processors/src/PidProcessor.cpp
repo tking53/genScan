@@ -309,15 +309,6 @@ PidProcessor::PidProcessor(const std::string& log) : Processor(log,"PidProcessor
 		}
 	};
 
-	this->fp1Tofs[0] = (db3.ppac0.anode.time - fp1.xplas.at(0).time) + this->fp1TofShifts[0];
-	this->fp1Tofs[1] = (db3.ppac0.anode.time - fp1.xplas.at(1).time) + this->fp1TofShifts[1];
-	this->fp1Tofs[2] = (db3.ppac1.anode.time - fp1.xplas.at(0).time) + this->fp1TofShifts[2];
-	this->fp1Tofs[3] = (db3.ppac1.anode.time - fp1.xplas.at(1).time) + this->fp1TofShifts[3];
-	this->fp1Tofs[4] = (db3.scint.left.time  - fp1.xplas.at(0).time) + this->fp1TofShifts[4];
-	this->fp1Tofs[5] = (db3.scint.left.time  - fp1.xplas.at(1).time) + this->fp1TofShifts[5];
-	this->fp1Tofs[6] = (db3.scint.right.time - fp1.xplas.at(0).time) + this->fp1TofShifts[6];
-	this->fp1Tofs[7] = (db3.scint.right.time - fp1.xplas.at(1).time) + this->fp1TofShifts[7];
-
 	db3.ppac0.xpos = this->CalcPPACPosition(db3.ppac0.left.time,db3.ppac0.right.time);
 	db3.ppac0.ypos = this->CalcPPACPosition(db3.ppac0.up.time  ,db3.ppac0.down.time);
 
@@ -336,14 +327,46 @@ PidProcessor::PidProcessor(const std::string& log) : Processor(log,"PidProcessor
 	db5.ppac1.xpos = this->CalcPPACPosition(db5.ppac1.left.time,db5.ppac1.right.time);
 	db5.ppac1.ypos = this->CalcPPACPosition(db5.ppac1.up.time  ,db5.ppac1.down.time);
 
-	this->fp2Tofs[0] = (db3.ppac0.anode.time - fp2.xplas.at(0).time) + this->fp2TofShifts[0];
-	this->fp2Tofs[1] = (db3.ppac0.anode.time - fp2.xplas.at(1).time) + this->fp2TofShifts[1];
-	this->fp2Tofs[2] = (db3.ppac1.anode.time - fp2.xplas.at(0).time) + this->fp2TofShifts[2];
-	this->fp2Tofs[3] = (db3.ppac1.anode.time - fp2.xplas.at(1).time) + this->fp2TofShifts[3];
-	this->fp2Tofs[4] = (db3.scint.left.time  - fp2.xplas.at(0).time) + this->fp2TofShifts[4];
-	this->fp2Tofs[5] = (db3.scint.left.time  - fp2.xplas.at(1).time) + this->fp2TofShifts[5];
-	this->fp2Tofs[6] = (db3.scint.right.time - fp2.xplas.at(0).time) + this->fp2TofShifts[6];
-	this->fp2Tofs[7] = (db3.scint.right.time - fp2.xplas.at(1).time) + this->fp2TofShifts[7];
+	if (this->TOFFLIP)
+	{
+		this->fp1Tofs[0] = (fp1.xplas.at(0).time) - db3.ppac0.anode.time + this->fp1TofShifts[0];
+		this->fp1Tofs[1] = (fp1.xplas.at(1).time) - db3.ppac0.anode.time + this->fp1TofShifts[1];
+		this->fp1Tofs[2] = (fp1.xplas.at(0).time) - db3.ppac1.anode.time + this->fp1TofShifts[2];
+		this->fp1Tofs[3] = (fp1.xplas.at(1).time) - db3.ppac1.anode.time + this->fp1TofShifts[3];
+		this->fp1Tofs[4] = (fp1.xplas.at(0).time) - db3.scint.left.time + this->fp1TofShifts[4];
+		this->fp1Tofs[5] = (fp1.xplas.at(1).time) - db3.scint.left.time + this->fp1TofShifts[5];
+		this->fp1Tofs[6] = (fp1.xplas.at(0).time) - db3.scint.right.time + this->fp1TofShifts[6];
+		this->fp1Tofs[7] = (fp1.xplas.at(1).time) - db3.scint.right.time + this->fp1TofShifts[7];
+
+		this->fp2Tofs[0] = (fp2.xplas.at(0).time) - db3.ppac0.anode.time + this->fp2TofShifts[0];
+		this->fp2Tofs[1] = (fp2.xplas.at(1).time) - db3.ppac0.anode.time + this->fp2TofShifts[1];
+		this->fp2Tofs[2] = (fp2.xplas.at(0).time) - db3.ppac1.anode.time + this->fp2TofShifts[2];
+		this->fp2Tofs[3] = (fp2.xplas.at(1).time) - db3.ppac1.anode.time + this->fp2TofShifts[3];
+		this->fp2Tofs[4] = (fp2.xplas.at(0).time) - db3.scint.left.time + this->fp2TofShifts[4];
+		this->fp2Tofs[5] = (fp2.xplas.at(1).time) - db3.scint.left.time + this->fp2TofShifts[5];
+		this->fp2Tofs[6] = (fp2.xplas.at(0).time) - db3.scint.right.time + this->fp2TofShifts[6];
+		this->fp2Tofs[7] = (fp2.xplas.at(1).time) - db3.scint.right.time + this->fp2TofShifts[7];
+	}
+	else
+	{
+		this->fp1Tofs[0] = (db3.ppac0.anode.time - fp1.xplas.at(0).time) + this->fp1TofShifts[0];
+		this->fp1Tofs[1] = (db3.ppac0.anode.time - fp1.xplas.at(1).time) + this->fp1TofShifts[1];
+		this->fp1Tofs[2] = (db3.ppac1.anode.time - fp1.xplas.at(0).time) + this->fp1TofShifts[2];
+		this->fp1Tofs[3] = (db3.ppac1.anode.time - fp1.xplas.at(1).time) + this->fp1TofShifts[3];
+		this->fp1Tofs[4] = (db3.scint.left.time - fp1.xplas.at(0).time) + this->fp1TofShifts[4];
+		this->fp1Tofs[5] = (db3.scint.left.time - fp1.xplas.at(1).time) + this->fp1TofShifts[5];
+		this->fp1Tofs[6] = (db3.scint.right.time - fp1.xplas.at(0).time) + this->fp1TofShifts[6];
+		this->fp1Tofs[7] = (db3.scint.right.time - fp1.xplas.at(1).time) + this->fp1TofShifts[7];
+
+		this->fp2Tofs[0] = (db3.ppac0.anode.time - fp2.xplas.at(0).time) + this->fp2TofShifts[0];
+		this->fp2Tofs[1] = (db3.ppac0.anode.time - fp2.xplas.at(1).time) + this->fp2TofShifts[1];
+		this->fp2Tofs[2] = (db3.ppac1.anode.time - fp2.xplas.at(0).time) + this->fp2TofShifts[2];
+		this->fp2Tofs[3] = (db3.ppac1.anode.time - fp2.xplas.at(1).time) + this->fp2TofShifts[3];
+		this->fp2Tofs[4] = (db3.scint.left.time - fp2.xplas.at(0).time) + this->fp2TofShifts[4];
+		this->fp2Tofs[5] = (db3.scint.left.time - fp2.xplas.at(1).time) + this->fp2TofShifts[5];
+		this->fp2Tofs[6] = (db3.scint.right.time - fp2.xplas.at(0).time) + this->fp2TofShifts[6];
+		this->fp2Tofs[7] = (db3.scint.right.time - fp2.xplas.at(1).time) + this->fp2TofShifts[7];
+	}
 
 	hismanager->Fill("PID_1", fp1Tofs.at(0));
 	hismanager->Fill("PID_2", fp1Tofs.at(1));
@@ -482,6 +505,7 @@ void PidProcessor::Init(const pugi::xml_node& config){
 	this->LoadHistogramSettings(config);
 
 	this->PIDPLOT = config.attribute("PIDPlot").as_int(-1);
+	this->TOFFLIP = config.attribute("TofFlip").as_bool(false);
 
 	this->fp1TofShifts = std::vector<double>(this->fp1Tofs.size(),0.0);
 	this->fp2TofShifts = std::vector<double>(this->fp2Tofs.size(),0.0);
