@@ -704,20 +704,42 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 			}
 		}
 
+		//prefetch these histograms because grabbing them every single loop is expensive
+		auto MTAS_3201 = hismanager->GetPlot<TH2*>("MTAS_3201");
 		for( int ii = 0; ii < 24; ++ii ){
-			hismanager->Fill("MTAS_3201",this->CrystalEnergy[ii],ii);
-		}
-		for( int ii = 0; ii < 12; ++ii ){
-			hismanager->Fill("MTAS_3202",this->RawCenter[ii],ii);
-			hismanager->Fill("MTAS_3203",this->Center[ii],ii);
-			hismanager->Fill("MTAS_3202",this->RawInner[ii],ii+12);
-			hismanager->Fill("MTAS_3203",this->Inner[ii],ii+12);
-			hismanager->Fill("MTAS_3202",this->RawMiddle[ii],ii+24);
-			hismanager->Fill("MTAS_3203",this->Middle[ii],ii+24);
-			hismanager->Fill("MTAS_3202",this->RawOuter[ii],ii+36);
-			hismanager->Fill("MTAS_3203",this->Outer[ii],ii+36);
+			MTAS_3201->Fill(this->CrystalEnergy[ii],ii);
 		}
 
+		//prefetch these histograms because grabbing them every single loop is expensive
+		auto MTAS_3202 = hismanager->GetPlot<TH2*>("MTAS_3202");
+		auto MTAS_3203 = hismanager->GetPlot<TH2*>("MTAS_3203");
+		for( int ii = 0; ii < 12; ++ii ){
+			MTAS_3202->Fill(this->RawCenter[ii],ii);
+			MTAS_3202->Fill(this->RawInner[ii],ii+12);
+			MTAS_3202->Fill(this->RawMiddle[ii],ii+24);
+			MTAS_3202->Fill(this->RawOuter[ii],ii+36);
+
+			MTAS_3203->Fill(this->Center[ii],ii);
+			MTAS_3203->Fill(this->Inner[ii],ii+12);
+			MTAS_3203->Fill(this->Middle[ii],ii+24);
+			MTAS_3203->Fill(this->Outer[ii],ii+36);
+		}
+
+		//prefetch these histograms because grabbing them every single loop is expensive
+		auto MTAS_3250  = hismanager->GetPlot<TH2*>("MTAS_3250");
+		auto MTAS_32508 = hismanager->GetPlot<TH2*>("MTAS_32508");
+		auto MTAS_3215  = hismanager->GetPlot<TH1*>("MTAS_3215");
+		auto MTAS_3225  = hismanager->GetPlot<TH1*>("MTAS_3225");
+		auto MTAS_3235  = hismanager->GetPlot<TH1*>("MTAS_3235");
+		auto MTAS_3245  = hismanager->GetPlot<TH1*>("MTAS_3245");
+		auto MTAS_3252  = hismanager->GetPlot<TH2*>("MTAS_3252");
+		auto MTAS_32528 = hismanager->GetPlot<TH2*>("MTAS_32528");
+		auto MTAS_3253  = hismanager->GetPlot<TH2*>("MTAS_3253");
+		auto MTAS_32538 = hismanager->GetPlot<TH2*>("MTAS_32538");
+		auto MTAS_3254  = hismanager->GetPlot<TH2*>("MTAS_3254");
+		auto MTAS_32548 = hismanager->GetPlot<TH2*>("MTAS_32548");
+		auto MTAS_3255  = hismanager->GetPlot<TH2*>("MTAS_3255");
+		auto MTAS_32558 = hismanager->GetPlot<TH2*>("MTAS_32558");
 		for( int ii = 0; ii < 6; ++ii ){
 			std::string id = std::to_string(ii);
 
@@ -730,33 +752,31 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 			name = "MTAS_326"+id;
 			hismanager->Fill(name,this->Position[ii],(this->RawCenter[2*ii] + this->RawCenter[2*ii + 1])/2.0);
 
-			hismanager->Fill("MTAS_3215",this->CrystalEnergy[ii]);
-			hismanager->Fill("MTAS_3225",this->CrystalEnergy[ii+6]);
-			hismanager->Fill("MTAS_3235",this->CrystalEnergy[ii+12]);
-			hismanager->Fill("MTAS_3245",this->CrystalEnergy[ii+18]);
+			MTAS_3215->Fill(this->CrystalEnergy[ii]);
+			MTAS_3225->Fill(this->CrystalEnergy[ii+6]);
+			MTAS_3235->Fill(this->CrystalEnergy[ii+12]);
+			MTAS_3245->Fill(this->CrystalEnergy[ii+18]);
 
-			hismanager->Fill("MTAS_3250",this->TotalEnergy[0],this->CrystalEnergy[ii+6]);
-			hismanager->Fill("MTAS_3250",this->TotalEnergy[0],this->CrystalEnergy[ii+12]);
-			hismanager->Fill("MTAS_3250",this->TotalEnergy[0],this->CrystalEnergy[ii+18]);
+			MTAS_3250->Fill(this->TotalEnergy[0],this->CrystalEnergy[ii+6]);
+			MTAS_3250->Fill(this->TotalEnergy[0],this->CrystalEnergy[ii+12]);
+			MTAS_3250->Fill(this->TotalEnergy[0],this->CrystalEnergy[ii+18]);
 
-			hismanager->Fill("MTAS_3252",this->TotalEnergy[0],this->CrystalEnergy[ii]);
+			MTAS_3252->Fill(this->TotalEnergy[0],this->CrystalEnergy[ii]);
+			MTAS_3253->Fill(this->TotalEnergy[1],this->CrystalEnergy[ii]);
 
-			hismanager->Fill("MTAS_3253",this->TotalEnergy[1],this->CrystalEnergy[ii]);
+			MTAS_32508->Fill(this->TotalEnergy[0],this->CrystalEnergy[ii+6]);
+			MTAS_32508->Fill(this->TotalEnergy[0],this->CrystalEnergy[ii+12]);
+			MTAS_32508->Fill(this->TotalEnergy[0],this->CrystalEnergy[ii+18]);
 
-			hismanager->Fill("MTAS_32508",this->TotalEnergy[0],this->CrystalEnergy[ii+6]);
-			hismanager->Fill("MTAS_32508",this->TotalEnergy[0],this->CrystalEnergy[ii+12]);
-			hismanager->Fill("MTAS_32508",this->TotalEnergy[0],this->CrystalEnergy[ii+18]);
-
-			hismanager->Fill("MTAS_32528",this->TotalEnergy[0],this->CrystalEnergy[ii]);
-
-			hismanager->Fill("MTAS_32538",this->TotalEnergy[1],this->CrystalEnergy[ii]);
+			MTAS_32528->Fill(this->TotalEnergy[0],this->CrystalEnergy[ii]);
+			MTAS_32538->Fill(this->TotalEnergy[1],this->CrystalEnergy[ii]);
 
 			if( (not this->MiddleFire) and (not this->OuterFire) ){
-				hismanager->Fill("MTAS_3255",this->TotalEnergy[0],this->CrystalEnergy[ii]);
-				hismanager->Fill("MTAS_32558",this->TotalEnergy[0],this->CrystalEnergy[ii]);
+				MTAS_3255->Fill(this->TotalEnergy[0],this->CrystalEnergy[ii]);
+				MTAS_32558->Fill(this->TotalEnergy[0],this->CrystalEnergy[ii]);
 				if( not this->InnerFire ){
-					hismanager->Fill("MTAS_3254",this->TotalEnergy[0],this->CrystalEnergy[ii]);
-					hismanager->Fill("MTAS_32548",this->TotalEnergy[0],this->CrystalEnergy[ii]);
+					MTAS_3254->Fill(this->TotalEnergy[0],this->CrystalEnergy[ii]);
+					MTAS_32548->Fill(this->TotalEnergy[0],this->CrystalEnergy[ii]);
 				}
 			}
 		}

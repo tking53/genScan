@@ -318,6 +318,21 @@ namespace PLOTS{
 				}
 			}
 
+			template<class T>
+			T GetPlot(const std::string& name){
+				if constexpr (std::is_same_v<T,TH1*>) {
+					auto it = Plots_1D.find(name);
+					return it != Plots_1D.end() ? it->second : nullptr;
+				}
+				else if constexpr (std::is_same_v<T,TH2*>) {
+					auto it = Plots_2D.find(name);
+					return it != Plots_2D.end() ? it->second : nullptr;
+				}
+				else {
+					static_assert(sizeof(T) == 0, "Unsupported type");
+				} 
+			}
+			
 			bool PlotExist(std::string name){
 				return Plot1DExist(name) or Plot2DExist(name) or Plot2DPolyExist(name);
 			}
