@@ -1723,45 +1723,68 @@ void MtasProcessor::FillBetaPlots(PLOTS::PlotRegistry* hismanager){
 
 		//these are the gamma-gamma matrices
 		if( this->gammagammaplots ){
+			auto MTAS_5300  = hismanager->GetPlot<TH2*>("MTAS_5300");
+			auto MTAS_5301  = hismanager->GetPlot<TH2*>("MTAS_5301");
+			auto MTAS_5302  = hismanager->GetPlot<TH2*>("MTAS_5302");
+			auto MTAS_53008 = hismanager->GetPlot<TH2*>("MTAS_53008");
+			auto MTAS_53018 = hismanager->GetPlot<TH2*>("MTAS_53018");
+			auto MTAS_53028 = hismanager->GetPlot<TH2*>("MTAS_53028");
 			for( int ii = 0; ii < 6; ++ii ){
 				for( int jj = ii+1; jj < 6; ++jj ){
-					hismanager->Fill("MTAS_5301",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-					hismanager->Fill("MTAS_5301",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
-					hismanager->Fill("MTAS_5302",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-					hismanager->Fill("MTAS_5302",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
-					hismanager->Fill("MTAS_53018",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-					hismanager->Fill("MTAS_53018",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
-					hismanager->Fill("MTAS_53028",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-					hismanager->Fill("MTAS_53028",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					MTAS_5301->Fill(this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					MTAS_5301->Fill(this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					MTAS_5302->Fill(this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					MTAS_5302->Fill(this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					MTAS_53018->Fill(this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					MTAS_53018->Fill(this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					MTAS_53028->Fill(this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					MTAS_53028->Fill(this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
 				}	
 			}
 			for( int ii = 6; ii < 24; ++ii ){
 				for( int jj = ii+1; jj < 24; ++jj ){
-					hismanager->Fill("MTAS_5300",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-					hismanager->Fill("MTAS_5300",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
-					hismanager->Fill("MTAS_5302",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-					hismanager->Fill("MTAS_5302",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
-					hismanager->Fill("MTAS_53008",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-					hismanager->Fill("MTAS_53008",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
-					hismanager->Fill("MTAS_53028",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-					hismanager->Fill("MTAS_53028",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					MTAS_5300->Fill(this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					MTAS_5300->Fill(this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					MTAS_5302->Fill(this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					MTAS_5302->Fill(this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					MTAS_53008->Fill(this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					MTAS_53008->Fill(this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					MTAS_53028->Fill(this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					MTAS_53028->Fill(this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
 				}
 			}
 		}
 
+		auto MTAS_3301 = hismanager->GetPlot<TH2*>("MTAS_3301");
 		for( int ii = 0; ii < 24; ++ii ){
-			hismanager->Fill("MTAS_3301",this->CrystalEnergy[ii],ii);
+			MTAS_3301->Fill(this->CrystalEnergy[ii],ii);
 		}
+		auto MTAS_3302 = hismanager->GetPlot<TH2*>("MTAS_3302");
+		auto MTAS_3303 = hismanager->GetPlot<TH2*>("MTAS_3303");
 		for( int ii = 0; ii < 12; ++ii ){
-			hismanager->Fill("MTAS_3302",this->RawCenter[ii],ii);
-			hismanager->Fill("MTAS_3303",this->Center[ii],ii);
-			hismanager->Fill("MTAS_3302",this->RawInner[ii],ii+12);
-			hismanager->Fill("MTAS_3303",this->Inner[ii],ii+12);
-			hismanager->Fill("MTAS_3302",this->RawMiddle[ii],ii+24);
-			hismanager->Fill("MTAS_3303",this->Middle[ii],ii+24);
-			hismanager->Fill("MTAS_3302",this->RawOuter[ii],ii+36);
-			hismanager->Fill("MTAS_3303",this->Outer[ii],ii+36);
+			MTAS_3302->Fill(this->RawCenter[ii],ii);
+			MTAS_3302->Fill(this->RawInner[ii],ii+12);
+			MTAS_3302->Fill(this->RawMiddle[ii],ii+24);
+			MTAS_3302->Fill(this->RawOuter[ii],ii+36);
+			MTAS_3303->Fill(this->Center[ii],ii);
+			MTAS_3303->Fill(this->Inner[ii],ii+12);
+			MTAS_3303->Fill(this->Middle[ii],ii+24);
+			MTAS_3303->Fill(this->Outer[ii],ii+36);
 		}
+		auto MTAS_3350  = hismanager->GetPlot<TH2*>("MTAS_3350");
+		auto MTAS_33508 = hismanager->GetPlot<TH2*>("MTAS_33508");
+		auto MTAS_3315  = hismanager->GetPlot<TH1*>("MTAS_3315");
+		auto MTAS_3325  = hismanager->GetPlot<TH1*>("MTAS_3325");
+		auto MTAS_3335  = hismanager->GetPlot<TH1*>("MTAS_3335");
+		auto MTAS_3345  = hismanager->GetPlot<TH1*>("MTAS_3345");
+		auto MTAS_3352  = hismanager->GetPlot<TH2*>("MTAS_3352");
+		auto MTAS_33528 = hismanager->GetPlot<TH2*>("MTAS_33528");
+		auto MTAS_3353  = hismanager->GetPlot<TH2*>("MTAS_3353");
+		auto MTAS_33538 = hismanager->GetPlot<TH2*>("MTAS_33538");
+		auto MTAS_3354  = hismanager->GetPlot<TH2*>("MTAS_3354");
+		auto MTAS_33548 = hismanager->GetPlot<TH2*>("MTAS_33548");
+		auto MTAS_3355  = hismanager->GetPlot<TH2*>("MTAS_3355");
+		auto MTAS_33558 = hismanager->GetPlot<TH2*>("MTAS_33558");
 		for( int ii = 0; ii < 6; ++ii ){
 			std::string id = std::to_string(ii);
 
@@ -1774,33 +1797,33 @@ void MtasProcessor::FillBetaPlots(PLOTS::PlotRegistry* hismanager){
 			name = "MTAS_336"+id;
 			hismanager->Fill(name,this->Position[ii],(this->RawCenter[2*ii] + this->RawCenter[2*ii + 1])/2.0);
 
-			hismanager->Fill("MTAS_3315",this->CrystalEnergy[ii]);
-			hismanager->Fill("MTAS_3325",this->CrystalEnergy[ii+6]);
-			hismanager->Fill("MTAS_3335",this->CrystalEnergy[ii+12]);
-			hismanager->Fill("MTAS_3345",this->CrystalEnergy[ii+18]);
+			MTAS_3315->Fill(this->CrystalEnergy[ii]);
+			MTAS_3325->Fill(this->CrystalEnergy[ii+6]);
+			MTAS_3335->Fill(this->CrystalEnergy[ii+12]);
+			MTAS_3345->Fill(this->CrystalEnergy[ii+18]);
 
-			hismanager->Fill("MTAS_3350",this->TotalEnergy[0],this->CrystalEnergy[ii+6]);
-			hismanager->Fill("MTAS_3350",this->TotalEnergy[0],this->CrystalEnergy[ii+12]);
-			hismanager->Fill("MTAS_3350",this->TotalEnergy[0],this->CrystalEnergy[ii+18]);
+			MTAS_3350->Fill(this->TotalEnergy[0],this->CrystalEnergy[ii+6]);
+			MTAS_3350->Fill(this->TotalEnergy[0],this->CrystalEnergy[ii+12]);
+			MTAS_3350->Fill(this->TotalEnergy[0],this->CrystalEnergy[ii+18]);
 
-			hismanager->Fill("MTAS_3352",this->TotalEnergy[0],this->CrystalEnergy[ii]);
+			MTAS_3352->Fill(this->TotalEnergy[0],this->CrystalEnergy[ii]);
 
-			hismanager->Fill("MTAS_3353",this->TotalEnergy[1],this->CrystalEnergy[ii]);
+			MTAS_3353->Fill(this->TotalEnergy[1],this->CrystalEnergy[ii]);
 
-			hismanager->Fill("MTAS_33508",this->TotalEnergy[0],this->CrystalEnergy[ii+6]);
-			hismanager->Fill("MTAS_33508",this->TotalEnergy[0],this->CrystalEnergy[ii+12]);
-			hismanager->Fill("MTAS_33508",this->TotalEnergy[0],this->CrystalEnergy[ii+18]);
+			MTAS_33508->Fill(this->TotalEnergy[0],this->CrystalEnergy[ii+6]);
+			MTAS_33508->Fill(this->TotalEnergy[0],this->CrystalEnergy[ii+12]);
+			MTAS_33508->Fill(this->TotalEnergy[0],this->CrystalEnergy[ii+18]);
 
-			hismanager->Fill("MTAS_33528",this->TotalEnergy[0],this->CrystalEnergy[ii]);
+			MTAS_33528->Fill(this->TotalEnergy[0],this->CrystalEnergy[ii]);
 
-			hismanager->Fill("MTAS_33538",this->TotalEnergy[1],this->CrystalEnergy[ii]);
+			MTAS_33538->Fill(this->TotalEnergy[1],this->CrystalEnergy[ii]);
 
 			if( (not this->MiddleFire) and (not this->OuterFire) ){
-				hismanager->Fill("MTAS_3355",this->TotalEnergy[0],this->CrystalEnergy[ii]);
-				hismanager->Fill("MTAS_33558",this->TotalEnergy[0],this->CrystalEnergy[ii]);
+				MTAS_3355->Fill(this->TotalEnergy[0],this->CrystalEnergy[ii]);
+				MTAS_33558->Fill(this->TotalEnergy[0],this->CrystalEnergy[ii]);
 				if( not this->InnerFire ){
-					hismanager->Fill("MTAS_3354",this->TotalEnergy[0],this->CrystalEnergy[ii]);
-					hismanager->Fill("MTAS_33548",this->TotalEnergy[0],this->CrystalEnergy[ii]);
+					MTAS_3354->Fill(this->TotalEnergy[0],this->CrystalEnergy[ii]);
+					MTAS_33548->Fill(this->TotalEnergy[0],this->CrystalEnergy[ii]);
 				}
 			}
 		}
@@ -1834,30 +1857,38 @@ void MtasProcessor::FillNoLogicBetaPlots(PLOTS::PlotRegistry* hismanager){
 		hismanager->Fill("MTAS_43028",this->TotalEnergy[0],this->currevttime/(60.0*60.0));
 
 		if( this->diagnosticplots ){
+			auto MTAS_3431 = hismanager->GetPlot<TH2*>("MTAS_3431");
+			auto MTAS_3432 = hismanager->GetPlot<TH2*>("MTAS_3432");
+			auto MTAS_3433 = hismanager->GetPlot<TH2*>("MTAS_3433");
+			auto MTAS_3434 = hismanager->GetPlot<TH2*>("MTAS_3434");
+			auto MTAS_3531 = hismanager->GetPlot<TH2*>("MTAS_3531");
+			auto MTAS_3532 = hismanager->GetPlot<TH2*>("MTAS_3532");
+			auto MTAS_3533 = hismanager->GetPlot<TH2*>("MTAS_3533");
+			auto MTAS_3534 = hismanager->GetPlot<TH2*>("MTAS_3534");
 			for( int ii = 0; ii < 6; ++ii ){
-				hismanager->Fill("MTAS_3431",this->RawCenter[2*ii],2*ii);
-				hismanager->Fill("MTAS_3431",this->RawCenter[2*ii + 1],2*ii + 1);
+				MTAS_3431->Fill(this->RawCenter[2*ii],2*ii);
+				MTAS_3431->Fill(this->RawCenter[2*ii + 1],2*ii + 1);
 
-				hismanager->Fill("MTAS_3432",this->RawInner[2*ii],2*ii);
-				hismanager->Fill("MTAS_3432",this->RawInner[2*ii + 1],2*ii + 1);
+				MTAS_3432->Fill(this->RawInner[2*ii],2*ii);
+				MTAS_3432->Fill(this->RawInner[2*ii + 1],2*ii + 1);
 
-				hismanager->Fill("MTAS_3433",this->RawMiddle[2*ii],2*ii);
-				hismanager->Fill("MTAS_3433",this->RawMiddle[2*ii + 1],2*ii + 1);
+				MTAS_3433->Fill(this->RawMiddle[2*ii],2*ii);
+				MTAS_3433->Fill(this->RawMiddle[2*ii + 1],2*ii + 1);
 
-				hismanager->Fill("MTAS_3434",this->RawOuter[2*ii],2*ii);
-				hismanager->Fill("MTAS_3434",this->RawOuter[2*ii + 1],2*ii + 1);
+				MTAS_3434->Fill(this->RawOuter[2*ii],2*ii);
+				MTAS_3434->Fill(this->RawOuter[2*ii + 1],2*ii + 1);
 
-				hismanager->Fill("MTAS_3531",this->CalCenter[2*ii],2*ii);
-				hismanager->Fill("MTAS_3531",this->CalCenter[2*ii + 1],2*ii + 1);
+				MTAS_3531->Fill(this->CalCenter[2*ii],2*ii);
+				MTAS_3531->Fill(this->CalCenter[2*ii + 1],2*ii + 1);
 
-				hismanager->Fill("MTAS_3532",this->CalInner[2*ii],2*ii);
-				hismanager->Fill("MTAS_3532",this->CalInner[2*ii + 1],2*ii + 1);
+				MTAS_3532->Fill(this->CalInner[2*ii],2*ii);
+				MTAS_3532->Fill(this->CalInner[2*ii + 1],2*ii + 1);
 
-				hismanager->Fill("MTAS_3533",this->CalMiddle[2*ii],2*ii);
-				hismanager->Fill("MTAS_3533",this->CalMiddle[2*ii + 1],2*ii + 1);
+				MTAS_3533->Fill(this->CalMiddle[2*ii],2*ii);
+				MTAS_3533->Fill(this->CalMiddle[2*ii + 1],2*ii + 1);
 
-				hismanager->Fill("MTAS_3534",this->CalOuter[2*ii],2*ii);
-				hismanager->Fill("MTAS_3534",this->CalOuter[2*ii + 1],2*ii + 1);
+				MTAS_3534->Fill(this->CalOuter[2*ii],2*ii);
+				MTAS_3534->Fill(this->CalOuter[2*ii + 1],2*ii + 1);
 			}
 		}
 	}
@@ -1962,45 +1993,68 @@ void MtasProcessor::FillNonBetaPlots(PLOTS::PlotRegistry* hismanager){
 
 		//these are the gamma-gamma matrices
 		if( this->gammagammaplots ){
+			auto MTAS_5100  = hismanager->GetPlot<TH2*>("MTAS_5100");
+			auto MTAS_5101  = hismanager->GetPlot<TH2*>("MTAS_5101");
+			auto MTAS_5102  = hismanager->GetPlot<TH2*>("MTAS_5102");
+			auto MTAS_51008 = hismanager->GetPlot<TH2*>("MTAS_51008");
+			auto MTAS_51018 = hismanager->GetPlot<TH2*>("MTAS_51018");
+			auto MTAS_51028 = hismanager->GetPlot<TH2*>("MTAS_51028");
 			for( int ii = 0; ii < 6; ++ii ){
 				for( int jj = ii+1; jj < 6; ++jj ){
-					hismanager->Fill("MTAS_5101",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-					hismanager->Fill("MTAS_5101",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
-					hismanager->Fill("MTAS_5102",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-					hismanager->Fill("MTAS_5102",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
-					hismanager->Fill("MTAS_51018",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-					hismanager->Fill("MTAS_51018",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
-					hismanager->Fill("MTAS_51028",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-					hismanager->Fill("MTAS_51028",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					MTAS_5101->Fill(this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					MTAS_5101->Fill(this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					MTAS_5102->Fill(this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					MTAS_5102->Fill(this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					MTAS_51018->Fill(this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					MTAS_51018->Fill(this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					MTAS_51028->Fill(this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					MTAS_51028->Fill(this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
 				}	
 			}
 			for( int ii = 6; ii < 24; ++ii ){
 				for( int jj = ii+1; jj < 24; ++jj ){
-					hismanager->Fill("MTAS_5100",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-					hismanager->Fill("MTAS_5100",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
-					hismanager->Fill("MTAS_5102",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-					hismanager->Fill("MTAS_5102",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
-					hismanager->Fill("MTAS_51008",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-					hismanager->Fill("MTAS_51008",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
-					hismanager->Fill("MTAS_51028",this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
-					hismanager->Fill("MTAS_51028",this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					MTAS_5100->Fill(this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					MTAS_5100->Fill(this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					MTAS_5102->Fill(this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					MTAS_5102->Fill(this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					MTAS_51008->Fill(this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					MTAS_51008->Fill(this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
+					MTAS_51028->Fill(this->CrystalEnergy[ii],this->CrystalEnergy[jj]);
+					MTAS_51028->Fill(this->CrystalEnergy[jj],this->CrystalEnergy[ii]);
 				}
 			}
 		}
 
+		auto MTAS_3101 = hismanager->GetPlot<TH2*>("MTAS_3101");
 		for( int ii = 0; ii < 24; ++ii ){
-			hismanager->Fill("MTAS_3101",this->CrystalEnergy[ii],ii);
+			MTAS_3101->Fill(this->CrystalEnergy[ii],ii);
 		}
+		auto MTAS_3102 = hismanager->GetPlot<TH2*>("MTAS_3102");
+		auto MTAS_3103 = hismanager->GetPlot<TH2*>("MTAS_3103");
 		for( int ii = 0; ii < 12; ++ii ){
-			hismanager->Fill("MTAS_3102",this->RawCenter[ii],ii);
-			hismanager->Fill("MTAS_3103",this->Center[ii],ii);
-			hismanager->Fill("MTAS_3102",this->RawInner[ii],ii+12);
-			hismanager->Fill("MTAS_3103",this->Inner[ii],ii+12);
-			hismanager->Fill("MTAS_3102",this->RawMiddle[ii],ii+24);
-			hismanager->Fill("MTAS_3103",this->Middle[ii],ii+24);
-			hismanager->Fill("MTAS_3102",this->RawOuter[ii],ii+36);
-			hismanager->Fill("MTAS_3103",this->Outer[ii],ii+36);
+			MTAS_3102->Fill(this->RawCenter[ii],ii);
+			MTAS_3102->Fill(this->RawInner[ii],ii+12);
+			MTAS_3102->Fill(this->RawMiddle[ii],ii+24);
+			MTAS_3102->Fill(this->RawOuter[ii],ii+36);
+			MTAS_3103->Fill(this->Center[ii],ii);
+			MTAS_3103->Fill(this->Inner[ii],ii+12);
+			MTAS_3103->Fill(this->Middle[ii],ii+24);
+			MTAS_3103->Fill(this->Outer[ii],ii+36);
 		}
+		auto MTAS_3150  = hismanager->GetPlot<TH2*>("MTAS_3150");
+		auto MTAS_31508 = hismanager->GetPlot<TH2*>("MTAS_31508");
+		auto MTAS_3115  = hismanager->GetPlot<TH1*>("MTAS_3115");
+		auto MTAS_3125  = hismanager->GetPlot<TH1*>("MTAS_3125");
+		auto MTAS_3135  = hismanager->GetPlot<TH1*>("MTAS_3135");
+		auto MTAS_3145  = hismanager->GetPlot<TH1*>("MTAS_3145");
+		auto MTAS_3152  = hismanager->GetPlot<TH2*>("MTAS_3152");
+		auto MTAS_31528 = hismanager->GetPlot<TH2*>("MTAS_31528");
+		auto MTAS_3153  = hismanager->GetPlot<TH2*>("MTAS_3153");
+		auto MTAS_31538 = hismanager->GetPlot<TH2*>("MTAS_31538");
+		auto MTAS_3154  = hismanager->GetPlot<TH2*>("MTAS_3154");
+		auto MTAS_31548 = hismanager->GetPlot<TH2*>("MTAS_31548");
+		auto MTAS_3155  = hismanager->GetPlot<TH2*>("MTAS_3155");
+		auto MTAS_31558 = hismanager->GetPlot<TH2*>("MTAS_31558");
 		for( int ii = 0; ii < 6; ++ii ){
 			std::string id = std::to_string(ii);
 
@@ -2013,33 +2067,33 @@ void MtasProcessor::FillNonBetaPlots(PLOTS::PlotRegistry* hismanager){
 			name = "MTAS_316"+id;
 			hismanager->Fill(name,this->Position[ii],(this->RawCenter[2*ii] + this->RawCenter[2*ii + 1])/2.0);
 
-			hismanager->Fill("MTAS_3115",this->CrystalEnergy[ii]);
-			hismanager->Fill("MTAS_3125",this->CrystalEnergy[ii+6]);
-			hismanager->Fill("MTAS_3135",this->CrystalEnergy[ii+12]);
-			hismanager->Fill("MTAS_3145",this->CrystalEnergy[ii+18]);
+			MTAS_3115->Fill(this->CrystalEnergy[ii]);
+			MTAS_3125->Fill(this->CrystalEnergy[ii+6]);
+			MTAS_3135->Fill(this->CrystalEnergy[ii+12]);
+			MTAS_3145->Fill(this->CrystalEnergy[ii+18]);
 
-			hismanager->Fill("MTAS_3150",this->TotalEnergy[0],this->CrystalEnergy[ii+6]);
-			hismanager->Fill("MTAS_3150",this->TotalEnergy[0],this->CrystalEnergy[ii+12]);
-			hismanager->Fill("MTAS_3150",this->TotalEnergy[0],this->CrystalEnergy[ii+18]);
+			MTAS_3150->Fill(this->TotalEnergy[0],this->CrystalEnergy[ii+6]);
+			MTAS_3150->Fill(this->TotalEnergy[0],this->CrystalEnergy[ii+12]);
+			MTAS_3150->Fill(this->TotalEnergy[0],this->CrystalEnergy[ii+18]);
 
-			hismanager->Fill("MTAS_3152",this->TotalEnergy[0],this->CrystalEnergy[ii]);
+			MTAS_3152->Fill(this->TotalEnergy[0],this->CrystalEnergy[ii]);
 
-			hismanager->Fill("MTAS_3153",this->TotalEnergy[1],this->CrystalEnergy[ii]);
+			MTAS_3153->Fill(this->TotalEnergy[1],this->CrystalEnergy[ii]);
 
-			hismanager->Fill("MTAS_31508",this->TotalEnergy[0],this->CrystalEnergy[ii+6]);
-			hismanager->Fill("MTAS_31508",this->TotalEnergy[0],this->CrystalEnergy[ii+12]);
-			hismanager->Fill("MTAS_31508",this->TotalEnergy[0],this->CrystalEnergy[ii+18]);
+			MTAS_31508->Fill(this->TotalEnergy[0],this->CrystalEnergy[ii+6]);
+			MTAS_31508->Fill(this->TotalEnergy[0],this->CrystalEnergy[ii+12]);
+			MTAS_31508->Fill(this->TotalEnergy[0],this->CrystalEnergy[ii+18]);
 
-			hismanager->Fill("MTAS_31528",this->TotalEnergy[0],this->CrystalEnergy[ii]);
+			MTAS_31528->Fill(this->TotalEnergy[0],this->CrystalEnergy[ii]);
 
-			hismanager->Fill("MTAS_31538",this->TotalEnergy[1],this->CrystalEnergy[ii]);
+			MTAS_31538->Fill(this->TotalEnergy[1],this->CrystalEnergy[ii]);
 
 			if( (not this->MiddleFire) and (not this->OuterFire) ){
-				hismanager->Fill("MTAS_3155",this->TotalEnergy[0],this->CrystalEnergy[ii]);
-				hismanager->Fill("MTAS_31558",this->TotalEnergy[0],this->CrystalEnergy[ii]);
+				MTAS_3155->Fill(this->TotalEnergy[0],this->CrystalEnergy[ii]);
+				MTAS_31558->Fill(this->TotalEnergy[0],this->CrystalEnergy[ii]);
 				if( not this->InnerFire ){
-					hismanager->Fill("MTAS_3154",this->TotalEnergy[0],this->CrystalEnergy[ii]);
-					hismanager->Fill("MTAS_31548",this->TotalEnergy[0],this->CrystalEnergy[ii]);
+					MTAS_3154->Fill(this->TotalEnergy[0],this->CrystalEnergy[ii]);
+					MTAS_31548->Fill(this->TotalEnergy[0],this->CrystalEnergy[ii]);
 				}
 			}
 
@@ -2074,30 +2128,38 @@ void MtasProcessor::FillNoLogicNonBetaPlots(PLOTS::PlotRegistry* hismanager){
 		hismanager->Fill("MTAS_41028",this->TotalEnergy[0],this->currevttime/(60.0*60.0));
 
 		if( this->diagnosticplots ){
+			auto MTAS_3411 = hismanager->GetPlot<TH2*>("MTAS_3411");
+			auto MTAS_3412 = hismanager->GetPlot<TH2*>("MTAS_3412");
+			auto MTAS_3413 = hismanager->GetPlot<TH2*>("MTAS_3413");
+			auto MTAS_3414 = hismanager->GetPlot<TH2*>("MTAS_3414");
+			auto MTAS_3511 = hismanager->GetPlot<TH2*>("MTAS_3511");
+			auto MTAS_3512 = hismanager->GetPlot<TH2*>("MTAS_3512");
+			auto MTAS_3513 = hismanager->GetPlot<TH2*>("MTAS_3513");
+			auto MTAS_3514 = hismanager->GetPlot<TH2*>("MTAS_3514");
 			for( int ii = 0; ii < 6; ++ii ){
-				hismanager->Fill("MTAS_3411",this->RawCenter[2*ii],2*ii);
-				hismanager->Fill("MTAS_3411",this->RawCenter[2*ii + 1],2*ii + 1);
+				MTAS_3411->Fill(this->RawCenter[2*ii],2*ii);
+				MTAS_3411->Fill(this->RawCenter[2*ii + 1],2*ii + 1);
 
-				hismanager->Fill("MTAS_3412",this->RawInner[2*ii],2*ii);
-				hismanager->Fill("MTAS_3412",this->RawInner[2*ii + 1],2*ii + 1);
+				MTAS_3412->Fill(this->RawInner[2*ii],2*ii);
+				MTAS_3412->Fill(this->RawInner[2*ii + 1],2*ii + 1);
 
-				hismanager->Fill("MTAS_3413",this->RawMiddle[2*ii],2*ii);
-				hismanager->Fill("MTAS_3413",this->RawMiddle[2*ii + 1],2*ii + 1);
+				MTAS_3413->Fill(this->RawMiddle[2*ii],2*ii);
+				MTAS_3413->Fill(this->RawMiddle[2*ii + 1],2*ii + 1);
 
-				hismanager->Fill("MTAS_3414",this->RawOuter[2*ii],2*ii);
-				hismanager->Fill("MTAS_3414",this->RawOuter[2*ii + 1],2*ii + 1);
+				MTAS_3414->Fill(this->RawOuter[2*ii],2*ii);
+				MTAS_3414->Fill(this->RawOuter[2*ii + 1],2*ii + 1);
 
-				hismanager->Fill("MTAS_3511",this->CalCenter[2*ii],2*ii);
-				hismanager->Fill("MTAS_3511",this->CalCenter[2*ii + 1],2*ii + 1);
+				MTAS_3511->Fill(this->CalCenter[2*ii],2*ii);
+				MTAS_3511->Fill(this->CalCenter[2*ii + 1],2*ii + 1);
 
-				hismanager->Fill("MTAS_3512",this->CalInner[2*ii],2*ii);
-				hismanager->Fill("MTAS_3512",this->CalInner[2*ii + 1],2*ii + 1);
+				MTAS_3512->Fill(this->CalInner[2*ii],2*ii);
+				MTAS_3512->Fill(this->CalInner[2*ii + 1],2*ii + 1);
 
-				hismanager->Fill("MTAS_3513",this->CalMiddle[2*ii],2*ii);
-				hismanager->Fill("MTAS_3513",this->CalMiddle[2*ii + 1],2*ii + 1);
+				MTAS_3513->Fill(this->CalMiddle[2*ii],2*ii);
+				MTAS_3513->Fill(this->CalMiddle[2*ii + 1],2*ii + 1);
 
-				hismanager->Fill("MTAS_3514",this->CalOuter[2*ii],2*ii);
-				hismanager->Fill("MTAS_3514",this->CalOuter[2*ii + 1],2*ii + 1);
+				MTAS_3514->Fill(this->CalOuter[2*ii],2*ii);
+				MTAS_3514->Fill(this->CalOuter[2*ii + 1],2*ii + 1);
 			}
 		}
 	}
