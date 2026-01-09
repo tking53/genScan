@@ -369,6 +369,12 @@ void ProcessorList::Finalize(){
 	for( auto& proc : this->known_processors ){
 		proc->Finalize();
 	}
+	if( this->known_processors.size() != 1 ){
+		this->console->critical("Not in experiment processor mode, notifying all processors present");
+		for( auto& proc : this->known_processors ){
+			proc->ToggleExpProcessorMode();
+		}
+	}
 }
 
 void ProcessorList::CleanupTrees(){

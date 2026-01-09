@@ -69,6 +69,7 @@ class Processor : public std::enable_shared_from_this<Processor> {
 		[[nodiscard]] virtual PLOTS::HisHelper2D Get2DSetting(int) const final;
 
 		virtual void SetEventIdx(unsigned long long) final;
+		virtual void ToggleExpProcessorMode() final;
 		
 	protected:
 		virtual void LoadHistogramSettings(const pugi::xml_node&) final;
@@ -113,6 +114,8 @@ class Processor : public std::enable_shared_from_this<Processor> {
 		std::map<int,PLOTS::HisHelper1D> h1dsettings;
 		std::map<int,PLOTS::HisHelper2D> h2dsettings;
 		std::map<std::string,std::string> customcuts;
+
+		bool ExpProcessorMode;
 };
 
 #endif

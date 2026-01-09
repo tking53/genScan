@@ -42,6 +42,7 @@ Processor::Processor(const std::string& log,const std::string& proc,const std::i
 	this->DefaultRegex = boost::regex(this->DefaultRegexString,boost::regex_constants::optimize|boost::regex_constants::nosubs);
 	this->AllDefaultRegex["ALL"] = this->DefaultRegex;
 	this->console->info("Default Type Regex established to be {}",this->DefaultRegexString);
+	this->ExpProcessorMode = true;
 }
 
 std::string Processor::GetProcessorName() const{
@@ -243,4 +244,8 @@ void Processor::LoadCustomCuts(const pugi::xml_node& config){
 
 void Processor::SetEventIdx(unsigned long long idx){
 	this->Eventidx = idx;
+}
+
+void Processor::ToggleExpProcessorMode() {
+	this->ExpProcessorMode = false;
 }

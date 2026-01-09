@@ -802,6 +802,28 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 }
 
 [[maybe_unused]] bool MtasProcessor::Process([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+	Processor::Process();
+
+	//this allows for all the beta and non-beta to be filled when no exp is defined
+	//but if we're in exp mode (i.e.) one known processor then we will not fill
+	//this could double fill if you define an exp that has MTAS as well as 
+	//mtas outside as well. hopefull nobody will be that dumb, likely 
+	//we need to recursively ask all the processors to name themselves and we double check 
+	//that there are no duplicates present
+	if( not this->ExpProcessorMode ){
+		//we're in a cluster of procs and need to query beta or not beta ourselves
+		auto summary = eventhistory->GetCurrentEventSummary();
+		auto HasBeta = summary->ContainsEventTag("beta");
+		if( HasBeta ){
+			this->FillBetaPlots(hismanager);
+			this->FillNoLogicBetaPlots(hismanager);
+		}else{
+			this->FillNonBetaPlots(hismanager);
+			this->FillNoLogicNonBetaPlots(hismanager);
+		}
+	}
+
+	Processor::EndProcess();
 	return true;
 }
 
