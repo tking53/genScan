@@ -7,7 +7,7 @@
 class PidProcessor : public Processor{
 	public:
 		PidProcessor(const std::string&);
-		virtual ~PidProcessor() = default;
+		virtual ~PidProcessor();
 		[[maybe_unused]] bool PreProcess([[maybe_unused]] EventHistoryManager*,[[maybe_unused]] PLOTS::PlotRegistry*,[[maybe_unused]] CUTS::CutRegistry*) final;
 		[[maybe_unused]] bool Process(EventHistoryManager*,[[maybe_unused]] PLOTS::PlotRegistry*,[[maybe_unused]] CUTS::CutRegistry*) final;
 		[[maybe_unused]] bool PostProcess([[maybe_unused]] EventHistoryManager*,[[maybe_unused]] PLOTS::PlotRegistry*,[[maybe_unused]] CUTS::CutRegistry*) final;
@@ -37,6 +37,7 @@ class PidProcessor : public Processor{
 	private:
 
 		inline double CalcPPACPosition(const double&,const double&);
+		void IncrementIsotopeCount(std::map<std::string,int>&,const std::pair<std::string,std::string>&,CUTS::CutRegistry*);
 
 		ProcessorStruct::DBOX db3;
 		ProcessorStruct::DBOX db4;
@@ -89,6 +90,7 @@ class PidProcessor : public Processor{
 
 		std::map<std::string,std::string> isotopes;
 		std::map<std::string,int> isotopecount;
+		std::map<std::string,int> implantedisotopecount;
 		std::vector<std::string> isotopetags;
 
 		int PIDPLOT;

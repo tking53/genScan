@@ -459,29 +459,29 @@ PidProcessor::PidProcessor(const std::string& log) : Processor(log,"PidProcessor
 	hismanager->Fill("PID_5010",db5.ppac1.xpos,db5.ppac1.ypos);
 
 	//in here tell it if what cut we made it in
-	size_t isotopeidx = 0;
+	// size_t isotopeidx = 0;
 	for( const auto& kv : this->isotopes ){
-		//hismanager->Fill("PID_21", fp1Tofs[6], fp1.pin.at(0).energy);
-		if( this->PIDPLOT == 21 ){
-			if( cutmanager->IsWithin(kv.second,fp1Tofs[6],fp1.pin[0].energy) ){
-				summary->AddEventTag(kv.first);
-				++(this->isotopecount[kv.first]);
-				//tdiff in seconds
-				auto tdiff = 1.0e-9*(summary->GetRawEvents().front().GetTimeStamp() - eventhistory->GetVeryFirstTime());
+		IncrementIsotopeCount(this->isotopecount,kv,cutmanager);
+		//if( this->PIDPLOT == 21 ){
+		//	if( cutmanager->IsWithin(kv.second,this->fp1Tofs[6],this->fp1.pin[0].energy) ){
+		//		summary->AddEventTag(kv.first);
+		//		++(this->isotopecount[kv.first]);
+		//		//tdiff in seconds
+		//		auto tdiff = 1.0e-9*(summary->GetRawEvents().front().GetTimeStamp() - eventhistory->GetVeryFirstTime());
 
-				std::string label = "PID_9000"+std::to_string(isotopeidx);
-				hismanager->Fill(label,tdiff);
+		//		std::string label = "PID_9000"+std::to_string(isotopeidx);
+		//		hismanager->Fill(label,tdiff);
 				
-				label = "PID_9001"+std::to_string(isotopeidx);
-				hismanager->Fill(label,tdiff/60.0);
+		//		label = "PID_9001"+std::to_string(isotopeidx);
+		//		hismanager->Fill(label,tdiff/60.0);
 
-				label = "PID_9002"+std::to_string(isotopeidx);
-				hismanager->Fill(label,tdiff/3600.0);
-			}
-		}else{
-			this->console->error("No PID used");
-		}
-		++isotopeidx;
+		//		label = "PID_9002"+std::to_string(isotopeidx);
+		//		hismanager->Fill(label,tdiff/3600.0);
+		//	}
+		//}else{
+		//	this->console->error("No PID used");
+		//}
+		// ++isotopeidx;
 	}
 
 
@@ -490,6 +490,16 @@ PidProcessor::PidProcessor(const std::string& log) : Processor(log,"PidProcessor
 }
 
 [[maybe_unused]] bool PidProcessor::Process([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+	Processor::Process();
+	
+	auto summary = eventhistory->GetCurrentEventSummary();
+	auto hasion = summary->ContainsEventTag("ion");
+	if( hasion ){
+		for( const auto& kv : this->isotopes ){
+			IncrementIsotopeCount(this->implantedisotopecount,kv,cutmanager);
+		}
+	}
+	Processor::EndProcess();
 	return true;
 }
 
@@ -551,6 +561,7 @@ void PidProcessor::Init(const pugi::xml_node& config){
 	for( const auto& kv : this->isotopes ){
 		this->isotopetags.push_back(kv.first);
 		this->isotopecount[kv.first] = 0;
+		this->implantedisotopecount[kv.first] = 0;
 	}
 }
 		
@@ -765,4 +776,26 @@ inline double PidProcessor::CalcPPACPosition(const double& a,const double& b){
 
 const int& PidProcessor::GetNumIsotopes(const std::string& id) const{
 	return this->isotopecount.at(id);
+}
+
+void PidProcessor::IncrementIsotopeCount(std::map<std::string,int>& cnt,
+		const std::pair<std::string,std::string>& kv,
+		CUTS::CutRegistry* cutmanager){
+	if( this->PIDPLOT == 21 ){
+		if( cutmanager->IsWithin(kv.second,this->fp1Tofs[6],this->fp1.pin[0].energy) ){
+			++(cnt[kv.first]);
+		}
+	}else{
+		this->console->error("No PID used");
+	}
+}
+
+PidProcessor::~PidProcessor(){
+	this->console->info("| Isotope |   Raw   | Implant |  Ratio  |");
+	for( const auto& i : this->isotopetags ){
+		auto raw = this->isotopecount[i];
+		auto implant = this->implantedisotopecount[i];
+		auto rat = (raw > 0 ) ? static_cast<float>(implant)/static_cast<float>(raw) : 0.0;
+		this->console->info("|{:^9}|{:^9d}|{:^9d}|{:^9g}|",i,raw,implant,rat); 
+	}
 }

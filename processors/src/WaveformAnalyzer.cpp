@@ -35,6 +35,25 @@ WaveformAnalyzer::~WaveformAnalyzer(){
 [[maybe_unused]] bool WaveformAnalyzer::PreProcess([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
 	Analyzer::PreProcess();
 
+	auto WAVE_1030 = hismanager->GetPlot<TH2*>("WAVE_1030");
+	auto WAVE_1031 = hismanager->GetPlot<TH2*>("WAVE_1031");
+	auto WAVE_1032 = hismanager->GetPlot<TH2*>("WAVE_1032");
+	auto WAVE_1033 = hismanager->GetPlot<TH2*>("WAVE_1033");
+	auto WAVE_1034 = hismanager->GetPlot<TH2*>("WAVE_1034");
+	auto WAVE_1035 = hismanager->GetPlot<TH2*>("WAVE_1035");
+
+	auto WAVE_1000 = hismanager->GetPlot<TH2*>("WAVE_1000");
+	auto WAVE_1001 = hismanager->GetPlot<TH2*>("WAVE_1001");
+	auto WAVE_1002 = hismanager->GetPlot<TH2*>("WAVE_1002");
+
+	auto WAVE_1010 = hismanager->GetPlot<TH2*>("WAVE_1010");
+	auto WAVE_1011 = hismanager->GetPlot<TH2*>("WAVE_1011");
+	auto WAVE_1012 = hismanager->GetPlot<TH2*>("WAVE_1012");
+
+	auto WAVE_1020 = hismanager->GetPlot<TH2*>("WAVE_1020");
+	auto WAVE_1021 = hismanager->GetPlot<TH2*>("WAVE_1021");
+	auto WAVE_1022 = hismanager->GetPlot<TH2*>("WAVE_1022");
+
 	for( const auto& key : this->Types ){
 		eventhistory->GetCurrentEventSummary()->GetDetectorSummary(this->AllDefaultRegex[key],this->SummaryData);
 		//this->console->info("ROOTDEV Size for type {} : {}",key,this->SummaryData.size());
@@ -85,13 +104,13 @@ WaveformAnalyzer::~WaveformAnalyzer(){
 							auto tail = std::get<1>(psd);
 							auto total = std::get<2>(psd);
 
-							hismanager->Fill("WAVE_1030",head,gcid);
-							hismanager->Fill("WAVE_1031",tail,gcid);
-							hismanager->Fill("WAVE_1032",total,gcid);
+							WAVE_1030->Fill(head,gcid);
+							WAVE_1031->Fill(tail,gcid);
+							WAVE_1032->Fill(total,gcid);
 							
-							hismanager->Fill("WAVE_1033",head/total,gcid);
-							hismanager->Fill("WAVE_1034",tail/total,gcid);
-							hismanager->Fill("WAVE_1035",head/tail,gcid);
+							WAVE_1033->Fill(head/total,gcid);
+							WAVE_1034->Fill(tail/total,gcid);
+							WAVE_1035->Fill(head/tail,gcid);
 						}
 					}
 					auto pre = evt->GetTracePreTriggerBaseline();
@@ -100,19 +119,19 @@ WaveformAnalyzer::~WaveformAnalyzer(){
 					auto blmax = evt->GetBaselineSubtractedMaxValue();
 					auto gcid = evt->GetGlobalChannelID();
 
-					hismanager->Fill("WAVE_1000",s.second.PreTriggerBounds.first,gcid);
-					hismanager->Fill("WAVE_1000",s.second.PreTriggerBounds.second,gcid);
-					hismanager->Fill("WAVE_1001",pre.first,gcid);
-					hismanager->Fill("WAVE_1002",pre.second,gcid);
+					WAVE_1000->Fill(s.second.PreTriggerBounds.first,gcid);
+					WAVE_1000->Fill(s.second.PreTriggerBounds.second,gcid);
+					WAVE_1001->Fill(pre.first,gcid);
+					WAVE_1002->Fill(pre.second,gcid);
 
-					hismanager->Fill("WAVE_1010",s.second.PostTriggerBounds.first,gcid);
-					hismanager->Fill("WAVE_1010",s.second.PostTriggerBounds.second,gcid);
-					hismanager->Fill("WAVE_1011",post.first,gcid);
-					hismanager->Fill("WAVE_1012",post.second,gcid);
+					WAVE_1010->Fill(s.second.PostTriggerBounds.first,gcid);
+					WAVE_1010->Fill(s.second.PostTriggerBounds.second,gcid);
+					WAVE_1011->Fill(post.first,gcid);
+					WAVE_1012->Fill(post.second,gcid);
 
-					hismanager->Fill("WAVE_1020",maxval.first,gcid);
-					hismanager->Fill("WAVE_1021",maxval.second,gcid);
-					hismanager->Fill("WAVE_1022",blmax,gcid);
+					WAVE_1020->Fill(maxval.first,gcid);
+					WAVE_1021->Fill(maxval.second,gcid);
+					WAVE_1022->Fill(blmax,gcid);
 
 					break;
 				}

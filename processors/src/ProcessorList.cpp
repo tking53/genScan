@@ -273,6 +273,35 @@ void ProcessorList::ProcessRaw(EventHistoryManager* History,PLOTS::PlotRegistry*
 	HistogramManager->Fill("Event_Spacing",historyspacing);
 	HistogramManager->Fill("History_Width",historyts*1.0e-3);
 
+	auto Raw = HistogramManager->GetPlot<TH2*>("Raw");
+	auto InternalRaw = HistogramManager->GetPlot<TH2*>("InternalRaw");
+	auto IntegralRaw = HistogramManager->GetPlot<TH2*>("IntegralRaw");
+	auto Scalar = HistogramManager->GetPlot<TH2*>("Scalar");
+	auto Scalar_M = HistogramManager->GetPlot<TH2*>("Scalar_M");
+	auto Scalar_5M = HistogramManager->GetPlot<TH2*>("Scalar_5M");
+	auto Cal = HistogramManager->GetPlot<TH2*>("Cal");
+	auto InternalCal = HistogramManager->GetPlot<TH2*>("InternalCal");
+	auto IntegralCal = HistogramManager->GetPlot<TH2*>("IntegralCal");
+	auto Event_Mult = HistogramManager->GetPlot<TH2*>("Event_Mult");
+	auto Trace_Size = HistogramManager->GetPlot<TH2*>("Trace_Size");
+	auto Total_Rate = HistogramManager->GetPlot<TH2*>("Total_Rate");
+	auto Total_Rate_M = HistogramManager->GetPlot<TH2*>("Total_Rate_M");
+	auto Total_Rate_5M = HistogramManager->GetPlot<TH2*>("Total_Rate_5M");
+	auto Total_Pileup = HistogramManager->GetPlot<TH2*>("Total_Pileup");
+	auto Total_Saturate = HistogramManager->GetPlot<TH2*>("Total_Saturate");
+	auto Total_Hits = HistogramManager->GetPlot<TH2*>("Total_Hits");
+
+	std::vector<TH2*> QDCs = {
+		HistogramManager->GetPlot<TH2*>(this->QDCHisNames[0]),
+		HistogramManager->GetPlot<TH2*>(this->QDCHisNames[1]),
+		HistogramManager->GetPlot<TH2*>(this->QDCHisNames[2]),
+		HistogramManager->GetPlot<TH2*>(this->QDCHisNames[3]),
+		HistogramManager->GetPlot<TH2*>(this->QDCHisNames[4]),
+		HistogramManager->GetPlot<TH2*>(this->QDCHisNames[5]),
+		HistogramManager->GetPlot<TH2*>(this->QDCHisNames[6]),
+		HistogramManager->GetPlot<TH2*>(this->QDCHisNames[7])
+	};
+
 	for( auto& evt : RawEvents ){
 		auto gChanID = evt.GetGlobalChannelID();
 		auto gBoardID = evt.GetGlobalBoardID();
@@ -285,30 +314,30 @@ void ProcessorList::ProcessRaw(EventHistoryManager* History,PLOTS::PlotRegistry*
 		int rate_m_x = static_cast<int>(scalartime_m)%scalarsize;
 		int rate_5m_y = scalartime_5m/scalarsize;
 		int rate_5m_x = static_cast<int>(scalartime_5m)%scalarsize;
-		HistogramManager->Fill("Raw",evt.GetRawEnergyWRandom(),gChanID);
-		HistogramManager->Fill("InternalRaw",evt.GetInternalFilterRaw(),gChanID);
-		HistogramManager->Fill("IntegralRaw",evt.GetInternalIntegralRaw(),gChanID);
-		HistogramManager->Fill("Scalar",scalartime,gChanID);
-		HistogramManager->Fill("Scalar_M",scalartime_m,gChanID);
-		HistogramManager->Fill("Scalar_5M",scalartime_5m,gChanID);
-		HistogramManager->Fill("Cal",evt.GetEnergy(),gChanID);
-		HistogramManager->Fill("InternalCal",evt.GetInternalFilterEnergy(),gChanID);
-		HistogramManager->Fill("IntegralCal",evt.GetInternalIntegralEnergy(),gChanID);
-		HistogramManager->Fill("Event_Mult",gChanID,evtsize);
-		HistogramManager->Fill("Trace_Size",gChanID,evt.GetRawTrace().size());
-		HistogramManager->Fill("Total_Rate",rate_x,rate_y);
-		HistogramManager->Fill("Total_Rate_M",rate_m_x,rate_m_y);
-		HistogramManager->Fill("Total_Rate_5M",rate_5m_x,rate_5m_y);
+		Raw->Fill(evt.GetRawEnergyWRandom(),gChanID);
+		InternalRaw->Fill(evt.GetInternalFilterRaw(),gChanID);
+		IntegralRaw->Fill(evt.GetInternalIntegralRaw(),gChanID);
+		Scalar->Fill(scalartime,gChanID);
+		Scalar_M->Fill(scalartime_m,gChanID);
+		Scalar_5M->Fill(scalartime_5m,gChanID);
+		Cal->Fill(evt.GetEnergy(),gChanID);
+		InternalCal->Fill(evt.GetInternalFilterEnergy(),gChanID);
+		IntegralCal->Fill(evt.GetInternalIntegralEnergy(),gChanID);
+		Event_Mult->Fill(gChanID,evtsize);
+		Trace_Size->Fill(gChanID,evt.GetRawTrace().size());
+		Total_Rate->Fill(rate_x,rate_y);
+		Total_Rate_M->Fill(rate_m_x,rate_m_y);
+		Total_Rate_5M->Fill(rate_5m_x,rate_5m_y);
 		if( evt.GetPileup() ){
-			HistogramManager->Fill("Total_Pileup",gBoardID,evt.GetChannel());
+			Total_Pileup->Fill(gBoardID,evt.GetChannel());
 		}
 		if( evt.GetSaturation() ){
-			HistogramManager->Fill("Total_Saturate",gBoardID,evt.GetChannel());
+			Total_Saturate->Fill(gBoardID,evt.GetChannel());
 		}
-		HistogramManager->Fill("Total_Hits",gBoardID,evt.GetChannel());
+		Total_Hits->Fill(gBoardID,evt.GetChannel());
 		auto qdcs = evt.GetQDCSums();
 		for( size_t ii = 0; ii < qdcs.size(); ++ii ){
-			HistogramManager->Fill(this->QDCHisNames[ii],qdcs[ii],gChanID);
+			QDCs[ii]->Fill(qdcs[ii],gChanID);
 		}
 	}
 }
