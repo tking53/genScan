@@ -363,17 +363,17 @@ void ProcessorList::ProcessRaw(EventHistoryManager* History,PLOTS::PlotRegistry*
 }
 
 void ProcessorList::Finalize(){
-	for( auto& anal : this->known_analyzers ){
-		anal->Finalize();
-	}
-	for( auto& proc : this->known_processors ){
-		proc->Finalize();
-	}
 	if( this->known_processors.size() != 1 ){
 		this->console->critical("Not in experiment processor mode, notifying all processors present");
 		for( auto& proc : this->known_processors ){
 			proc->ToggleExpProcessorMode();
 		}
+	}
+	for( auto& anal : this->known_analyzers ){
+		anal->Finalize();
+	}
+	for( auto& proc : this->known_processors ){
+		proc->Finalize();
 	}
 }
 

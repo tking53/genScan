@@ -972,6 +972,9 @@ void MtasProcessor::Init(const pugi::xml_node& config){
 
 void MtasProcessor::Finalize(){
 	this->console->info("{} has been finalized",this->ProcessorName);
+	if( not this->ExpProcessorMode ){
+		this->console->critical("Experiment Processor Mode is disabled, MtasProcessor itself will try and fill Beta/NonBeta");
+	}
 }
 
 void MtasProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
