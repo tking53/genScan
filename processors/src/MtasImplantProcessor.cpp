@@ -225,14 +225,19 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 	hismanager->Fill("IMPLANT_7021",this->lgImage.dynode,this->lgImage.anodesum);
 	hismanager->Fill("IMPLANT_70218",this->lgImage.dynode,this->lgImage.anodesum);
 
-	hismanager->Fill("IMPLANT_7030",this->HighGainDynodeHits,0);
-	hismanager->Fill("IMPLANT_7030",this->LowGainDynodeHits,1);
-	hismanager->Fill("IMPLANT_7030",this->HighGainAnodeHits,2);
-	hismanager->Fill("IMPLANT_7030",this->LowGainAnodeHits,3);
+	//prefetch since we fill more than once
+	auto IMPLANT_7030 = hismanager->GetPlot<TH2*>("IMPLANT_7030");
+	IMPLANT_7030->Fill(this->HighGainDynodeHits,0);
+	IMPLANT_7030->Fill(this->LowGainDynodeHits,1);
+	IMPLANT_7030->Fill(this->HighGainAnodeHits,2);
+	IMPLANT_7030->Fill(this->LowGainAnodeHits,3);
 
+	//prefetch since we fill more than once
+	auto IMPLANT_7040 = hismanager->GetPlot<TH2*>("IMPLANT_7040");
+	auto IMPLANT_7043 = hismanager->GetPlot<TH2*>("IMPLANT_7043");
 	for( size_t ii = 0; ii < 64; ++ii ){
-		hismanager->Fill("IMPLANT_7040",this->HighGainAnodeHitMap[ii],ii);
-		hismanager->Fill("IMPLANT_7043",this->LowGainAnodeHitMap[ii],ii);
+		IMPLANT_7040->Fill(this->HighGainAnodeHitMap[ii],ii);
+		IMPLANT_7043->Fill(this->LowGainAnodeHitMap[ii],ii);
 	}
 
 	if( this->lgImage.dynode > this->IsIonThresh.first and this->lgImage.dynode < this->IsIonThresh.second ){
