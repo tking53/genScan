@@ -7,7 +7,7 @@
 	<Global EventWidth="5.0e-7" EventWidthUnit="s" CorrelationType="rolling-window" />
 	<DetectorDriver>
 		<Processor name="RootDevProcessor" included_types="mtasimplant,veto" />
-		<Analyzer name="WaveformAnalyzer" included_types="mtasimplant:dynode" >
+		<Analyzer name="WaveformAnalyzer" included_types="mtasimplant,veto" >
 			<!-- <settings Crate="[0]" Module="([0,5-8])" Channel="(0|[0-9]|1[0-5])" CalcDerivative="true" > -->
 			<settings Crate="[0]" Module="0" Channel="(0|[0-9]|1[0-5])" CalcDerivative="true" >
 				<PreTrigger min="5" max="43" />
@@ -88,8 +88,6 @@
 		<!-- 	<Histogram id="18" xlow="173" xhigh="183" ylow="8000" yhigh="12000" />  -->
 		<!-- 	<Histogram id="22" xlow="178" xhigh="188" ylow="8000" yhigh="12000" />  -->
 		</Processor>  
-
-		
 		<!---->
 		<!---->
 		<!-- <!-- MTAS Gate in Energy  --> -->
@@ -198,11 +196,6 @@
 						0.0 1.0
 					</Calibration>
 				</Channel>
-				<Channel number="15" type="generic" subtype="Pulser">
-					<Calibration model="linear">
-						0.0 1.0
-					</Calibration>
-				</Channel>
 			</Module>
 			<Module number="1" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="264">
 
@@ -264,6 +257,11 @@
 					</Calibration>
 				</Channel>
 				<Channel number="11" type="pid" subtype="ppac" group="1" tags="tas,db3,down">
+					<Calibration model="linear">
+						0.0 1.0
+					</Calibration>
+				</Channel>
+				<Channel number="15" type="generic" subtype="Pulser">
 					<Calibration model="linear">
 						0.0 1.0
 					</Calibration>
