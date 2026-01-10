@@ -293,22 +293,25 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 				if( this->EarlyCycle.IsWithin(cycletime) ){
 					hismanager->Fill("EARLY_3300",erg);
 					hismanager->Fill("EARLY_3351",erg,cerg);
+					auto EARLY_3350 = hismanager->GetPlot<TH2*>("EARLY_3350");
 					for( size_t ii = 6; ii < 24; ++ii ){
-						hismanager->Fill("EARLY_3350",erg,MtasProc->GetCrystalEnergy(ii));
+						EARLY_3350->Fill(erg,MtasProc->GetCrystalEnergy(ii));
 					}
 				}
 				if( this->MidCycle.IsWithin(cycletime) ){
 					hismanager->Fill("MID_3300",erg);
 					hismanager->Fill("MID_3351",erg,cerg);
+					auto MID_3350 = hismanager->GetPlot<TH2*>("MID_3350");
 					for( size_t ii = 6; ii < 24; ++ii ){
-						hismanager->Fill("MID_3350",erg,MtasProc->GetCrystalEnergy(ii));
+						MID_3350->Fill(erg,MtasProc->GetCrystalEnergy(ii));
 					}
 				}
 				if( this->LateCycle.IsWithin(cycletime) ){
 					hismanager->Fill("LATE_3300",erg);
 					hismanager->Fill("LATE_3351",erg,cerg);
+					auto LATE_3350 = hismanager->GetPlot<TH2*>("LATE_3350");
 					for( size_t ii = 6; ii < 24; ++ii ){
-						hismanager->Fill("LATE_3350",erg,MtasProc->GetCrystalEnergy(ii));
+						LATE_3350->Fill(erg,MtasProc->GetCrystalEnergy(ii));
 					}
 				}
 				this->MtasProc->FillBetaPlots(hismanager);
@@ -353,11 +356,15 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 				hismanager->Fill("BKG_3220",this->MtasProc->GetTotalEnergy(2));
 				hismanager->Fill("BKG_3230",this->MtasProc->GetTotalEnergy(3));
 				hismanager->Fill("BKG_3240",this->MtasProc->GetTotalEnergy(4));
+				auto BKG_3215 = hismanager->GetPlot<TH1*>("BKG_3215");
+				auto BKG_3225 = hismanager->GetPlot<TH1*>("BKG_3225");
+				auto BKG_3235 = hismanager->GetPlot<TH1*>("BKG_3235");
+				auto BKG_3245 = hismanager->GetPlot<TH1*>("BKG_3245");
 				for( size_t ii = 0; ii < 6; ++ii ){
-					hismanager->Fill("BKG_3215",this->MtasProc->GetCrystalEnergy(ii));
-					hismanager->Fill("BKG_3225",this->MtasProc->GetCrystalEnergy(ii+6));
-					hismanager->Fill("BKG_3235",this->MtasProc->GetCrystalEnergy(ii+12));
-					hismanager->Fill("BKG_3245",this->MtasProc->GetCrystalEnergy(ii+18));
+					BKG_3215->Fill(this->MtasProc->GetCrystalEnergy(ii));
+					BKG_3225->Fill(this->MtasProc->GetCrystalEnergy(ii+6));
+					BKG_3235->Fill(this->MtasProc->GetCrystalEnergy(ii+12));
+					BKG_3245->Fill(this->MtasProc->GetCrystalEnergy(ii+18));
 				}
 				if( summary->ContainsEventTag(this->beta) ){
 					hismanager->Fill("BKG_3300",this->MtasProc->GetTotalEnergy(0));
@@ -365,11 +372,15 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 					hismanager->Fill("BKG_3320",this->MtasProc->GetTotalEnergy(2));
 					hismanager->Fill("BKG_3330",this->MtasProc->GetTotalEnergy(3));
 					hismanager->Fill("BKG_3340",this->MtasProc->GetTotalEnergy(4));
+					auto BKG_3315 = hismanager->GetPlot<TH1*>("BKG_3315");
+					auto BKG_3325 = hismanager->GetPlot<TH1*>("BKG_3325");
+					auto BKG_3335 = hismanager->GetPlot<TH1*>("BKG_3335");
+					auto BKG_3345 = hismanager->GetPlot<TH1*>("BKG_3345");
 					for( size_t ii = 0; ii < 6; ++ii ){
-						hismanager->Fill("BKG_3315",this->MtasProc->GetCrystalEnergy(ii));
-						hismanager->Fill("BKG_3325",this->MtasProc->GetCrystalEnergy(ii+6));
-						hismanager->Fill("BKG_3335",this->MtasProc->GetCrystalEnergy(ii+12));
-						hismanager->Fill("BKG_3345",this->MtasProc->GetCrystalEnergy(ii+18));
+						BKG_3315->Fill(this->MtasProc->GetCrystalEnergy(ii));
+						BKG_3325->Fill(this->MtasProc->GetCrystalEnergy(ii+6));
+						BKG_3335->Fill(this->MtasProc->GetCrystalEnergy(ii+12));
+						BKG_3345->Fill(this->MtasProc->GetCrystalEnergy(ii+18));
 					}
 				}else{
 					hismanager->Fill("BKG_3100",this->MtasProc->GetTotalEnergy(0));
@@ -377,38 +388,50 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 					hismanager->Fill("BKG_3120",this->MtasProc->GetTotalEnergy(2));
 					hismanager->Fill("BKG_3130",this->MtasProc->GetTotalEnergy(3));
 					hismanager->Fill("BKG_3140",this->MtasProc->GetTotalEnergy(4));
+					auto BKG_3115 = hismanager->GetPlot<TH1*>("BKG_3115");
+					auto BKG_3125 = hismanager->GetPlot<TH1*>("BKG_3125");
+					auto BKG_3135 = hismanager->GetPlot<TH1*>("BKG_3135");
+					auto BKG_3145 = hismanager->GetPlot<TH1*>("BKG_3145");
 					for( size_t ii = 0; ii < 6; ++ii ){
-						hismanager->Fill("BKG_3115",this->MtasProc->GetCrystalEnergy(ii));
-						hismanager->Fill("BKG_3125",this->MtasProc->GetCrystalEnergy(ii+6));
-						hismanager->Fill("BKG_3135",this->MtasProc->GetCrystalEnergy(ii+12));
-						hismanager->Fill("BKG_3145",this->MtasProc->GetCrystalEnergy(ii+18));
+						BKG_3115->Fill(this->MtasProc->GetCrystalEnergy(ii));
+						BKG_3125->Fill(this->MtasProc->GetCrystalEnergy(ii+6));
+						BKG_3135->Fill(this->MtasProc->GetCrystalEnergy(ii+12));
+						BKG_3145->Fill(this->MtasProc->GetCrystalEnergy(ii+18));
 					}
 				}
 
+				auto BKG_3411 = hismanager->GetPlot<TH2*>("BKG_3411");
+				auto BKG_3412 = hismanager->GetPlot<TH2*>("BKG_3412");
+				auto BKG_3413 = hismanager->GetPlot<TH2*>("BKG_3413");
+				auto BKG_3414 = hismanager->GetPlot<TH2*>("BKG_3414");
+				auto BKG_3511 = hismanager->GetPlot<TH2*>("BKG_3511");
+				auto BKG_3512 = hismanager->GetPlot<TH2*>("BKG_3512");
+				auto BKG_3513 = hismanager->GetPlot<TH2*>("BKG_3513");
+				auto BKG_3514 = hismanager->GetPlot<TH2*>("BKG_3514");
 				for( int ii = 0; ii < 6; ++ii ){
-					hismanager->Fill("BKG_3411",this->MtasProc->GetIndividualCenterPMTRawEnergy(2*ii),2*ii);
-					hismanager->Fill("BKG_3411",this->MtasProc->GetIndividualCenterPMTRawEnergy(2*ii + 1),2*ii + 1);
+					BKG_3411->Fill(this->MtasProc->GetIndividualCenterPMTRawEnergy(2*ii),2*ii);
+					BKG_3411->Fill(this->MtasProc->GetIndividualCenterPMTRawEnergy(2*ii + 1),2*ii + 1);
 
-					hismanager->Fill("BKG_3412",this->MtasProc->GetIndividualInnerPMTRawEnergy(2*ii),2*ii);
-					hismanager->Fill("BKG_3412",this->MtasProc->GetIndividualInnerPMTRawEnergy(2*ii + 1),2*ii + 1);
+					BKG_3412->Fill(this->MtasProc->GetIndividualInnerPMTRawEnergy(2*ii),2*ii);
+					BKG_3412->Fill(this->MtasProc->GetIndividualInnerPMTRawEnergy(2*ii + 1),2*ii + 1);
 
-					hismanager->Fill("BKG_3413",this->MtasProc->GetIndividualMiddlePMTRawEnergy(2*ii),2*ii);
-					hismanager->Fill("BKG_3413",this->MtasProc->GetIndividualMiddlePMTRawEnergy(2*ii + 1),2*ii + 1);
+					BKG_3413->Fill(this->MtasProc->GetIndividualMiddlePMTRawEnergy(2*ii),2*ii);
+					BKG_3413->Fill(this->MtasProc->GetIndividualMiddlePMTRawEnergy(2*ii + 1),2*ii + 1);
 
-					hismanager->Fill("BKG_3414",this->MtasProc->GetIndividualOuterPMTRawEnergy(2*ii),2*ii);
-					hismanager->Fill("BKG_3414",this->MtasProc->GetIndividualOuterPMTRawEnergy(2*ii + 1),2*ii + 1);
+					BKG_3414->Fill(this->MtasProc->GetIndividualOuterPMTRawEnergy(2*ii),2*ii);
+					BKG_3414->Fill(this->MtasProc->GetIndividualOuterPMTRawEnergy(2*ii + 1),2*ii + 1);
 
-					hismanager->Fill("BKG_3511",this->MtasProc->GetIndividualCenterPMTEnergy(2*ii),2*ii);
-					hismanager->Fill("BKG_3511",this->MtasProc->GetIndividualCenterPMTEnergy(2*ii + 1),2*ii + 1);
+					BKG_3511->Fill(this->MtasProc->GetIndividualCenterPMTEnergy(2*ii),2*ii);
+					BKG_3511->Fill(this->MtasProc->GetIndividualCenterPMTEnergy(2*ii + 1),2*ii + 1);
 
-					hismanager->Fill("BKG_3512",this->MtasProc->GetIndividualInnerPMTEnergy(2*ii),2*ii);
-					hismanager->Fill("BKG_3512",this->MtasProc->GetIndividualInnerPMTEnergy(2*ii + 1),2*ii + 1);
+					BKG_3512->Fill(this->MtasProc->GetIndividualInnerPMTEnergy(2*ii),2*ii);
+					BKG_3512->Fill(this->MtasProc->GetIndividualInnerPMTEnergy(2*ii + 1),2*ii + 1);
 
-					hismanager->Fill("BKG_3513",this->MtasProc->GetIndividualMiddlePMTEnergy(2*ii),2*ii);
-					hismanager->Fill("BKG_3513",this->MtasProc->GetIndividualMiddlePMTEnergy(2*ii + 1),2*ii + 1);
+					BKG_3513->Fill(this->MtasProc->GetIndividualMiddlePMTEnergy(2*ii),2*ii);
+					BKG_3513->Fill(this->MtasProc->GetIndividualMiddlePMTEnergy(2*ii + 1),2*ii + 1);
 
-					hismanager->Fill("BKG_3514",this->MtasProc->GetIndividualOuterPMTEnergy(2*ii),2*ii);
-					hismanager->Fill("BKG_3514",this->MtasProc->GetIndividualOuterPMTEnergy(2*ii + 1),2*ii + 1);
+					BKG_3514->Fill(this->MtasProc->GetIndividualOuterPMTEnergy(2*ii),2*ii);
+					BKG_3514->Fill(this->MtasProc->GetIndividualOuterPMTEnergy(2*ii + 1),2*ii + 1);
 				}
 			}
 		}else if( TapeProc->GetCurrentCycleState() == TAPE::IRRADIATION ){
@@ -416,17 +439,23 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 			bool hasimplant = summary->ContainsEventTag(this->implant);
 
 			//add in HPGe monitor
+			auto IRRAD_2200 = hismanager->GetPlot<TH2*>("IRRAD_2200");
+			auto IRRAD_2260 = hismanager->GetPlot<TH2*>("IRRAD_2260");
+			auto IRRAD_2261 = hismanager->GetPlot<TH2*>("IRRAD_2261");
+			auto IRRAD_2262 = hismanager->GetPlot<TH2*>("IRRAD_2262");
+			auto IRRAD_2263 = hismanager->GetPlot<TH2*>("IRRAD_2263");
+			auto IRRAD_2600 = hismanager->GetPlot<TH2*>("IRRAD_2600");
 			for( auto ii = 0; ii < this->HPGeProc->GetNumCrystals(); ++ii ){
 				auto hpge_erg = this->HPGeProc->GetEnergy(ii);
-				hismanager->Fill("IRRAD_2200",hpge_erg,ii);
+				IRRAD_2200->Fill(hpge_erg,ii);
 				for( auto jj = ii+1; jj < this->HPGeProc->GetNumCrystals(); ++jj ){
-					hismanager->Fill("IRRAD_2600",hpge_erg,this->HPGeProc->GetEnergy(jj));
-					hismanager->Fill("IRRAD_2600",this->HPGeProc->GetEnergy(jj),hpge_erg);
+					IRRAD_2600->Fill(hpge_erg,this->HPGeProc->GetEnergy(jj));
+					IRRAD_2600->Fill(this->HPGeProc->GetEnergy(jj),hpge_erg);
 				}
-				hismanager->Fill("IRRAD_2260",hpge_erg,cycletime*1.0e3);
-				hismanager->Fill("IRRAD_2261",hpge_erg,cycletime);
-				hismanager->Fill("IRRAD_2262",hpge_erg,cycletime/60.0);
-				hismanager->Fill("IRRAD_2263",hpge_erg,cycletime/(60.0*60.0));
+				IRRAD_2260->Fill(hpge_erg,cycletime*1.0e3);
+				IRRAD_2261->Fill(hpge_erg,cycletime);
+				IRRAD_2262->Fill(hpge_erg,cycletime/60.0);
+				IRRAD_2263->Fill(hpge_erg,cycletime/(60.0*60.0));
 			}
 
 			
@@ -434,30 +463,42 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 			//this is the logic that makes PSPMT_1902 show up, use it here too
 			auto hgimage = this->ImplantProc->GetHighGainImage();
 			if( hgimage.anodesum > this->ImplantThreshold ){
+				auto IRRAD_2300 = hismanager->GetPlot<TH2*>("IRRAD_2300");
+				auto IRRAD_2360 = hismanager->GetPlot<TH2*>("IRRAD_2360");
+				auto IRRAD_2361 = hismanager->GetPlot<TH2*>("IRRAD_2361");
+				auto IRRAD_2362 = hismanager->GetPlot<TH2*>("IRRAD_2362");
+				auto IRRAD_2363 = hismanager->GetPlot<TH2*>("IRRAD_2363");
+				auto IRRAD_2700 = hismanager->GetPlot<TH2*>("IRRAD_2700");
 				for( auto ii = 0; ii < this->HPGeProc->GetNumCrystals(); ++ii ){
 					auto hpge_erg = this->HPGeProc->GetEnergy(ii);
-					hismanager->Fill("IRRAD_2300",hpge_erg,ii);
+					IRRAD_2300->Fill(hpge_erg,ii);
 					for( auto jj = ii+1; jj < this->HPGeProc->GetNumCrystals(); ++jj ){
-						hismanager->Fill("IRRAD_2700",hpge_erg,this->HPGeProc->GetEnergy(jj));
-						hismanager->Fill("IRRAD_2700",this->HPGeProc->GetEnergy(jj),hpge_erg);
+						IRRAD_2700->Fill(hpge_erg,this->HPGeProc->GetEnergy(jj));
+						IRRAD_2700->Fill(this->HPGeProc->GetEnergy(jj),hpge_erg);
 					}
-					hismanager->Fill("IRRAD_2360",hpge_erg,cycletime*1.0e3);
-					hismanager->Fill("IRRAD_2361",hpge_erg,cycletime);
-					hismanager->Fill("IRRAD_2362",hpge_erg,cycletime/60.0);
-					hismanager->Fill("IRRAD_2363",hpge_erg,cycletime/(60.0*60.0));
+					IRRAD_2360->Fill(hpge_erg,cycletime*1.0e3);
+					IRRAD_2361->Fill(hpge_erg,cycletime);
+					IRRAD_2362->Fill(hpge_erg,cycletime/60.0);
+					IRRAD_2363->Fill(hpge_erg,cycletime/(60.0*60.0));
 				}
 			}else{
+				auto IRRAD_2100 = hismanager->GetPlot<TH2*>("IRRAD_2100");
+				auto IRRAD_2160 = hismanager->GetPlot<TH2*>("IRRAD_2160");
+				auto IRRAD_2161 = hismanager->GetPlot<TH2*>("IRRAD_2161");
+				auto IRRAD_2162 = hismanager->GetPlot<TH2*>("IRRAD_2162");
+				auto IRRAD_2163 = hismanager->GetPlot<TH2*>("IRRAD_2163");
+				auto IRRAD_2500 = hismanager->GetPlot<TH2*>("IRRAD_2500");
 				for( auto ii = 0; ii < this->HPGeProc->GetNumCrystals(); ++ii ){
 					auto hpge_erg = this->HPGeProc->GetEnergy(ii);
-					hismanager->Fill("IRRAD_2100",hpge_erg,ii);
+					IRRAD_2100->Fill(hpge_erg,ii);
 					for( auto jj = ii+1; jj < this->HPGeProc->GetNumCrystals(); ++jj ){
-						hismanager->Fill("IRRAD_2500",hpge_erg,this->HPGeProc->GetEnergy(jj));
-						hismanager->Fill("IRRAD_2500",this->HPGeProc->GetEnergy(jj),hpge_erg);
+						IRRAD_2500->Fill(hpge_erg,this->HPGeProc->GetEnergy(jj));
+						IRRAD_2500->Fill(this->HPGeProc->GetEnergy(jj),hpge_erg);
 					}
-					hismanager->Fill("IRRAD_2160",hpge_erg,cycletime*1.0e3);
-					hismanager->Fill("IRRAD_2161",hpge_erg,cycletime);
-					hismanager->Fill("IRRAD_2162",hpge_erg,cycletime/60.0);
-					hismanager->Fill("IRRAD_2163",hpge_erg,cycletime/(60.0*60.0));
+					IRRAD_2160->Fill(hpge_erg,cycletime*1.0e3);
+					IRRAD_2161->Fill(hpge_erg,cycletime);
+					IRRAD_2162->Fill(hpge_erg,cycletime/60.0);
+					IRRAD_2163->Fill(hpge_erg,cycletime/(60.0*60.0));
 				}
 			}
 

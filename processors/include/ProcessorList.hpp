@@ -32,7 +32,7 @@ class ProcessorList{
 		ProcessorList(const std::string&);
 		~ProcessorList() = default;
 
-		void InitializeProcessors(ConfigParser*);
+		void InitializeProcessors(ConfigParser*,bool);
 		void InitializeAnalyzers(ConfigParser*);
 		
 		void PreAnalyze(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*);

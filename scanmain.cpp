@@ -315,7 +315,7 @@ int main(int argc, char *argv[]) {
 	std::shared_ptr<ProcessorList> processorlist = std::make_shared<ProcessorList>(logname);
 	try{
 		if( config_extension == "xml" ){
-			processorlist->InitializeProcessors(cfgparser.get());
+			processorlist->InitializeProcessors(cfgparser.get(),enabletree);
 			processorlist->InitializeAnalyzers(cfgparser.get());
 		}else{
 			console->error("unknown file extension of {}, supported extensions are xml",config_extension);
@@ -328,6 +328,10 @@ int main(int argc, char *argv[]) {
 	}catch(std::runtime_error const& e){
 		console->error(e.what());
 		exit(EXIT_FAILURE);
+	}
+	if( not enabletree ){
+		console->critical("Even though listed as registered, no Trees will be filled to the file.");
+		console->critical("For safety though they are still registered and cleaned up each loop");
 	}
 	
 	console->info("Generating {}.list file that contains all the declared histograms",StringManip::GetFileBaseName(outputfile));

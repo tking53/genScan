@@ -1,4 +1,5 @@
 #include <random>
+#include <set>
 #include <stdexcept>
 #include <sstream>
 
@@ -172,9 +173,13 @@ void ProcessorList::CreateAnal(const std::string& name){
 	}
 }
 
-void ProcessorList::InitializeProcessors(ConfigParser* cmap){
+void ProcessorList::InitializeProcessors(ConfigParser* cmap,bool enabletree){
 	auto procnames = cmap->GetProcessorNames();
 	for( auto& name : procnames ){
+		if( not enabletree and name.compare("RootDevProcessor") == 0 ){
+			this->console->critical("tree output is disabled, but RootDevProcessor is declared, skipping it");
+			continue;
+		}
 		this->CreateProc(name);
 		known_processors.back()->Init(cmap->GetProcessorXMLInfo(name));
 	}
@@ -363,8 +368,23 @@ void ProcessorList::ProcessRaw(EventHistoryManager* History,PLOTS::PlotRegistry*
 }
 
 void ProcessorList::Finalize(){
-	if( this->known_processors.size() != 1 ){
-		this->console->critical("Not in experiment processor mode, notifying all processors present");
+	std::set<std::string> names;
+	for( const auto& proc : this->known_processors ){
+		names.insert(proc->GetProcessorName());
+	}
+	bool HasRootDev = names.find("RootDevProcessor") != names.end();
+	bool EXPMode = true;
+	if( this->known_processors.size() == 2 and HasRootDev ){
+		this->console->critical("Found RootDevProcessor and one other, staying in experiment processor mode");
+	}else if( this->known_processors.size() != 1 ){
+		EXPMode = false;
+		this->console->critical("Found Multiple Processors other than RootDev, disabling experiment processor mode");
+	}else{
+		this->console->critical("Found exactly 1 processor, staying in experiment processor mode");
+		EXPMode = true;
+	}
+	if( not EXPMode ){
+		this->console->critical("Not in experiment processor mode, notifying all processors declared");
 		for( auto& proc : this->known_processors ){
 			proc->ToggleExpProcessorMode();
 		}
