@@ -187,7 +187,7 @@ namespace PLOTS{
 
 			void HandleSocketHelper(){
 				while(KeepListen){
-					//std::this_thread::sleep_for(std::chrono::seconds(20));
+					std::this_thread::sleep_for(std::chrono::microseconds(30));
 					//spdlog::info("Update");
 					fCanvas->Modified();
 					fCanvas->Update();
