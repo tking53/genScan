@@ -15,6 +15,12 @@
 				<QDC bounds="0,10,20,30,40,50,60" />
 				<PSD begin="45" middle="85" end="240" pre="5" post="10" fraction="0.75" />
 			</settings>
+			<settings Crate="[0]" Module="1" Channel="([0-3])" cALCdERIvative="true" >
+				<PreTrigger min="2" max="16" />
+				<PostTrigger min="0" max="124" />
+				<QDC bounds="0,10,20,30,40,50,60" />
+				<PSD begin="45" middle="85" end="240" pre="5" post="10" fraction="0.75" />
+			</settings>
 
 			<Histogram id="1022" xhigh="65536" />
 		</Analyzer>
@@ -76,17 +82,17 @@
 		<!-- 	<Isotope name="D3" cutid="PID_D3" filename="D3.cxx" />  -->
 		<!-- 	<Isotope name="D4" cutid="PID_D4" filename="D4.cxx" />  -->
 		<!---->
-		<!-- 	<!-- Pin1 PIDs   --> -->
-		<!-- 	<Histogram  id="9" xlow="178" xhigh="188" ylow="5000" yhigh="8000" />  -->
-		<!-- 	<Histogram id="13" xlow="178" xhigh="188" ylow="5000" yhigh="8000" />  -->
-		<!-- 	<Histogram id="17" xlow="173" xhigh="183" ylow="5000" yhigh="8000" />  -->
-		<!-- 	<Histogram id="21" xlow="178" xhigh="188" ylow="5000" yhigh="8000" />  -->
-		<!---->
-		<!-- 	<!-- Pin2 PIDs   --> -->
-		<!-- 	<Histogram id="10" xlow="178" xhigh="188" ylow="8000" yhigh="12000" />  -->
-		<!-- 	<Histogram id="14" xlow="178" xhigh="188" ylow="8000" yhigh="12000" />  -->
-		<!-- 	<Histogram id="18" xlow="173" xhigh="183" ylow="8000" yhigh="12000" />  -->
-		<!-- 	<Histogram id="22" xlow="178" xhigh="188" ylow="8000" yhigh="12000" />  -->
+		<!-- FP2 Pin1 PIDs   -->
+		<Histogram id="109" nbinsx="2000" xlow="-1000" xhigh="1000" ylow="10000" yhigh="5000" /> 
+		<Histogram id="113" nbinsx="2000" xlow="-1000" xhigh="1000" ylow="10000" yhigh="5000" /> 
+		<Histogram id="117" nbinsx="2000" xlow="-1000" xhigh="1000" ylow="10000" yhigh="5000" /> 
+		<Histogram id="121" nbinsx="2000" xlow="-1000" xhigh="1000" ylow="10000" yhigh="5000" /> 
+
+		<!-- FP2 Pin2 PIDs   -->
+		<Histogram id="110" nbinsx="2000" xlow="-1000" xhigh="1000" nbinsy="35000" ylow="0" yhigh="35000" /> 
+		<Histogram id="114" nbinsx="2000" xlow="-1000" xhigh="1000" nbinsy="35000" ylow="0" yhigh="35000" /> 
+		<Histogram id="118" nbinsx="2000" xlow="-1000" xhigh="1000" nbinsy="35000" ylow="0" yhigh="35000" /> 
+		<Histogram id="122" nbinsx="2000" xlow="-1000" xhigh="1000" nbinsy="35000" ylow="0" yhigh="35000" /> 
 		</Processor>  
 		<!---->
 		<!---->
