@@ -641,10 +641,10 @@ void PidProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH2F>("PID_23","FP1: Pin 3 Energy vs DB3SR-FP1XP1; TDiff (ns); Energy (keV)",this->h2dsettings.at(23));
 	hismanager->RegisterPlot<TH2F>("PID_24","FP1: Pin 4 Energy vs DB3SR-FP1XP1; TDiff (ns); Energy (keV)",this->h2dsettings.at(24));
 	
-	hismanager->RegisterPlot<TH2F>("PID_125","FP1: Pin 1 Energy vs DB5S-FP1XP1; TDiff (ns); Energy (keV)",this->h2dsettings.at(25));
-	hismanager->RegisterPlot<TH2F>("PID_126","FP1: Pin 2 Energy vs DB5S-FP1XP1; TDiff (ns); Energy (keV)",this->h2dsettings.at(26));
-	hismanager->RegisterPlot<TH2F>("PID_127","FP1: Pin 3 Energy vs DB5S-FP1XP1; TDiff (ns); Energy (keV)",this->h2dsettings.at(26));
-	hismanager->RegisterPlot<TH2F>("PID_128","FP1: Pin 4 Energy vs DB5S-FP1XP1; TDiff (ns); Energy (keV)",this->h2dsettings.at(27));
+	hismanager->RegisterPlot<TH2F>("PID_25","FP1: Pin 1 Energy vs DB5S-FP1XP1; TDiff (ns); Energy (keV)",this->h2dsettings.at(25));
+	hismanager->RegisterPlot<TH2F>("PID_26","FP1: Pin 2 Energy vs DB5S-FP1XP1; TDiff (ns); Energy (keV)",this->h2dsettings.at(26));
+	hismanager->RegisterPlot<TH2F>("PID_27","FP1: Pin 3 Energy vs DB5S-FP1XP1; TDiff (ns); Energy (keV)",this->h2dsettings.at(26));
+	hismanager->RegisterPlot<TH2F>("PID_28","FP1: Pin 4 Energy vs DB5S-FP1XP1; TDiff (ns); Energy (keV)",this->h2dsettings.at(27));
 	
 	//FP2
 	hismanager->RegisterPlot<TH1F>("PID_101" ,"DB3P0 Anode - FP2XP1 TDiff; TDiff (ns)",this->h1dsettings.at(101));
