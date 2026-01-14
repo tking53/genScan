@@ -836,6 +836,16 @@ void PidProcessor::IncrementIsotopeCount(std::map<std::string,int>& cnt,
 			if( cutmanager->IsWithin(kv.second,this->fp1Tofs[6],this->fp1.pin[0].energy) ){
 				++(cnt[kv.first]);
 			}
+        }else if( this->PIDPLOT == 121 ){
+	        //hismanager->Fill("PID_121", fp2Tofs[6], fp2.pin.at(0).energy);
+			if( cutmanager->IsWithin(kv.second,this->fp2Tofs[6],this->fp2.pin[0].energy) ){
+				++(cnt[kv.first]);
+			}
+        }else if( this->PIDPLOT == 122 ){
+	        //hismanager->Fill("PID_122", fp2Tofs[6], fp2.pin.at(1).energy);
+			if( cutmanager->IsWithin(kv.second,this->fp2Tofs[6],this->fp2.pin[1].energy) ){
+				++(cnt[kv.first]);
+			}
 		}else{
 			this->console->error("No PID used");
 		}

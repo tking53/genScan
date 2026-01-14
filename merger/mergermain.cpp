@@ -401,7 +401,7 @@ int main(int argc, char *argv[]) {
 			mtas->GetEntry(ii);
 			//this is the gate placed in EXP_11012, 
 			bool LightIon = false;
-			if( CutManager->IsWithin("PID",fp1Tofs[6],fp1->pin[0].energy) ){
+			if( CutManager->IsWithin("PID",fp2Tofs[6],fp2->pin[1].energy) ){
 				//let's only only load the rit/fit when we're inside a good tof
 				for( const auto& g : RitReject ){
 					if( g.IsWithin(rit->energy) ){

@@ -63,70 +63,27 @@
 			<Histogram id="7005" nbinsx="65536" xlow="0" xhigh="65536" />
 			<Histogram id="70208" ylow="0" yhigh="65536" />
 		</Processor>
-		<Processor name="PidProcessor" TofFlip="true" PIDPlot="-1" > 
-		<!-- 	<Histogram id="1" xlow="-100" xhigh="100" />  -->
-		<!---->
-		<!-- 	<Isotope name="A1" cutid="PID_A1" filename="A1.cxx" />  -->
-		<!---->
-		<!-- 	<Isotope name="B1" cutid="PID_B1" filename="B1.cxx" />  -->
-		<!-- 	<Isotope name="B2" cutid="PID_B2" filename="B2.cxx" />  -->
-		<!-- 	<Isotope name="B3" cutid="PID_B3" filename="B3.cxx" />  -->
-		<!---->
-		<!-- 	<Isotope name="C1" cutid="PID_C1" filename="C1.cxx" />  -->
-		<!-- 	<Isotope name="C2" cutid="PID_C2" filename="C2.cxx" />  -->
-		<!-- 	<Isotope name="C3" cutid="PID_C3" filename="C3.cxx" />  -->
-		<!-- 	<Isotope name="C4" cutid="PID_C4" filename="C4.cxx" />  -->
-		<!---->
-		<!-- 	<Isotope name="D1" cutid="PID_D1" filename="D1.cxx" />  -->
-		<!-- 	<Isotope name="D2" cutid="PID_D2" filename="D2.cxx" />  -->
-		<!-- 	<Isotope name="D3" cutid="PID_D3" filename="D3.cxx" />  -->
-		<!-- 	<Isotope name="D4" cutid="PID_D4" filename="D4.cxx" />  -->
-		<!---->
-		<!-- FP2 Pin1 PIDs   -->
-		<Histogram id="109" nbinsx="2000" xlow="-1000" xhigh="1000" ylow="10000" yhigh="5000" /> 
-		<Histogram id="113" nbinsx="2000" xlow="-1000" xhigh="1000" ylow="10000" yhigh="5000" /> 
-		<Histogram id="117" nbinsx="2000" xlow="-1000" xhigh="1000" ylow="10000" yhigh="5000" /> 
-		<Histogram id="121" nbinsx="2000" xlow="-1000" xhigh="1000" ylow="10000" yhigh="5000" /> 
+		<Processor name="PidProcessor" TofFlip="true" PIDPlot="122" > 
+            <Isotope name="Pd96" cutid="Pd96" filename="OtherClockTickPd96.cxx" />
+            <Isotope name="In99" cutid="In99" filename="OtherClockTickIn99.cxx" />
+            <!-- <Isotope name="Pd96" cutid="Pd96" filename="Pd96.cxx" /> -->
+            <!-- <Isotope name="In99" cutid="In99" filename="In99.cxx" /> -->
+            <!-- <Isotope name="Pd97" cutid="Pd97" filename="Pd97.cxx" /> -->
+            <!-- <Isotope name="Rh95" cutid="Rh95" filename="Rh95.cxx" /> -->
+            <!-- <Isotope name="Ag97" cutid="Ag97" filename="Ag97.cxx" /> -->
+            <!-- <Isotope name="Cd98" cutid="Cd98" filename="Cd98.cxx" /> -->
+            <!-- FP2 Pin1 PIDs   -->
+		    <Histogram id="109" nbinsx="5000" xlow="-250" xhigh="-150" ylow="10000" yhigh="5000" /> 
+		    <Histogram id="113" nbinsx="5000" xlow="-250" xhigh="-150" ylow="10000" yhigh="5000" /> 
+		    <Histogram id="117" nbinsx="5000" xlow="-250" xhigh="-150" ylow="10000" yhigh="5000" /> 
+		    <Histogram id="121" nbinsx="5000" xlow="-250" xhigh="-150" ylow="10000" yhigh="5000" /> 
 
-		<!-- FP2 Pin2 PIDs   -->
-		<Histogram id="110" nbinsx="2000" xlow="-1000" xhigh="1000" nbinsy="35000" ylow="0" yhigh="35000" /> 
-		<Histogram id="114" nbinsx="2000" xlow="-1000" xhigh="1000" nbinsy="35000" ylow="0" yhigh="35000" /> 
-		<Histogram id="118" nbinsx="2000" xlow="-1000" xhigh="1000" nbinsy="35000" ylow="0" yhigh="35000" /> 
-		<Histogram id="122" nbinsx="2000" xlow="-1000" xhigh="1000" nbinsy="35000" ylow="0" yhigh="35000" /> 
+		    <!-- FP2 Pin2 PIDs   -->
+		    <Histogram id="110" nbinsx="5000" xlow="-250" xhigh="-150" nbinsy="35000" ylow="0" yhigh="35000" /> 
+		    <Histogram id="114" nbinsx="5000" xlow="-250" xhigh="-150" nbinsy="35000" ylow="0" yhigh="35000" /> 
+		    <Histogram id="118" nbinsx="5000" xlow="-250" xhigh="-150" nbinsy="35000" ylow="0" yhigh="35000" /> 
+		    <Histogram id="122" nbinsx="5000" xlow="-250" xhigh="-150" nbinsy="35000" ylow="0" yhigh="35000" /> 
 		</Processor>  
-		<!---->
-		<!---->
-		<!-- <!-- MTAS Gate in Energy  --> -->
-		<!-- <Gate label="MTAS_Total" lowerbound="166.0" upperbound="291.0" /> -->
-		<!-- <Gate label="MTAS_Total" lowerbound="408.0" upperbound="522.0" /> -->
-		<!-- <Gate label="MTAS_Total" lowerbound="597.0" upperbound="729.0" /> -->
-		<!-- <Gate label="MTAS_Total" lowerbound="987.0" upperbound="1150.0" /> -->
-		<!-- <Gate label="MTAS_Total" lowerbound="1332.0" upperbound="1493.0" />  -->
-		<!---->
-		<!-- <!-- Pin1 PIDs  --> -->
-		<!-- <Histogram id="10000" xlow="178" xhigh="188" ylow="5000" yhigh="8000" /> -->
-		<!-- <Histogram id="10004" xlow="178" xhigh="188" ylow="5000" yhigh="8000" /> -->
-		<!-- <Histogram id="10008" xlow="178" xhigh="188" ylow="5000" yhigh="8000" /> -->
-		<!-- <Histogram id="10012" xlow="178" xhigh="188" ylow="5000" yhigh="8000" />  -->
-		<!---->
-		<!-- <!-- Pin2 PIDs  --> -->
-		<!-- <Histogram id="10001" xlow="178" xhigh="188" ylow="8000" yhigh="12000" /> -->
-		<!-- <Histogram id="10005" xlow="178" xhigh="188" ylow="8000" yhigh="12000" /> -->
-		<!-- <Histogram id="10009" xlow="178" xhigh="188" ylow="8000" yhigh="12000" /> -->
-		<!-- <Histogram id="10013" xlow="178" xhigh="188" ylow="8000" yhigh="12000" />  -->
-		<!---->
-		<!-- <!-- Pin1 PIDs  --> -->
-		<!-- <Histogram id="11000" xlow="178" xhigh="188" ylow="5000" yhigh="8000" /> -->
-		<!-- <Histogram id="11004" xlow="178" xhigh="188" ylow="5000" yhigh="8000" /> -->
-		<!-- <Histogram id="11008" xlow="178" xhigh="188" ylow="5000" yhigh="8000" /> -->
-		<!-- <Histogram id="11012" xlow="178" xhigh="188" ylow="5000" yhigh="8000" />  -->
-		<!---->
-		<!-- <!-- Pin2 PIDs  --> -->
-		<!-- <Histogram id="11001" xlow="178" xhigh="188" ylow="8000" yhigh="12000" /> -->
-		<!-- <Histogram id="11005" xlow="178" xhigh="188" ylow="8000" yhigh="12000" /> -->
-		<!-- <Histogram id="11009" xlow="178" xhigh="188" ylow="8000" yhigh="12000" /> -->
-		<!-- <Histogram id="11013" xlow="178" xhigh="188" ylow="8000" yhigh="12000" />  -->
-		<!-- </Processor>   -->
 
 	</DetectorDriver>
 	<Map>
