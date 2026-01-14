@@ -220,10 +220,10 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 	hismanager->Fill("IMPLANT_7007",this->lgImage.dynode,this->hgImage.dynode);
 	hismanager->Fill("IMPLANT_70078",this->lgImage.dynode,this->hgImage.dynode);
 
-	hismanager->Fill("IMPLANT_7020",this->hgImage.dynode,this->hgImage.anodesum);
-	hismanager->Fill("IMPLANT_70208",this->hgImage.dynode,this->hgImage.anodesum);
-	hismanager->Fill("IMPLANT_7021",this->lgImage.dynode,this->lgImage.anodesum);
-	hismanager->Fill("IMPLANT_70218",this->lgImage.dynode,this->lgImage.anodesum);
+	hismanager->Fill("IMPLANT_7020" ,this->hgImage.anodesum,this->hgImage.dynode);
+	hismanager->Fill("IMPLANT_70208",this->hgImage.anodesum,this->hgImage.dynode);
+	hismanager->Fill("IMPLANT_7021" ,this->lgImage.anodesum,this->lgImage.dynode);
+	hismanager->Fill("IMPLANT_70218",this->lgImage.anodesum,this->lgImage.dynode);
 
 	//prefetch since we fill more than once
 	auto IMPLANT_7030 = hismanager->GetPlot<TH2*>("IMPLANT_7030");
