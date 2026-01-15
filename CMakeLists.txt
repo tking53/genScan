@@ -3,6 +3,18 @@ cmake_minimum_required(VERSION 3.10)
 project(GENSCAN C CXX )
 include(CheckCXXCompilerFlag)
 
+#wanted to see if we can do an LTO build
+#include(CheckIPOSupported)
+#check_ipo_supported(RESULT ipo_supported OUTPUT ipo_error)
+#
+#if(ipo_supported)
+#    message(STATUS "IPO / LTO enabled")
+#	# Enable LTO for all targets below this line
+#	set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+#else()
+#    message(WARNING "IPO/LTO not supported: ${ipo_error}")
+#endif()
+
 #make cmake depend on git things
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
     "${CMAKE_SOURCE_DIR}/.git/HEAD"
@@ -420,6 +432,16 @@ endif()
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
 	target_compile_definitions(GenScanor PRIVATE DEBUG_MODE)
 endif()
+
+add_custom_command(
+    TARGET GenScanor
+    POST_BUILD
+    COMMAND Python3::Interpreter
+    ${CMAKE_CURRENT_SOURCE_DIR}/scripts/ValidateHistogramSingletons.py
+    --dir ${CMAKE_SOURCE_DIR}
+    --exclude build
+    COMMENT "Simple Checking for Duplicate PLOT IDs using RegisterPlot"
+)
 
 install(TARGETS GenScanor DESTINATION bin)
 #Configure and install the module file
