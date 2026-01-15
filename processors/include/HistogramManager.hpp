@@ -209,6 +209,8 @@ namespace PLOTS{
 				this->width_bins = width_size;
 				this->event_bins = event_size;
 				this->roll_bins = roll_size;
+				// Event_size == size of RawEvent 
+				// Width_size == width of the events  in rolling window
 				RegisterPlot<TH2F>("Raw","Raw Energy; Energy (channel); Channel (arb.);",ergsize,0.0,ergsize,numchannels,0,numchannels);
 				RegisterPlot<TH2F>("InternalRaw","Internal Trapezoid Filter Raw Energy; Energy (channel); Channel (arb.);",ergsize,-0.5*ergsize,0.5*ergsize,numchannels,0,numchannels);
 				RegisterPlot<TH2F>("IntegralRaw","Internal Integral Filter Raw Energy; Energy (channel); Channel (arb.);",ergsize,-0.5*ergsize,0.5*ergsize,numchannels,0,numchannels);
@@ -221,6 +223,7 @@ namespace PLOTS{
 				RegisterPlot<TH1F>("Event_Width","Event Width; Time (ns);",width_size,0.0,width_size);
 				RegisterPlot<TH1F>("Event_Size","Num Hits Event; Event Size (arb.);",event_size,0,event_size);
 				RegisterPlot<TH2F>("Event_Mult","Event Size vs Channel; Channel (arb.); Event Size (arb.);",numchannels,0,numchannels,event_size,0,event_size);
+				RegisterPlot<TH2F>("Event_TDiff","Event TDiff vs Channel; Channel (arb.); TDiff (ticks);",numchannels,0,numchannels,width_size,0,width_size);
 				RegisterPlot<TH2F>("Event_Scale","Event Size vs Event Width; Time (ns); Event Size (arb.);",width_size,0,width_size,event_size,0,event_size);
 				RegisterPlot<TH2F>("Total_Rate","Total Rate of All Channels; Time (s); Rollover (arb.)",scalarsize,0,scalarsize,roll_size,0,roll_size);
 				RegisterPlot<TH2F>("Total_Rate_M","Total Rate of All Channels; Time (min); Rollover (arb.)",scalarsize,0,scalarsize,roll_size,0,roll_size);

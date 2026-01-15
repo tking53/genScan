@@ -291,6 +291,7 @@ void ProcessorList::ProcessRaw(EventHistoryManager* History,PLOTS::PlotRegistry*
 	auto IntegralCal = HistogramManager->GetPlot<TH2*>("IntegralCal");
 
 	auto Event_Mult = HistogramManager->GetPlot<TH2*>("Event_Mult");
+	auto Event_TDiff = HistogramManager->GetPlot<TH2*>("Event_TDiff");
 
 	auto Trace_Size = HistogramManager->GetPlot<TH2*>("Trace_Size");
 
@@ -337,6 +338,8 @@ void ProcessorList::ProcessRaw(EventHistoryManager* History,PLOTS::PlotRegistry*
 		Scalar->Fill(scalartime,gChanID);
 		Scalar_M->Fill(scalartime_m,gChanID);
 		Scalar_5M->Fill(scalartime_5m,gChanID);
+
+		Event_TDiff->Fill(gChanID,evt.GetTimeStamp()-RawEvents.front().GetTimeStamp());
 
 		Cal->Fill(evt.GetEnergy(),gChanID);
 		InternalCal->Fill(evt.GetInternalFilterEnergy(),gChanID);
