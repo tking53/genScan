@@ -44,6 +44,9 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 		
 		{7050,{4096,0,65536,4096,0,64}},
 		{7051,{4096,0,65536,4096,0,64}},
+
+		{7052,{64,0,64,8000,-4000,4000}},
+		{7053,{64,0,64,8000,-4000,4000}},
 		
 		{7060,{1000,-5,5,1000,-5,5}},
 		{7061,{1000,-5,5,1000,-5,5}},
@@ -82,7 +85,10 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 
 	this->YSOHGThreshold = 0.0;
 	this->YSOLGThreshold = 0.0;
-
+	
+	this->HighGainAnodes = std::vector<AnodeHitInfo>(64,AnodeHitInfo{.energy=0.0,.timestamp=-1.0,.hits=0});
+	this->LowGainAnodes = std::vector<AnodeHitInfo>(64,AnodeHitInfo{.energy=0.0,.timestamp=-1.0,.hits=0});
+	
 	for( size_t ii = 0; ii < 8; ++ii ){
 		for( size_t jj = 0; jj < 8; ++jj ){
 			this->PositionMap.push_back({-3.5+jj,3.5-ii});
@@ -97,12 +103,15 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 	Processor::PreProcess();
 	auto summary = 	eventhistory->GetCurrentEventSummary();
 	summary->GetDetectorSummary(this->AllDefaultRegex["mtasimplant"],this->SummaryData);
+	auto IMPLANT_7000 = hismanager->GetPlot<TH2*>("IMPLANT_7000");
+	auto IMPLANT_7003 = hismanager->GetPlot<TH2*>("IMPLANT_7003");
+
 	for( const auto& evt : this->SummaryData ){
 		auto subtype = evt->GetSubType();
 		auto group = evt->GetGroup();
 		auto ishighgain = evt->HasTag(this->highgaintag);
 		auto islowgain = evt->HasTag(this->lowgaintag);
-
+		
 		int pixelid = -1;
 
 		if( (not ishighgain and not islowgain) or (islowgain and ishighgain) ){
@@ -124,24 +133,26 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 			}
 		}else if(subtype.compare("anode") == 0 and ishighgain ){
 			pixelid = std::stoi(group);
-			++(this->HighGainAnodeHitMap[pixelid]);
+			++(this->HighGainAnodes[pixelid].hits);
+			this->HighGainAnodes[pixelid].energy += evt->GetEnergy();
+			this->HighGainAnodes[pixelid].timestamp = evt->GetTimeStamp();
 			++(this->HighGainAnodeHits);
-			hismanager->Fill("IMPLANT_7000",evt->GetEnergy(),pixelid);
+			IMPLANT_7000->Fill(evt->GetEnergy(),pixelid);
 			if( evt->GetEnergy() > this->YSOHGThreshold ){
-				this->HighGainAnodes.at(pixelid) += evt->GetEnergy();
-				//auto coarsepixel = this->CalcXY(pixelid);
-				//hismanager->Fill("IMPLANT_7012",coarsepixel.first,coarsepixel.second);
+				this->HighGainAnodes.at(pixelid).energy += evt->GetEnergy();
 			}
+
 		}else if(subtype.compare("anode") == 0 and islowgain ){
 			pixelid = std::stoi(group);
-			hismanager->Fill("IMPLANT_7003",evt->GetEnergy(),pixelid);
-			++(this->LowGainAnodeHitMap[pixelid]);
+			IMPLANT_7003->Fill(evt->GetEnergy(),pixelid);
+			++(this->LowGainAnodes[pixelid].hits);
+			this->LowGainAnodes[pixelid].energy += evt->GetEnergy();
+			this->LowGainAnodes[pixelid].timestamp = evt->GetTimeStamp();
 			++(this->LowGainAnodeHits);
 			if( evt->GetEnergy() > this->YSOLGThreshold ){
-				this->LowGainAnodes.at(pixelid) += evt->GetEnergy();
-				//auto coarsepixel = this->CalcXY(pixelid);
-				//hismanager->Fill("IMPLANT_7013",coarsepixel.first,coarsepixel.second);
+				this->LowGainAnodes.at(pixelid).energy += evt->GetEnergy();
 			}
+
 		}else{
 			throw std::runtime_error("unknown subtype"+subtype+" correct subtypes are anode, dynode");
 		}
@@ -235,9 +246,13 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 	//prefetch since we fill more than once
 	auto IMPLANT_7040 = hismanager->GetPlot<TH2*>("IMPLANT_7040");
 	auto IMPLANT_7043 = hismanager->GetPlot<TH2*>("IMPLANT_7043");
+	auto IMPLANT_7052 = hismanager->GetPlot<TH2 *>("IMPLANT_7052");
+	auto IMPLANT_7053 = hismanager->GetPlot<TH2*>("IMPLANT_7053");
 	for( size_t ii = 0; ii < 64; ++ii ){
-		IMPLANT_7040->Fill(this->HighGainAnodeHitMap[ii],ii);
-		IMPLANT_7043->Fill(this->LowGainAnodeHitMap[ii],ii);
+		IMPLANT_7040->Fill(this->HighGainAnodes[ii].hits,ii);
+		IMPLANT_7043->Fill(this->LowGainAnodes[ii].hits,ii);
+		IMPLANT_7052->Fill(ii,this->HighGainAnodes[ii].timestamp - this->hgImage.DynodeTimeStamp);
+		IMPLANT_7053->Fill(ii,this->LowGainAnodes[ii].timestamp - this->lgImage.DynodeTimeStamp);
 	}
 
 	if( this->lgImage.dynode > this->IsIonThresh.first and this->lgImage.dynode < this->IsIonThresh.second ){
@@ -327,6 +342,9 @@ void MtasImplantProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH2F>("IMPLANT_7050","High Gain Dynode PSD (Head/Tail); Energy (keV); PSD (arb.)",this->h2dsettings.at(7050));
 	hismanager->RegisterPlot<TH2F>("IMPLANT_7051","Low Gain Dynode PSD (Head/Tail); Energy (keV); PSD (arb.)",this->h2dsettings.at(7051));
 
+	hismanager->RegisterPlot<TH2F>("IMPLANT_7052" ,"High Gain: TDiff: Anode - Dynode ; Pixel Number (arb.); TDiff (ns) ",this->h2dsettings.at(7052));
+	hismanager->RegisterPlot<TH2F>("IMPLANT_7053" , "Low Gain: TDiff: Anode - Dynode ; Pixel Number (arb.); TDiff (ns) ",this->h2dsettings.at(7053));
+
 	hismanager->RegisterPlot<TH2F>("IMPLANT_7060", "High Gain X StdDev. vs X Position; Pixel (arb.); Pixel (arb.)",this->h2dsettings.at(7060));
 	hismanager->RegisterPlot<TH2F>("IMPLANT_7061" ,"High Gain Y StdDev. vs Y Position; Pixel (arb.); Pixel (arb.)",this->h2dsettings.at(7061));
 	hismanager->RegisterPlot<TH2F>("IMPLANT_7062" ,"High Gain X StdDev. vs Dynode; Energy (keV); Pixel (arb.)",this->h2dsettings.at(7062));
@@ -369,10 +387,20 @@ void MtasImplantProcessor::CleanupTree(){
 }
 
 void MtasImplantProcessor::Reset(){
-	this->HighGainAnodeHitMap = std::vector<short>(64,0);
+
+	for( auto& hit : this->HighGainAnodes ){
+		hit.energy=0.0;
+		hit.timestamp=-1.0;
+		hit.hits=0;
+	}
+	for( auto& hit : this->LowGainAnodes ){
+		hit.energy=0.0;
+		hit.timestamp=-1.0;
+		hit.hits=0;
+	}
+
 	this->HighGainDynodeHits = 0;
 	this->HighGainAnodeHits = 0;
-	this->HighGainAnodes = std::vector<double>(64,0.0);
 	this->hgImage.ResetAnode();
 	this->hgImage.ResetDynode();
 	this->hgImage.ResetHighResPosition();
@@ -381,10 +409,8 @@ void MtasImplantProcessor::Reset(){
 	this->hgImage.ResetSecondaryLowResPosition();
 	this->hgPSD = 0.0;
 	
-	this->LowGainAnodeHitMap = std::vector<short>(64,0);
 	this->LowGainDynodeHits = 0;
 	this->LowGainAnodeHits = 0;
-	this->LowGainAnodes = std::vector<double>(64,0.0);
 	this->lgImage.ResetAnode();
 	this->lgImage.ResetDynode();
 	this->lgImage.ResetHighResPosition();
@@ -399,27 +425,27 @@ std::pair<double,double> MtasImplantProcessor::CalcXY(const unsigned int& idx) c
 	return this->PositionMap[idx];
 }
 
-void MtasImplantProcessor::CalcPosition(const std::vector<double>& ergs,SIPMIMP::Image& img){
-	double max_erg = ergs.front();
+void MtasImplantProcessor::CalcPosition(const std::vector<AnodeHitInfo>& anodes,SIPMIMP::Image& img){
+	double max_erg = anodes.front().energy;
 	double esum = 0.0;
 	unsigned int idx = 0;
 	double xtmp = 0.0;
 	double xtmp2 = 0.0;
 	double ytmp = 0.0;
 	double ytmp2 = 0.0;
-	for( const auto& e : ergs ){
+	for( const auto& e : anodes ){
 		auto pixel = this->CalcXY(idx);
-		if( e > max_erg ){
-			max_erg = e;
+		if( e.energy > max_erg ){
+			max_erg = e.energy;
 			img.lowResPosition = pixel;
 		}
-		esum += e;
+		esum += e.energy;
 		//need to get the edges to be -4,-3,-2,-1,0,1,2,3,4
 		//with the centers being -3.5, -2.5, -1.5, -0.5, 0.5, 1.5, 2.5, 3.5
-		xtmp += e*pixel.first;
-		xtmp2 += e*pixel.first*pixel.first;
-		ytmp += e*pixel.second;
-		ytmp2 += e*pixel.second*pixel.second;
+		xtmp += e.energy*pixel.first;
+		xtmp2 += e.energy*pixel.first*pixel.first;
+		ytmp += e.energy*pixel.second;
+		ytmp2 += e.energy*pixel.second*pixel.second;
 		++idx;
 	}
 	img.anodesum = esum;

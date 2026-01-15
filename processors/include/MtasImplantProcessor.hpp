@@ -29,8 +29,14 @@ class MtasImplantProcessor : public Processor{
 	
 		void Reset();
 	private:
+		struct AnodeHitInfo{
+			double energy;
+			double timestamp;
+			short hits;
+		} ;
+		
 		std::pair<double,double> CalcXY(const unsigned int&) const;
-		void CalcPosition(const std::vector<double>&,SIPMIMP::Image&);
+		void CalcPosition(const std::vector<AnodeHitInfo>&,SIPMIMP::Image&);
 		std::vector<size_t> get_sorted_indices(const std::vector<double>&);
 
 		std::vector<std::pair<double,double>> PositionMap;
@@ -54,21 +60,20 @@ class MtasImplantProcessor : public Processor{
 		std::pair<double,double> IsBetaThresh;
 		std::pair<double,double> IsIonThresh;
 
-		std::vector<short> HighGainAnodeHitMap;
 		short HighGainDynodeHits;
 		short HighGainAnodeHits;
 		SIPMIMP::Image hgImage;
 		double hgPSD;
-		std::vector<double> HighGainAnodes;
+		std::vector<AnodeHitInfo> HighGainAnodes;
 		ProcessorStruct::MtasImplant HighGain;
 
-		std::vector<short> LowGainAnodeHitMap;
 		short LowGainDynodeHits;
 		short LowGainAnodeHits;
 		SIPMIMP::Image lgImage;
 		double lgPSD;
-		std::vector<double> LowGainAnodes;
+		std::vector<AnodeHitInfo> LowGainAnodes;
 		ProcessorStruct::MtasImplant LowGain;
+
 };
 
 #endif
