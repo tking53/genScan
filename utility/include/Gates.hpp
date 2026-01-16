@@ -30,12 +30,12 @@ class Gate{
 
 		template<class U>
 		bool IsWithin(const U& val) const{
-			return val >= this->bounds.first and val <= this->bounds.second;
+			return val >= this->bounds.first and val < this->bounds.second;
 		}
 
 		template<class U>
 		bool IsOutside(const U& val) const{
-			return val < this->bounds.first or val > this->bounds.second;
+			return val < this->bounds.first or val >= this->bounds.second;
 		}
 
 		template<class U>
