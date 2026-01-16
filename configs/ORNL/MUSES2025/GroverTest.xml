@@ -1,0 +1,167 @@
+<?xml version="1.0"?>
+<Configuration>
+	<Author>
+		<Name>GenConfig</Name>
+		<Date>Today</Date>
+		<Email>default AT gmail DOT com</Email>
+	</Author>
+	<Description>Automatically Generated xml by GenConfig</Description>
+	<Global EventWidth="500" EventWidthUnit="ns" CorrelationType="rolling-trigger" />
+	<DetectorDriver >
+		<Processor name="RootDevProcessor" included_types="hpge,muses,plastic,generic" />
+	</DetectorDriver >
+	<Map>
+		<Crate number="0">
+			<Module number="0" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
+				<Channel number="0" type="hpge" subtype="grover" group="0" tags="highgain">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="1" type="hpge" subtype="grover" group="1" tags="highgain">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="2" type="hpge" subtype="grover" group="2" tags="highgain">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="3" type="hpge" subtype="grover" group="3" tags="highgain">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="4" type="generic" subtype="generic" group="generic" tags="4">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="5" type="hpge" subtype="grover" group="4" tags="highgain">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="6" type="hpge" subtype="grover" group="5" tags="highgain">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="7" type="hpge" subtype="grover" group="6" tags="highgain">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="8" type="hpge" subtype="grover" group="7" tags="highgain">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="9" type="generic" subtype="generic" group="generic" tags="9">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="10" type="generic" subtype="generic" group="generic" tags="10">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="11" type="generic" subtype="generic" group="generic" tags="11">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="12" type="generic" subtype="generic" group="generic" tags="12">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="13" type="generic" subtype="generic" group="generic" tags="13">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="14" type="generic" subtype="generic" group="generic" tags="14">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="15" type="generic" subtype="generic" group="generic" tags="15">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+			</Module>
+			<Module number="1" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
+				<Channel number="0" type="muses" subtype="pixel" group="0" tags="">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="1" type="muses" subtype="pixel" group="1" tags="">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="2" type="muses" subtype="pixel" group="2" tags="">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="3" type="muses" subtype="pixel" group="3" tags="">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="4" type="generic" subtype="generic" group="generic" tags="20">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="5" type="generic" subtype="generic" group="generic" tags="21">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="6" type="generic" subtype="generic" group="generic" tags="22">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="7" type="generic" subtype="generic" group="generic" tags="23">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="8" type="generic" subtype="generic" group="generic" tags="24">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="9" type="generic" subtype="generic" group="generic" tags="25">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="10" type="generic" subtype="generic" group="generic" tags="26">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="11" type="generic" subtype="generic" group="generic" tags="27">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="12" type="generic" subtype="generic" group="generic" tags="28">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="13" type="generic" subtype="generic" group="generic" tags="29">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="14" type="generic" subtype="generic" group="generic" tags="30">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="15" type="generic" subtype="generic" group="generic" tags="31">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+			</Module>
+			<Module number="2" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
+				<Channel number="0" type="plastic" subtype="trigger" group="0" tags="left">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="1" type="plastic" subtype="trigger" group="1" tags="left">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="2" type="plastic" subtype="trigger" group="0" tags="right">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="3" type="plastic" subtype="trigger" group="1" tags="right">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="4" type="generic" subtype="generic" group="generic" tags="36">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="5" type="generic" subtype="generic" group="generic" tags="37">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="6" type="generic" subtype="generic" group="generic" tags="38">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="7" type="generic" subtype="generic" group="generic" tags="39">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="8" type="generic" subtype="generic" group="generic" tags="40">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="9" type="generic" subtype="generic" group="generic" tags="41">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="10" type="generic" subtype="generic" group="generic" tags="42">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="11" type="generic" subtype="generic" group="generic" tags="43">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="12" type="generic" subtype="generic" group="generic" tags="44">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="13" type="generic" subtype="generic" group="generic" tags="45">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="14" type="generic" subtype="generic" group="generic" tags="46">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="15" type="generic" subtype="generic" group="generic" tags="47">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+			</Module>
+		</Crate>
+	</Map>
+</Configuration>

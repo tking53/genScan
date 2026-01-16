@@ -31,7 +31,8 @@ class DataParser{
 			PACMAN_LDF_PIXIE,
 			PLD,
 			EVT_PRESORT,
-			EVT_BUILT
+			EVT_BUILT,
+			EVT_TO
 		};
 		DataParser(DataFileType,const std::string&);
 		~DataParser() = default;
