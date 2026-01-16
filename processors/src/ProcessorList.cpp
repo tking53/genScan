@@ -36,7 +36,7 @@
 
 #include "WaveformAnalyzer.hpp"
 
-ProcessorList::ProcessorList(const std::string& log){
+ProcessorList::ProcessorList(const std::string& log, PLOTS::PlotRegistry* HistogramManager) {
 	this->LogName = log;
 	this->console = spdlog::get(this->LogName)->clone("ProcessorList");
 	std::random_device rd;
@@ -45,6 +45,7 @@ ProcessorList::ProcessorList(const std::string& log){
 	this->FirstTimeStamp = -1;
 	this->EventStamp = 0;
 	this->QDCHisNames = {"QDC_0","QDC_1","QDC_2","QDC_3","QDC_4","QDC_5","QDC_6","QDC_7"};
+	this->Hits = std::vector<short>(HistogramManager->GetChannelBins(),0);
 }
 
 void ProcessorList::PreAnalyze(EventHistoryManager* History,PLOTS::PlotRegistry* HistogramManager,CUTS::CutRegistry* CutManager){
@@ -242,6 +243,9 @@ void ProcessorList::ThreshAndCal(boost::container::devector<PhysicsData>& RawEve
 		#endif
 		#endif
 	}
+	for (auto& h : this->Hits){
+		h = 0;
+	}
 }
 
 void ProcessorList::ProcessRaw(EventHistoryManager* History,PLOTS::PlotRegistry* HistogramManager){
@@ -320,6 +324,8 @@ void ProcessorList::ProcessRaw(EventHistoryManager* History,PLOTS::PlotRegistry*
 		auto gChanID = evt.GetGlobalChannelID();
 		auto gBoardID = evt.GetGlobalBoardID();
 
+		++(this->Hits[gChanID]);
+
 		auto scalartime = 1.0e-9*(evt.GetTimeStamp()-this->FirstTimeStamp);
 		auto scalartime_m = scalartime/60.0;
 		auto scalartime_5m = scalartime_m/5.0;
@@ -367,6 +373,11 @@ void ProcessorList::ProcessRaw(EventHistoryManager* History,PLOTS::PlotRegistry*
 		for( size_t ii = 0; ii < qdcs.size(); ++ii ){
 			QDCs[ii]->Fill(qdcs[ii],gChanID);
 		}
+	}
+
+	auto Channel_Hits = HistogramManager->GetPlot<TH2*>("Channel_Hits"); 
+	for (size_t ii = 0; ii < this->Hits.size(); ++ii ){
+		Channel_Hits->Fill(ii,this->Hits[ii]);
 	}
 }
 

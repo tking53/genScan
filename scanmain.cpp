@@ -312,7 +312,7 @@ int main(int argc, char *argv[]) {
 	console->info("Generated Raw, Scalar, and Cal plots for {} Channels, There are {} bins for Raw and Cal, and {} bins for Scalar",MAX_CHANNELS,ebins,sbins);
 	
 	//Init the processors/analyzers
-	std::shared_ptr<ProcessorList> processorlist = std::make_shared<ProcessorList>(logname);
+	std::shared_ptr<ProcessorList> processorlist = std::make_shared<ProcessorList>(logname,HistogramManager.get());
 	try{
 		if( config_extension == "xml" ){
 			processorlist->InitializeProcessors(cfgparser.get(),enabletree);
@@ -411,6 +411,23 @@ int main(int argc, char *argv[]) {
 	cfgdata->Branch("data",&data);
 	cfgdata->Fill();
 	cfgdata->Write(0,2,0);
+	TTree* filelist = new TTree("inputfiles","list of input files used to scan data");
+	std::string filelistToRoot = "";
+	filelist->Branch("filename",&filelistToRoot);
+	for ( const auto& f : FileNames ){
+		filelistToRoot = f;
+		filelist->Fill();
+	}
+	filelist->Write(0,2,0);
+	TTree* cutlist = new TTree("cutsearchpath","list of cut files used during the scan");
+	std::string cutfileToRoot = "";
+	cutlist->Branch("path",&cutfileToRoot);
+	for ( const auto& c : CutManager->GetCutSearchPath() ){
+		cutfileToRoot = c;
+		cutlist->Fill();
+	}
+	cutlist->Write(0,2,0);
+
 	//need to move above into RootManager
 	RootManager->FinalizeTrees();
 	std::chrono::time_point<std::chrono::high_resolution_clock> global_stop_time = std::chrono::high_resolution_clock::now();

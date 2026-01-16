@@ -26,6 +26,8 @@ namespace CUTS{
 			bool IsWithin(const std::string&,double,double);
 			TCutG* GetCut(const std::string&);
 
+			std::vector<std::string> GetCutSearchPath() const;
+	
 		private:
 			bool CutIDExists(const std::string&) const;
 			std::vector<std::string> CutIDs;

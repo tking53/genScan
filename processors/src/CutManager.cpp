@@ -138,4 +138,7 @@ namespace CUTS{
 	TCutG* CutRegistry::GetCut(const std::string& cutid){
 		return this->Cuts.at(cutid);
 	}
+	std::vector<std::string> CutRegistry::GetCutSearchPath() const{
+		return this->Paths;
+	}
 }

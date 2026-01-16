@@ -29,7 +29,7 @@
 
 class ProcessorList{
 	public:
-		ProcessorList(const std::string&);
+		ProcessorList(const std::string&, PLOTS::PlotRegistry*);
 		~ProcessorList() = default;
 
 		void InitializeProcessors(ConfigParser*,bool);
@@ -55,6 +55,7 @@ class ProcessorList{
 
 		void CleanupTrees();
 
+
 		const std::vector<std::shared_ptr<Processor>>& GetProcessors() const;
 		const std::vector<std::shared_ptr<Analyzer>>& GetAnalyzers() const;
 	private:
@@ -71,6 +72,7 @@ class ProcessorList{
 		double FirstTimeStamp;
 		unsigned long long EventStamp;
 		std::vector<std::string> QDCHisNames;
+		std::vector<short> Hits;
 };
 
 #endif
