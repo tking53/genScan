@@ -12,7 +12,7 @@
 	</DetectorDriver >
 	<Map>
 		<Crate number="0">
-			<Module number="0" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
+			<Module number="0" Revision="F" Frequency="100" Firmware="R37640" TraceDelay="120">
 				<Channel number="0" type="hpge" subtype="grover" group="0" tags="highgain">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
@@ -62,7 +62,7 @@
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 			</Module>
-			<Module number="1" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
+			<Module number="1" Revision="F" Frequency="100" Firmware="R37640" TraceDelay="120">
 				<Channel number="0" type="muses" subtype="pixel" group="0" tags="">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
@@ -112,7 +112,9 @@
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 			</Module>
-			<Module number="2" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
+			<!-- This is the actual Firmware number, I think these are the same though -->
+			<!-- <Module number="2" Revision="F" Frequency="500" Firmware="R45762" TraceDelay="120"> -->
+			<Module number="2" Revision="F" Frequency="500" Firmware="R42950" TraceDelay="120">
 				<Channel number="0" type="plastic" subtype="trigger" group="0" tags="left">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
