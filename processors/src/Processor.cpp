@@ -192,25 +192,25 @@ void Processor::LoadHistogramSettings(const pugi::xml_node& config){
 		auto currh1d = this->h1dsettings.find(id);
 		auto currh2d = this->h2dsettings.find(id);
 		if( currh1d != this->h1dsettings.end()){
-			this->console->info("Found Different his settings for 1D histogram : {}",id);
-			this->console->info("original X: {} {} {}",currh1d->second.nbinsx,currh1d->second.xlow,currh1d->second.xhigh);
+			this->console->info("Found Different his settings for 1D histogram : {} More Info output in dbg",id);
+			this->console->debug("original X: {} {} {}",currh1d->second.nbinsx,currh1d->second.xlow,currh1d->second.xhigh);
 			this->h1dsettings[id].nbinsx = histogram.attribute("nbinsx").as_int(currh1d->second.nbinsx);
 			this->h1dsettings[id].xlow = histogram.attribute("xlow").as_double(currh1d->second.xlow);
 			this->h1dsettings[id].xhigh = histogram.attribute("xhigh").as_double(currh1d->second.xhigh);
-			this->console->info("X: {} {} {}",this->h1dsettings[id].nbinsx,this->h1dsettings[id].xlow,this->h1dsettings[id].xhigh);
+			this->console->debug("X: {} {} {}",this->h1dsettings[id].nbinsx,this->h1dsettings[id].xlow,this->h1dsettings[id].xhigh);
 		}else if( currh2d != this->h2dsettings.end() ){
-			this->console->info("Found Different his settings for 2D histogram : {}",id);
-			this->console->info("original X: {} {} {}",currh2d->second.nbinsx,currh2d->second.xlow,currh2d->second.xhigh);
-			this->console->info("original Y: {} {} {}",currh2d->second.nbinsy,currh2d->second.ylow,currh2d->second.yhigh);
+			this->console->info("Found Different his settings for 2D histogram : {} More Info output in dbg",id);
+			this->console->debug("original X: {} {} {}",currh2d->second.nbinsx,currh2d->second.xlow,currh2d->second.xhigh);
+			this->console->debug("original Y: {} {} {}",currh2d->second.nbinsy,currh2d->second.ylow,currh2d->second.yhigh);
 			this->h2dsettings[id].nbinsx = histogram.attribute("nbinsx").as_int(currh2d->second.nbinsx);
 			this->h2dsettings[id].xlow = histogram.attribute("xlow").as_double(currh2d->second.xlow);
 			this->h2dsettings[id].xhigh = histogram.attribute("xhigh").as_double(currh2d->second.xhigh);
 			this->h2dsettings[id].nbinsy = histogram.attribute("nbinsy").as_int(currh2d->second.nbinsy);
 			this->h2dsettings[id].ylow = histogram.attribute("ylow").as_double(currh2d->second.ylow);
 			this->h2dsettings[id].yhigh = histogram.attribute("yhigh").as_double(currh2d->second.yhigh);
-			this->console->info("New his settings for {}",id);
-			this->console->info("X: {} {} {}",this->h2dsettings[id].nbinsx,this->h2dsettings[id].xlow,this->h2dsettings[id].xhigh);
-			this->console->info("Y: {} {} {}",this->h2dsettings[id].nbinsy,this->h2dsettings[id].ylow,this->h2dsettings[id].yhigh);
+			this->console->debug("New his settings for {}",id);
+			this->console->debug("X: {} {} {}",this->h2dsettings[id].nbinsx,this->h2dsettings[id].xlow,this->h2dsettings[id].xhigh);
+			this->console->debug("Y: {} {} {}",this->h2dsettings[id].nbinsy,this->h2dsettings[id].ylow,this->h2dsettings[id].yhigh);
 		}else{
 			std::string mess = "Unknown histogram id: "+std::to_string(id)+" for "+this->ProcessorName;
 			throw std::runtime_error(mess);
