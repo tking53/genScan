@@ -223,7 +223,7 @@ namespace PLOTS{
 				RegisterPlot<TH1F>("Event_Width","Event Width; Time (ns);",width_size,0.0,width_size);
 				RegisterPlot<TH1F>("Event_Size","Num Hits Event; Event Size (arb.);",event_size,0,event_size);
 				RegisterPlot<TH2F>("Event_Mult","Event Size vs Channel; Channel (arb.); Event Size (arb.);",numchannels,0,numchannels,event_size,0,event_size);
-				RegisterPlot<TH2F>("Channel_Hits","Total Hits per Channel; Channel (arb.); Hits (arb.);",numchannels,0,numchannels,100,0,100);
+				RegisterPlot<TH2F>("Channel_Hits","Total Hits per Channel; Channel (arb.); Hits (arb.);",numchannels,0,numchannels,10,0,10);
 				RegisterPlot<TH2F>("Event_TDiff","Event TDiff vs Channel; Channel (arb.); TDiff (ticks);",numchannels,0,numchannels,width_size,0,width_size);
 				RegisterPlot<TH2F>("Event_Scale","Event Size vs Event Width; Time (ns); Event Size (arb.);",width_size,0,width_size,event_size,0,event_size);
 				RegisterPlot<TH2F>("Total_Rate","Total Rate of All Channels; Time (s); Rollover (arb.)",scalarsize,0,scalarsize,roll_size,0,roll_size);
