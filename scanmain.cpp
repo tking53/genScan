@@ -102,7 +102,7 @@ int main(int argc, char *argv[]) {
 		("enabletree,t",boost::program_options::value<bool>(&enabletree)->default_value(true),
 		 		"enable root tree output or disable it and only generate histograms")
 		("format,x",boost::program_options::value<std::string>(&dataformat)->default_value("null"),
-		 		"[file_format] format of the data file (evt,evt-presort,ldf,pacman_ldf,pld,caen_root,caen_bin)")
+		 		"[file_format] format of the data file (evt,evt_to,evt-presort,ldf,pacman_ldf,pld,caen_root,caen_bin)")
 
 		("version","print version number and exit")
 		("cmake-info","print info about the cmake used")
@@ -206,6 +206,8 @@ int main(int argc, char *argv[]) {
 	try{ 
 		if( dataformat.compare("evt") == 0 ){
 			dataparser.reset(new DataParser(DataParser::DataFileType::EVT_BUILT,logname));
+		}else if( dataformat.compare("evt_to") == 0 ){
+			dataparser.reset(new DataParser(DataParser::DataFileType::EVT_TO,logname));
 		}else if( dataformat.compare("evt-presort") == 0 ){
 			dataparser.reset(new DataParser(DataParser::DataFileType::EVT_PRESORT,logname));
 		}else if( dataformat.compare("ldf") == 0 ){
@@ -219,7 +221,7 @@ int main(int argc, char *argv[]) {
 		}else if( dataformat.compare("caen_bin") == 0 ){
 			dataparser.reset(new DataParser(DataParser::DataFileType::CAEN_BIN,logname));
 		}else{
-			throw std::runtime_error("Unknown file format : "+dataformat+", supported types are evt,evt-presort,ldf,pld,caen_root,caen_bin");
+			throw std::runtime_error("Unknown file format : "+dataformat+", supported types are evt,evt_to,evt-presort,ldf,pld,caen_root,caen_bin");
 		}
 	}catch(std::runtime_error const& e){
 		console->error(e.what());
