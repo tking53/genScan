@@ -239,7 +239,11 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		//timing checks 
 		{6100, {48,0,48,1600,0,1600}},
 		{6200, {48,0,48,1600,0,1600}},
-		{6300, {48,0,48,1600,0,1600}}
+		{6300, {48,0,48,1600,0,1600}},
+		
+		{6101, {48,0,48,10,0,10}},
+		{6201, {48,0,48,10,0,10}},
+		{6301, {48,0,48,10,0,10}}
 	};
 
 	this->Position = std::vector<double>(24,0.0);
@@ -721,7 +725,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 
 		//prefetch these histograms because grabbing them every single loop is expensive
 		auto MTAS_3201 = hismanager->GetPlot<TH2*>("MTAS_3201");
-		auto MTAS_6200  = hismanager->GetPlot<TH2*>("MTAS_6200");
+		auto MTAS_6200 = hismanager->GetPlot<TH2*>("MTAS_6200");
 		for( int ii = 0; ii < 24; ++ii ){
 			MTAS_3201->Fill(this->CrystalEnergy[ii],ii);
 			MTAS_6200->Fill(2*ii,this->SegmentDataVec[ii].fronttimestamp-this->FirstTime);
@@ -731,6 +735,7 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 		//prefetch these histograms because grabbing them every single loop is expensive
 		auto MTAS_3202 = hismanager->GetPlot<TH2*>("MTAS_3202");
 		auto MTAS_3203 = hismanager->GetPlot<TH2*>("MTAS_3203");
+		auto MTAS_6201 = hismanager->GetPlot<TH2*>("MTAS_6201");
 		for( int ii = 0; ii < 12; ++ii ){
 			MTAS_3202->Fill(this->RawCenter[ii],ii);
 			MTAS_3202->Fill(this->RawInner[ii],ii+12);
@@ -741,6 +746,11 @@ MtasProcessor::MtasProcessor(const std::string& log) : Processor(log,"MtasProces
 			MTAS_3203->Fill(this->Inner[ii],ii+12);
 			MTAS_3203->Fill(this->Middle[ii],ii+24);
 			MTAS_3203->Fill(this->Outer[ii],ii+36);
+
+			MTAS_6201->Fill(ii,this->CenterHits[ii]);
+			MTAS_6201->Fill(ii+12,this->InnerHits[ii]);
+			MTAS_6201->Fill(ii+24,this->MiddleHits[ii]);
+			MTAS_6201->Fill(ii+36,this->OuterHits[ii]);
 		}
 
 		//prefetch these histograms because grabbing them every single loop is expensive
@@ -1038,6 +1048,7 @@ void MtasProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	}
 	
 	hismanager->RegisterPlot<TH2F>("MTAS_6200","Mtas Internal TDiff; PMT (arb.); TDiff (ns)",this->h2dsettings.at(6200));
+	hismanager->RegisterPlot<TH2F>("MTAS_6201","Mtas Hit Multiplicity; PMT (arb.); Multiplicity (arb.)",this->h2dsettings.at(6201));
 
 	//MTAS diagnostic plots, always want these no matter what
 	hismanager->RegisterPlot<TH1F>("MTAS_3270","Mtas Total Scalar Rate (s); Time (s)",this->h1dsettings.at(3270));
@@ -1201,6 +1212,7 @@ void MtasProcessor::DeclareNoLogicAntiBetaPlots(PLOTS::PlotRegistry* hismanager)
 
 void MtasProcessor::DeclareBetaPlots(PLOTS::PlotRegistry* hismanager){
 	hismanager->RegisterPlot<TH2F>("MTAS_6300","Mtas Internal TDiff #beta-gated; PMT (arb.); TDiff (ns)",this->h2dsettings.at(6300));
+	hismanager->RegisterPlot<TH2F>("MTAS_6301","Mtas Hit Multiplicity #beta-gated; PMT (arb.); Multiplicity (arb.)",this->h2dsettings.at(6301));
 	//beta event
 	hismanager->RegisterPlot<TH1F>("MTAS_3370","Mtas Total Scalar Rate #beta-gated (s); Time (s)",this->h1dsettings.at(3370));
 	hismanager->RegisterPlot<TH1F>("MTAS_3371","Mtas Total Scalar Rate #beta-gated (min); Time (min)",this->h1dsettings.at(3371));
@@ -1283,7 +1295,8 @@ void MtasProcessor::DeclareBetaPlots(PLOTS::PlotRegistry* hismanager){
 }
 
 void MtasProcessor::DeclareAntiBetaPlots(PLOTS::PlotRegistry* hismanager){
-	hismanager->RegisterPlot<TH2F>("MTAS_6100","Mtas Internal TDiff #anti-beta-gated; PMT (arb.); TDiff (ns)",this->h2dsettings.at(6100));
+	hismanager->RegisterPlot<TH2F>("MTAS_6100","Mtas Internal TDiff anti-#beta-gated; PMT (arb.); TDiff (ns)",this->h2dsettings.at(6100));
+	hismanager->RegisterPlot<TH2F>("MTAS_6101","Mtas Hit Multiplicity anti-#beta-gated; PMT (arb.); Multiplicity (arb.)",this->h2dsettings.at(6101));
 	//not beta event
 	hismanager->RegisterPlot<TH1F>("MTAS_3170","Mtas Total Scalar Rate anti-#beta-gated (s); Time (s)",this->h1dsettings.at(3170));
 	hismanager->RegisterPlot<TH1F>("MTAS_3171","Mtas Total Scalar Rate anti-#beta-gated (min); Time (min)",this->h1dsettings.at(3171));
@@ -1801,6 +1814,7 @@ void MtasProcessor::FillBetaPlots(PLOTS::PlotRegistry* hismanager){
 		}
 		auto MTAS_3302 = hismanager->GetPlot<TH2*>("MTAS_3302");
 		auto MTAS_3303 = hismanager->GetPlot<TH2*>("MTAS_3303");
+		auto MTAS_6301 = hismanager->GetPlot<TH2*>("MTAS_6301");
 		for( int ii = 0; ii < 12; ++ii ){
 			MTAS_3302->Fill(this->RawCenter[ii],ii);
 			MTAS_3302->Fill(this->RawInner[ii],ii+12);
@@ -1810,6 +1824,10 @@ void MtasProcessor::FillBetaPlots(PLOTS::PlotRegistry* hismanager){
 			MTAS_3303->Fill(this->Inner[ii],ii+12);
 			MTAS_3303->Fill(this->Middle[ii],ii+24);
 			MTAS_3303->Fill(this->Outer[ii],ii+36);
+			MTAS_6301->Fill(ii,this->CenterHits[ii]);
+			MTAS_6301->Fill(ii+12,this->InnerHits[ii]);
+			MTAS_6301->Fill(ii+24,this->MiddleHits[ii]);
+			MTAS_6301->Fill(ii+36,this->OuterHits[ii]);
 		}
 		auto MTAS_3350  = hismanager->GetPlot<TH2*>("MTAS_3350");
 		auto MTAS_33508 = hismanager->GetPlot<TH2*>("MTAS_33508");
@@ -2074,6 +2092,7 @@ void MtasProcessor::FillNonBetaPlots(PLOTS::PlotRegistry* hismanager){
 		}
 		auto MTAS_3102 = hismanager->GetPlot<TH2*>("MTAS_3102");
 		auto MTAS_3103 = hismanager->GetPlot<TH2*>("MTAS_3103");
+		auto MTAS_6101 = hismanager->GetPlot<TH2*>("MTAS_6101");
 		for( int ii = 0; ii < 12; ++ii ){
 			MTAS_3102->Fill(this->RawCenter[ii],ii);
 			MTAS_3102->Fill(this->RawInner[ii],ii+12);
@@ -2083,6 +2102,10 @@ void MtasProcessor::FillNonBetaPlots(PLOTS::PlotRegistry* hismanager){
 			MTAS_3103->Fill(this->Inner[ii],ii+12);
 			MTAS_3103->Fill(this->Middle[ii],ii+24);
 			MTAS_3103->Fill(this->Outer[ii],ii+36);
+			MTAS_6101->Fill(ii,this->CenterHits[ii]);
+			MTAS_6101->Fill(ii+12,this->InnerHits[ii]);
+			MTAS_6101->Fill(ii+24,this->MiddleHits[ii]);
+			MTAS_6101->Fill(ii+36,this->OuterHits[ii]);
 		}
 		auto MTAS_3150  = hismanager->GetPlot<TH2*>("MTAS_3150");
 		auto MTAS_31508 = hismanager->GetPlot<TH2*>("MTAS_31508");
