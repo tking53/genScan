@@ -787,7 +787,7 @@ void PidProcessor::FillStruct(PhysicsData* data, ProcessorStruct::PidDet &det){
 	det.time = data->GetCFDTimeStamp();
 	det.saturation = data->GetSaturation();
 	det.pileup = data->GetPileup();
-};
+}
 
 size_t PidProcessor::GetNumFP1Pins() const{
 	return this->fp1.pin.size();
