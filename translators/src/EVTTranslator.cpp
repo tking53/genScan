@@ -45,7 +45,7 @@ Translator::TRANSLATORSTATE EVTTranslator::Parse(boost::container::devector<Phys
 				this->correlator->Clear();
 			}
 		}
-		if( this->CurrentFile.eof() ){
+		if( this->CurrentFile.eof() or not this->CurrentFile.good() ){
 			if( not this->OpenNextFile() ){
 				return Translator::TRANSLATORSTATE::COMPLETE;
 			}
