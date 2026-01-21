@@ -10,6 +10,7 @@ namespace ProcessorStruct{
 		double dynodeerg = 0.0;
 		double dynodets = -1.0;
 		double anodesum = 0.0;
+		int numanodes = 0;
 	};
 	static const MtasImplant DEFAULT_MTAS_IMPLANT_STRUCT;
 }

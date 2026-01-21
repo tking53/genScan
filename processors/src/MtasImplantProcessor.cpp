@@ -159,6 +159,11 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 	}
 
 	this->CalcPosition(this->HighGainAnodes,this->hgImage);
+	for( auto& anode : this->HighGainAnodes ){
+		if( anode.energy > 0.0 ){
+			this->hgImage.numanodes += 1;
+		}
+	}
 	//if( this->HighGainAnodeHits > 1 ){
 	//	auto HGIndices = this->get_sorted_indices(this->HighGainAnodes);
 	//	this->hgImage.secondarylowResPosition = this->CalcXY(HGIndices[1]);
@@ -172,6 +177,7 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 	this->HighGain.dynodeerg = this->hgImage.dynode;
 	this->HighGain.dynodets = this->hgImage.DynodeTimeStamp;
 	this->HighGain.anodesum = this->hgImage.anodesum;
+	this->HighGain.numanodes = this->hgImage.numanodes;
 	hismanager->Fill("IMPLANT_7005",this->hgImage.dynode);
 	hismanager->Fill("IMPLANT_7012",this->hgImage.lowResPosition.first,this->hgImage.lowResPosition.second);
 	hismanager->Fill("IMPLANT_7014",this->hgImage.highResPosition.first,this->hgImage.highResPosition.second);
@@ -193,6 +199,11 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 	hismanager->Fill("IMPLANT_7067",this->HighGainAnodeHits,this->hgImage.highResStdDev.second);
 
 	this->CalcPosition(this->LowGainAnodes,this->lgImage);
+	for( auto& anode : this->LowGainAnodes ){
+		if( anode.energy > 0.0 ){
+			this->lgImage.numanodes += 1;
+		}
+	}
 	//if( this->LowGainAnodeHits > 1 ){
 	//	auto LGIndices = this->get_sorted_indices(this->LowGainAnodes);
 	//	this->lgImage.secondarylowResPosition = this->CalcXY(LGIndices[1]);
@@ -206,6 +217,7 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log) : Processor(l
 	this->LowGain.dynodeerg = this->lgImage.dynode;
 	this->LowGain.dynodets = this->lgImage.DynodeTimeStamp;
 	this->LowGain.anodesum = this->lgImage.anodesum;
+	this->LowGain.numanodes = this->lgImage.numanodes;
 	hismanager->Fill("IMPLANT_7006",this->lgImage.dynode);
 	hismanager->Fill("IMPLANT_7013",this->lgImage.lowResPosition.first,this->lgImage.lowResPosition.second);
 	hismanager->Fill("IMPLANT_7015",this->lgImage.highResPosition.first,this->lgImage.highResPosition.second);

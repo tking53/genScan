@@ -49,14 +49,16 @@ namespace SIPMIMP {
 		std::pair<double,double> highResPosition;
 		std::pair<double,double> highResStdDev;
 		double anodesum;
+		int numanodes;
 
 		void ResetDynode(double val = 0.0,double ts = 0.0){
 			dynode = val;
 			DynodeTimeStamp = ts;
 		}
 
-		void ResetAnode(double val = 0.0){
+		void ResetAnode(double val = 0.0,int nanodes = 0){
 			anodesum = val;
+			numanodes = nanodes;
 		}
 
 		void ResetHighResPosition(double x = 0.0,double y = 0.0){
