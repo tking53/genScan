@@ -208,12 +208,19 @@ int main(int argc, char *argv[]) {
 			{"Ion_Spatial_Distribution",{1000,-5,5,1000,-5,5}},
 			{"Ion_R2_v_X",{1000,-5,5,1000,0,100}},
 			{"Ion_R2_v_Y",{1000,-5,5,1000,0,100}},
+			{"Ion_AnodeSum_v_X",{1000,-5,5,10000,0,200000}},
+			{"Ion_AnodeSum_v_Y",{1000,-5,5,10000,0,200000}},
 			{"Corrected_Ion_Spatial_Distribution",{1000,-5,5,1000,-5,5}},
 			{"Positive_Beta_Spatial_Distribution",{1000,-5,5,1000,-5,5}},
 			{"Negative_Beta_Spatial_Distribution",{1000,-5,5,1000,-5,5}},
 
 			{"Positive_Beta_v_Radius",{1000,0,10,4096,0,16384}},
 			{"Negative_Beta_v_Radius",{1000,0,10,4096,0,16384}},
+			
+			{"Positive_Beta_AnodeSum_v_X",{1000,-5,5,10000,0,200000}},
+			{"Positive_Beta_AnodeSum_v_Y",{1000,-5,5,10000,0,200000}},
+			{"Negative_Beta_AnodeSum_v_X",{1000,-5,5,10000,0,200000}},
+			{"Negative_Beta_AnodeSum_v_Y",{1000,-5,5,10000,0,200000}},
 
 			{"Positive_Mtas_C_v_T",{4096,0,16384,4096,0,16384}},
 			{"Negative_Mtas_C_v_T",{4096,0,16384,4096,0,16384}},
@@ -248,7 +255,6 @@ int main(int argc, char *argv[]) {
 			His2D[name] = {nbinsx,xlow,xhigh,nbinsy,ylow,yhigh};
 		}
 
-
 		std::vector<Gate<double>> RitReject;
 		for( const auto& g : doc["RIT"] ){
 			auto lowerbound = g["Gate"]["lowerbound"].as<double>(-1.0);
@@ -257,13 +263,16 @@ int main(int argc, char *argv[]) {
 			console->info("Found Rit Rejection Bounds : {} {}",lowerbound,upperbound);
 		}
 
+		int MinIonAnodes = 2;
 		Gate<double> ValidIon(2000.0,16384.0);
 		if( auto g = doc["ION"] ){
 			auto lowerbound = g["lowerbound"].as<double>(2000.0);
 			auto upperbound = g["upperbound"].as<double>(16384.0);
 			ValidIon = Gate<double>(lowerbound,upperbound);
+			MinIonAnodes = g["numanodes"].as<int>(2);
 		}
 		console->info("Found Valid Ion Bounds : {} {}",ValidIon.GetLowerBound(),ValidIon.GetUpperBound());
+		console->info("Found Min Anodes for Ion : {}",MinIonAnodes);
 
 		Gate<double> ValidBeta;
 		if( auto g  = doc["BETA"] ){
@@ -387,6 +396,7 @@ int main(int argc, char *argv[]) {
 
 		std::vector<ProcessorStruct::MtasImplant> ValidImplants;
 		std::vector<ProcessorStruct::MtasImplant> RitRejectedImplants;
+		std::vector<ProcessorStruct::MtasImplant> NumAnodeRejectedImplants;
 		std::vector<ProcessorStruct::MtasImplant> ValidBetas;
 		std::vector<std::vector<ProcessorStruct::MtasTotal>> ValidTotals;
 		std::vector<std::vector<ProcessorStruct::MtasSegment>> ValidSegments;
@@ -414,7 +424,12 @@ int main(int argc, char *argv[]) {
 				}
 				//this is checking for either light ion or beta
 				if( not LightIon ){
-					ValidImplants.push_back(*lowgain);
+					//this removes those vertical bars
+					if( lowgain->numanodes > MinIonAnodes ){
+						ValidImplants.push_back(*lowgain);
+					}else{
+						NumAnodeRejectedImplants.push_back(*lowgain);
+					}
 				}else{
 					RitRejectedImplants.push_back(*lowgain);
 				}
@@ -432,7 +447,8 @@ int main(int argc, char *argv[]) {
 			}
 		}
 
-		console->info("Found {} Valid Implants, {} RitRejectedImplants, {} Valid Betas",ValidImplants.size(),RitRejectedImplants.size(),ValidBetas.size());
+		console->info("Found {} Valid Implants, {} RitRejectedImplants, {} NumAnodeRejectedImplants, {} Valid Betas",
+				ValidImplants.size(),RitRejectedImplants.size(),NumAnodeRejectedImplants.size(),ValidBetas.size());
 
 		//the actual correlation step
 		console->info("Begin sorting");
@@ -454,7 +470,7 @@ int main(int argc, char *argv[]) {
 		//-0.0006, 0.0006 curves at top and bottom towards corners
 		//-0.0006, 0.006  full circle again
 		//-0.06, 0.0 gives pincushion
-		const double k1 = -0.06;
+		const double k1 = 0.0;
 		const double k2 = 0.0;
 		const double xc = 0.0;
 		const double yc = 0.0;
@@ -478,6 +494,7 @@ int main(int argc, char *argv[]) {
 			const auto ion_ts = ion.dynodets;
 			const auto ion_x = ion.highresx;
 			const auto ion_y = ion.highresy;
+			const auto ion_anodesum = ion.anodesum;
 			const auto ion_xdiff = ion_x - xc;
 			const auto ion_ydiff = ion_y - yc;
 			const auto ion_r2 = ion_xdiff*ion_xdiff + ion_ydiff*ion_ydiff;
@@ -487,15 +504,17 @@ int main(int argc, char *argv[]) {
 			HistogramManager->Fill("Ion_R2_v_X",ion_xdiff,ion_r2);
 			HistogramManager->Fill("Ion_R2_v_Y",ion_ydiff,ion_r2);
 			HistogramManager->Fill("Corrected_Ion_Spatial_Distribution",c_ion_x,c_ion_y);
+			HistogramManager->Fill("Ion_AnodeSum_v_X",c_ion_x,ion_anodesum);
+			HistogramManager->Fill("Ion_AnodeSum_v_Y",c_ion_y,ion_anodesum);
 			auto start = std::distance(ValidBetas.begin(),beta_begin);
 			auto stop = std::distance(ValidBetas.begin(),beta_end);
 			for( auto iter = start; iter < stop; ++iter ){
 				const auto beta_ts = ValidBetas[iter].dynodets;
-				const auto beta_x = ValidBetas[iter].highresx;
-				const auto beta_y = ValidBetas[iter].highresy;
+				const auto c_beta_x = ValidBetas[iter].highresx;
+				const auto c_beta_y = ValidBetas[iter].highresy;
 				const auto tdiff = 1.0e-9*(beta_ts - ion_ts);
-				const auto xdiff = ion_x - beta_x;
-				const auto ydiff = ion_y - beta_y;
+				const auto xdiff = ion_x - c_beta_x;
+				const auto ydiff = ion_y - c_beta_y;
 				const auto radius = std::sqrt(xdiff*xdiff + ydiff*ydiff);
 				if( radius <= allowed_radius ){
 					const auto beta_erg = ValidBetas[iter].dynodeerg;
@@ -508,7 +527,7 @@ int main(int argc, char *argv[]) {
 					const auto O = ValidTotals[iter][4].sumenergy;
 
 					if( tdiff < 0 ){
-						HistogramManager->Fill("Negative_Beta_Spatial_Distribution",beta_x,beta_y);
+						HistogramManager->Fill("Negative_Beta_Spatial_Distribution",c_beta_x,c_beta_y);
 						HistogramManager->Fill("Negative_Mtas_C_v_T",T,C);
 						HistogramManager->Fill("Negative_Mtas_T",T);
 						HistogramManager->Fill("Negative_Mtas_C",C);
@@ -519,6 +538,8 @@ int main(int argc, char *argv[]) {
 						HistogramManager->Fill("Negative_Beta_v_Mtas_T",T,beta_erg);
 						HistogramManager->Fill("Negative_Beta_v_Mtas_C",C,beta_erg);
 						HistogramManager->Fill("Negative_Beta_v_Radius",radius,beta_erg);
+						HistogramManager->Fill("Negative_Beta_AnodeSum_v_X",c_beta_x,beta_anode_sum);
+						HistogramManager->Fill("Negative_Beta_AnodeSum_v_Y",c_beta_y,beta_anode_sum);
 						for( size_t ii = 0; ii < 6; ++ii ){
 							HistogramManager->Fill("Negative_Mtas_Ci_v_T",T,ValidSegments[iter][ii].sumenergy);
 							HistogramManager->Fill("Negative_Mtas_Ci_v_C",C,ValidSegments[iter][ii].sumenergy);
@@ -545,7 +566,7 @@ int main(int argc, char *argv[]) {
 							}
 						}
 					}else{
-						HistogramManager->Fill("Positive_Beta_Spatial_Distribution",beta_x,beta_y);
+						HistogramManager->Fill("Positive_Beta_Spatial_Distribution",c_beta_x,c_beta_y);
 						HistogramManager->Fill("Positive_Mtas_C_v_T",T,C);
 						HistogramManager->Fill("Positive_Mtas_T",T);
 						HistogramManager->Fill("Positive_Mtas_C",C);
@@ -556,6 +577,8 @@ int main(int argc, char *argv[]) {
 						HistogramManager->Fill("Positive_Beta_v_Mtas_T",T,beta_erg);
 						HistogramManager->Fill("Positive_Beta_v_Mtas_C",C,beta_erg);
 						HistogramManager->Fill("Positive_Beta_v_Radius",radius,beta_erg);
+						HistogramManager->Fill("Positive_Beta_AnodeSum_v_X",c_beta_x,beta_anode_sum);
+						HistogramManager->Fill("Positive_Beta_AnodeSum_v_Y",c_beta_y,beta_anode_sum);
 						for( size_t ii = 0; ii < 6; ++ii ){
 							HistogramManager->Fill("Positive_Mtas_Ci_v_T",T,ValidSegments[iter][ii].sumenergy);
 							HistogramManager->Fill("Positive_Mtas_Ci_v_C",C,ValidSegments[iter][ii].sumenergy);
