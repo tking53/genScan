@@ -56,6 +56,15 @@ list(APPEND PROCESSOR_STRUCT_LIBS MtasStruct)
 list(APPEND PROCESSOR_STRUCT_PCM ${CMAKE_CURRENT_BINARY_DIR}/libMtasStruct_root_rdict.pcm)
 list(APPEND PROCESSOR_STRUCT_RMAP ${CMAKE_CURRENT_BINARY_DIR}/libMtasStruct_root.rootmap)
 
+ROOT_GENERATE_DICTIONARY(MusesStruct_root 
+	MusesStruct.hpp ${ROOT_CONTAINER_PATHS}
+	LINKDEF include/MusesStructLinkDef.hpp )
+add_library(MusesStruct SHARED MusesStruct_root.cxx MusesStruct_root)
+target_link_libraries(MusesStruct ${ROOT_LIBRARIES})
+list(APPEND PROCESSOR_STRUCT_LIBS MusesStruct)
+list(APPEND PROCESSOR_STRUCT_PCM ${CMAKE_CURRENT_BINARY_DIR}/libMusesStruct_root_rdict.pcm)
+list(APPEND PROCESSOR_STRUCT_RMAP ${CMAKE_CURRENT_BINARY_DIR}/libMusesStruct_root.rootmap)
+
 ROOT_GENERATE_DICTIONARY(VetoStruct_root 
 	VetoStruct.hpp ${ROOT_CONTAINER_PATHS}
 	LINKDEF include/VetoStructLinkDef.hpp )

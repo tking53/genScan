@@ -412,7 +412,16 @@ set_property(TARGET GenScanor PROPERTY
 if( EXTERNAL_DEPS )
 	add_dependencies(GenScanor ${EXTERNAL_DEPS})
 endif()
-target_link_libraries(GenScanor PRIVATE BSMStruct VetoStruct MtasImplantStruct MtasStruct PidStruct PSPMTStruct RootDevStruct GenScanTranslators GenScanCore)
+target_link_libraries(GenScanor PRIVATE BSMStruct 
+					VetoStruct 
+					MtasImplantStruct 
+					MtasStruct 
+					MusesStruct 
+					PidStruct 
+					PSPMTStruct 
+					RootDevStruct 
+					GenScanTranslators GenScanCore)
+
 target_include_directories(GenScanor PRIVATE ${CMAKE_BINARY_DIR}/generated/include)
 
 if( USE_SYSTEM_FMT )

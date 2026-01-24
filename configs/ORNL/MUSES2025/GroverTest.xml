@@ -8,36 +8,38 @@
 	<Description>Automatically Generated xml by GenConfig</Description>
 	<Global EventWidth="500" EventWidthUnit="ns" CorrelationType="rolling-trigger" />
 	<DetectorDriver >
-		<Processor name="RootDevProcessor" included_types="hpge,muses,plastic,generic" />
+		<Processor name="RootDevProcessor" included_types="grover,muses,plastic,generic" />
+		<Processor name="MusesProcessor" />
+		<!-- <Processor name="SimpleGroverProcessor" /> -->
 	</DetectorDriver >
 	<Map>
 		<Crate number="0">
 			<Module number="0" Revision="F" Frequency="100" Firmware="R37640" TraceDelay="120">
-				<Channel number="0" type="hpge" subtype="grover" group="0" tags="highgain">
+				<Channel number="0" type="grover" subtype="leaf" group="0" tags="highgain">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="1" type="hpge" subtype="grover" group="1" tags="highgain">
+				<Channel number="1" type="grover" subtype="leaf" group="1" tags="highgain">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="2" type="hpge" subtype="grover" group="2" tags="highgain">
+				<Channel number="2" type="grover" subtype="leaf" group="2" tags="highgain">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="3" type="hpge" subtype="grover" group="3" tags="highgain">
+				<Channel number="3" type="grover" subtype="leaf" group="3" tags="highgain">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 				<Channel number="4" type="generic" subtype="generic" group="generic" tags="4">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="5" type="hpge" subtype="grover" group="4" tags="highgain">
+				<Channel number="5" type="grover" subtype="leaf" group="4" tags="highgain">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="6" type="hpge" subtype="grover" group="5" tags="highgain">
+				<Channel number="6" type="grover" subtype="leaf" group="5" tags="highgain">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="7" type="hpge" subtype="grover" group="6" tags="highgain">
+				<Channel number="7" type="grover" subtype="leaf" group="6" tags="highgain">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="8" type="hpge" subtype="grover" group="7" tags="highgain">
+				<Channel number="8" type="grover" subtype="leaf" group="7" tags="highgain">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 				<Channel number="9" type="generic" subtype="generic" group="generic" tags="9">
@@ -66,13 +68,13 @@
 				<Channel number="0" type="muses" subtype="pixel" group="0" tags="">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="1" type="muses" subtype="pixel" group="1" tags="">
+				<Channel number="1" type="muses" subtype="pixel" group="3" tags="">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="2" type="muses" subtype="pixel" group="2" tags="">
+				<Channel number="2" type="muses" subtype="pixel" group="6" tags="">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="3" type="muses" subtype="pixel" group="3" tags="">
+				<Channel number="3" type="generic" subtype="generic" group="generic" tags="19">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 				<Channel number="4" type="generic" subtype="generic" group="generic" tags="20">
