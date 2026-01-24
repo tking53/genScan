@@ -112,9 +112,15 @@ int main(int argc, char *argv[]) {
 		CutManager->AddCut("PID",pid_filename);
 		console->critical("Using {} as PID file",pid_filename);
 
+		int focalplane = doc["FOCALPLANE"].as<int>(1);
+		console->critical("Using focal plane {}",focalplane);
+
 		//this is the good one for fp1 and fp2 usually
 		int tofid = doc["TOFID"].as<int>(6);
-		console->critical("Using fp1Tof_{} for pid cut",tofid);
+		console->critical("Using fp{}Tof_{} for pid cut",focalplane,tofid);
+
+		int pinid = doc["PINID"].as<int>(0);
+		console->critical("Using fp{}.pin[{}].energy for pid cut",focalplane,pinid);
 
 		bool prob_acceptance = doc["PROBACCEPTANCE"].as<bool>(false);
 		double half_life = half_life = doc["HALFLIFE"].as<double>(-1.0);
@@ -411,7 +417,9 @@ int main(int argc, char *argv[]) {
 			mtas->GetEntry(ii);
 			//this is the gate placed in EXP_11012, 
 			bool LightIon = false;
-			if( CutManager->IsWithin("PID",fp2Tofs[6],fp2->pin[1].energy) ){
+			auto tof = (focalplane == 1) ? fp1Tofs[tofid] : fp2Tofs[tofid];
+			auto pin = (focalplane == 1) ? fp1->pin[pinid].energy : fp2->pin[pinid].energy;
+			if( CutManager->IsWithin("PID",tof,pin) ){
 				//let's only only load the rit/fit when we're inside a good tof
 				for( const auto& g : RitReject ){
 					if( g.IsWithin(rit->energy) ){
