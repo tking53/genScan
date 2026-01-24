@@ -65,6 +65,15 @@ list(APPEND PROCESSOR_STRUCT_LIBS MusesStruct)
 list(APPEND PROCESSOR_STRUCT_PCM ${CMAKE_CURRENT_BINARY_DIR}/libMusesStruct_root_rdict.pcm)
 list(APPEND PROCESSOR_STRUCT_RMAP ${CMAKE_CURRENT_BINARY_DIR}/libMusesStruct_root.rootmap)
 
+ROOT_GENERATE_DICTIONARY(GroverStruct_root 
+	GroverStruct.hpp ${ROOT_CONTAINER_PATHS}
+	LINKDEF include/GroverStructLinkDef.hpp )
+add_library(GroverStruct SHARED GroverStruct_root.cxx GroverStruct_root)
+target_link_libraries(GroverStruct ${ROOT_LIBRARIES})
+list(APPEND PROCESSOR_STRUCT_LIBS GroverStruct)
+list(APPEND PROCESSOR_STRUCT_PCM ${CMAKE_CURRENT_BINARY_DIR}/libGroverStruct_root_rdict.pcm)
+list(APPEND PROCESSOR_STRUCT_RMAP ${CMAKE_CURRENT_BINARY_DIR}/libGroverStruct_root.rootmap)
+
 ROOT_GENERATE_DICTIONARY(VetoStruct_root 
 	VetoStruct.hpp ${ROOT_CONTAINER_PATHS}
 	LINKDEF include/VetoStructLinkDef.hpp )

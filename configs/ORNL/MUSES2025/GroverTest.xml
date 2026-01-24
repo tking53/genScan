@@ -10,36 +10,36 @@
 	<DetectorDriver >
 		<Processor name="RootDevProcessor" included_types="grover,muses,plastic,generic" />
 		<Processor name="MusesProcessor" />
-		<!-- <Processor name="SimpleGroverProcessor" /> -->
+		<Processor name="SingleGroverProcessor" />
 	</DetectorDriver >
 	<Map>
 		<Crate number="0">
 			<Module number="0" Revision="F" Frequency="100" Firmware="R37640" TraceDelay="120">
-				<Channel number="0" type="grover" subtype="leaf" group="0" tags="highgain">
+				<Channel number="0" type="grover" subtype="port_a" group="0" tags="lowgain">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="1" type="grover" subtype="leaf" group="1" tags="highgain">
+				<Channel number="1" type="grover" subtype="port_a" group="1" tags="lowgain">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="2" type="grover" subtype="leaf" group="2" tags="highgain">
+				<Channel number="2" type="grover" subtype="port_a" group="2" tags="lowgain">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="3" type="grover" subtype="leaf" group="3" tags="highgain">
+				<Channel number="3" type="grover" subtype="port_a" group="3" tags="lowgain">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 				<Channel number="4" type="generic" subtype="generic" group="generic" tags="4">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="5" type="grover" subtype="leaf" group="4" tags="highgain">
+				<Channel number="5" type="grover" subtype="port_a" group="0" tags="highgain">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="6" type="grover" subtype="leaf" group="5" tags="highgain">
+				<Channel number="6" type="grover" subtype="port_a" group="1" tags="highgain">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="7" type="grover" subtype="leaf" group="6" tags="highgain">
+				<Channel number="7" type="grover" subtype="port_a" group="2" tags="highgain">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="8" type="grover" subtype="leaf" group="7" tags="highgain">
+				<Channel number="8" type="grover" subtype="port_a" group="3" tags="highgain">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 				<Channel number="9" type="generic" subtype="generic" group="generic" tags="9">

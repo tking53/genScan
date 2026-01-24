@@ -33,6 +33,7 @@
 #include "RIKENPidProcessor.hpp"
 #include "RootDevProcessor.hpp"
 #include "SimpleHPGeProcessor.hpp"
+#include "SingleGroverProcessor.hpp"
 #include "VetoProcessor.hpp"
 
 #include "WaveformAnalyzer.hpp"
@@ -149,6 +150,8 @@ void ProcessorList::CreateProc(const std::string& name){
 		known_processors.push_back(std::make_shared<RootDevProcessor>(this->LogName));
 	}else if( name.compare("SimpleHPGeProcessor") == 0 ){
 		known_processors.push_back(std::make_shared<SimpleHPGeProcessor>(this->LogName));
+	}else if( name.compare("SingleGroverProcessor") == 0 ){
+		known_processors.push_back(std::make_shared<SingleGroverProcessor>(this->LogName));
 	}else if( name.compare("VetoProcessor") == 0 ){
 		known_processors.push_back(std::make_shared<VetoProcessor>(this->LogName));
 	}else if( name.compare("YAPProcessor") == 0 ){

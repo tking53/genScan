@@ -417,6 +417,7 @@ target_link_libraries(GenScanor PRIVATE BSMStruct
 					MtasImplantStruct 
 					MtasStruct 
 					MusesStruct 
+					GroverStruct 
 					PidStruct 
 					PSPMTStruct 
 					RootDevStruct 
