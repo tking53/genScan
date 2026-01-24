@@ -672,3 +672,7 @@ double PhysicsData::GetInternalIntegralEnergy() const{
 double PhysicsData::GetAliasValue() const{
 	return this->AliasValue;
 }
+
+unsigned int PhysicsData::GetQDC(size_t idx) const{
+	return this->QDCSums.at(idx);
+}

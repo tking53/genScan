@@ -24,6 +24,8 @@ class MtasImplantProcessor : public Processor{
 
 		const SIPMIMP::Image& GetLowGainImage() const;
 		const SIPMIMP::Image& GetHighGainImage() const;
+		const SIPMIMP::Image& GetLowGainQDCImage() const;
+		const SIPMIMP::Image& GetHighGainQDCImage() const;
 		const double& GetHighGainPSD() const;
 		const double& GetLowGainPSD() const;
 	
@@ -34,6 +36,10 @@ class MtasImplantProcessor : public Processor{
 			double timestamp;
 			short hits;
 		} ;
+
+		void AssignRootStruct(ProcessorStruct::MtasImplant&,const SIPMIMP::Image&);
+		void ResetImage(SIPMIMP::Image&);
+		void ResetAnodes(std::vector<AnodeHitInfo>&);
 		
 		std::pair<double,double> CalcXY(const unsigned int&) const;
 		void CalcPosition(const std::vector<AnodeHitInfo>&,SIPMIMP::Image&);
@@ -60,19 +66,28 @@ class MtasImplantProcessor : public Processor{
 		std::pair<double,double> IsBetaThresh;
 		std::pair<double,double> IsIonThresh;
 
+		size_t qdc_baseline_idx;
+		size_t qdc_energy_idx;
+
 		short HighGainDynodeHits;
 		short HighGainAnodeHits;
 		SIPMIMP::Image hgImage;
+		SIPMIMP::Image hgQDCImage;
 		double hgPSD;
 		std::vector<AnodeHitInfo> HighGainAnodes;
+		std::vector<AnodeHitInfo> HighGainQDCAnodes;
 		ProcessorStruct::MtasImplant HighGain;
+		ProcessorStruct::MtasImplant HighGainQDC;
 
 		short LowGainDynodeHits;
 		short LowGainAnodeHits;
 		SIPMIMP::Image lgImage;
+		SIPMIMP::Image lgQDCImage;
 		double lgPSD;
 		std::vector<AnodeHitInfo> LowGainAnodes;
+		std::vector<AnodeHitInfo> LowGainQDCAnodes;
 		ProcessorStruct::MtasImplant LowGain;
+		ProcessorStruct::MtasImplant LowGainQDC;
 
 };
 

@@ -295,6 +295,7 @@ class PhysicsData{
 		void SetQDCSums(std::vector<unsigned int>&&);
 
 		const std::vector<unsigned int>& GetQDCSums() const;
+		unsigned int GetQDC(size_t) const;
 
 		//Make faster update
 		void SetRawQDCSumLength(const unsigned int);
