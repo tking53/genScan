@@ -4,8 +4,8 @@
 - fmt
 - spdlog
 - pugixml
-- jsoncpp
 - yaml-cpp
+- boost
 - ROOT
 
 ### ROOT 
@@ -23,6 +23,9 @@ Then checkout the particular tag you want
 
 Where <tag_name> is the particular version you want (i.e. v6-28-06)
 
+Currently we require a version of root that has RVec and RDataFrame.
+RVec is required for compilation of the struct libraries.
+RDataFrame is required for scripts shipped.
 
 ### spdlog
 spdlog needs to be installed externally (usually via package)
@@ -72,22 +75,6 @@ Below is the current compatibility list, if you need a specific one tested let u
 |:-------|:-------------:|
 |v1.13   | Yes | 
 
-### jsoncpp
-jsoncpp needs to be installed externally (usually via package)
-
-MacOS 
-```brew install jsoncpp```
-
-Ubuntu/Debian
-``` apt install libjsoncpp-dev```
-
-If one does not wish to install it externally, we will download a compatible version from https://github.com/open-source-parsers/jsoncpp 
-Below is the current compatibility list, if you need a specific one tested let us know.
-
-|version | Compatibility |
-|:-------|:-------------:|
-|1.9.5   | Yes | 
-
 ### yaml-cpp
 yaml-cpp needs to be installed externally (usually via package)
 
@@ -102,77 +89,43 @@ Below is the current compatibility list, if you need a specific one tested let u
 
 |version | Compatibility |
 |:-------|:-------------:|
-|yaml-cpp-0.6.3   | Yes | 
+|yaml-cpp-0.6.3   | No  | 
+|yaml-cpp-0.8.0   | Yes | 
 
-## Usage (GenScanor)
-Providing GenScanor with no arguments will have it print the help message
+### boost
+boost needs to be installed externally (usually via package)
 
-### Currently supported options
-``` 
-./GenScanor \
--c/--configfile [filename] filename for channel map \
--o/--outputfile [filename] filename for output \ 
--e/--evtbuild event build only \
--f/--filenames [file1 file2 file3 ...] list of files used for input \
--h/--help show this message \
--l/--limit limit of coincidence queue \
--x/--fileformat [file_format] format of the data file (evt,ldf,pld,caen_root,caen_bin) \
-```
+MacOS
+```brew install boost```
+
+Ubuntu/Debian 
+```apt install libboost-all-dev```
+
+If one does not wish to install it externally, we will download a compatible version from 
+Below is the current compatibility list, if you need a specific one tested let us know.
+
+|version | Compatibility |
+|:-------|:-------------:|
+|libboost-1.89.0   | Yes  | 
+
+## Usage and Generated Executables 
+All compiled executables are prefixed with Gen, (i.e. GenScanor, GenPeakFit, etc.)
+There are also several scripts in both python and root that are shipped as well.
+The python scripts contain no extension and are mostly used for automated calibration and gain matching.
+The root scripts do have their extensions (.cxx) when installed.
+The root scripts are self contained and use standard C++ and root features.
 
 ### Output Files
-In addition to the root file output, three more files are created.
+In addition to the root file output, four more files are created.
+A list file containing the names, sizes, titles, and bounds of each histogram.
+A log file containing information of all items tagged with [info] and [critical]
+A dbg file containing information of all items tagged with [info], [critical], [error], and [debug] 
+A err file containing information of all items tagged with [critical] and [error]
 
-- genscan.log this is a log and contains information about when things occur during the program runtime a sample is shown below
-```
-INSERT EXAMPLE OF LOG
-```
-
-- genscan.dbg this contains the same information as genscan.log, but also contains debugging information for when things go awry, a sample is show below
-```
-INSERT EXAMPLE OF DEBUG
-```
-
-- genscan.err this contains any errors that occured during runtime and should be empty in almost all use cases, but an example is shown below
-```
-INSERT EXAMPLE OF ERROR
-```
-
-The output root file contains the correlated events stored as 
-```
-INSERT FORMAT HERE
-```
+Also contained in the dbg file is the parsing information of the channel map, as well
+as accumulated pileup, saturation, and hit statistics for each channel as it was decoded.
 
 ### Currently supported file formats
-- PLD (UTK Pixie16)
 - LDF (UTK Pixie16)
-- CAEN (ROOT)
-- CAEN (Single Binary File)
-- CAEN (Multiple Binary File)
-- EVT (NSCLDaq)
-
-### TODO LIST/NOTES
-- Add in signal handling so that way we get output for our log/err/dbg/list files
-- Also need to make sure that all the currently processed data is dumped to disk as well
-- doxygen tags in everything
-- change the ChannelMap to not be a singleton, but rather something we pass around a shared_ptr of to most everything
-- Determine a way to track the size of the HistogramManager as it could get unweildy depending on what is asked for
-- Need to also have the HistogramManager act as the SpyServe and to write the Spy program so that you can get live histogramming
-- complete PLD format
-- Add in rest of the formats 
-- Write the correlator 
-- Write the base processors 
-    - processors composed of 4 functions (Init, preprocess, process, postprocess)
-    - None of the functions should be allowed to modify the incoming data to enfore the ability to parallelize the processing 
-    - In preprocess they will generate the data that only they need/know 
-    - In process the experiment processors will have access to the information of their member processes
-    - In postprocess any extra cleanup will take place
-- Move to the experiment paradigm of processors instead of just raw processors like in paass
-    - Design paradigm will be a set of DetectorProcessors that will typically only have a preprocess function where they generate their base information
-        - i.e. MTASProcessor will generate the segment information as well as the totals
-    - The ExperimentProcessors will be composed of one or more DetectorProcessors. It will handle the calling of preprocess for each of those DetectorProcessors.
-    - The ExperimentProcessors will then generate the correlated information inside it's process call.
-        - i.e. FDSiTASProcessor will be composed of MTASProcessor, PIDProcessor, MTASSIPMImplantProcessor
-        - It will call all of the above mentioned preprocess
-        - During it's process call, it will generate the MTAS-Beta gated spectra and energies related to the appropriate PID
-    - This design paradigm should be more extensible and cause less repetition among the code base unlike paass, and it will also allow each ExperimentProcessor to determine the appropriate parallel processing
-- Move the correlation/processing/writing to the Observer design pattern to allow for better asynchronous processing 
+- EVT (NSCLDaq Pixie16)
+- EVT_TO (Allmond Pixie16)
