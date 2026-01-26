@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
 		("outputprefix,o",boost::program_options::value<std::string>(&outputprefix),"output prefix to dump the histograms/trimmed root tree to")
 		("port,p",boost::program_options::value<int>(&port)->default_value(9090),"[portid] port to listen/send on for the live histogramming, -1 disables for batch scanning")
 		("searchpath,s",boost::program_options::value<std::string>(&searchpath)->default_value(""),
-		 		"path list used to search for things formatted as path_1:path2:path_3, with current_dir as final")
+		 "path list used to search for things formatted as path_1:path2:path_3, with current_dir as final")
 		;
 
 
@@ -207,7 +207,7 @@ int main(int argc, char *argv[]) {
 
 			{"Mtas_O_TDiff_Beta_Ion_Gamma_s",{16384,0,16384,1000,backward_corr_time,forward_corr_time}},
 			{"Sparse_Mtas_O_TDiff_Beta_Ion_Gamma_s",{16384,0,65536,1000,backward_corr_time,forward_corr_time}},
-			
+
 			{"Mtas_Oi_TDiff_Beta_Ion_Gamma_s",{16384,0,16384,1000,backward_corr_time,forward_corr_time}},
 			{"Sparse_Mtas_Oi_TDiff_Beta_Ion_Gamma_s",{16384,0,65536,1000,backward_corr_time,forward_corr_time}},
 
@@ -222,7 +222,7 @@ int main(int argc, char *argv[]) {
 
 			{"Positive_Beta_v_Radius",{1000,0,10,4096,0,16384}},
 			{"Negative_Beta_v_Radius",{1000,0,10,4096,0,16384}},
-			
+
 			{"Positive_Beta_AnodeSum_v_X",{1000,-5,5,10000,0,200000}},
 			{"Positive_Beta_AnodeSum_v_Y",{1000,-5,5,10000,0,200000}},
 			{"Negative_Beta_AnodeSum_v_X",{1000,-5,5,10000,0,200000}},
@@ -288,19 +288,6 @@ int main(int argc, char *argv[]) {
 		}
 		console->info("Found Valid Beta Bounds : {} {}",ValidBeta.GetLowerBound(),ValidBeta.GetUpperBound());
 
-		std::shared_ptr<PLOTS::PlotRegistry> HistogramManager(new PLOTS::PlotRegistry(logname,StringManip::StripFileExtension(outputprefix),port));
-
-		for( const auto& kv : His1D ){
-			HistogramManager->RegisterPlot<TH1F>(kv.first,"",kv.second);
-		}
-
-		for( const auto& kv : His2D ){
-			HistogramManager->RegisterPlot<TH2F>(kv.first,"",kv.second);
-		}
-		
-		console->info("Generating {}.list file that contains all the declared histograms",StringManip::GetFileBaseName(outputprefix));
-		HistogramManager->WriteInfo();
-
 		ProcessorStruct::MtasImplant* lowgain = nullptr;
 		ProcessorStruct::MtasImplant* highgain = nullptr;
 
@@ -318,7 +305,6 @@ int main(int argc, char *argv[]) {
 
 		ProcessorStruct::Veto* fit = nullptr;
 		ProcessorStruct::Veto* rit = nullptr;
-
 
 		//try this way if it doesn't work then we make a tchain of everything
 		//this is currently specific to MTAS, need to make this dynamic
@@ -454,11 +440,40 @@ int main(int argc, char *argv[]) {
 						});
 			}
 		}
-
 		console->info("Found {} Valid Implants, {} RitRejectedImplants, {} NumAnodeRejectedImplants, {} Valid Betas",
 				ValidImplants.size(),RitRejectedImplants.size(),NumAnodeRejectedImplants.size(),ValidBetas.size());
 
-		//the actual correlation step
+
+		console->info("Creating output rootfile");
+		std::shared_ptr<RootFileManager> RootManager(
+				new RootFileManager(
+					logname,
+					StringManip::StripFileExtension(outputprefix),
+					false
+					)
+				);
+
+		std::shared_ptr<PLOTS::PlotRegistry> HistogramManager(
+				new PLOTS::PlotRegistry(
+					logname,
+					StringManip::StripFileExtension(outputprefix),
+					port
+					)
+				);
+
+		for( const auto& kv : His1D ){
+			HistogramManager->RegisterPlot<TH1F>(kv.first,"",kv.second);
+		}
+
+		for( const auto& kv : His2D ){
+			HistogramManager->RegisterPlot<TH2F>(kv.first,"",kv.second);
+		}
+
+		console->info("Generating {}.list file that contains all the declared histograms",
+				StringManip::GetFileBaseName(outputprefix));
+
+		HistogramManager->WriteInfo();
+
 		console->info("Begin sorting");
 
 		volatile const auto period = ValidImplants.size()/10 + 1;
@@ -489,17 +504,17 @@ int main(int argc, char *argv[]) {
 			const auto b = ion.dynodets + backward_corr_time*1.0e9; 
 			auto beta_begin = std::lower_bound(ValidBetas.begin(),ValidBetas.end(),b,
 					[](const ProcessorStruct::MtasImplant& b,double t){ 
-						return b.dynodets <= t; 
+					return b.dynodets <= t; 
 					});
 
 			const auto f = ion.dynodets + forward_corr_time*1.0e9; 
 			auto beta_end = std::upper_bound(ValidBetas.begin(),ValidBetas.end(),f,
 					[](double t,const ProcessorStruct::MtasImplant& b){ 
-						return b.dynodets >= t; 
+					return b.dynodets >= t; 
 					});
 
 			//console->info("{}:{} {} {}:{}",beta_begin->first,beta_begin->second,ion.second,beta_end->first,beta_end->second);
-			const auto ion_ts = ion.dynodets;
+				const auto ion_ts = ion.dynodets;
 			const auto ion_x = ion.highresx;
 			const auto ion_y = ion.highresy;
 			const auto ion_anodesum = ion.anodesum;
@@ -527,7 +542,7 @@ int main(int argc, char *argv[]) {
 				if( radius <= allowed_radius ){
 					const auto beta_erg = ValidBetas[iter].dynodeerg;
 					const auto beta_anode_sum = ValidBetas[iter].anodesum;
-					
+
 					const auto T = ValidTotals[iter][0].sumenergy;
 					const auto C = ValidTotals[iter][1].sumenergy;
 					const auto I = ValidTotals[iter][2].sumenergy;
@@ -554,12 +569,12 @@ int main(int argc, char *argv[]) {
 							HistogramManager->Fill("Negative_Mtas_IMO_v_T",T,ValidSegments[iter][ii+6].sumenergy);
 							HistogramManager->Fill("Negative_Mtas_IMO_v_T",T,ValidSegments[iter][ii+12].sumenergy);
 							HistogramManager->Fill("Negative_Mtas_IMO_v_T",T,ValidSegments[iter][ii+18].sumenergy);
-						
+
 							HistogramManager->Fill("Negative_Mtas_C_Stack",ValidSegments[iter][ii].sumenergy);
 							HistogramManager->Fill("Negative_Mtas_I_Stack",ValidSegments[iter][ii+6].sumenergy);
 							HistogramManager->Fill("Negative_Mtas_M_Stack",ValidSegments[iter][ii+12].sumenergy);
 							HistogramManager->Fill("Negative_Mtas_O_Stack",ValidSegments[iter][ii+18].sumenergy);
-						
+
 							HistogramManager->Fill("Negative_Beta_v_Mtas_Ci",ValidSegments[iter][ii].sumenergy,beta_erg);
 							HistogramManager->Fill("Negative_Beta_v_Mtas_IMO",ValidSegments[iter][ii+6].sumenergy,beta_erg);
 							HistogramManager->Fill("Negative_Beta_v_Mtas_IMO",ValidSegments[iter][ii+12].sumenergy,beta_erg);
@@ -593,12 +608,12 @@ int main(int argc, char *argv[]) {
 							HistogramManager->Fill("Positive_Mtas_IMO_v_T",T,ValidSegments[iter][ii+6].sumenergy);
 							HistogramManager->Fill("Positive_Mtas_IMO_v_T",T,ValidSegments[iter][ii+12].sumenergy);
 							HistogramManager->Fill("Positive_Mtas_IMO_v_T",T,ValidSegments[iter][ii+18].sumenergy);
-						
+
 							HistogramManager->Fill("Positive_Mtas_C_Stack",ValidSegments[iter][ii].sumenergy);
 							HistogramManager->Fill("Positive_Mtas_I_Stack",ValidSegments[iter][ii+6].sumenergy);
 							HistogramManager->Fill("Positive_Mtas_M_Stack",ValidSegments[iter][ii+12].sumenergy);
 							HistogramManager->Fill("Positive_Mtas_O_Stack",ValidSegments[iter][ii+18].sumenergy);
-						
+
 							HistogramManager->Fill("Positive_Beta_v_Mtas_Ci",ValidSegments[iter][ii].sumenergy,beta_erg);
 							HistogramManager->Fill("Positive_Beta_v_Mtas_IMO",ValidSegments[iter][ii+6].sumenergy,beta_erg);
 							HistogramManager->Fill("Positive_Beta_v_Mtas_IMO",ValidSegments[iter][ii+12].sumenergy,beta_erg);
@@ -637,8 +652,6 @@ int main(int argc, char *argv[]) {
 			++iiter;
 		}
 		console->info("Finished sorting");
-
-		std::shared_ptr<RootFileManager> RootManager(new RootFileManager(logname,StringManip::StripFileExtension(outputprefix),false));
 
 		HistogramManager->WriteAllPlots();
 		//this closes the damn root file
