@@ -66,6 +66,10 @@ add_executable(GenUIDRegexTest src/uidregexchecker.cpp)
 target_link_libraries(GenUIDRegexTest PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES})
 list(APPEND EXE_LIST GenUIDRegexTest)
 
+add_executable(GenMCHalfLifeFitter src/mcmchalflifefitter.cpp)
+target_link_libraries(GenMCHalfLifeFitter PRIVATE GenScanUtility ${ROOT_LIBRARIES} yaml-cpp::yaml-cpp)
+list(APPEND EXE_LIST GenMCHalfLifeFitter)
+
 #separate out things that are not necessary for running experiments
 #tools hidden behind this option will be purely analysis based such as 
 #bayesian deconvolution, and things to verify OpenCL
