@@ -1,5 +1,6 @@
 #include <cmath>
 #include <limits>
+#include <mutex>
 #include <random>
 #include <set>
 #include <cstdlib>
@@ -34,6 +35,20 @@
 #include "TH1.h"
 #include "TH2.h"
 
+struct RootHisSettings{
+	std::string inputfile;
+	std::string axis;
+	std::string hisname;
+	std::vector<std::string> gate;
+	std::vector<int> projection_indices;
+	std::pair<double,double> gate_bounds;
+	double low;
+	double high;
+	int xrebin;
+	int yrebin;
+};
+
+//need to change this to be shifting steps not drastic changes
 template<class T>
 class LimitedValue {
 	public:
@@ -109,7 +124,7 @@ class LimitedValue {
 		T value;
 		T next_value;
 		std::pair<T,T> limits;
-		std::normal_distribution<T> dist;
+		std::uniform_real_distribution<T> dist;
 };
 
 template<class T>
@@ -296,6 +311,15 @@ class Isotope {
 		}
 
 		bool IsIsotopeWithinLimits() const{
+			// if( not this->IsBranchingRatioWithinLimits() ){
+			// 	spdlog::critical("{} fails on BR {}",this->name,this->GetBranchingRatio());
+			// }
+			// if( not this->IsHalfLifeWithinLimits() ){
+			// 	spdlog::critical("{} fails on HL {}",this->name,this->GetHalfLife());
+			// }
+			// if( not this->IsEfficiencyWithinLimits() ){
+			// 	spdlog::critical("{} fails on EF {}",this->name,this->GetEfficiency());
+			// }
 			return this->IsBranchingRatioWithinLimits() and 
 			       this->IsHalfLifeWithinLimits() and 
 			       this->IsEfficiencyWithinLimits();
@@ -463,7 +487,7 @@ LimitedValue<T> generate_limited_value_from_yaml(const YAML::Node& node){
 
 class DecayNetwork{
 	public:
-		DecayNetwork(const std::string& inputfile){
+		DecayNetwork(const std::string& inputfile,const RootHisSettings& root_info){
 			YAML::Node doc = YAML::LoadFile(inputfile);
 			if( auto bkg = doc["Background"] ){
 				this->LoadBkgFromYaml(bkg,inputfile);
@@ -483,11 +507,14 @@ class DecayNetwork{
 				spdlog::error("No Isotope tag in config file: {}",inputfile);
 				throw std::runtime_error("No Isotope tag in yaml");
 			}
-			// this->components["Bkg"] = DecayCurve<float>(this->xvals,*(this->bkg));
-			// this->keys.insert("Bkg");
-			// this->GenerateKeys();
-			// this->Evaluate();
-			// this->keys.insert("Total");
+			this->LoadRootSettings(root_info);
+			
+			this->workspace = std::vector<float>(this->xvals.size(),0.0);
+			this->components["Bkg"] = DecayCurve<float>(this->xvals,*(this->bkg));
+			this->keys.insert("Bkg");
+			this->GenerateKeys();
+			this->Evaluate();
+			this->keys.insert("Total");
 		}
 
 		DecayNetwork(const LimitedValue<float>& n,const std::vector<float>& x) : number(n), xvals(x){
@@ -527,6 +554,12 @@ class DecayNetwork{
 			return this->keys;
 		}
 
+		void DisplayKeys() const{
+			for( const auto& k : this->keys ){
+				std::cout << k << std::endl;
+			}
+		}
+
 		void DisplayNames() const{
 			this->parent->display_names();
 		}
@@ -545,13 +578,16 @@ class DecayNetwork{
 
 		float log_posterior() const{
 			auto lp = this->log_prior();
+			// spdlog::info("lp : {}",lp);
 			if( not std::isfinite(lp) ){
 				return -std::numeric_limits<float>::infinity();
 			}
 
-			return lp + this->log_likelihood();
+			//return lp + this->log_likelihood();
+			return lp + this->log_likelihood_poisson();
 		}
 
+		//sigma is the sticking point
 		float log_likelihood() const{
 			float ll = 0.0;
 			auto total = this->GetCurve("Total");
@@ -564,8 +600,20 @@ class DecayNetwork{
 			return ll;
 		}
 
+		float log_likelihood_poisson() const{
+			float ll = 0.0;
+			auto total = this->GetCurve("Total");
+			for( size_t ii = 0; ii < this->xvals.size(); ++ii ){
+				auto mu = total.GetPoint(ii).second;
+				spdlog::info("ii:{} k:{} mu:{}",ii,this->yvals[ii],mu);
+				ll += this->yvals[ii]*std::log(mu) - mu;
+			}
+			return ll;
+		}
+
 		float log_prior() const{
 			if( this->number.GetValue() <= 0.0 ){
+				// spdlog::critical("number is bad {}",this->number.GetValue());
 				return -std::numeric_limits<float>::infinity();
 			}
 			float retval = 0.0;
@@ -598,13 +646,12 @@ class DecayNetwork{
 		void Evaluate() {
 			//this only get's evaluated when we do a new proposition
 			this->components["Bkg"] = DecayCurve<float>(this->xvals,*(this->bkg));
-			this->workspace.clear();
 		 	const float A0 = this->number.GetValue()*this->parent->GetLambda();
-			for( const auto& x : this->xvals ){
-				workspace.push_back(A0*
+			for( size_t ii = 0; ii < this->xvals.size(); ++ii ){
+				this->workspace[ii] = (A0*
 						this->parent->GetEfficiency()*
 						this->parent->GetBranchingRatio()*
-						this->parent->Exp(x)
+						this->parent->Exp(this->xvals[ii])
 					   );
 			}
 			this->components[this->parent->GetName()] = DecayCurve<float>(this->xvals,this->workspace);
@@ -614,17 +661,23 @@ class DecayNetwork{
 				this->Evaluate(this->parent->GetDaughter(ii),chain);
 			}	
 
-			this->workspace = std::vector<float>(this->xvals.size(),0.0);
-
-			for( const auto& kv : this->components ){
+			for( size_t ii = 0; ii < this->xvals.size(); ++ii ){
+				this->workspace[ii] = 0.0;
+			}
+			for( const auto& kv : this->isotopes ){
+				auto curve = this->GetCurve(kv);
 				for( size_t ii = 0; ii < this->xvals.size(); ++ii ){
-					const auto& [x,y] = kv.second.GetPoint(ii);
+					const auto& [x,y] = curve.GetPoint(ii);
 					this->workspace[ii] += y;
 				}
 			}
+			auto curve = this->GetCurve("Bkg");
+			for( size_t ii = 0; ii < this->xvals.size(); ++ii ){
+				const auto& [x,y] = curve.GetPoint(ii);
+				this->workspace[ii] += y;
+			}
 
 			this->components["Total"] = DecayCurve<float>(this->xvals,this->workspace);
-			this->workspace.clear();
 		}
 
 		void GenerateKeys() {
@@ -635,10 +688,23 @@ class DecayNetwork{
 			}
 		}
 
+		size_t GetNumVals() const {
+			return this->xvals.size();
+		}
+
+		float GetData(size_t idx) const{
+			return this->yvals[idx];
+		}
+
+		float GetNumber() const{
+			return this->number.GetValue();
+		}
+
 	private:
 		LimitedValue<float> number;
 		std::vector<float> xvals;
 		std::vector<float> yvals;
+		std::vector<float> yerrs;
 		std::vector<float> workspace;
 
 		DecayCurve<float> data;
@@ -650,6 +716,73 @@ class DecayNetwork{
 		Isotope<float>* parent;
 		BkgTerm<float>* bkg;
 		std::map<std::string,DecayCurve<float>> components;
+
+		void LoadRootSettings(const RootHisSettings& root_info){
+			auto rfile = new TFile(root_info.inputfile.c_str(),"READ");
+			auto mainhis = rfile->Get(root_info.hisname.c_str());
+			TH1* histofit = nullptr;;
+			if( mainhis != nullptr ){
+				auto histype = std::string(mainhis->ClassName());
+				boost::regex re2d("TH2");
+				boost::regex re1d("TH1");
+				if( boost::regex_search(histype, re2d) ){
+					if( root_info.projection_indices.size() == 2 ){
+						auto name = std::string(mainhis->GetName())+"_proj_"+root_info.axis;
+						if( root_info.axis.compare("x") == 0 ){
+							histofit = dynamic_cast<TH2*>(mainhis)->ProjectionX(name.c_str(),root_info.projection_indices[0],root_info.projection_indices[1]);
+							if( root_info.xrebin > 0 ){
+								histofit->RebinX(root_info.xrebin);
+							}
+						}else{
+							histofit = dynamic_cast<TH2*>(mainhis)->ProjectionY(name.c_str(),root_info.projection_indices[0],root_info.projection_indices[1]);
+							if( root_info.yrebin > 0 ){
+								histofit->RebinX(root_info.yrebin);
+							}
+						}	
+					}
+					if( root_info.gate.size() == 2 ){
+						auto name = std::string(mainhis->GetName())+"_gate_"+root_info.axis;
+						auto g = root_info.gate_bounds;
+						if( root_info.axis.compare("x") == 0 ){
+							auto minbin = dynamic_cast<TH2*>(mainhis)->GetYaxis()->FindBin(g.first);
+							auto maxbin = dynamic_cast<TH2*>(mainhis)->GetYaxis()->FindBin(g.second);
+							histofit = dynamic_cast<TH2*>(mainhis)->ProjectionY(name.c_str(),minbin,maxbin);
+							if( root_info.xrebin > 0 ){
+								histofit->RebinX(root_info.xrebin);
+							}
+						}else{
+							auto minbin = dynamic_cast<TH2*>(mainhis)->GetXaxis()->FindBin(g.first);
+							auto maxbin = dynamic_cast<TH2*>(mainhis)->GetXaxis()->FindBin(g.second);
+							histofit = dynamic_cast<TH2*>(mainhis)->ProjectionX(name.c_str(),minbin,maxbin);
+							if( root_info.yrebin > 0 ){
+								histofit->RebinX(root_info.yrebin);
+							}
+						}
+					}
+				}else if( boost::regex_search(histype,re1d) ){
+					histofit = dynamic_cast<TH1*>(mainhis);
+				}else{
+					throw std::runtime_error("not passed a TH1 or TH2 histogram");
+				}
+			}else{
+				spdlog::error("histogram {} does not exist in root file {}",root_info.hisname,root_info.inputfile);
+				throw std::runtime_error("his does not exist");
+			}
+			if( histofit != nullptr ){
+				auto lowbin = histofit->FindBin(root_info.low);
+				auto highbin = histofit->FindBin(root_info.high);
+				for( int ii = lowbin; ii < highbin; ++ii ){
+					this->xvals.push_back(histofit->GetBinCenter(ii));
+					this->yvals.push_back(histofit->GetBinContent(ii));
+					this->yerrs.push_back(histofit->GetBinError(ii));
+				}
+				this->data = DecayCurve<float>(this->xvals,this->yvals);
+			}else{
+				spdlog::error("retreived histogram {} exists, but failed to retrieve from root file {}",
+						root_info.hisname,root_info.inputfile);
+				throw std::runtime_error("issue loading his");
+			}
+		}
 		
 		void LoadIsotopeFromYaml(const YAML::Node& isotope,const std::string& inputfile){
 			auto name = isotope["Name"].as<std::string>();
@@ -773,38 +906,43 @@ class DecayNetwork{
 
 		void Evaluate(Isotope<float>* d,std::vector<Isotope<float>*> chain){
 			chain.push_back(d);
-			this->workspace.clear();
 
 			std::vector<float> lambdas;
 			for( const auto& c : chain ){
 				lambdas.push_back(c->GetLambda());
 			}
 			float l_prod = this->number.GetValue()*d->GetBranchingRatio()*d->GetEfficiency();
-			for( const auto& l : lambdas ){
-				l_prod *= l;
-			}
+			if( l_prod > 0.0 ){
+				for( const auto& l : lambdas ){
+					l_prod *= l;
+				}
 
-			for( const auto& x : this->xvals ){
-				auto sum = 0.0;
-				for( size_t ii = 0; ii < chain.size(); ++ii ){
-					auto denom = 1.0;
-					for( size_t jj = 0; jj < chain.size(); ++jj ){
-						if( ii != jj ){
-							auto diff = (lambdas[jj] - lambdas[ii]);
-							//this is a sticking point
-							//we need to actually generate the 
-							//transmuation matrix to avoid this issue
-							if( abs(diff) > 0.0 ){
-								denom *= (lambdas[jj] - lambdas[ii]);
-							}else{
-								denom *= 1.0e-16;
+				for( size_t kk = 0; kk < this->xvals.size(); ++kk ){
+					auto sum = 0.0;
+					for( size_t ii = 0; ii < chain.size(); ++ii ){
+						auto denom = 1.0;
+						for( size_t jj = 0; jj < chain.size(); ++jj ){
+							if( ii != jj ){
+								auto diff = (lambdas[jj] - lambdas[ii]);
+								//this is a sticking point
+								//we need to actually generate the 
+								//transmuation matrix to avoid this issue
+								if( abs(diff) > 0.0 ){
+									denom *= (lambdas[jj] - lambdas[ii]);
+								}else{
+									denom *= 1.0e-16;
+								}
 							}
 						}
-					}
-					sum += chain[ii]->Exp(x)/denom;
-				}	
-				sum *= l_prod;
-				this->workspace.push_back(sum);
+						sum += chain[ii]->Exp(this->xvals[kk])/denom;
+					}	
+					sum *= l_prod;
+					this->workspace[kk] = sum;
+				}
+			}else{
+				for( size_t kk = 0; kk < this->xvals.size(); ++kk ){
+					this->workspace[kk] = 0.0;
+				}
 			}
 			this->components[d->GetName()] = DecayCurve<float>(this->xvals,this->workspace);
 
@@ -817,19 +955,10 @@ class DecayNetwork{
 int main(int argc, char *argv[]) {
 	std::string outputprefix;
 	std::string configfile;
-	std::string inputfile;
-	std::string hisname;
-	std::string axis;
-	std::vector<int> projection_indices;
-	std::vector<std::string> gates;
-	double low;
-	double high;
+	RootHisSettings root_info;
 	bool quiet;
 	bool chi2;
 	bool storechi2;
-	std::vector<std::pair<double,double>> gatevalues;
-	int xrebin;
-	int yrebin;
 	size_t nthreads;
 	size_t ntrials;
 	size_t thin;
@@ -837,25 +966,25 @@ int main(int argc, char *argv[]) {
 
 	boost::program_options::options_description cmdline_options("Generic Options");
 	cmdline_options.add_options()
-		("axis,a",boost::program_options::value<std::string>(&axis)->default_value("x"),"axis to project onto (x,y,X,Y) if 2D")
+		("axis,a",boost::program_options::value<std::string>(&root_info.axis)->default_value("x"),"axis to project onto (x,y,X,Y) if 2D")
 		("burnin,b",boost::program_options::value<size_t>(&burnin)->default_value(1000),"number to burnin the random number generation (done by each thread)")
 		("chi2,c",boost::program_options::value<bool>(&chi2)->default_value(true),"chi2 fit, or loglikelihood")
-		("data,d",boost::program_options::value<std::string>(&hisname),"histogram to manipulate")
+		("data,d",boost::program_options::value<std::string>(&root_info.hisname),"histogram to manipulate")
 		("configfile,f",boost::program_options::value<std::string>(&configfile),"yaml file to read the decay configuration and fit settings from")
-		("gate,g",boost::program_options::value<std::vector<std::string>>(&gates)->multitoken(),"values to gate within in 2d histogram")
+		("gate,g",boost::program_options::value<std::vector<std::string>>(&root_info.gate)->multitoken(),"values to gate within in 2d histogram")
 		("help,h", "produce help message")
-		("inputfile,i",boost::program_options::value<std::string>(&inputfile),"file to get the histogram from")
-		("lowerbound,l",boost::program_options::value<double>(&low),"lower bound to perform fit")
+		("inputfile,i",boost::program_options::value<std::string>(&root_info.inputfile),"file to get the histogram from")
+		("lowerbound,l",boost::program_options::value<double>(&root_info.low),"lower bound to perform fit")
 		("thinning,m",boost::program_options::value<size_t>(&thin)->default_value(1000),"modulo used to determine if a trial should be recorded")
 		("ntrials,n",boost::program_options::value<size_t>(&ntrials)->default_value(10000),"number of trials to perform when fitting")
 		("outputprefix,o",boost::program_options::value<std::string>(&outputprefix)->default_value("GenMCHalfLife"),"file to output to fit info to")
-		("projectionindex,p",boost::program_options::value<std::vector<int>>(&projection_indices)->multitoken(),"index limits to project on if 2d histogram")
+		("projectionindex,p",boost::program_options::value<std::vector<int>>(&root_info.projection_indices)->multitoken(),"index limits to project on if 2d histogram")
 		("quiet,q",boost::program_options::value<bool>(&quiet)->default_value(false),"quiet output")
 		("storechi2,s",boost::program_options::value<bool>(&storechi2)->default_value(true),"store chi2 plot")
 		("nthreads,t",boost::program_options::value<size_t>(&nthreads)->default_value(std::thread::hardware_concurrency()/2),"number of threads used in parallel")
-		("upperbound,u",boost::program_options::value<double>(&high),"upper bound to perform fit")
-		("xrebin,x",boost::program_options::value<int>(&xrebin)->default_value(0),"rebin factor for the x direction")
-		("yrebin,y",boost::program_options::value<int>(&yrebin)->default_value(0),"rebin factor for the y direction")
+		("upperbound,u",boost::program_options::value<double>(&root_info.high),"upper bound to perform fit")
+		("xrebin,x",boost::program_options::value<int>(&root_info.xrebin)->default_value(0),"rebin factor for the x direction")
+		("yrebin,y",boost::program_options::value<int>(&root_info.yrebin)->default_value(0),"rebin factor for the y direction")
 		;
 
 
@@ -870,8 +999,7 @@ int main(int argc, char *argv[]) {
 			exit(EXIT_SUCCESS);
 		}
 
-		auto numproj = projection_indices.size();
-		auto numgates = gatevalues.size();
+		auto numproj = root_info.projection_indices.size();
 
 		if( not vm.count("lowerbound") ){
 			spdlog::error("missing lowerbound");
@@ -960,10 +1088,39 @@ int main(int argc, char *argv[]) {
 	// }
 
 
-	DecayNetwork dn(configfile);
-	dn.DisplayNames();
+	DecayNetwork dn(configfile,root_info);
 
-	return 0;
+	auto print_dn = [](const DecayNetwork& dn,std::ostream& out){
+		auto keys = dn.GetKeys(); 
+		auto numpts = dn.GetNumVals();
+		out << "#";
+		for( const auto& k : keys ){
+			out << " " << k;
+		}
+		out << std::endl;
+
+		for( size_t ii = 0; ii < numpts; ++ii ){
+			std::vector<float> vals;
+			for( const auto& k : keys ){
+				auto curve = dn.GetCurve(k);
+				const auto& [x,y] = curve.GetPoint(ii);
+				vals.push_back(x);
+				vals.push_back(y);
+			}
+			out << vals[0];
+			for( size_t jj = 0; jj < keys.size(); ++jj ){
+				out << " " << vals[2*jj+1];
+			}
+			out << " " << dn.GetData(ii);
+			out << std::endl;
+		}
+	};
+
+
+	//dn.DisplayNames();
+	dn.DisplayKeys();
+
+	// return 0;
 
 	std::mt19937_64 gen(42);
 
@@ -974,30 +1131,47 @@ int main(int argc, char *argv[]) {
 	for( size_t ii = 0; ii < nthreads; ++ii ){
 		gen_vec.push_back(std::mt19937_64(gen()));
 		dn_vec.push_back(DecayNetwork(dn));
+		dn_vec.back().propose(gen_vec[ii]);
+		dn_vec.back().Evaluate();
 		logp_current.push_back(dn.log_posterior());
 		indices.push_back({ii*((ntrials+burnin)/nthreads),(ii+1)*((ntrials+burnin)/nthreads)});
 	}
 
-	std::uniform_real_distribution<float> U(0.0, 1.0);
+	std::uniform_real_distribution<double> U(0.0, 1.0);
+
+	std::mutex cout_mutex;
 
 	std::vector<std::thread> workers;
 	std::chrono::time_point<std::chrono::high_resolution_clock> global_start_time = std::chrono::high_resolution_clock::now();
 	for( size_t ii = 0; ii < nthreads; ++ii ){
 		workers.emplace_back(
-				[=,&dn_vec,&indices,&gen_vec,&logp_current,&U](){
+				[=,&dn_vec,&indices,&gen_vec,&logp_current,&U,&cout_mutex,&print_dn](){
 					for( size_t jj = indices[ii].first; jj < indices[ii].second; ++jj ){
 						dn_vec[ii].propose(gen_vec[ii]);
 						dn_vec[ii].Evaluate();
 						auto logp_trial = dn_vec[ii].log_posterior();
-						auto accept_prob = std::exp(logp_trial - logp_current[ii]);
+						double diff = logp_trial - logp_current[ii];
+						auto accept_prob = std::exp(diff);
+						auto logu = std::log(U(gen_vec[ii]));
+						if( ii == 0 ){
+						std::cout << jj << " " << diff << " " << logu <<  " " << accept_prob << std::endl;
+						}
 						if( U(gen_vec[ii]) < accept_prob ){
 							logp_current[ii] = logp_trial;
+							// if( ii == 0 ){
+							// std::cout << jj << " " << dn_vec[ii].GetNumber() << std::endl;
+							// }
 						}else{
 							dn_vec[ii].undo_proposition();
 						}
-						if( jj%thin == 0 and jj > burnin ){
-						}
+						//if( jj%thin == 0 and jj > burnin ){
+							//cout_mutex.lock();
+							//cout_mutex.unlock();
+						//}
 					}
+					std::ofstream out("thread-"+std::to_string(ii)+".out");
+					print_dn(dn_vec[ii],out);
+					out.close();
 				}
 				);
 	}
