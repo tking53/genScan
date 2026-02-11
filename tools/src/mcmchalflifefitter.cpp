@@ -61,11 +61,14 @@ class LimitedValue {
 		LimitedValue() {
 		}
 
-		LimitedValue(const T& v,const std::pair<T,T>& l) : 
+		//the number is intricately linked to the other ones 
+		//so since we're moving number by 1.0 we need the others 
+		//to move much less otherwise the acceptance test fails constantly
+		LimitedValue(const T& v,const std::pair<T,T>& l,const std::pair<T,T>& d = {0.0,0.00001}) : 
 			value(v), 
 			next_value(v), 
 			limits(l), 
-			delta(0.0,0.0001) 
+			delta(d.first,d.second) 
 		{
 		}	
 
@@ -123,7 +126,9 @@ class LimitedValue {
 		}
 
 		void ProposeNextValue(std::mt19937_64& gen){
-			this->next_value = this->value + delta(gen);
+			do{
+				this->next_value = this->value + delta(gen);
+			}while( not this->IsWithinLimits(this->next_value) );
 		}
 
 	private:
@@ -151,6 +156,14 @@ class BkgTerm {
 			for( auto& p : this->pars ){
 				p.SwapValues();
 			}
+		}
+
+		virtual size_t GetNPars() const final{
+			return this->pars.size();
+		}
+
+		virtual T GetParValue(size_t idx) const final{
+			return this->pars[idx].GetValue();
 		}
 	protected:
 		std::vector<LimitedValue<T>> pars;
@@ -317,15 +330,6 @@ class Isotope {
 		}
 
 		bool IsIsotopeWithinLimits() const{
-			// if( not this->IsBranchingRatioWithinLimits() ){
-			// 	spdlog::critical("{} fails on BR {}",this->name,this->GetBranchingRatio());
-			// }
-			// if( not this->IsHalfLifeWithinLimits() ){
-			// 	spdlog::critical("{} fails on HL {}",this->name,this->GetHalfLife());
-			// }
-			// if( not this->IsEfficiencyWithinLimits() ){
-			// 	spdlog::critical("{} fails on EF {}",this->name,this->GetEfficiency());
-			// }
 			return this->IsBranchingRatioWithinLimits() and 
 			       this->IsHalfLifeWithinLimits() and 
 			       this->IsEfficiencyWithinLimits();
@@ -475,12 +479,12 @@ class DecayCurve{
 };
 
 template<class T>
-LimitedValue<T> generate_limited_value_from_yaml(const YAML::Node& node){
+LimitedValue<T> generate_limited_value_from_yaml(const YAML::Node& node,const std::pair<T,T>& d = {0.0,0.00001}){
 	if( auto constrain = node["Constrain"] ){
 		if( auto range = constrain["Range"] ){
 			auto min_val = range["Min"].as<T>();
 			auto max_val = range["Max"].as<T>();
-			return LimitedValue<T>((min_val+max_val)/2.0,{min_val,max_val});
+			return LimitedValue<T>((min_val+max_val)/2.0,{min_val,max_val},d);
 		}else{
 			spdlog::error("unable to create LimitedValue<T> from yaml node missing Range:");
 			throw std::runtime_error("unable to make LimitedValue<T> from yaml node missing Range:");
@@ -519,35 +523,6 @@ class DecayNetwork{
 			this->components["Bkg"] = DecayCurve<double>(this->xvals,*(this->bkg));
 			this->keys.insert("Bkg");
 			this->GenerateKeys();
-			this->Evaluate();
-			this->keys.insert("Total");
-		}
-
-		DecayNetwork(const LimitedValue<double>& n,const std::vector<double>& x) : number(n), xvals(x){
-			this->parent = new Isotope<double>("Cu78",
-					LimitedValue<double>(0.3313,{0.3,0.36}),
-					LimitedValue<double>(0.6,{0.2,1.0}),
-					LimitedValue<double>(1.0,{1.0,1.0}));
-
-			this->parent->AddDaughter("Zn78",
-					LimitedValue<double>(1.47,{1.3,1.6}),
-					LimitedValue<double>(0.6,{0.2,1.0}),
-					LimitedValue<double>(0.5,{0.0,1.0}));
-			this->parent->AddDaughter("Zn77",
-					LimitedValue<double>(20.09,{2.0,2.1}),
-					LimitedValue<double>(0.6,{0.2,1.0}),
-					LimitedValue<double>(0.5,{0.0,1.0}));
-			parent->GetDaughter(0)->AddDaughter("Ga78",
-					LimitedValue<double>(5.09,{5.0,5.2}),
-					LimitedValue<double>(0.6,{0.2,1.0}),
-					LimitedValue<double>(0.5,{0.0,0.1}));
-
-			this->bkg = new SlopeBkg<double>({{10.0,{0.0,100.0}},{0.0,{0.0,0.0}}});
-			this->components["Bkg"] = DecayCurve<double>(this->xvals,*(this->bkg));
-			this->keys.insert("Bkg");
-
-			this->GenerateKeys();
-
 			this->Evaluate();
 			this->keys.insert("Total");
 		}
@@ -666,9 +641,13 @@ class DecayNetwork{
 			}
 			this->components[this->parent->GetName()] = DecayCurve<double>(this->xvals,this->workspace);
 
+			double norm = 0.0;
+			for( size_t ii = 0; ii < this->parent->GetNumDaughters(); ++ii ){
+				norm += this->parent->GetDaughter(ii)->GetBranchingRatio();
+			}
 			for( size_t ii = 0; ii < this->parent->GetNumDaughters(); ++ii ){
 				std::vector<Isotope<double>*> chain = {this->parent};
-				this->Evaluate(this->parent->GetDaughter(ii),chain);
+				this->Evaluate(this->parent->GetDaughter(ii),chain,norm);
 			}	
 
 			for( size_t ii = 0; ii < this->xvals.size(); ++ii ){
@@ -736,6 +715,14 @@ class DecayNetwork{
 				}
 			}
 			return -std::numeric_limits<double>::infinity();
+		}
+
+		size_t GetNBkgPars() const{
+			return this->bkg->GetNPars();
+		}
+
+		double GetBkgParValue(size_t idx) const{
+			return this->bkg->GetParValue(idx);
 		}
 
 	private:
@@ -849,8 +836,9 @@ class DecayNetwork{
 			}
 		}
 		
+		//let's try and tune the number faster and not move nearly as slowly as the other values
 		void LoadNumberFromYaml(const YAML::Node& number,const std::string& inputfile){
-			this->number = generate_limited_value_from_yaml<double>(number);
+			this->number = generate_limited_value_from_yaml<double>(number,{0.0,1.0});
 		}
 
 		void LoadBkgFromYaml(const YAML::Node& bkg,const std::string& inputfile){
@@ -863,7 +851,11 @@ class DecayNetwork{
 			std::map<std::string,LimitedValue<double>> pmap;
 			for( size_t ii = 0; ii < pars.size(); ++ii ){
 				auto name = StringManip::tolower(pars[ii]["Name"].as<std::string>("unknown"));
-				pmap[name] = generate_limited_value_from_yaml<double>(pars[ii]);
+				if( name.compare("constant") == 0 ){
+					pmap[name] = generate_limited_value_from_yaml<double>(pars[ii],{0.0,1.0});
+				}else{
+					pmap[name] = generate_limited_value_from_yaml<double>(pars[ii]);
+				}
 			}	
 			if( bkg_model.compare("constant") == 0 ){
 				if( pmap.find("constant") == pmap.end() ){
@@ -944,14 +936,15 @@ class DecayNetwork{
 			}
 		}
 
-		void Evaluate(Isotope<double>* d,std::vector<Isotope<double>*> chain){
+		//do we enforce that these sum to 1.0?
+		void Evaluate(Isotope<double>* d,std::vector<Isotope<double>*> chain,double mynorm){
 			chain.push_back(d);
 
 			std::vector<double> lambdas;
 			for( const auto& c : chain ){
 				lambdas.push_back(c->GetLambda());
 			}
-			double l_prod = this->number.GetValue()*d->GetBranchingRatio()*d->GetEfficiency();
+			double l_prod = this->number.GetValue()*d->GetBranchingRatio()*d->GetEfficiency()/mynorm;
 			if( l_prod > 0.0 ){
 				for( const auto& l : lambdas ){
 					l_prod *= l;
@@ -986,8 +979,12 @@ class DecayNetwork{
 			}
 			this->components[d->GetName()] = DecayCurve<double>(this->xvals,this->workspace);
 
+			double norm = 0.0;
 			for( size_t ii = 0; ii < d->GetNumDaughters(); ++ii ){
-				this->Evaluate(d->GetDaughter(ii),chain);
+				norm += d->GetDaughter(ii)->GetBranchingRatio();
+			}
+			for( size_t ii = 0; ii < d->GetNumDaughters(); ++ii ){
+				this->Evaluate(d->GetDaughter(ii),chain,norm);
 			}
 		}
 };
@@ -1089,45 +1086,6 @@ int main(int argc, char *argv[]) {
 	}    
 
 
-	//need to strip the histogram into something we can use for fitting
-	//we should probably not allow this program to do multiple fits at once
-	//because of the sheer nature of monte carlo, but we need to limit ourself to either be 
-	//a single projection of a single gate
-
-	// std::vector<double> xvals;
-	// double x = -50.0;
-	// const double dx = 0.001;
-	// while( x < 50.0 ){
-	// 	xvals.push_back(x);
-	// 	x += dx;
-	// }
-	
-	// DecayNetwork dn(LimitedValue<double>(1.0e3,{0.0,1.0e6}),xvals);
-
-	// auto bkg = dn.GetCurve("Bkg");
-	// auto cu78 = dn.GetCurve("Cu78");
-	// auto zn78 = dn.GetCurve("Zn78");
-	// auto ga78 = dn.GetCurve("Ga78");
-	// auto zn77 = dn.GetCurve("Zn77");
-	// auto total = dn.GetCurve("Total");
-	// auto numpts = bkg.GetNumVals();
-	// for( size_t ii = 0; ii < numpts; ++ii ){
-	// 	const auto& [x,y] = bkg.GetPoint(ii);
-	// 	const auto& [cu78x,cu78y] = cu78.GetPoint(ii);
-	// 	const auto& [zn78x,zn78y] = zn78.GetPoint(ii);
-	// 	const auto& [ga78x,ga78y] = ga78.GetPoint(ii);
-	// 	const auto& [zn77x,zn77y] = zn77.GetPoint(ii);
-	// 	const auto& [tx,ty] = total.GetPoint(ii);
-	// 	std::cout << x << " " 
-	// 		  << y << " " 
-	// 		  << cu78y << " " 
-	// 		  << zn78y << " " 
-	// 		  << zn77y << " " 
-	// 		  << ga78y << " " 
-	// 		  << ty << std::endl;
-	// }
-
-
 	DecayNetwork dn(configfile,root_info);
 
 	auto print_dn = [](const DecayNetwork& dn,std::ostream& out){
@@ -1156,12 +1114,6 @@ int main(int argc, char *argv[]) {
 		}
 	};
 
-
-	//dn.DisplayNames();
-	// dn.DisplayKeys();
-
-	// return 0;
-
 	std::mt19937_64 gen(42);
 
 	std::vector<std::mt19937_64> gen_vec;
@@ -1175,7 +1127,25 @@ int main(int argc, char *argv[]) {
 		logp_current.push_back(dn.log_posterior());
 	}
 
-	const std::vector<std::string> elements = { "NN", "H", "He", "Li", "Be", "B", "C", "N", "O", "F", "Ne", "Na", "Mg", "Al", "Si", "P", "S", "Cl", "Ar", "K", "Ca", "Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn", "Ga", "Ge", "As", "Se", "Br", "Kr", "Rb", "Sr", "Y", "Zr", "Nb", "Mo", "Tc", "Ru", "Rh", "Pd", "Ag", "Cd", "In", "Sn", "Sb", "Te", "I", "Xe", "Cs", "Ba", "La", "Ce", "Pr", "Nd", "Pm", "Sm", "Eu", "Gd", "Tb", "Dy", "Ho", "Er", "Tm", "Yb", "Lu", "Hf", "Ta", "W", "Re", "Os", "Ir", "Pt", "Au", "Hg", "Tl", "Pb", "Bi", "Po", "At", "Rn", "Fr", "Ra", "Ac", "Th", "Pa", "U", "Np", "Pu", "Am", "Cm", "Bk", "Cf", "Es", "Fm", "Md", "No", "Lr", "Rf", "Db", "Sg", "Bh", "Hs", "Mt", "Ds", "Rg", "Cp", "Uut", "Uuq", "Uup", "Uuh", "Uus", "Uuo"};
+	const std::vector<std::string> elements = { 
+		//s-shell
+		"NN", "H", "He", "Li", "Be", "B", "C", "N", "O", 
+		//p-shell
+		"F", "Ne", "Na", "Mg", "Al", "Si", "P", "S", "Cl", "Ar", "K", "Ca", 
+		//d-shell	
+		"Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", 
+		//f-shell
+		"Cu", "Zn", "Ga", "Ge", "As", "Se", "Br", "Kr", "Rb", "Sr", "Y", "Zr", 
+		"Nb", "Mo", "Tc", "Ru", "Rh", "Pd", "Ag", "Cd", "In", "Sn", 
+		//g-shell	
+		"Sb", "Te", "I", "Xe", "Cs", "Ba", "La", "Ce", "Pr", "Nd", "Pm", "Sm", 
+		"Eu", "Gd", "Tb", "Dy", "Ho", "Er", "Tm", "Yb", "Lu", "Hf", "Ta", "W", 
+		"Re", "Os", "Ir", "Pt", "Au", "Hg", "Tl", "Pb", 
+		//h-shell
+		"Bi", "Po", "At", "Rn", "Fr", "Ra", "Ac", "Th", "Pa", "U", "Np", "Pu", 
+		"Am", "Cm", "Bk", "Cf", "Es", "Fm", "Md", "No", "Lr", "Rf", "Db", "Sg", 
+		"Bh", "Hs", "Mt", "Ds", "Rg", "Cn", "Nh", "Fl", "Mc", "Lv", "Ts", "Og"
+	};
 
 
 	std::map<std::string,size_t> element_map;
@@ -1210,8 +1180,10 @@ int main(int argc, char *argv[]) {
 		workers.emplace_back(
 				[=,&dn_vec,&gen_vec,&logp_current,&U,&print_dn,&convert_name,&merger](){
 					auto f = merger.GetFile();
-					TNtuple mytuple("simulation","ntuple from mcmchalflifefitter","threadid:idx:aaa:zzz:number:half_life:efficiency:branching_ratio");
-					double* vars = new double[8];
+					TNtuple mytuple("isotopes","ntuple from mcmchalflifefitter","threadid:idx:aaa:zzz:half_life:efficiency:branching_ratio");
+					TNtuple mytuple2("normals","ntuple from mcmchalflifefitter","threadid:idx:number:par0:par1:par2");
+					double* vars = new double[7];
+					double* bpars = new double[6];
 					for( size_t jj = 0; jj < (ntrials+burnin); ++jj ){
 						dn_vec[ii].propose(gen_vec[ii]);
 						dn_vec[ii].Evaluate();
@@ -1219,46 +1191,55 @@ int main(int argc, char *argv[]) {
 						double diff = logp_trial - logp_current[ii];
 						auto accept_prob = std::exp(diff);
 						auto logu = std::log(U(gen_vec[ii]));
-						// if( ii == 0 ){
-						// std::cout << jj << logp_trial << " " << logp_current[ii] << " " << diff << " " << logu <<  " " << accept_prob << std::endl;
-						// }
 						//if( U(gen_vec[ii]) < accept_prob ){
 						if( logu < diff ){
-							// if( ii == 0 ){
-							// std::cout << jj << " " << std::setprecision(16) << logp_trial << " " << dn_vec[ii].GetNumber() << " " << dn_vec[ii].GetHalfLife("Cu78") << " " << dn_vec[ii].GetEfficiency("Cu78") << std::endl;
-							// }
 							logp_current[ii] = logp_trial;
 						}else{
 							dn_vec[ii].undo_proposition();
 						}
-						vars[0] = ii;
-						vars[1] = jj;
-						for( const auto& k : dn_vec[ii].GetIsotopes() ){
-							auto aaa_zzz = convert_name(k);
-							vars[2] = aaa_zzz.first;
-							vars[3] = aaa_zzz.second;
-							vars[4] = dn_vec[ii].GetNumber();
-							vars[5] = dn_vec[ii].GetHalfLife(k);
-							vars[6] = dn_vec[ii].GetEfficiency(k);
-							vars[7] = dn_vec[ii].GetBranchingRatio(k);
-							mytuple.Fill(vars[0],
-								     vars[1],
-								     vars[2],
-								     vars[3],
-								     vars[4],
-								     vars[5],
-								     vars[6],
-								     vars[7]
+						if( jj%thin == 0 and jj > burnin ){
+							vars[0] = ii;
+							vars[1] = jj;
+							for( const auto& k : dn_vec[ii].GetIsotopes() ){
+								auto aaa_zzz = convert_name(k);
+								vars[2] = aaa_zzz.first;
+								vars[3] = aaa_zzz.second;
+								vars[4] = dn_vec[ii].GetHalfLife(k);
+								vars[5] = dn_vec[ii].GetEfficiency(k);
+								vars[6] = dn_vec[ii].GetBranchingRatio(k);
+								mytuple.Fill(vars[0],
+										vars[1],
+										vars[2],
+										vars[3],
+										vars[4],
+										vars[5],
+										vars[6]
+									    );
+							}
+							//this will fault if we define something that uses more than
+							//3 parameters to define the bkg, likely we won't actually need that
+							//although it would seem good to actually create this where you reflect
+							//the bkg across the zero line, bin for bin ....
+							bpars[0] = ii;
+							bpars[1] = jj;
+							bpars[2] = dn_vec[ii].GetNumber();
+							bpars[3] = 0.0;
+							bpars[4] = 0.0;
+							bpars[5] = 0.0;
+							for( size_t kk = 0; kk < dn_vec[ii].GetNBkgPars(); ++kk ){
+								bpars[kk+3] = dn_vec[ii].GetBkgParValue(kk);
+							}
+							mytuple2.Fill(bpars[0],
+									bpars[1],
+									bpars[2],
+									bpars[3],
+									bpars[4],
+									bpars[5]
 								     );
 						}
-						//if( jj%thin == 0 and jj > burnin ){
-						//}
 					}
 					f->Write();
 					spdlog::info("thread {} made it to writing",ii);
-					// std::ofstream out("thread-"+std::to_string(ii)+".out");
-					// print_dn(dn_vec[ii],out);
-					// out.close();
 					delete [] vars;
 				}
 				);
@@ -1269,37 +1250,16 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	//for( size_t ii = 0; ii < ntrials; ++ii ){
-	//	dn.propose(gen);
-	//	dn.Evaluate();
-	////	auto logp_trial = dn.log_posterior();
-	////	auto accept_prob = std::exp(logp_trial - logp_current);
-	////	if( U(gen) < accept_prob ){
-	////		logp_current = logp_trial;
-	////	}else{
-	//	if( U(gen) < 0.9 ){
-	//		dn.undo_proposition();
-	//	}
-	////	}
-	//	if( ii%thin == 0 ){
-	//		std::cout << ii << std::endl;
-	//	}
-	////	if( ii > burnin and ii%thin == 0 ){
-	////		//record result
-	////		dn.RecordValues();
-	////	}
-	//}
-	////dn.CollectStatistics();
 	std::chrono::time_point<std::chrono::high_resolution_clock> global_stop_time = std::chrono::high_resolution_clock::now();
 	auto global_run_time = global_stop_time - global_start_time;
 	const auto hrs = std::chrono::duration_cast<std::chrono::hours>(global_run_time);
 	const auto mins = std::chrono::duration_cast<std::chrono::minutes>(global_run_time - hrs);
 	const auto secs = std::chrono::duration_cast<std::chrono::seconds>(global_run_time - hrs - mins);
 	const auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(global_run_time - hrs - mins - secs);
-	// std::cout << "Finished in "
-	// 	  << hrs.count() << " hrs "
-	// 	  << mins.count() << " mins "
-	// 	  << secs.count() << " secs "
-	// 	  << ms.count() << " ms" 
-	// 	  << std::endl;
+	std::cout << "Finished in "
+		  << hrs.count() << " hrs "
+		  << mins.count() << " mins "
+		  << secs.count() << " secs "
+		  << ms.count() << " ms" 
+		  << std::endl;
 }
