@@ -1,4 +1,6 @@
+#include <TNtupleD.h>
 #include <cmath>
+#include <iomanip>
 #include <limits>
 #include <mutex>
 #include <random>
@@ -31,9 +33,13 @@
 #include <yaml-cpp/node/parse.h>
 
 #include "StringManipFunctions.hpp"
+#include "TROOT.h"
+#include "ROOT/TBufferMerger.hxx"
 #include "TFile.h"
+#include "TTree.h"
 #include "TH1.h"
 #include "TH2.h"
+#include "TNtuple.h"
 
 struct RootHisSettings{
 	std::string inputfile;
@@ -59,7 +65,7 @@ class LimitedValue {
 			value(v), 
 			next_value(v), 
 			limits(l), 
-			dist(l.first,l.second) 
+			delta(0.0,0.0001) 
 		{
 		}	
 
@@ -67,14 +73,14 @@ class LimitedValue {
 			value(rhs.value), 
 			next_value(rhs.next_value), 
 			limits(rhs.limits), 
-			dist(rhs.dist)
+			delta(rhs.delta)
 		{
 		}
 		LimitedValue(LimitedValue&& rhs) noexcept : 
 			value(rhs.value), 
 			next_value(rhs.next_value), 
 			limits(std::move(rhs.limits)),
-			dist(std::move(rhs.dist))
+			delta(std::move(rhs.delta))
 		{
 		}	
 		LimitedValue& operator=(const LimitedValue& other){
@@ -82,7 +88,7 @@ class LimitedValue {
 				this->value = other.value;
 				this->next_value = other.next_value;
 				this->limits = other.limits;
-				this->dist = other.dist;
+				this->delta = other.delta;
 			}
 			return *this;
 		}
@@ -91,7 +97,7 @@ class LimitedValue {
 				this->value = other.value;
 				this->next_value = other.next_value;
 				this->limits = std::move(other.limits);
-				this->dist = std::move(other.dist);
+				this->delta = std::move(other.delta);
 			}
 			return *this;
 		}
@@ -117,14 +123,14 @@ class LimitedValue {
 		}
 
 		void ProposeNextValue(std::mt19937_64& gen){
-			this->next_value = dist(gen);
+			this->next_value = this->value + delta(gen);
 		}
 
 	private:
 		T value;
 		T next_value;
 		std::pair<T,T> limits;
-		std::uniform_real_distribution<T> dist;
+		std::normal_distribution<T> delta;
 };
 
 template<class T>
@@ -509,35 +515,35 @@ class DecayNetwork{
 			}
 			this->LoadRootSettings(root_info);
 			
-			this->workspace = std::vector<float>(this->xvals.size(),0.0);
-			this->components["Bkg"] = DecayCurve<float>(this->xvals,*(this->bkg));
+			this->workspace = std::vector<double>(this->xvals.size(),0.0);
+			this->components["Bkg"] = DecayCurve<double>(this->xvals,*(this->bkg));
 			this->keys.insert("Bkg");
 			this->GenerateKeys();
 			this->Evaluate();
 			this->keys.insert("Total");
 		}
 
-		DecayNetwork(const LimitedValue<float>& n,const std::vector<float>& x) : number(n), xvals(x){
-			this->parent = new Isotope<float>("Cu78",
-					LimitedValue<float>(0.3313,{0.3,0.36}),
-					LimitedValue<float>(0.6,{0.2,1.0}),
-					LimitedValue<float>(1.0,{1.0,1.0}));
+		DecayNetwork(const LimitedValue<double>& n,const std::vector<double>& x) : number(n), xvals(x){
+			this->parent = new Isotope<double>("Cu78",
+					LimitedValue<double>(0.3313,{0.3,0.36}),
+					LimitedValue<double>(0.6,{0.2,1.0}),
+					LimitedValue<double>(1.0,{1.0,1.0}));
 
 			this->parent->AddDaughter("Zn78",
-					LimitedValue<float>(1.47,{1.3,1.6}),
-					LimitedValue<float>(0.6,{0.2,1.0}),
-					LimitedValue<float>(0.5,{0.0,1.0}));
+					LimitedValue<double>(1.47,{1.3,1.6}),
+					LimitedValue<double>(0.6,{0.2,1.0}),
+					LimitedValue<double>(0.5,{0.0,1.0}));
 			this->parent->AddDaughter("Zn77",
-					LimitedValue<float>(20.09,{2.0,2.1}),
-					LimitedValue<float>(0.6,{0.2,1.0}),
-					LimitedValue<float>(0.5,{0.0,1.0}));
+					LimitedValue<double>(20.09,{2.0,2.1}),
+					LimitedValue<double>(0.6,{0.2,1.0}),
+					LimitedValue<double>(0.5,{0.0,1.0}));
 			parent->GetDaughter(0)->AddDaughter("Ga78",
-					LimitedValue<float>(5.09,{5.0,5.2}),
-					LimitedValue<float>(0.6,{0.2,1.0}),
-					LimitedValue<float>(0.5,{0.0,0.1}));
+					LimitedValue<double>(5.09,{5.0,5.2}),
+					LimitedValue<double>(0.6,{0.2,1.0}),
+					LimitedValue<double>(0.5,{0.0,0.1}));
 
-			this->bkg = new SlopeBkg<float>({{10.0,{0.0,100.0}},{0.0,{0.0,0.0}}});
-			this->components["Bkg"] = DecayCurve<float>(this->xvals,*(this->bkg));
+			this->bkg = new SlopeBkg<double>({{10.0,{0.0,100.0}},{0.0,{0.0,0.0}}});
+			this->components["Bkg"] = DecayCurve<double>(this->xvals,*(this->bkg));
 			this->keys.insert("Bkg");
 
 			this->GenerateKeys();
@@ -546,12 +552,16 @@ class DecayNetwork{
 			this->keys.insert("Total");
 		}
 
-		const DecayCurve<float>& GetCurve(const std::string& name) const {
+		const DecayCurve<double>& GetCurve(const std::string& name) const {
 			return this->components.at(name);
 		}
 
 		const std::set<std::string>& GetKeys() const{
 			return this->keys;
+		}
+		
+		const std::vector<std::string>& GetIsotopes() const{
+			return this->isotopes;
 		}
 
 		void DisplayKeys() const{
@@ -576,11 +586,11 @@ class DecayNetwork{
 			this->parent->display_efficiencies();
 		}
 
-		float log_posterior() const{
+		double log_posterior() const{
 			auto lp = this->log_prior();
 			// spdlog::info("lp : {}",lp);
 			if( not std::isfinite(lp) ){
-				return -std::numeric_limits<float>::infinity();
+				return -std::numeric_limits<double>::infinity();
 			}
 
 			//return lp + this->log_likelihood();
@@ -588,8 +598,8 @@ class DecayNetwork{
 		}
 
 		//sigma is the sticking point
-		float log_likelihood() const{
-			float ll = 0.0;
+		double log_likelihood() const{
+			double ll = 0.0;
 			auto total = this->GetCurve("Total");
 			auto diff = this->data - total;
 			auto y = diff.GetYVals();
@@ -600,23 +610,23 @@ class DecayNetwork{
 			return ll;
 		}
 
-		float log_likelihood_poisson() const{
-			float ll = 0.0;
+		double log_likelihood_poisson() const{
+			double ll = 0.0;
 			auto total = this->GetCurve("Total");
 			for( size_t ii = 0; ii < this->xvals.size(); ++ii ){
 				auto mu = total.GetPoint(ii).second;
-				spdlog::info("ii:{} k:{} mu:{}",ii,this->yvals[ii],mu);
+				// spdlog::info("ii:{} k:{} mu:{}",ii,this->yvals[ii],mu);
 				ll += this->yvals[ii]*std::log(mu) - mu;
 			}
 			return ll;
 		}
 
-		float log_prior() const{
+		double log_prior() const{
 			if( this->number.GetValue() <= 0.0 ){
 				// spdlog::critical("number is bad {}",this->number.GetValue());
-				return -std::numeric_limits<float>::infinity();
+				return -std::numeric_limits<double>::infinity();
 			}
-			float retval = 0.0;
+			double retval = 0.0;
 			this->log_prior(this->parent,retval);
 			return retval;
 		}
@@ -645,8 +655,8 @@ class DecayNetwork{
 
 		void Evaluate() {
 			//this only get's evaluated when we do a new proposition
-			this->components["Bkg"] = DecayCurve<float>(this->xvals,*(this->bkg));
-		 	const float A0 = this->number.GetValue()*this->parent->GetLambda();
+			this->components["Bkg"] = DecayCurve<double>(this->xvals,*(this->bkg));
+		 	const double A0 = this->number.GetValue()*this->parent->GetLambda();
 			for( size_t ii = 0; ii < this->xvals.size(); ++ii ){
 				this->workspace[ii] = (A0*
 						this->parent->GetEfficiency()*
@@ -654,10 +664,10 @@ class DecayNetwork{
 						this->parent->Exp(this->xvals[ii])
 					   );
 			}
-			this->components[this->parent->GetName()] = DecayCurve<float>(this->xvals,this->workspace);
+			this->components[this->parent->GetName()] = DecayCurve<double>(this->xvals,this->workspace);
 
 			for( size_t ii = 0; ii < this->parent->GetNumDaughters(); ++ii ){
-				std::vector<Isotope<float>*> chain = {this->parent};
+				std::vector<Isotope<double>*> chain = {this->parent};
 				this->Evaluate(this->parent->GetDaughter(ii),chain);
 			}	
 
@@ -677,12 +687,13 @@ class DecayNetwork{
 				this->workspace[ii] += y;
 			}
 
-			this->components["Total"] = DecayCurve<float>(this->xvals,this->workspace);
+			this->components["Total"] = DecayCurve<double>(this->xvals,this->workspace);
 		}
 
 		void GenerateKeys() {
 			this->isotopes.push_back(this->parent->GetName());
 			this->keys.insert(this->parent->GetName());
+			this->values.push_back({this->parent->GetName(),this->parent});
 			for( size_t ii = 0; ii < this->parent->GetNumDaughters(); ++ii ){
 				this->GenerateKeys(this->parent->GetDaughter(ii));
 			}
@@ -692,30 +703,58 @@ class DecayNetwork{
 			return this->xvals.size();
 		}
 
-		float GetData(size_t idx) const{
+		double GetData(size_t idx) const{
 			return this->yvals[idx];
 		}
 
-		float GetNumber() const{
+		double GetNumber() const{
 			return this->number.GetValue();
 		}
 
-	private:
-		LimitedValue<float> number;
-		std::vector<float> xvals;
-		std::vector<float> yvals;
-		std::vector<float> yerrs;
-		std::vector<float> workspace;
+		double GetHalfLife(const std::string& key) const{
+			for( const auto& kv : this->values ){
+				if( kv.first.compare(key) == 0 ){
+					return kv.second->GetHalfLife();
+				}
+			}
+			return -std::numeric_limits<double>::infinity();
+		}
 
-		DecayCurve<float> data;
-		float sigma;
+		double GetEfficiency(const std::string& key) const{
+			for( const auto& kv : this->values ){
+				if( kv.first.compare(key) == 0 ){
+					return kv.second->GetEfficiency();
+				}
+			}
+			return -std::numeric_limits<double>::infinity();
+		}
+
+		double GetBranchingRatio(const std::string& key) const{
+			for( const auto& kv : this->values ){
+				if( kv.first.compare(key) == 0 ){
+					return kv.second->GetBranchingRatio();
+				}
+			}
+			return -std::numeric_limits<double>::infinity();
+		}
+
+	private:
+		LimitedValue<double> number;
+		std::vector<double> xvals;
+		std::vector<double> yvals;
+		std::vector<double> yerrs;
+		std::vector<double> workspace;
+
+		DecayCurve<double> data;
+		double sigma;
 
 		std::set<std::string> keys;
 		std::vector<std::string> isotopes;
 
-		Isotope<float>* parent;
-		BkgTerm<float>* bkg;
-		std::map<std::string,DecayCurve<float>> components;
+		Isotope<double>* parent;
+		BkgTerm<double>* bkg;
+		std::map<std::string,DecayCurve<double>> components;
+		std::vector<std::pair<std::string,Isotope<double>*>> values;
 
 		void LoadRootSettings(const RootHisSettings& root_info){
 			auto rfile = new TFile(root_info.inputfile.c_str(),"READ");
@@ -776,7 +815,7 @@ class DecayNetwork{
 					this->yvals.push_back(histofit->GetBinContent(ii));
 					this->yerrs.push_back(histofit->GetBinError(ii));
 				}
-				this->data = DecayCurve<float>(this->xvals,this->yvals);
+				this->data = DecayCurve<double>(this->xvals,this->yvals);
 			}else{
 				spdlog::error("retreived histogram {} exists, but failed to retrieve from root file {}",
 						root_info.hisname,root_info.inputfile);
@@ -786,10 +825,10 @@ class DecayNetwork{
 		
 		void LoadIsotopeFromYaml(const YAML::Node& isotope,const std::string& inputfile){
 			auto name = isotope["Name"].as<std::string>();
-			auto hl = generate_limited_value_from_yaml<float>(isotope["HalfLife"]);
-			auto eff = generate_limited_value_from_yaml<float>(isotope["Efficiency"]);
-			auto br = generate_limited_value_from_yaml<float>(isotope["BranchingRatio"]); 
-			this->parent = new Isotope<float>(name,hl,eff,br);
+			auto hl = generate_limited_value_from_yaml<double>(isotope["HalfLife"]);
+			auto eff = generate_limited_value_from_yaml<double>(isotope["Efficiency"]);
+			auto br = generate_limited_value_from_yaml<double>(isotope["BranchingRatio"]); 
+			this->parent = new Isotope<double>(name,hl,eff,br);
 			if( auto child = isotope["Isotope"] ){
 				for( size_t ii = 0; ii < child.size(); ++ii ){
 					this->LoadIsotopeFromYaml(child[ii],inputfile,this->parent);
@@ -797,11 +836,11 @@ class DecayNetwork{
 			}
 		}
 
-		void LoadIsotopeFromYaml(const YAML::Node& isotope,const std::string& inputfile,Isotope<float>* p){
+		void LoadIsotopeFromYaml(const YAML::Node& isotope,const std::string& inputfile,Isotope<double>* p){
 			auto name = isotope["Name"].as<std::string>();
-			auto hl = generate_limited_value_from_yaml<float>(isotope["HalfLife"]);
-			auto eff = generate_limited_value_from_yaml<float>(isotope["Efficiency"]);
-			auto br = generate_limited_value_from_yaml<float>(isotope["BranchingRatio"]); 
+			auto hl = generate_limited_value_from_yaml<double>(isotope["HalfLife"]);
+			auto eff = generate_limited_value_from_yaml<double>(isotope["Efficiency"]);
+			auto br = generate_limited_value_from_yaml<double>(isotope["BranchingRatio"]); 
 			p->AddDaughter(name,hl,eff,br);
 			if( auto child = isotope["Isotope"] ){
 				for( size_t ii = 0; ii < child.size(); ++ii ){
@@ -811,7 +850,7 @@ class DecayNetwork{
 		}
 		
 		void LoadNumberFromYaml(const YAML::Node& number,const std::string& inputfile){
-			this->number = generate_limited_value_from_yaml<float>(number);
+			this->number = generate_limited_value_from_yaml<double>(number);
 		}
 
 		void LoadBkgFromYaml(const YAML::Node& bkg,const std::string& inputfile){
@@ -821,17 +860,17 @@ class DecayNetwork{
 				throw std::runtime_error("Background Model missing Parameter list in config");
 			}
 			auto bkg_model = StringManip::tolower(bkg["Model"].as<std::string>("unknown"));
-			std::map<std::string,LimitedValue<float>> pmap;
+			std::map<std::string,LimitedValue<double>> pmap;
 			for( size_t ii = 0; ii < pars.size(); ++ii ){
 				auto name = StringManip::tolower(pars[ii]["Name"].as<std::string>("unknown"));
-				pmap[name] = generate_limited_value_from_yaml<float>(pars[ii]);
+				pmap[name] = generate_limited_value_from_yaml<double>(pars[ii]);
 			}	
 			if( bkg_model.compare("constant") == 0 ){
 				if( pmap.find("constant") == pmap.end() ){
 					spdlog::error("constant background model, expected Name: constant field");
 					throw std::runtime_error("constant background model missing Name: constant field");
 				}else{
-					this->bkg = new FlatBkg<float>({pmap["constant"]});
+					this->bkg = new FlatBkg<double>({pmap["constant"]});
 				}
 			}else if( bkg_model.compare("linear") == 0 ){
 				if( pmap.find("constant") == pmap.end() ){
@@ -842,7 +881,7 @@ class DecayNetwork{
 						spdlog::error("linear background model, expected Name: slope field");
 						throw std::runtime_error("linear background model missing Name: slope field");
 					}else{
-						this->bkg = new SlopeBkg<float>({pmap["constant"],pmap["slope"]});
+						this->bkg = new SlopeBkg<double>({pmap["constant"],pmap["slope"]});
 					}
 				}
 			}else if( bkg_model.compare("exp_cusp") == 0 ){
@@ -858,7 +897,7 @@ class DecayNetwork{
 							spdlog::error("exp_cusp background model, expected Name: slope field");
 							throw std::runtime_error("exp_cusp background model missing Name: slope field");
 						}else{
-							this->bkg = new SlopeBkg<float>({pmap["offset"],pmap["constant"],pmap["slope"]});
+							this->bkg = new SlopeBkg<double>({pmap["offset"],pmap["constant"],pmap["slope"]});
 						}
 					}
 				}
@@ -868,15 +907,16 @@ class DecayNetwork{
 			}
 		}
 
-		void GenerateKeys(Isotope<float>* d){
+		void GenerateKeys(Isotope<double>* d){
 			this->isotopes.push_back(d->GetName());
 			this->keys.insert(d->GetName());
+			this->values.push_back({d->GetName(),d});
 			for( size_t ii = 0; ii < d->GetNumDaughters(); ++ii ){
 				this->GenerateKeys(d->GetDaughter(ii));
 			}
 		}
 
-		void propose(std::mt19937_64& gen,Isotope<float>* d) {
+		void propose(std::mt19937_64& gen,Isotope<double>* d) {
 			d->ProposeNewHalfLife(gen);
 			d->ProposeNewEfficiency(gen);
 			d->ProposeNewBranchingRatio(gen);
@@ -886,9 +926,9 @@ class DecayNetwork{
 			}
 		}
 
-		void log_prior(Isotope<float>* d,float& retval) const{
+		void log_prior(Isotope<double>* d,double& retval) const{
 			if( not d->IsIsotopeWithinLimits() ){
-				retval = -std::numeric_limits<float>::infinity();
+				retval = -std::numeric_limits<double>::infinity();
 				return;
 			}else{
 				for( size_t ii = 0; ii < d->GetNumDaughters(); ++ii ){
@@ -897,21 +937,21 @@ class DecayNetwork{
 			}
 		}
 
-		void undo_proposition(Isotope<float>* d){
+		void undo_proposition(Isotope<double>* d){
 			d->SwapValues();
 			for( size_t ii = 0; ii < d->GetNumDaughters(); ++ii ){
 				this->undo_proposition(d->GetDaughter(ii));
 			}
 		}
 
-		void Evaluate(Isotope<float>* d,std::vector<Isotope<float>*> chain){
+		void Evaluate(Isotope<double>* d,std::vector<Isotope<double>*> chain){
 			chain.push_back(d);
 
-			std::vector<float> lambdas;
+			std::vector<double> lambdas;
 			for( const auto& c : chain ){
 				lambdas.push_back(c->GetLambda());
 			}
-			float l_prod = this->number.GetValue()*d->GetBranchingRatio()*d->GetEfficiency();
+			double l_prod = this->number.GetValue()*d->GetBranchingRatio()*d->GetEfficiency();
 			if( l_prod > 0.0 ){
 				for( const auto& l : lambdas ){
 					l_prod *= l;
@@ -944,7 +984,7 @@ class DecayNetwork{
 					this->workspace[kk] = 0.0;
 				}
 			}
-			this->components[d->GetName()] = DecayCurve<float>(this->xvals,this->workspace);
+			this->components[d->GetName()] = DecayCurve<double>(this->xvals,this->workspace);
 
 			for( size_t ii = 0; ii < d->GetNumDaughters(); ++ii ){
 				this->Evaluate(d->GetDaughter(ii),chain);
@@ -1054,15 +1094,15 @@ int main(int argc, char *argv[]) {
 	//because of the sheer nature of monte carlo, but we need to limit ourself to either be 
 	//a single projection of a single gate
 
-	// std::vector<float> xvals;
-	// float x = -50.0;
-	// const float dx = 0.001;
+	// std::vector<double> xvals;
+	// double x = -50.0;
+	// const double dx = 0.001;
 	// while( x < 50.0 ){
 	// 	xvals.push_back(x);
 	// 	x += dx;
 	// }
 	
-	// DecayNetwork dn(LimitedValue<float>(1.0e3,{0.0,1.0e6}),xvals);
+	// DecayNetwork dn(LimitedValue<double>(1.0e3,{0.0,1.0e6}),xvals);
 
 	// auto bkg = dn.GetCurve("Bkg");
 	// auto cu78 = dn.GetCurve("Cu78");
@@ -1100,7 +1140,7 @@ int main(int argc, char *argv[]) {
 		out << std::endl;
 
 		for( size_t ii = 0; ii < numpts; ++ii ){
-			std::vector<float> vals;
+			std::vector<double> vals;
 			for( const auto& k : keys ){
 				auto curve = dn.GetCurve(k);
 				const auto& [x,y] = curve.GetPoint(ii);
@@ -1118,7 +1158,7 @@ int main(int argc, char *argv[]) {
 
 
 	//dn.DisplayNames();
-	dn.DisplayKeys();
+	// dn.DisplayKeys();
 
 	// return 0;
 
@@ -1126,52 +1166,100 @@ int main(int argc, char *argv[]) {
 
 	std::vector<std::mt19937_64> gen_vec;
 	std::vector<DecayNetwork> dn_vec;
-	std::vector<std::pair<size_t,size_t>> indices;
-	std::vector<float> logp_current;
+	std::vector<double> logp_current;
 	for( size_t ii = 0; ii < nthreads; ++ii ){
 		gen_vec.push_back(std::mt19937_64(gen()));
 		dn_vec.push_back(DecayNetwork(dn));
 		dn_vec.back().propose(gen_vec[ii]);
 		dn_vec.back().Evaluate();
 		logp_current.push_back(dn.log_posterior());
-		indices.push_back({ii*((ntrials+burnin)/nthreads),(ii+1)*((ntrials+burnin)/nthreads)});
 	}
+
+	const std::vector<std::string> elements = { "NN", "H", "He", "Li", "Be", "B", "C", "N", "O", "F", "Ne", "Na", "Mg", "Al", "Si", "P", "S", "Cl", "Ar", "K", "Ca", "Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn", "Ga", "Ge", "As", "Se", "Br", "Kr", "Rb", "Sr", "Y", "Zr", "Nb", "Mo", "Tc", "Ru", "Rh", "Pd", "Ag", "Cd", "In", "Sn", "Sb", "Te", "I", "Xe", "Cs", "Ba", "La", "Ce", "Pr", "Nd", "Pm", "Sm", "Eu", "Gd", "Tb", "Dy", "Ho", "Er", "Tm", "Yb", "Lu", "Hf", "Ta", "W", "Re", "Os", "Ir", "Pt", "Au", "Hg", "Tl", "Pb", "Bi", "Po", "At", "Rn", "Fr", "Ra", "Ac", "Th", "Pa", "U", "Np", "Pu", "Am", "Cm", "Bk", "Cf", "Es", "Fm", "Md", "No", "Lr", "Rf", "Db", "Sg", "Bh", "Hs", "Mt", "Ds", "Rg", "Cp", "Uut", "Uuq", "Uup", "Uuh", "Uus", "Uuo"};
+
+
+	std::map<std::string,size_t> element_map;
+	for( size_t ii = 0; ii < elements.size(); ++ii ){
+		element_map[elements[ii]] = ii;
+	}
+
+	boost::regex splitter = boost::regex("^([A-Za-z]+)(\\d+)$");
+
+	auto convert_name = [=,&element_map](const std::string& name){
+		boost::smatch m;
+		std::pair<int,int> AAA_ZZZ = {0,0};
+		if( boost::regex_match(name, m, splitter) ){
+			std::string element = m[1];
+			std::string mass = m[2];
+			auto ZZZ = element_map[element];
+			auto AAA = std::stoi(mass);
+			AAA_ZZZ = {AAA,ZZZ};
+		}
+		return AAA_ZZZ;
+	};
 
 	std::uniform_real_distribution<double> U(0.0, 1.0);
 
-	std::mutex cout_mutex;
+	//this is critical otherwise things don't work
+	ROOT::EnableThreadSafety();
+	ROOT::TBufferMerger merger("dump.root");
 
 	std::vector<std::thread> workers;
 	std::chrono::time_point<std::chrono::high_resolution_clock> global_start_time = std::chrono::high_resolution_clock::now();
 	for( size_t ii = 0; ii < nthreads; ++ii ){
 		workers.emplace_back(
-				[=,&dn_vec,&indices,&gen_vec,&logp_current,&U,&cout_mutex,&print_dn](){
-					for( size_t jj = indices[ii].first; jj < indices[ii].second; ++jj ){
+				[=,&dn_vec,&gen_vec,&logp_current,&U,&print_dn,&convert_name,&merger](){
+					auto f = merger.GetFile();
+					TNtuple mytuple("simulation","ntuple from mcmchalflifefitter","threadid:idx:aaa:zzz:number:half_life:efficiency:branching_ratio");
+					double* vars = new double[8];
+					for( size_t jj = 0; jj < (ntrials+burnin); ++jj ){
 						dn_vec[ii].propose(gen_vec[ii]);
 						dn_vec[ii].Evaluate();
 						auto logp_trial = dn_vec[ii].log_posterior();
 						double diff = logp_trial - logp_current[ii];
 						auto accept_prob = std::exp(diff);
 						auto logu = std::log(U(gen_vec[ii]));
-						if( ii == 0 ){
-						std::cout << jj << " " << diff << " " << logu <<  " " << accept_prob << std::endl;
-						}
-						if( U(gen_vec[ii]) < accept_prob ){
-							logp_current[ii] = logp_trial;
+						// if( ii == 0 ){
+						// std::cout << jj << logp_trial << " " << logp_current[ii] << " " << diff << " " << logu <<  " " << accept_prob << std::endl;
+						// }
+						//if( U(gen_vec[ii]) < accept_prob ){
+						if( logu < diff ){
 							// if( ii == 0 ){
-							// std::cout << jj << " " << dn_vec[ii].GetNumber() << std::endl;
+							// std::cout << jj << " " << std::setprecision(16) << logp_trial << " " << dn_vec[ii].GetNumber() << " " << dn_vec[ii].GetHalfLife("Cu78") << " " << dn_vec[ii].GetEfficiency("Cu78") << std::endl;
 							// }
+							logp_current[ii] = logp_trial;
 						}else{
 							dn_vec[ii].undo_proposition();
 						}
+						vars[0] = ii;
+						vars[1] = jj;
+						for( const auto& k : dn_vec[ii].GetIsotopes() ){
+							auto aaa_zzz = convert_name(k);
+							vars[2] = aaa_zzz.first;
+							vars[3] = aaa_zzz.second;
+							vars[4] = dn_vec[ii].GetNumber();
+							vars[5] = dn_vec[ii].GetHalfLife(k);
+							vars[6] = dn_vec[ii].GetEfficiency(k);
+							vars[7] = dn_vec[ii].GetBranchingRatio(k);
+							mytuple.Fill(vars[0],
+								     vars[1],
+								     vars[2],
+								     vars[3],
+								     vars[4],
+								     vars[5],
+								     vars[6],
+								     vars[7]
+								     );
+						}
 						//if( jj%thin == 0 and jj > burnin ){
-							//cout_mutex.lock();
-							//cout_mutex.unlock();
 						//}
 					}
-					std::ofstream out("thread-"+std::to_string(ii)+".out");
-					print_dn(dn_vec[ii],out);
-					out.close();
+					f->Write();
+					spdlog::info("thread {} made it to writing",ii);
+					// std::ofstream out("thread-"+std::to_string(ii)+".out");
+					// print_dn(dn_vec[ii],out);
+					// out.close();
+					delete [] vars;
 				}
 				);
 	}
@@ -1208,10 +1296,10 @@ int main(int argc, char *argv[]) {
 	const auto mins = std::chrono::duration_cast<std::chrono::minutes>(global_run_time - hrs);
 	const auto secs = std::chrono::duration_cast<std::chrono::seconds>(global_run_time - hrs - mins);
 	const auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(global_run_time - hrs - mins - secs);
-	std::cout << "Finished in "
-		  << hrs.count() << " hrs "
-		  << mins.count() << " mins "
-		  << secs.count() << " secs "
-		  << ms.count() << " ms" 
-		  << std::endl;
+	// std::cout << "Finished in "
+	// 	  << hrs.count() << " hrs "
+	// 	  << mins.count() << " mins "
+	// 	  << secs.count() << " secs "
+	// 	  << ms.count() << " ms" 
+	// 	  << std::endl;
 }
