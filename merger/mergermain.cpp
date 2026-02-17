@@ -53,12 +53,20 @@ int main(int argc, char* argv[]) {
 	std::vector<std::string> inputfiles;
 	std::string searchpath;
 
+	// clang-format off
 	boost::program_options::options_description cmdline_options("Generic Options");
-	cmdline_options.add_options()("help,h", "produce help message")("inputfile,i", boost::program_options::value<std::vector<std::string>>(&inputfiles)->multitoken(), "input root file for merging")("configfile,c", boost::program_options::value<std::string>(&configfile), "yaml config file to read in settings")("outputprefix,o", boost::program_options::value<std::string>(&outputprefix), "output prefix to dump the histograms/trimmed root tree to")("port,p", boost::program_options::value<int>(&port)->default_value(9090), "[portid] port to listen/send on for the live histogramming, -1 disables for batch scanning")("searchpath,s", boost::program_options::value<std::string>(&searchpath)->default_value(""),
-																																																																													     "path list used to search for things formatted as path_1:path2:path_3, with current_dir as final");
+	cmdline_options.add_options()
+		("help,h", "produce help message")
+		("inputfile,i", boost::program_options::value<std::vector<std::string>>(&inputfiles)->multitoken(), "input root file for merging")
+		("configfile,c", boost::program_options::value<std::string>(&configfile), "yaml config file to read in settings")
+		("outputprefix,o", boost::program_options::value<std::string>(&outputprefix), "output prefix to dump the histograms/trimmed root tree to")
+		("port,p", boost::program_options::value<int>(&port)->default_value(9090), "[portid] port to listen/send on for the live histogramming, -1 disables for batch scanning")
+		("searchpath,s", boost::program_options::value<std::string>(&searchpath)->default_value(""),
+		 		"path list used to search for things formatted as path_1:path2:path_3, with current_dir as final");
 
 	boost::program_options::positional_options_description p;
 	p.add("inputfile", -1);
+	// clang-format on
 
 	try {
 		boost::program_options::variables_map vm;

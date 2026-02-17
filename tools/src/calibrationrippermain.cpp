@@ -121,10 +121,24 @@ int main(int argc, char* argv[]) {
 	bool apply;
 	bool txtmode;
 
+	// clang-format off
 	boost::program_options::options_description cmdline_options("Generic Options");
-	cmdline_options.add_options()("apply,a", boost::program_options::value<bool>(&apply)->default_value(true), "apply to a configfile")("configfile,c", boost::program_options::value<std::string>(&configfile), "configfile to read in and adjust")("error,e", boost::program_options::value<bool>(&usefiterror)->default_value(true), "use the fit error from the file")("fitpoints,f", boost::program_options::value<std::vector<std::string>>(&fitfiles)->multitoken(), "Add file:energy pair (e.g. fit.yaml:661.657:pkerr, pkerr is optional)")("help,h", "produce help message")("logfile,l", boost::program_options::value<std::string>(&logfile)->default_value("GenCalRipper.yaml"), "log file to output new calibration params to")("mode,m", boost::program_options::value<bool>(&txtmode)->default_value(false), "operate in mode where we parse a txt file instead of yaml, see txtfile option for more info")("namedparameter,n", boost::program_options::value<std::string>(&parname)->default_value("Mean"), "parameter name used to gen calibration for")("outputfile,o", boost::program_options::value<std::string>(&outputfile), "configfile to output to")("polyorder,p", boost::program_options::value<int>(&order)->default_value(1), "order to do calibration")("scale,s", boost::program_options::value<bool>(&fixcontstant)->default_value(true), "fix the constant term in the fit")("txtfile,t", boost::program_options::value<std::string>(&txtfile)->default_value("CalMap.txt"), "txt file formatted as crate module channel pars");
+	cmdline_options.add_options()
+		("apply,a", boost::program_options::value<bool>(&apply)->default_value(true), "apply to a configfile")
+		("configfile,c", boost::program_options::value<std::string>(&configfile), "configfile to read in and adjust")
+		("error,e", boost::program_options::value<bool>(&usefiterror)->default_value(true), "use the fit error from the file")
+		("fitpoints,f", boost::program_options::value<std::vector<std::string>>(&fitfiles)->multitoken(), "Add file:energy pair (e.g. fit.yaml:661.657:pkerr, pkerr is optional)")
+		("help,h", "produce help message")
+		("logfile,l", boost::program_options::value<std::string>(&logfile)->default_value("GenCalRipper.yaml"), "log file to output new calibration params to")
+		("mode,m", boost::program_options::value<bool>(&txtmode)->default_value(false), "operate in mode where we parse a txt file instead of yaml, see txtfile option for more info")
+		("namedparameter,n", boost::program_options::value<std::string>(&parname)->default_value("Mean"), "parameter name used to gen calibration for")
+		("outputfile,o", boost::program_options::value<std::string>(&outputfile), "configfile to output to")
+		("polyorder,p", boost::program_options::value<int>(&order)->default_value(1), "order to do calibration")
+		("scale,s", boost::program_options::value<bool>(&fixcontstant)->default_value(true), "fix the constant term in the fit")
+		("txtfile,t", boost::program_options::value<std::string>(&txtfile)->default_value("CalMap.txt"), "txt file formatted as crate module channel pars");
 
 	boost::program_options::positional_options_description p;
+	// clang-format on
 
 	try {
 		boost::program_options::variables_map vm;

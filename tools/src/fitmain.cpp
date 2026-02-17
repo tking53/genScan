@@ -22,10 +22,18 @@ int main(int argc, char* argv[]) {
 	double xmax = 80.0;
 	std::string fitfunc = "tracefunc";
 
+	// clang-format off
 	boost::program_options::options_description cmdline_options("Generic Options");
-	cmdline_options.add_options()("help,h", "produce help message")("inputfile,i", boost::program_options::value<std::string>(&inputfile)->default_value("trace.txt"), "file to read the trace data in formatted as x y_i")("outputfile,o", boost::program_options::value<std::string>(&outputfile)->default_value("fit.txt"), "file to write the trace fit in formatted as x y_i y_f")("fitfunc,f", boost::program_options::value<std::string>(&fitfunc)->default_value("tracefunc"), "function to use for trace fitting [tracefunc,sintracefunc]")("xmin,l", boost::program_options::value<double>(&xmin)->default_value(0.0), "lower fit bound")("xmax,u", boost::program_options::value<double>(&xmax)->default_value(0.0), "upper fit bound");
+	cmdline_options.add_options()
+		("help,h", "produce help message")
+		("inputfile,i", boost::program_options::value<std::string>(&inputfile)->default_value("trace.txt"), "file to read the trace data in formatted as x y_i")
+		("outputfile,o", boost::program_options::value<std::string>(&outputfile)->default_value("fit.txt"), "file to write the trace fit in formatted as x y_i y_f")
+		("fitfunc,f", boost::program_options::value<std::string>(&fitfunc)->default_value("tracefunc"), "function to use for trace fitting [tracefunc,sintracefunc]")
+		("xmin,l", boost::program_options::value<double>(&xmin)->default_value(0.0), "lower fit bound")
+		("xmax,u", boost::program_options::value<double>(&xmax)->default_value(0.0), "upper fit bound");
 
 	boost::program_options::positional_options_description pos;
+	// clang-format on
 
 	try {
 		boost::program_options::variables_map vm;

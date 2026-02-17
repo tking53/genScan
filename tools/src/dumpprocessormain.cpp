@@ -53,11 +53,16 @@ int main(int argc, char* argv[]) {
 	std::string configfile;
 	std::vector<std::string> procs;
 
+	// clang-format off
 	boost::program_options::options_description cmdline_options("Generic Options");
-	cmdline_options.add_options()("help,h", "produce help message")("names,n", boost::program_options::value<std::vector<std::string>>(&procs), "[name1 name2 ... nameN] names of the processors/analyzers to dump info about")("configfile,c", boost::program_options::value<std::string>(&configfile), "configfile to read in and print the portions of the config which have name=name1 or name=name2, etc.");
+	cmdline_options.add_options()
+		("help,h", "produce help message")
+		("names,n", boost::program_options::value<std::vector<std::string>>(&procs), "[name1 name2 ... nameN] names of the processors/analyzers to dump info about")
+		("configfile,c", boost::program_options::value<std::string>(&configfile), "configfile to read in and print the portions of the config which have name=name1 or name=name2, etc.");
 
 	boost::program_options::positional_options_description p;
 	p.add("names", -1);
+	// clang-format on
 
 	try {
 		boost::program_options::variables_map vm;

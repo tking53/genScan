@@ -78,21 +78,37 @@ int main(int argc, char* argv[]) {
 
 	std::string version(GIT_COMMIT_HASH);
 
+	// clang-format off
 	boost::program_options::options_description cmdline_options("Generic Options");
-	cmdline_options.add_options()("configfile,c", boost::program_options::value<std::string>(&configfile)->default_value("config.xml"),
-				      "[filename] filename for channel map")("file,f", boost::program_options::value<std::vector<std::string>>(&FileNames),
-									     "[file1 file2 file3 ...] list of files used for input")("help,h", "produce this message")("max_crates,i", boost::program_options::value<int>(&MAX_CRATES)->default_value(1),
-																				       "[MAX_CRATES] Number of crates to expect in data stream")("max_slots,j", boost::program_options::value<int>(&MAX_CARDS_PER_CRATE)->default_value(13),
-																												 "[MAX_CARDS_PER_CRATE] Number of cards per crate to expect in data stream")("max_channels,k", boost::program_options::value<int>(&MAX_CHANNELS_PER_BOARD)->default_value(16),
-																																					     "[MAX_CHANNELS_PER_BOARD] Number of channels per board to expect in data stream")("limit,l", boost::program_options::value<int>(&limit)->default_value(10),
-																																															       "number of events to keep in history [0 -> current, 1 -> prev., ... N-1]")("outputfile,o", boost::program_options::value<std::string>(&outputfile)->default_value("out"),
-																																																									  "[filename] filename for output")("port,p", boost::program_options::value<int>(&port)->default_value(9090),
-																																																													    "[portid] port to listen/send on for the live histogramming, -1 disables for batch scanning")("searchpath,s", boost::program_options::value<std::string>(&searchpath)->default_value(""),
-																																																																									  "path list used to search for things formatted as path_1:path2:path_3, with current_dir as final")("enabletree,t", boost::program_options::value<bool>(&enabletree)->default_value(true),
-																																																																																					     "enable root tree output or disable it and only generate histograms")("format,x", boost::program_options::value<std::string>(&dataformat)->default_value("null"),
-																																																																																														   "[file_format] format of the data file (evt,evt_to,evt-presort,ldf,pacman_ldf,pld,caen_root,caen_bin)")
-
-		("version", "print version number and exit")("cmake-info", "print info about the cmake used")("compiler-info", "print info about the compiler used")("git-info", "print info about the git branch and version used");
+	cmdline_options.add_options()
+		("configfile,c", boost::program_options::value<std::string>(&configfile)->default_value("config.xml"),
+		 		"[filename] filename for channel map")
+		("file,f", boost::program_options::value<std::vector<std::string>>(&FileNames),
+		 		"[file1 file2 file3 ...] list of files used for input")
+		("help,h", "produce this message")
+		("max_crates,i", boost::program_options::value<int>(&MAX_CRATES)->default_value(1),
+		 		"[MAX_CRATES] Number of crates to expect in data stream")
+		("max_slots,j", boost::program_options::value<int>(&MAX_CARDS_PER_CRATE)->default_value(13),
+				"[MAX_CARDS_PER_CRATE] Number of cards per crate to expect in data stream")
+		("max_channels,k", boost::program_options::value<int>(&MAX_CHANNELS_PER_BOARD)->default_value(16),
+		 		"[MAX_CHANNELS_PER_BOARD] Number of channels per board to expect in data stream")
+		("limit,l", boost::program_options::value<int>(&limit)->default_value(10),
+				"number of events to keep in history [0 -> current, 1 -> prev., ... N-1]")
+		("outputfile,o", boost::program_options::value<std::string>(&outputfile)->default_value("out"),
+		 		"[filename] filename for output")
+		("port,p", boost::program_options::value<int>(&port)->default_value(9090),
+				"[portid] port to listen/send on for the live histogramming, -1 disables for batch scanning")
+		("searchpath,s", boost::program_options::value<std::string>(&searchpath)->default_value(""),
+				"path list used to search for things formatted as path_1:path2:path_3, with current_dir as final")
+		("enabletree,t", boost::program_options::value<bool>(&enabletree)->default_value(true),
+				"enable root tree output or disable it and only generate histograms")
+		("format,x", boost::program_options::value<std::string>(&dataformat)->default_value("null"),
+				"[file_format] format of the data file (evt,evt_to,evt-presort,ldf,pacman_ldf,pld,caen_root,caen_bin)")
+		("version", "print version number and exit")
+		("cmake-info", "print info about the cmake used")
+		("compiler-info", "print info about the compiler used")
+		("git-info", "print info about the git branch and version used");
+	// clang-format on
 
 	boost::program_options::positional_options_description p;
 	p.add("file", -1);

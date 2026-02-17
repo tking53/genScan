@@ -20,10 +20,16 @@ int main(int argc, char* argv[]) {
 	std::string outputfile = "makima.txt";
 	int npts = 1000;
 
+	// clang-format off
 	boost::program_options::options_description cmdline_options("Generic Options");
-	cmdline_options.add_options()("help,h", "produce help message")("inputfile,i", boost::program_options::value<std::string>(&inputfile)->default_value("trace.txt"), "file to read the trace data in formatted as x y_i")("outputfile,o", boost::program_options::value<std::string>(&outputfile)->default_value("fit.txt"), "file to write the trace fit in formatted as x y_i y_f")("npts,n", boost::program_options::value<int>(&npts)->default_value(1000), "number of points to dump for the spline");
+	cmdline_options.add_options()
+		("help,h", "produce help message")
+		("inputfile,i", boost::program_options::value<std::string>(&inputfile)->default_value("trace.txt"), "file to read the trace data in formatted as x y_i")
+		("outputfile,o", boost::program_options::value<std::string>(&outputfile)->default_value("fit.txt"), "file to write the trace fit in formatted as x y_i y_f")
+		("npts,n", boost::program_options::value<int>(&npts)->default_value(1000), "number of points to dump for the spline");
 
 	boost::program_options::positional_options_description pos;
+	// clang-format on
 
 	try {
 		boost::program_options::variables_map vm;

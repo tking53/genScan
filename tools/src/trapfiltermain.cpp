@@ -23,10 +23,20 @@ int main(int argc, char* argv[]) {
 	int blen = 0;
 	int nval = 1;
 
+	// clang-format off
 	boost::program_options::options_description cmdline_options("Generic Options");
-	cmdline_options.add_options()("help,h", "produce help message")("inputfile,i", boost::program_options::value<std::string>(&inputfile)->default_value("trace.txt"), "file to read the trace data in formatted as x y_i")("outputfile,o", boost::program_options::value<std::string>(&outputfile)->default_value("trap.txt"), "file to write the trace trapezoid in formatted as x y_i t_i")("tau,t", boost::program_options::value<float>(&tau)->default_value(1.0), "tau value used for pole zero correction if <= 0.0 no pole zero performed")("length,l", boost::program_options::value<int>(&l)->default_value(1), "length of filter in samples")("gap,g", boost::program_options::value<int>(&g)->default_value(0), "gap of filter in samples")("baseline,b", boost::program_options::value<int>(&blen)->default_value(0), "length of region in samples to use for baseline")("numeval,n", boost::program_options::value<int>(&nval)->default_value(1), "number of times to run filter for timing purposes");
+	cmdline_options.add_options()
+		("help,h", "produce help message")
+		("inputfile,i", boost::program_options::value<std::string>(&inputfile)->default_value("trace.txt"), "file to read the trace data in formatted as x y_i")
+		("outputfile,o", boost::program_options::value<std::string>(&outputfile)->default_value("trap.txt"), "file to write the trace trapezoid in formatted as x y_i t_i")
+		("tau,t", boost::program_options::value<float>(&tau)->default_value(1.0), "tau value used for pole zero correction if <= 0.0 no pole zero performed")
+		("length,l", boost::program_options::value<int>(&l)->default_value(1), "length of filter in samples")
+		("gap,g", boost::program_options::value<int>(&g)->default_value(0), "gap of filter in samples")
+		("baseline,b", boost::program_options::value<int>(&blen)->default_value(0), "length of region in samples to use for baseline")
+		("numeval,n", boost::program_options::value<int>(&nval)->default_value(1), "number of times to run filter for timing purposes");
 
 	boost::program_options::positional_options_description pos;
+	// clang-format on
 
 	try {
 		boost::program_options::variables_map vm;

@@ -11,10 +11,15 @@ int main(int argc, char* argv[]) {
 	std::string inputfile;
 	std::string keyname;
 
+	// clang-format off
 	boost::program_options::options_description cmdline_options("Generic Options");
-	cmdline_options.add_options()("help,h", "produce help message")("inputfile,i", boost::program_options::value<std::string>(&inputfile), "file to get the histogram from")("keyname,k", boost::program_options::value<std::string>(&keyname), "TNamed value to extract");
+	cmdline_options.add_options()
+		("help,h", "produce help message")
+		("inputfile,i", boost::program_options::value<std::string>(&inputfile), "file to get the histogram from")
+		("keyname,k", boost::program_options::value<std::string>(&keyname), "TNamed value to extract");
 
 	boost::program_options::positional_options_description p;
+	// clang-format on
 
 	try {
 		boost::program_options::variables_map vm;

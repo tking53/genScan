@@ -1008,10 +1008,31 @@ int main(int argc, char* argv[]) {
 	size_t thin;
 	size_t burnin;
 
+	// clang-format off
 	boost::program_options::options_description cmdline_options("Generic Options");
-	cmdline_options.add_options()("axis,a", boost::program_options::value<std::string>(&root_info.axis)->default_value("x"), "axis to project onto (x,y,X,Y) if 2D")("burnin,b", boost::program_options::value<size_t>(&burnin)->default_value(1000), "number to burnin the random number generation (done by each thread)")("chi2,c", boost::program_options::value<bool>(&chi2)->default_value(true), "chi2 fit, or loglikelihood")("data,d", boost::program_options::value<std::string>(&root_info.hisname), "histogram to manipulate")("configfile,f", boost::program_options::value<std::string>(&configfile), "yaml file to read the decay configuration and fit settings from")("gate,g", boost::program_options::value<std::vector<std::string>>(&root_info.gate)->multitoken(), "values to gate within in 2d histogram")("help,h", "produce help message")("inputfile,i", boost::program_options::value<std::string>(&root_info.inputfile), "file to get the histogram from")("lowerbound,l", boost::program_options::value<double>(&root_info.low), "lower bound to perform fit")("thinning,m", boost::program_options::value<size_t>(&thin)->default_value(1000), "modulo used to determine if a trial should be recorded")("ntrials,n", boost::program_options::value<size_t>(&ntrials)->default_value(10000), "number of trials to perform when fitting")("outputprefix,o", boost::program_options::value<std::string>(&outputprefix)->default_value("GenMCHalfLife"), "file to output to fit info to")("projectionindex,p", boost::program_options::value<std::vector<int>>(&root_info.projection_indices)->multitoken(), "index limits to project on if 2d histogram")("quiet,q", boost::program_options::value<bool>(&quiet)->default_value(false), "quiet output")("storechi2,s", boost::program_options::value<bool>(&storechi2)->default_value(true), "store chi2 plot")("nthreads,t", boost::program_options::value<size_t>(&nthreads)->default_value(std::thread::hardware_concurrency() / 2), "number of threads used in parallel")("upperbound,u", boost::program_options::value<double>(&root_info.high), "upper bound to perform fit")("xrebin,x", boost::program_options::value<int>(&root_info.xrebin)->default_value(0), "rebin factor for the x direction")("yrebin,y", boost::program_options::value<int>(&root_info.yrebin)->default_value(0), "rebin factor for the y direction");
+	cmdline_options.add_options()
+		("axis,a", boost::program_options::value<std::string>(&root_info.axis)->default_value("x"), "axis to project onto (x,y,X,Y) if 2D")
+		("burnin,b", boost::program_options::value<size_t>(&burnin)->default_value(1000), "number to burnin the random number generation (done by each thread)")
+		("chi2,c", boost::program_options::value<bool>(&chi2)->default_value(true), "chi2 fit, or loglikelihood")
+		("data,d", boost::program_options::value<std::string>(&root_info.hisname), "histogram to manipulate")
+		("configfile,f", boost::program_options::value<std::string>(&configfile), "yaml file to read the decay configuration and fit settings from")
+		("gate,g", boost::program_options::value<std::vector<std::string>>(&root_info.gate)->multitoken(), "values to gate within in 2d histogram")
+		("help,h", "produce help message")
+		("inputfile,i", boost::program_options::value<std::string>(&root_info.inputfile), "file to get the histogram from")
+		("lowerbound,l", boost::program_options::value<double>(&root_info.low), "lower bound to perform fit")
+		("thinning,m", boost::program_options::value<size_t>(&thin)->default_value(1000), "modulo used to determine if a trial should be recorded")
+		("ntrials,n", boost::program_options::value<size_t>(&ntrials)->default_value(10000), "number of trials to perform when fitting")
+		("outputprefix,o", boost::program_options::value<std::string>(&outputprefix)->default_value("GenMCHalfLife"), "file to output to fit info to")
+		("projectionindex,p", boost::program_options::value<std::vector<int>>(&root_info.projection_indices)->multitoken(), "index limits to project on if 2d histogram")
+		("quiet,q", boost::program_options::value<bool>(&quiet)->default_value(false), "quiet output")
+		("storechi2,s", boost::program_options::value<bool>(&storechi2)->default_value(true), "store chi2 plot")
+		("nthreads,t", boost::program_options::value<size_t>(&nthreads)->default_value(std::thread::hardware_concurrency() / 2), "number of threads used in parallel")
+		("upperbound,u", boost::program_options::value<double>(&root_info.high), "upper bound to perform fit")
+		("xrebin,x", boost::program_options::value<int>(&root_info.xrebin)->default_value(0), "rebin factor for the x direction")
+		("yrebin,y", boost::program_options::value<int>(&root_info.yrebin)->default_value(0), "rebin factor for the y direction");
 
 	boost::program_options::positional_options_description p;
+	// clang-format on
 
 	try {
 		boost::program_options::variables_map vm;

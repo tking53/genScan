@@ -57,10 +57,16 @@ int main(int argc, char* argv[]) {
 	std::string configfile;
 	int ntimes;
 
+	// clang-format off
 	boost::program_options::options_description cmdline_options("Generic Options");
-	cmdline_options.add_options()("help,h", "produce help message")("regex,r", boost::program_options::value<std::string>(&restr), "input regex")("configfile,c", boost::program_options::value<std::string>(&configfile), "config file to run the regex checks on")("ntimes,n", boost::program_options::value<int>(&ntimes)->default_value(0), "number of times to test for timing purposes");
+	cmdline_options.add_options()
+		("help,h", "produce help message")
+		("regex,r", boost::program_options::value<std::string>(&restr), "input regex")
+		("configfile,c", boost::program_options::value<std::string>(&configfile), "config file to run the regex checks on")
+		("ntimes,n", boost::program_options::value<int>(&ntimes)->default_value(0), "number of times to test for timing purposes");
 
 	boost::program_options::positional_options_description p;
+	// clang-format on
 
 	try {
 		boost::program_options::variables_map vm;

@@ -244,10 +244,23 @@ int main(int argc, char* argv[]) {
 	std::vector<std::pair<double, double>> gatevalues;
 	std::vector<std::string> gates;
 
+	// clang-format off
 	boost::program_options::options_description cmdline_options("Generic Options");
-	cmdline_options.add_options()("axis,a", boost::program_options::value<std::string>(&axis)->default_value("x"), "axis to project onto (x,y,X,Y) if 2D")("data,d", boost::program_options::value<std::string>(&hisname), "histogram to manipulate")("gate,g", boost::program_options::value<std::vector<std::string>>(&gates)->multitoken(), "values to gate within in 2d histogram")("help,h", "produce help message")("inputfile,i", boost::program_options::value<std::string>(&inputfile), "root file to pull data from")("length,l", boost::program_options::value<int>(&length)->default_value(10), "length of filter in bins")("numdimension,n", boost::program_options::value<int>(&dimensionality)->default_value(1), "dimensionality of histogram (1,2)")("outputfile,o", boost::program_options::value<std::string>(&outputfile)->default_value("Peaks.yaml"), "yaml outputfile")("projectionindex,p", boost::program_options::value<std::vector<int>>(&indices)->multitoken(), "index to project on if 2d histogram")("sigma,s", boost::program_options::value<int>(&sigma)->default_value(10), "rough sigma of peak in bins")("threshold,t", boost::program_options::value<float>(&threshold)->default_value(0.05), "fraction [0,1] of max peak to include when dumping peaks");
+	cmdline_options.add_options()
+		("axis,a", boost::program_options::value<std::string>(&axis)->default_value("x"), "axis to project onto (x,y,X,Y) if 2D")
+		("data,d", boost::program_options::value<std::string>(&hisname), "histogram to manipulate")
+		("gate,g", boost::program_options::value<std::vector<std::string>>(&gates)->multitoken(), "values to gate within in 2d histogram")
+		("help,h", "produce help message")
+		("inputfile,i", boost::program_options::value<std::string>(&inputfile), "root file to pull data from")
+		("length,l", boost::program_options::value<int>(&length)->default_value(10), "length of filter in bins")
+		("numdimension,n", boost::program_options::value<int>(&dimensionality)->default_value(1), "dimensionality of histogram (1,2)")
+		("outputfile,o", boost::program_options::value<std::string>(&outputfile)->default_value("Peaks.yaml"), "yaml outputfile")
+		("projectionindex,p", boost::program_options::value<std::vector<int>>(&indices)->multitoken(), "index to project on if 2d histogram")
+		("sigma,s", boost::program_options::value<int>(&sigma)->default_value(10), "rough sigma of peak in bins")
+		("threshold,t", boost::program_options::value<float>(&threshold)->default_value(0.05), "fraction [0,1] of max peak to include when dumping peaks");
 
 	boost::program_options::positional_options_description pos;
+	// clang-format on
 
 	try {
 		boost::program_options::variables_map vm;

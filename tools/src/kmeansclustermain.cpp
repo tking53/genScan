@@ -39,11 +39,21 @@ int main(int argc, char* argv[]) {
 	double tol;
 	std::string searchpath;
 
+	// clang-format off
 	boost::program_options::options_description cmdline_options("Generic Options");
-	cmdline_options.add_options()("help,h", "produce help message")("inputfile,i", boost::program_options::value<std::string>(&inputfile), "file to get the histogram from")("data,d", boost::program_options::value<std::string>(&hisname), "historam to run kmeans algorithm on")("cut,c", boost::program_options::value<std::string>(&cutname)->default_value(""), "cut to use to separate the data")("nummeans,n", boost::program_options::value<int>(&kmeans), "number of means to cluster into")("maxiters,m", boost::program_options::value<int>(&maxiter), "maximum number of iterations")("tolerance,t", boost::program_options::value<double>(&tol), "tolerance for early exiting")("searchpath,s", boost::program_options::value<std::string>(&searchpath)->default_value(""),
-																																																																																				  "path list used to search for things formatted as path_1:path2:path_3, with current_dir as final");
+	cmdline_options.add_options()
+		("help,h", "produce help message")
+		("inputfile,i", boost::program_options::value<std::string>(&inputfile), "file to get the histogram from")
+		("data,d", boost::program_options::value<std::string>(&hisname), "historam to run kmeans algorithm on")
+		("cut,c", boost::program_options::value<std::string>(&cutname)->default_value(""), "cut to use to separate the data")
+		("nummeans,n", boost::program_options::value<int>(&kmeans), "number of means to cluster into")
+		("maxiters,m", boost::program_options::value<int>(&maxiter), "maximum number of iterations")
+		("tolerance,t", boost::program_options::value<double>(&tol), "tolerance for early exiting")
+		("searchpath,s", boost::program_options::value<std::string>(&searchpath)->default_value(""),
+				"path list used to search for things formatted as path_1:path2:path_3, with current_dir as final");
 
 	boost::program_options::positional_options_description p;
+	// clang-format on
 
 	try {
 		boost::program_options::variables_map vm;

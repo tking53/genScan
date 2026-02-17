@@ -266,11 +266,19 @@ int main(int argc, char* argv[]) {
 	operation_message += "\nymult:value -> shift the cut by multiplying y_com by value";
 	operation_message += "\n value is allowed to be any number, or these special values xl, xc, xu, yl, yc, yu where l,c,u are the lower, center, and upper limits of the respective axis";
 
+	// clang-format off
 	boost::program_options::options_description cmdline_options("Generic Options");
-	cmdline_options.add_options()("help,h", "produce help message")("tcutfile,t", boost::program_options::value<std::string>(&tcutfile), "filename to read tcut from, is expected to be a cxx")("outputfile,o", boost::program_options::value<std::string>(&outputfile), "filename to output to, will be a cxx")("operation,v", boost::program_options::value<std::vector<std::string>>(&opcodes)->multitoken(), operation_message.c_str())("name,n", boost::program_options::value<std::string>(&name)->default_value("dump"), "name that the cut will have when saved")("searchpath,s", boost::program_options::value<std::string>(&searchpath)->default_value(""),
-																																																																					      "path list used to search for things formatted as path_1:path2:path_3, with current_dir as final");
+	cmdline_options.add_options()
+		("help,h", "produce help message")
+		("tcutfile,t", boost::program_options::value<std::string>(&tcutfile), "filename to read tcut from, is expected to be a cxx")
+		("outputfile,o", boost::program_options::value<std::string>(&outputfile), "filename to output to, will be a cxx")
+		("operation,v", boost::program_options::value<std::vector<std::string>>(&opcodes)->multitoken(), operation_message.c_str())
+		("name,n", boost::program_options::value<std::string>(&name)->default_value("dump"), "name that the cut will have when saved")
+		("searchpath,s", boost::program_options::value<std::string>(&searchpath)->default_value(""),
+				"path list used to search for things formatted as path_1:path2:path_3, with current_dir as final");
 
 	boost::program_options::positional_options_description p;
+	// clang-format on
 
 	try {
 		boost::program_options::variables_map vm;

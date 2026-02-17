@@ -20,10 +20,20 @@ int main(int argc, char* argv[]) {
 	std::string channelregex;
 	bool individualmode;
 
+	// clang-format off
 	boost::program_options::options_description cmdline_options("Generic Options");
-	cmdline_options.add_options()("help,h", "produce help message notable regex patterns All Numbers 0-15: (0|[1-9]|1[0-5]) All Even Numbers : \\d*[02468] All Odd Numbers : \\d*[13579]")("numcrate,x", boost::program_options::value<int>(&numcrate)->default_value(1), "number of crates in default xml")("nummodule,y", boost::program_options::value<int>(&nummodule)->default_value(13), "number of modules per crate in default xml")("numchannel,z", boost::program_options::value<int>(&numchannel)->default_value(16), "number of channels per module in default xml")("crateregex,a", boost::program_options::value<std::string>(&crateregex), "crate regex")("moduleregex,b", boost::program_options::value<std::string>(&moduleregex), "module regex")("channelregex,c", boost::program_options::value<std::string>(&channelregex), "channel regex")("individualmode,i", boost::program_options::value<bool>(&individualmode)->default_value(false), "run the full regex pattern, or as individual sections");
+	cmdline_options.add_options()
+		("help,h", "produce help message notable regex patterns All Numbers 0-15: (0|[1-9]|1[0-5]) All Even Numbers : \\d*[02468] All Odd Numbers : \\d*[13579]")
+		("numcrate,x", boost::program_options::value<int>(&numcrate)->default_value(1), "number of crates in default xml")
+		("nummodule,y", boost::program_options::value<int>(&nummodule)->default_value(13), "number of modules per crate in default xml")
+		("numchannel,z", boost::program_options::value<int>(&numchannel)->default_value(16), "number of channels per module in default xml")
+		("crateregex,a", boost::program_options::value<std::string>(&crateregex), "crate regex")
+		("moduleregex,b", boost::program_options::value<std::string>(&moduleregex), "module regex")
+		("channelregex,c", boost::program_options::value<std::string>(&channelregex), "channel regex")
+		("individualmode,i", boost::program_options::value<bool>(&individualmode)->default_value(false), "run the full regex pattern, or as individual sections");
 
 	boost::program_options::positional_options_description p;
+	// clang-format on
 
 	try {
 		boost::program_options::variables_map vm;

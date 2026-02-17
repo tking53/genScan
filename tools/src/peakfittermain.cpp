@@ -203,8 +203,31 @@ int main(int argc, char* argv[]) {
 	}
 	FittingMessage += "\n=========== 2D Fits ===========";
 
+	// clang-format off
 	boost::program_options::options_description cmdline_options("Generic Options");
-	cmdline_options.add_options()("axis,a", boost::program_options::value<std::string>(&axis)->default_value("x"), "axis to project onto (x,y,X,Y) if 2D")("boundparameter,b", boost::program_options::value<std::vector<std::string>>(&boundedparams)->multitoken(), "parameter to bound name:low:high")("chi2,c", boost::program_options::value<bool>(&chi2)->default_value(true), "chi2 fit, or loglikelihood")("data,d", boost::program_options::value<std::string>(&hisname), "histogram to manipulate")("ellipse,e", boost::program_options::value<double>(&ellipse)->default_value(3.0), "uncertainty ellipse size")("fixparameter,f", boost::program_options::value<std::vector<std::string>>(&fixedparams)->multitoken(), "parameter to bound name:value")("gate,g", boost::program_options::value<std::vector<std::string>>(&gates)->multitoken(), "values to gate within in 2d histogram")("help,h", "produce help message")("inputfile,i", boost::program_options::value<std::string>(&inputfile), "file to get the histogram from")("lowerbound,l", boost::program_options::value<std::vector<double>>(&low)->multitoken(), "lower bound to perform fit, if 1 provided then is XLow, if 2 provided then Xlow, Ylow")("mode,m", boost::program_options::value<int>(&mode)->default_value(0), FittingMessage.c_str())("numdimension,n", boost::program_options::value<int>(&dimensionality)->default_value(1), "dimensionality of histogram (1,2)")("outputprefix,o", boost::program_options::value<std::string>(&outputprefix)->default_value("GenPeakFitterResults"), "file to output to fit info to")("projectionindex,p", boost::program_options::value<std::vector<int>>(&indices)->multitoken(), "index to project on if 2d histogram")("quiet,q", boost::program_options::value<bool>(&quiet)->default_value(false), "quiet output")("tolerance,r", boost::program_options::value<double>(&tol)->default_value(1.0e-6), "tolerance used to determine if we're too close to the limits")("storechi2,s", boost::program_options::value<bool>(&storechi2)->default_value(true), "store chi2 plot")("tpoints,t", boost::program_options::value<int>(&npoints)->default_value(15), "npoints in the uncertainty ellipse tcut")("upperbound,u", boost::program_options::value<std::vector<double>>(&high)->multitoken(), "upper bound to perform fit, if 1 provided then Xhigh, if 2 then Xhigh,Yhigh")("xrebin,x", boost::program_options::value<int>(&xrebin)->default_value(0), "rebin factor for the x direction")("yrebin,y", boost::program_options::value<int>(&yrebin)->default_value(0), "rebin factor for the y direction");
+	cmdline_options.add_options()
+		("axis,a", boost::program_options::value<std::string>(&axis)->default_value("x"), "axis to project onto (x,y,X,Y) if 2D")
+		("boundparameter,b", boost::program_options::value<std::vector<std::string>>(&boundedparams)->multitoken(), "parameter to bound name:low:high")
+		("chi2,c", boost::program_options::value<bool>(&chi2)->default_value(true), "chi2 fit, or loglikelihood")
+		("data,d", boost::program_options::value<std::string>(&hisname), "histogram to manipulate")
+		("ellipse,e", boost::program_options::value<double>(&ellipse)->default_value(3.0), "uncertainty ellipse size")
+		("fixparameter,f", boost::program_options::value<std::vector<std::string>>(&fixedparams)->multitoken(), "parameter to bound name:value")
+		("gate,g", boost::program_options::value<std::vector<std::string>>(&gates)->multitoken(), "values to gate within in 2d histogram")
+		("help,h", "produce help message")
+		("inputfile,i", boost::program_options::value<std::string>(&inputfile), "file to get the histogram from")
+		("lowerbound,l", boost::program_options::value<std::vector<double>>(&low)->multitoken(), "lower bound to perform fit, if 1 provided then is XLow, if 2 provided then Xlow, Ylow")
+		("mode,m", boost::program_options::value<int>(&mode)->default_value(0), FittingMessage.c_str())
+		("numdimension,n", boost::program_options::value<int>(&dimensionality)->default_value(1), "dimensionality of histogram (1,2)")
+		("outputprefix,o", boost::program_options::value<std::string>(&outputprefix)->default_value("GenPeakFitterResults"), "file to output to fit info to")
+		("projectionindex,p", boost::program_options::value<std::vector<int>>(&indices)->multitoken(), "index to project on if 2d histogram")
+		("quiet,q", boost::program_options::value<bool>(&quiet)->default_value(false), "quiet output")
+		("tolerance,r", boost::program_options::value<double>(&tol)->default_value(1.0e-6), "tolerance used to determine if we're too close to the limits")
+		("storechi2,s", boost::program_options::value<bool>(&storechi2)->default_value(true), "store chi2 plot")
+		("tpoints,t", boost::program_options::value<int>(&npoints)->default_value(15), "npoints in the uncertainty ellipse tcut")
+		("upperbound,u", boost::program_options::value<std::vector<double>>(&high)->multitoken(), "upper bound to perform fit, if 1 provided then Xhigh, if 2 then Xhigh,Yhigh")
+		("xrebin,x", boost::program_options::value<int>(&xrebin)->default_value(0), "rebin factor for the x direction")
+		("yrebin,y", boost::program_options::value<int>(&yrebin)->default_value(0), "rebin factor for the y direction");
+	// clang-format on
 
 	boost::program_options::positional_options_description p;
 
@@ -393,19 +416,28 @@ int main(int argc, char* argv[]) {
 						auto p = (*f)[kv.first];
 						if (p.second >= std::abs(p.first)) {
 							spdlog::warn("{}: The error for {} is larger than its fit value {} +- {}",
-								     f->GetHisName(), kv.first, p.first, p.second);
+								     f->GetHisName(),
+								     kv.first,
+								     p.first,
+								     p.second);
 						}
 						auto bres = bounds.find(kv.first);
 						if (bres != bounds.end()) {
 							if (IsWithinTol(p.first, bres->second.first, tol)) {
 								spdlog::warn("{}: {} is at the lower limit of its bounds [{},{},{}]",
 									     f->GetHisName(),
-									     kv.first, bres->second.first, p.first, bres->second.second);
+									     kv.first,
+									     bres->second.first,
+									     p.first,
+									     bres->second.second);
 							}
 							if (IsWithinTol(p.first, bres->second.second, tol)) {
 								spdlog::warn("{}: {} is at the upper limit of its bounds [{},{},{}]",
 									     f->GetHisName(),
-									     kv.first, bres->second.first, p.first, bres->second.second);
+									     kv.first,
+									     bres->second.first,
+									     p.first,
+									     bres->second.second);
 							}
 						}
 					}
@@ -420,19 +452,28 @@ int main(int argc, char* argv[]) {
 						auto p = (*f)[kv.first];
 						if (p.second >= std::abs(p.first)) {
 							spdlog::warn("{}: The error for {} is larger than its fit value {} +- {}",
-								     f->GetHisName(), kv.first, p.first, p.second);
+								     f->GetHisName(),
+								     kv.first,
+								     p.first,
+								     p.second);
 						}
 						auto bres = bounds.find(kv.first);
 						if (bres != bounds.end()) {
 							if (IsWithinTol(p.first, bres->second.first, tol)) {
 								spdlog::warn("{}: {} is at the lower limit of its bounds [{},{},{}]",
 									     f->GetHisName(),
-									     kv.first, bres->second.first, p.first, bres->second.second);
+									     kv.first,
+									     bres->second.first,
+									     p.first,
+									     bres->second.second);
 							}
 							if (IsWithinTol(p.first, bres->second.second, tol)) {
 								spdlog::warn("{}: {} is at the upper limit of its bounds [{},{},{}]",
 									     f->GetHisName(),
-									     kv.first, bres->second.first, p.first, bres->second.second);
+									     kv.first,
+									     bres->second.first,
+									     p.first,
+									     bres->second.second);
 							}
 						}
 					}

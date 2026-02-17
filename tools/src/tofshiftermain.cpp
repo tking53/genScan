@@ -148,10 +148,17 @@ int main(int argc, char* argv[]) {
 	std::vector<std::string> yamlfiles;
 	std::vector<std::string> fitfiles;
 
+	// clang-format off
 	boost::program_options::options_description cmdline_options("Generic Options");
-	cmdline_options.add_options()("help,h", "produce help message")("file,f", boost::program_options::value<std::vector<std::string>>(&yamlfiles), "[file1 file2 file3 ...] list of files used for input")("pidmap,p", boost::program_options::value<std::vector<std::string>>(&fitfiles)->multitoken(), "Add PID_X:id:focal_plane tuple (e.g. PID_7:6:fp1)")("configfile,c", boost::program_options::value<std::string>(&configfile), "configfile to read in and regenerate new configs from")("outputdir,o", boost::program_options::value<std::string>(&outputdir), "directory to output to, name will be based on the parse rootfile name in the input yaml");
+	cmdline_options.add_options()
+		("help,h", "produce help message")
+		("file,f", boost::program_options::value<std::vector<std::string>>(&yamlfiles), "[file1 file2 file3 ...] list of files used for input")
+		("pidmap,p", boost::program_options::value<std::vector<std::string>>(&fitfiles)->multitoken(), "Add PID_X:id:focal_plane tuple (e.g. PID_7:6:fp1)")
+		("configfile,c", boost::program_options::value<std::string>(&configfile), "configfile to read in and regenerate new configs from")
+		("outputdir,o", boost::program_options::value<std::string>(&outputdir), "directory to output to, name will be based on the parse rootfile name in the input yaml");
 
 	boost::program_options::positional_options_description p;
+	// clang-format on
 
 	try {
 		boost::program_options::variables_map vm;

@@ -16,10 +16,12 @@
 #endif
 
 int main(int argc, char* argv[]) {
+	// clang-format off
 	boost::program_options::options_description cmdline_options("Generic Options");
 	cmdline_options.add_options()("help,h", "produce help message");
 
 	boost::program_options::positional_options_description p;
+	// clang-format on
 
 	try {
 		boost::program_options::variables_map vm;

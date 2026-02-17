@@ -622,11 +622,23 @@ int main(int argc, char* argv[]) {
 	std::vector<std::string> h2d;
 	bool validate;
 
+	// clang-format off
 	boost::program_options::options_description cmdline_options("Generic Options");
-	cmdline_options.add_options()("help,h", "produce help message")("processor,p", boost::program_options::value<std::string>(&procname), "name of the processor to insert the info into, it does not matter if it is nested")("file,f", boost::program_options::value<std::vector<std::string>>(&files)->multitoken(), "config files which to edit")("isotope,i", boost::program_options::value<std::vector<std::string>>(&isotopes)->multitoken(), "isotope cut to add to the config files formatted as name:cutid:filename")("cut,c", boost::program_options::value<std::vector<std::string>>(&cuts)->multitoken(), "general cut to add to the config files formatted as name:filename")("gate,g", boost::program_options::value<std::vector<std::string>>(&gates)->multitoken(), "gates to add to the config files formatted as label:lowerbound:upperbound")("box,b", boost::program_options::value<std::vector<std::string>>(&boxes)->multitoken(), "boxes to add to the config files formatted as label:xlowerbound:xupperbound:ylowerbound:yupperbound")("h1d", boost::program_options::value<std::vector<std::string>>(&h1d)->multitoken(), "1d histogram to add to the config files formatted as id:nx:xlow:xhigh, to specify the default for either nx, xlow, or xhigh leave it empty like this 20::1.0:2.0, will set id=20 to be between 1.0 and 2.0, but use the default binsize")("h2d", boost::program_options::value<std::vector<std::string>>(&h2d)->multitoken(), "2d histogram to add to the config files formatted as id:nx:xlow:xhigh:ny:ylow:yhigh, to specify the default for either nx, xlow, xhigh, ny, ylow, or yhigh leave it empty like this 2000:100:::100::: will set id=2000 to have 100 bins in both x and y with default bounds")("validate,v", boost::program_options::value<bool>(&validate)->default_value(true), "validate the parameters to change before modifying the input files");
+	cmdline_options.add_options()
+		("help,h", "produce help message")
+		("processor,p", boost::program_options::value<std::string>(&procname), "name of the processor to insert the info into, it does not matter if it is nested")
+		("file,f", boost::program_options::value<std::vector<std::string>>(&files)->multitoken(), "config files which to edit")
+		("isotope,i", boost::program_options::value<std::vector<std::string>>(&isotopes)->multitoken(), "isotope cut to add to the config files formatted as name:cutid:filename")
+		("cut,c", boost::program_options::value<std::vector<std::string>>(&cuts)->multitoken(), "general cut to add to the config files formatted as name:filename")
+		("gate,g", boost::program_options::value<std::vector<std::string>>(&gates)->multitoken(), "gates to add to the config files formatted as label:lowerbound:upperbound")
+		("box,b", boost::program_options::value<std::vector<std::string>>(&boxes)->multitoken(), "boxes to add to the config files formatted as label:xlowerbound:xupperbound:ylowerbound:yupperbound")
+		("h1d", boost::program_options::value<std::vector<std::string>>(&h1d)->multitoken(), "1d histogram to add to the config files formatted as id:nx:xlow:xhigh, to specify the default for either nx, xlow, or xhigh leave it empty like this 20::1.0:2.0, will set id=20 to be between 1.0 and 2.0, but use the default binsize")
+		("h2d", boost::program_options::value<std::vector<std::string>>(&h2d)->multitoken(), "2d histogram to add to the config files formatted as id:nx:xlow:xhigh:ny:ylow:yhigh, to specify the default for either nx, xlow, xhigh, ny, ylow, or yhigh leave it empty like this 2000:100:::100::: will set id=2000 to have 100 bins in both x and y with default bounds")
+		("validate,v", boost::program_options::value<bool>(&validate)->default_value(true), "validate the parameters to change before modifying the input files");
 
 	boost::program_options::positional_options_description p;
 	p.add("file", -1);
+	// clang-format on
 
 	try {
 		boost::program_options::variables_map vm;
