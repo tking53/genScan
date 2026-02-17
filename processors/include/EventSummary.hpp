@@ -23,52 +23,52 @@ class EventHistoryManager;
 
 /// @addtogroup Events
 /// @{
-class EventSummary{
-	public:
-		EventSummary(EventHistoryManager*,const boost::container::flat_map<std::string,std::vector<bool>>&);
-		~EventSummary() = default;
-	
-		void BuildDetectorSummary();
+class EventSummary {
+public:
+	EventSummary(EventHistoryManager*, const boost::container::flat_map<std::string, std::vector<bool>>&);
+	~EventSummary() = default;
 
-		/// @callgraph
-		/// @callergraph
-		void GetDetectorTypeSummary(const std::string&,std::vector<PhysicsData*>&);
+	void BuildDetectorSummary();
 
-		/// @callgraph
-		/// @callergraph
-		void GetDetectorSummary(const std::string&,std::vector<PhysicsData*>&);
+	/// @callgraph
+	/// @callergraph
+	void GetDetectorTypeSummary(const std::string&, std::vector<PhysicsData*>&);
 
-		/// @callgraph
-		/// @callergraph
-		void GetDetectorSummary(const boost::regex&,std::vector<PhysicsData*>&);
+	/// @callgraph
+	/// @callergraph
+	void GetDetectorSummary(const std::string&, std::vector<PhysicsData*>&);
 
-		boost::container::devector<PhysicsData>& GetRawEvents();
-		void ClearRawEvents();
+	/// @callgraph
+	/// @callergraph
+	void GetDetectorSummary(const boost::regex&, std::vector<PhysicsData*>&);
 
-		void AddEventTag(const std::string&);
-		bool ContainsEventTag(const std::string&) const;
+	boost::container::devector<PhysicsData>& GetRawEvents();
+	void ClearRawEvents();
 
-		void AddEventObservable(const std::string&,const double&);
-		std::optional<double> GetEventObservable(const std::string&) const;
+	void AddEventTag(const std::string&);
+	bool ContainsEventTag(const std::string&) const;
 
-		const std::set<std::string>& GetKnownTypes() const;
+	void AddEventObservable(const std::string&, const double&);
+	std::optional<double> GetEventObservable(const std::string&) const;
 
-		PhysicsData* GetDetectorMaxEvent(const std::vector<PhysicsData*>&) const;
+	const std::set<std::string>& GetKnownTypes() const;
 
-	private:
-		EventHistoryManager* parent;
-		std::set<std::string> EventTags;
-		std::map<std::string,double> EventObservable;
+	PhysicsData* GetDetectorMaxEvent(const std::vector<PhysicsData*>&) const;
 
-		boost::container::devector<PhysicsData> RawEvents;
-		std::set<std::string> KnownTypes;
-		boost::container::flat_map<std::string,std::vector<bool>> MappedUIDs;
-		boost::regex ColonParse;
-		unsigned long long UIDCacheHits;
-		unsigned long long UIDCacheMisses;
-		boost::container::flat_map<std::string,std::vector<PhysicsData*>> Cache;
-		unsigned long long CacheHits;
-		unsigned long long CacheMisses;
+private:
+	EventHistoryManager* parent;
+	std::set<std::string> EventTags;
+	std::map<std::string, double> EventObservable;
+
+	boost::container::devector<PhysicsData> RawEvents;
+	std::set<std::string> KnownTypes;
+	boost::container::flat_map<std::string, std::vector<bool>> MappedUIDs;
+	boost::regex ColonParse;
+	unsigned long long UIDCacheHits;
+	unsigned long long UIDCacheMisses;
+	boost::container::flat_map<std::string, std::vector<PhysicsData*>> Cache;
+	unsigned long long CacheHits;
+	unsigned long long CacheMisses;
 };
 /// @}
 

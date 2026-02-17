@@ -12,7 +12,6 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-
 #include <boost/container/flat_map.hpp>
 #include <boost/container/devector.hpp>
 #include <boost/regex.hpp>
@@ -25,64 +24,63 @@
 class ProcessorList;
 class EventSummary;
 
-class EventHistoryManager{
-	public:
-		EventHistoryManager(const std::string&,size_t);
-		~EventHistoryManager();
+class EventHistoryManager {
+public:
+	EventHistoryManager(const std::string&, size_t);
+	~EventHistoryManager();
 
-		void InitMappedUIDs(const ChannelMap*,const ProcessorList*);
+	void InitMappedUIDs(const ChannelMap*, const ProcessorList*);
 
-		unsigned long long GetEventCount() const;
+	unsigned long long GetEventCount() const;
 
-		void RotateBuffer();
+	void RotateBuffer();
 
-		EventSummary* GetCurrentEventSummary();
-		bool IsCurrentEventSummaryEmpty();
-		void BuildCurrentEventDetectorSummary();
+	EventSummary* GetCurrentEventSummary();
+	bool IsCurrentEventSummaryEmpty();
+	void BuildCurrentEventDetectorSummary();
 
-		EventSummary* GetPreviousEventSummary(size_t);
-		EventSummary* GetOldestEventSummary();
+	EventSummary* GetPreviousEventSummary(size_t);
+	EventSummary* GetOldestEventSummary();
 
-		inline void IncrementUIDCacheHits(){
-			++(this->UIDCacheHits);
-		}
+	inline void IncrementUIDCacheHits() {
+		++(this->UIDCacheHits);
+	}
 
-		inline void IncrementUIDCacheMisses(){
-			++(this->UIDCacheMisses);
-		}
+	inline void IncrementUIDCacheMisses() {
+		++(this->UIDCacheMisses);
+	}
 
-		inline void IncrementCacheHits(){
-			++(this->CacheHits);
-		}
+	inline void IncrementCacheHits() {
+		++(this->CacheHits);
+	}
 
-		inline void IncrementCacheMisses(){
-			++(this->CacheMisses);
-		}
+	inline void IncrementCacheMisses() {
+		++(this->CacheMisses);
+	}
 
-		size_t GetMaxHistoryID() const;
-		size_t GetMaxHistorySize() const;
+	size_t GetMaxHistoryID() const;
+	size_t GetMaxHistorySize() const;
 
-		void SetVeryFirstTime(double);
-		double GetVeryFirstTime() const;
-		
-	private:
-		std::string LogName;
-		std::shared_ptr<spdlog::logger> console;
-		size_t MaxHistorySize;
-		size_t CurrHistorySize;
+	void SetVeryFirstTime(double);
+	double GetVeryFirstTime() const;
 
-		unsigned long long EventCount;
+private:
+	std::string LogName;
+	std::shared_ptr<spdlog::logger> console;
+	size_t MaxHistorySize;
+	size_t CurrHistorySize;
 
-		boost::circular_buffer<EventSummary> History;
+	unsigned long long EventCount;
 
-		boost::container::flat_map<std::string,std::vector<bool>> MappedUIDs;
-		boost::regex ColonParse;
-		unsigned long long UIDCacheHits;
-		unsigned long long UIDCacheMisses;
-		unsigned long long CacheHits;
-		unsigned long long CacheMisses;
-		double FirstTime;
+	boost::circular_buffer<EventSummary> History;
 
+	boost::container::flat_map<std::string, std::vector<bool>> MappedUIDs;
+	boost::regex ColonParse;
+	unsigned long long UIDCacheHits;
+	unsigned long long UIDCacheMisses;
+	unsigned long long CacheHits;
+	unsigned long long CacheMisses;
+	double FirstTime;
 };
 
 #endif

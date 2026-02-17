@@ -5,127 +5,126 @@
 #include "BSMStruct.hpp"
 #include "Correction.hpp"
 
-class BSMProcessor : public Processor{
-	public:
-		BSMProcessor(const std::string&);
-		virtual ~BSMProcessor() = default;
-		[[maybe_unused]] virtual bool PreProcess([[maybe_unused]] EventHistoryManager*,[[maybe_unused]] PLOTS::PlotRegistry*,[[maybe_unused]] CUTS::CutRegistry*) final;
-		[[maybe_unused]] virtual bool Process(EventHistoryManager*,[[maybe_unused]] PLOTS::PlotRegistry*,[[maybe_unused]] CUTS::CutRegistry*) final;
-		[[maybe_unused]] virtual bool PostProcess([[maybe_unused]] EventHistoryManager*,[[maybe_unused]] PLOTS::PlotRegistry*,[[maybe_unused]] CUTS::CutRegistry*) final;
+class BSMProcessor : public Processor {
+public:
+	BSMProcessor(const std::string&);
+	virtual ~BSMProcessor() = default;
+	[[maybe_unused]] virtual bool PreProcess([[maybe_unused]] EventHistoryManager*, [[maybe_unused]] PLOTS::PlotRegistry*, [[maybe_unused]] CUTS::CutRegistry*) final;
+	[[maybe_unused]] virtual bool Process(EventHistoryManager*, [[maybe_unused]] PLOTS::PlotRegistry*, [[maybe_unused]] CUTS::CutRegistry*) final;
+	[[maybe_unused]] virtual bool PostProcess([[maybe_unused]] EventHistoryManager*, [[maybe_unused]] PLOTS::PlotRegistry*, [[maybe_unused]] CUTS::CutRegistry*) final;
 
-		virtual void Finalize() final;
+	virtual void Finalize() final;
 
-		virtual void Init(const pugi::xml_node&);
+	virtual void Init(const pugi::xml_node&);
 
-		virtual void DeclarePlots(PLOTS::PlotRegistry*);
-		virtual void RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>&) final;
-		virtual void CleanupTree() final;
+	virtual void DeclarePlots(PLOTS::PlotRegistry*);
+	virtual void RegisterTree([[maybe_unused]] std::unordered_map<std::string, TTree*>&) final;
+	virtual void CleanupTree() final;
 
-		const double& GetAverageTotalEnergy() const;
-		const double& GetSumFrontBackEnergy(const int&) const;
+	const double& GetAverageTotalEnergy() const;
+	const double& GetSumFrontBackEnergy(const int&) const;
 
-		const double& GetGeometricTotalEnergy() const;
-		const double& GetGeometricFrontBackEnergy(const int&) const;
+	const double& GetGeometricTotalEnergy() const;
+	const double& GetGeometricFrontBackEnergy(const int&) const;
 
-		const double& GetPosition(const int&) const;
+	const double& GetPosition(const int&) const;
 
-		const double& GetTDiff(const int&) const;
+	const double& GetTDiff(const int&) const;
 
-		const double& GetFirstFireTime() const;
-		const double& GetLastFireTime() const;
+	const double& GetFirstFireTime() const;
+	const double& GetLastFireTime() const;
 
-		bool DidIndividualPMTSaturate(const int&) const;
-		const bool& DidAnySaturate() const;
+	bool DidIndividualPMTSaturate(const int&) const;
+	const bool& DidAnySaturate() const;
 
-		bool DidIndividualPMTPileup(const int&) const;
-		const bool& DidAnyPileup() const;
+	bool DidIndividualPMTPileup(const int&) const;
+	const bool& DidAnyPileup() const;
 
-		void FillGSPileupTracePlots(PLOTS::PlotRegistry*) const;
-		void FillPositionPlots(PLOTS::PlotRegistry*) const;
+	void FillGSPileupTracePlots(PLOTS::PlotRegistry*) const;
+	void FillPositionPlots(PLOTS::PlotRegistry*) const;
 
-		int GetNumPMTs() const;
-		int GetNumSegments() const;
+	int GetNumPMTs() const;
+	int GetNumSegments() const;
 
-		double GetIndividualPMTEnergy(const int&) const;
+	double GetIndividualPMTEnergy(const int&) const;
 
-		int GetBSMHits(const int&) const;
+	int GetBSMHits(const int&) const;
 
-	private:
-		struct TraceAnalysis{
-			float integralthreshold;
-			std::string cutid;
+private:
+	struct TraceAnalysis {
+		float integralthreshold;
+		std::string cutid;
 
-			TraceAnalysis(){
-				integralthreshold = 0.0;
-				cutid = "";
-			}
-		};
+		TraceAnalysis() {
+			integralthreshold = 0.0;
+			cutid = "";
+		}
+	};
 
+	double CalcPosition(double, double);
 
-		double CalcPosition(double,double);
+	void Reset();
 
-		void Reset();
+	std::vector<PhysicsData*> Pairs;
 
-		std::vector<PhysicsData*> Pairs;
+	std::vector<double> RawBSM;
+	std::vector<double> UnCorrectedBSM;
+	std::vector<double> CorrectedBSM;
+	std::vector<int> BSMHits;
+	std::vector<int> TotalMult;
+	std::vector<int> SinglePileupTraceCounter;
+	std::vector<int> CoincPileupTraceCounter;
+	size_t MaxTraceStore;
+	size_t MaxTraceLength;
+	std::vector<std::unique_ptr<TraceAnalysis>> TraceSettings;
 
-		std::vector<double> RawBSM;
-		std::vector<double> UnCorrectedBSM;
-		std::vector<double> CorrectedBSM;
-		std::vector<int> BSMHits;
-		std::vector<int> TotalMult;
-		std::vector<int> SinglePileupTraceCounter;
-		std::vector<int> CoincPileupTraceCounter;
-		size_t MaxTraceStore;
-		size_t MaxTraceLength;
-		std::vector<std::unique_ptr<TraceAnalysis>> TraceSettings;
+	ProcessorStruct::BSMTraceFit fronttracefitvalues;
+	ProcessorStruct::BSMTraceFit backtracefitvalues;
 
-		ProcessorStruct::BSMTraceFit fronttracefitvalues;
-		ProcessorStruct::BSMTraceFit backtracefitvalues;
+	std::vector<ProcessorStruct::BSMSingle> FrontPMTDataVec;
+	std::vector<ProcessorStruct::BSMSingle> BackPMTDataVec;
 
-		std::vector<ProcessorStruct::BSMSingle> FrontPMTDataVec;
-		std::vector<ProcessorStruct::BSMSingle> BackPMTDataVec;
+	double AverageTotalEnergy;
+	double GeometricTotalEnergy;
+	std::vector<double> SumFrontBackEnergy;
+	std::vector<double> GeometricFrontBackEnergy;
 
-		double AverageTotalEnergy;
-		double GeometricTotalEnergy;
-		std::vector<double> SumFrontBackEnergy;
-		std::vector<double> GeometricFrontBackEnergy;
-		
-		std::vector<double> Position;
-		std::vector<double> TDiff;
+	std::vector<double> Position;
+	std::vector<double> TDiff;
 
-		double FirstTime;
-		double LastTime;
+	double FirstTime;
+	double LastTime;
 
-		int NumValidSegments;
+	int NumValidSegments;
 
-		std::vector<bool> IndividualPMTSaturate;
-		bool AnySaturate;
-		
-		std::vector<bool> IndividualPMTPileup;
-		bool AnyPileup;
+	std::vector<bool> IndividualPMTSaturate;
+	bool AnySaturate;
 
-		std::vector<double> TimeStamps;
-		std::vector<double> HitTimeStamps;
-		std::vector<std::vector<uint16_t>> Traces;
+	std::vector<bool> IndividualPMTPileup;
+	bool AnyPileup;
 
-		std::vector<std::unique_ptr<Correction::ExpoPosCorrection>> PosCorrectionMap;
+	std::vector<double> TimeStamps;
+	std::vector<double> HitTimeStamps;
+	std::vector<std::vector<uint16_t>> Traces;
 
-		std::string fronttag;
-		std::string backtag;
+	std::vector<std::unique_ptr<Correction::ExpoPosCorrection>> PosCorrectionMap;
 
-		bool foundfirstevt;
-		double globalfirsttime;
-		double currevttime;
+	std::string fronttag;
+	std::string backtag;
 
-		int NumPairs;
-		int NumPMTs;
+	bool foundfirstevt;
+	double globalfirsttime;
+	double currevttime;
 
-		bool PlotAllTraces;
+	int NumPairs;
+	int NumPMTs;
 
-		TH2Poly* BSM_2500;
-		TH2Poly* BSM_2501;
-		TH2Poly* BSM_2502;
-		TH2Poly* BSM_2503;
+	bool PlotAllTraces;
+
+	TH2Poly* BSM_2500;
+	TH2Poly* BSM_2501;
+	TH2Poly* BSM_2502;
+	TH2Poly* BSM_2503;
 };
 
 #endif

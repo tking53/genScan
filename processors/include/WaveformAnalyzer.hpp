@@ -10,40 +10,40 @@
 #include "RootFitter.hpp"
 
 class WaveformAnalyzer : public Analyzer {
-	public:
-		WaveformAnalyzer(const std::string&);
-		virtual ~WaveformAnalyzer();
+public:
+	WaveformAnalyzer(const std::string&);
+	virtual ~WaveformAnalyzer();
 
-		virtual bool PreProcess(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
-		virtual bool Process(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
-		virtual bool PostProcess(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
+	virtual bool PreProcess(EventHistoryManager*, PLOTS::PlotRegistry*, CUTS::CutRegistry*);
+	virtual bool Process(EventHistoryManager*, PLOTS::PlotRegistry*, CUTS::CutRegistry*);
+	virtual bool PostProcess(EventHistoryManager*, PLOTS::PlotRegistry*, CUTS::CutRegistry*);
 
-		virtual void Init([[maybe_unused]] const pugi::xml_node&);
+	virtual void Init([[maybe_unused]] const pugi::xml_node&);
 
-		virtual void Finalize();
+	virtual void Finalize();
 
-		virtual void DeclarePlots([[maybe_unused]] PLOTS::PlotRegistry*) const;
+	virtual void DeclarePlots([[maybe_unused]] PLOTS::PlotRegistry*) const;
 
-	private:
-		boost::regex GenerateRegex(const std::string&,const std::string&,const std::string&);
+private:
+	boost::regex GenerateRegex(const std::string&, const std::string&, const std::string&);
 
-		void InsertAdditionalTypes(const std::string&);
+	void InsertAdditionalTypes(const std::string&);
 
-		std::set<int> BannedGCID;
-		std::set<boost::regex> KnownWaveSettings;
-		std::set<boost::regex> KnownTraceSettings;
-		std::vector<std::pair<boost::regex,PSDCalculator>> WaveSettings;
-		std::vector<std::pair<boost::regex,RootFitter>> TraceFitSettings;
+	std::set<int> BannedGCID;
+	std::set<boost::regex> KnownWaveSettings;
+	std::set<boost::regex> KnownTraceSettings;
+	std::vector<std::pair<boost::regex, PSDCalculator>> WaveSettings;
+	std::vector<std::pair<boost::regex, RootFitter>> TraceFitSettings;
 
-		TFitResultPtr FitResult;
-		
-		std::chrono::time_point<std::chrono::high_resolution_clock> fit_start_time;
-		std::chrono::time_point<std::chrono::high_resolution_clock> fit_stop_time;
-		double fittime;
+	TFitResultPtr FitResult;
 
-		int MaxSaveFits;
-		int currsave;
-		int NumTraceFits;
+	std::chrono::time_point<std::chrono::high_resolution_clock> fit_start_time;
+	std::chrono::time_point<std::chrono::high_resolution_clock> fit_stop_time;
+	double fittime;
+
+	int MaxSaveFits;
+	int currsave;
+	int NumTraceFits;
 };
 
 #endif

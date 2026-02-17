@@ -15,88 +15,88 @@
 
 #include "ChannelMap.hpp"
 
-class ConfigParser{
-	public:
-		ConfigParser(const std::string&);
-		void Parse(ChannelMap*);
-		~ConfigParser();
-		
-		pugi::xml_node GetAnalyzerXMLInfo(const std::string&) const;
-		pugi::xml_node GetProcessorXMLInfo(const std::string&) const;
+class ConfigParser {
+public:
+	ConfigParser(const std::string&);
+	void Parse(ChannelMap*);
+	~ConfigParser();
 
-		void SetConfigFile(std::string&);
-		void SetDescriptionText(std::string*);
-		void SetAuthorNameText(std::string*);
-		void SetAuthorDateText(std::string*);
-		void SetAuthorEmailText(std::string*);
+	pugi::xml_node GetAnalyzerXMLInfo(const std::string&) const;
+	pugi::xml_node GetProcessorXMLInfo(const std::string&) const;
 
-		double GetGlobalEventWidth() const;
-		double GetGlobalEventWidthInNS() const;
-		void SetGlobalEventWidthInS(double);
+	void SetConfigFile(std::string&);
+	void SetDescriptionText(std::string*);
+	void SetAuthorNameText(std::string*);
+	void SetAuthorDateText(std::string*);
+	void SetAuthorEmailText(std::string*);
 
-		std::string* GetConfigName() const;
-		std::string* GetDescriptionText() const;
-		std::string* GetAuthorNameText() const;
-		std::string* GetAuthorDateText() const;
-		std::string* GetAuthorEmailText() const;
+	double GetGlobalEventWidth() const;
+	double GetGlobalEventWidthInNS() const;
+	void SetGlobalEventWidthInS(double);
 
-		std::vector<std::string> GetProcessorNames() const;
-		std::vector<std::string> GetAnalyzerNames() const;
+	std::string* GetConfigName() const;
+	std::string* GetDescriptionText() const;
+	std::string* GetAuthorNameText() const;
+	std::string* GetAuthorDateText() const;
+	std::string* GetAuthorEmailText() const;
 
-		void AddProcessorName(const std::string&);
-		void AddAnalyzerName(const std::string&);
+	std::vector<std::string> GetProcessorNames() const;
+	std::vector<std::string> GetAnalyzerNames() const;
 
-		std::string* GetCorrelationType() const;
-		void SetCorrelationType(std::string*);
+	void AddProcessorName(const std::string&);
+	void AddAnalyzerName(const std::string&);
 
-		std::vector<std::pair<std::string,std::string>> GetCutDetails() const;
+	std::string* GetCorrelationType() const;
+	void SetCorrelationType(std::string*);
 
-		void GetConfigFileStr(std::stringstream&) const;
-	protected:
-		void ParseDescription();
-		void ParseAuthor();
-		void ParseGlobal();
-		void ParseDetectorDriver();
-		void ParseCuts();
-		void ParseMap(ChannelMap*);
-		void RecursiveNameCheck(pugi::xml_node&,std::set<std::string>&) const;
+	std::vector<std::pair<std::string, std::string>> GetCutDetails() const;
 
-		std::vector<std::string> ProcessorNames;
-		std::vector<std::string> AnalyzerNames;
-		
-		std::string LogName;
+	void GetConfigFileStr(std::stringstream&) const;
 
-		std::unique_ptr<std::string> ConfigName;
+protected:
+	void ParseDescription();
+	void ParseAuthor();
+	void ParseGlobal();
+	void ParseDetectorDriver();
+	void ParseCuts();
+	void ParseMap(ChannelMap*);
+	void RecursiveNameCheck(pugi::xml_node&, std::set<std::string>&) const;
 
-		std::unique_ptr<std::string> DescriptionText;
+	std::vector<std::string> ProcessorNames;
+	std::vector<std::string> AnalyzerNames;
 
-		std::unique_ptr<std::string> AuthorNameText;
-		std::unique_ptr<std::string> AuthorEmailText;
-		std::unique_ptr<std::string> AuthorDateText;
+	std::string LogName;
 
-		std::unique_ptr<std::string> CoincidenceType;
+	std::unique_ptr<std::string> ConfigName;
 
-		std::vector<std::pair<std::string,std::string>> CutFiles;
+	std::unique_ptr<std::string> DescriptionText;
 
-		double GlobalEventWidthInS;
+	std::unique_ptr<std::string> AuthorNameText;
+	std::unique_ptr<std::string> AuthorEmailText;
+	std::unique_ptr<std::string> AuthorDateText;
 
-		boost::container::flat_set<int> KnownCrates;
-		boost::container::flat_set<int> KnownBoardsInCrate;
-		boost::container::flat_set<int> KnownChannelsInBoard;
-	
-		pugi::xml_document XMLDoc;
+	std::unique_ptr<std::string> CoincidenceType;
 
-		pugi::xml_node Configuration;
-		pugi::xml_node Description;
-		pugi::xml_node Author;
-		pugi::xml_node Global;
-		pugi::xml_node DetectorDriver;
-		pugi::xml_node Cuts;
-		pugi::xml_node Map;
+	std::vector<std::pair<std::string, std::string>> CutFiles;
 
-		std::map<std::string,pugi::xml_node> ProcessorNodes;
-		std::map<std::string,pugi::xml_node> AnalyzerNodes;
+	double GlobalEventWidthInS;
 
+	boost::container::flat_set<int> KnownCrates;
+	boost::container::flat_set<int> KnownBoardsInCrate;
+	boost::container::flat_set<int> KnownChannelsInBoard;
+
+	pugi::xml_document XMLDoc;
+
+	pugi::xml_node Configuration;
+	pugi::xml_node Description;
+	pugi::xml_node Author;
+	pugi::xml_node Global;
+	pugi::xml_node DetectorDriver;
+	pugi::xml_node Cuts;
+	pugi::xml_node Map;
+
+	std::map<std::string, pugi::xml_node> ProcessorNodes;
+	std::map<std::string, pugi::xml_node> AnalyzerNodes;
 };
 
 #endif

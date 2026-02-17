@@ -3,15 +3,15 @@
 
 #include <TString.h>
 
-namespace ProcessorStruct{
-	struct GroverLeaf{
+namespace ProcessorStruct {
+	struct GroverLeaf {
 		double timestamp = -999.0;
 		double energy = -999.0;
 		bool saturate = false;
 		bool pileup = false;
 		int leafid = -1;
 	};
-	static const GroverLeaf DEFAULT_GROVER_LEAF_STRUCT; 
-}
+	static const GroverLeaf DEFAULT_GROVER_LEAF_STRUCT;
+} // namespace ProcessorStruct
 
 #endif

@@ -6,15 +6,15 @@
 #include <TTreeReader.h>
 #include <TString.h>
 
-void DumpXML(const std::string& filename){
-	auto file = TFile::Open(filename.c_str(),"READ");
+void DumpXML(const std::string& filename) {
+	auto file = TFile::Open(filename.c_str(), "READ");
 	auto configdata = file->Get<TTree>("configdata");
 
 	TString* xmlfile = nullptr;
 	TString* data = nullptr;
-	
-	configdata->SetBranchAddress("filename",&xmlfile);
-	configdata->SetBranchAddress("data",&data);
+
+	configdata->SetBranchAddress("filename", &xmlfile);
+	configdata->SetBranchAddress("data", &data);
 
 	configdata->GetEntry(0);
 

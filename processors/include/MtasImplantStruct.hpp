@@ -1,8 +1,8 @@
 #ifndef __MTAS_IMPLANT_STRUCT_HPP__
 #define __MTAS_IMPLANT_STRUCT_HPP__
 
-namespace ProcessorStruct{
-	struct MtasImplant{
+namespace ProcessorStruct {
+	struct MtasImplant {
 		double highresx = -999.0;
 		double highresy = -999.0;
 		int lowresx = -999;
@@ -13,6 +13,6 @@ namespace ProcessorStruct{
 		int numanodes = 0;
 	};
 	static const MtasImplant DEFAULT_MTAS_IMPLANT_STRUCT;
-}
+} // namespace ProcessorStruct
 
 #endif

@@ -5,8 +5,8 @@
 
 #include <TString.h>
 
-namespace ProcessorStruct{
-	struct MtasSegment{
+namespace ProcessorStruct {
+	struct MtasSegment {
 		double frontenergy = -999.0;
 		double fronttimestamp = -999.0;
 
@@ -18,14 +18,14 @@ namespace ProcessorStruct{
 	};
 	static const MtasSegment DEFAULT_MTAS_SEGMENT_STRUCT;
 
-	struct MtasTotal{
+	struct MtasTotal {
 		double timestamp = -999.0;
 		double sumenergy = -999.0;
 		int numfire = 0;
 		bool saturate = false;
 		bool pileup = false;
 	};
-	static const MtasTotal DEFAULT_MTAS_TOTAL_STRUCT; 
-}
+	static const MtasTotal DEFAULT_MTAS_TOTAL_STRUCT;
+} // namespace ProcessorStruct
 
 #endif

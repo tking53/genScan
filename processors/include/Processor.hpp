@@ -1,9 +1,9 @@
 #ifndef __PROCESSOR_HPP__
 #define __PROCESSOR_HPP__
 
-//will be the generic processor class that all other processors will derive from
-//this will act on every piece of data no matter what, will output to special root tree and make generic
-//histograms inside root
+// will be the generic processor class that all other processors will derive from
+// this will act on every piece of data no matter what, will output to special root tree and make generic
+// histograms inside root
 
 #include <initializer_list>
 #include <string>
@@ -32,90 +32,90 @@
 #include "HistogramManager.hpp"
 
 class Processor : public std::enable_shared_from_this<Processor> {
-	public:
-		Processor(const std::string&,const std::string&,const std::initializer_list<std::string>&);
-		[[maybe_unused]] virtual bool PreProcess() final;
-		[[maybe_unused]] virtual bool Process() final;
-		[[maybe_unused]] virtual bool PostProcess() final;
-		[[noreturn]] virtual bool PreProcess(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
-		[[noreturn]] virtual bool Process(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
-		[[noreturn]] virtual bool PostProcess(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
-		virtual void EndProcess() final;
-		virtual ~Processor();
+public:
+	Processor(const std::string&, const std::string&, const std::initializer_list<std::string>&);
+	[[maybe_unused]] virtual bool PreProcess() final;
+	[[maybe_unused]] virtual bool Process() final;
+	[[maybe_unused]] virtual bool PostProcess() final;
+	[[noreturn]] virtual bool PreProcess(EventHistoryManager*, PLOTS::PlotRegistry*, CUTS::CutRegistry*);
+	[[noreturn]] virtual bool Process(EventHistoryManager*, PLOTS::PlotRegistry*, CUTS::CutRegistry*);
+	[[noreturn]] virtual bool PostProcess(EventHistoryManager*, PLOTS::PlotRegistry*, CUTS::CutRegistry*);
+	virtual void EndProcess() final;
+	virtual ~Processor();
 
-		std::shared_ptr<Processor> GetPtr();
-		virtual std::string GetProcessorName() const final;
-		virtual void RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>&);
+	std::shared_ptr<Processor> GetPtr();
+	virtual std::string GetProcessorName() const final;
+	virtual void RegisterTree([[maybe_unused]] std::unordered_map<std::string, TTree*>&);
 
-		[[nodiscard]] virtual bool ContainsType(const std::string&) const final;
-		[[nodiscard]] virtual bool ContainsAnyType(const std::set<std::string>&) const final;
+	[[nodiscard]] virtual bool ContainsType(const std::string&) const final;
+	[[nodiscard]] virtual bool ContainsAnyType(const std::set<std::string>&) const final;
 
-		[[noreturn]] virtual void Init([[maybe_unused]] const pugi::xml_node&);
+	[[noreturn]] virtual void Init([[maybe_unused]] const pugi::xml_node&);
 
-		virtual void AssociateType(const std::string&) final;
-		[[noreturn]] virtual void Finalize();
+	virtual void AssociateType(const std::string&) final;
+	[[noreturn]] virtual void Finalize();
 
-		[[noreturn]] virtual void DeclarePlots([[maybe_unused]] PLOTS::PlotRegistry*);
-		virtual void RegisterCuts(CUTS::CutRegistry*);
+	[[noreturn]] virtual void DeclarePlots([[maybe_unused]] PLOTS::PlotRegistry*);
+	virtual void RegisterCuts(CUTS::CutRegistry*);
 
-		virtual void CleanupTree();
+	virtual void CleanupTree();
 
-		[[nodiscard]] virtual const boost::regex& GetDefaultRegex() const final;
-		[[nodiscard]] virtual const std::unordered_map<std::string,boost::regex>& GetAllDefaultRegex() const final;
-		
-		[[nodiscard]] virtual std::set<std::string> GetKnownTypes() const final;
-		
-		[[nodiscard]] virtual PLOTS::HisHelper1D Get1DSetting(int) const final;
-		[[nodiscard]] virtual PLOTS::HisHelper2D Get2DSetting(int) const final;
+	[[nodiscard]] virtual const boost::regex& GetDefaultRegex() const final;
+	[[nodiscard]] virtual const std::unordered_map<std::string, boost::regex>& GetAllDefaultRegex() const final;
 
-		virtual void SetEventIdx(unsigned long long) final;
-		virtual void ToggleExpProcessorMode() final;
-		
-	protected:
-		virtual void LoadHistogramSettings(const pugi::xml_node&) final;
-		
-		virtual void LoadCustomCuts(const pugi::xml_node&) final;
+	[[nodiscard]] virtual std::set<std::string> GetKnownTypes() const final;
 
-		enum STEP{
-			PREPROCESS,
-			PROCESS,
-			POSTPROCESS,
-			UNKNOWN
-		};
+	[[nodiscard]] virtual PLOTS::HisHelper1D Get1DSetting(int) const final;
+	[[nodiscard]] virtual PLOTS::HisHelper2D Get2DSetting(int) const final;
 
-		STEP currstep;
+	virtual void SetEventIdx(unsigned long long) final;
+	virtual void ToggleExpProcessorMode() final;
 
-		std::chrono::time_point<std::chrono::high_resolution_clock> start_time;
-		std::chrono::time_point<std::chrono::high_resolution_clock> stop_time;
-		double preprocesstime;
-		double processtime;
-		double postprocesstime;
+protected:
+	virtual void LoadHistogramSettings(const pugi::xml_node&) final;
 
-		unsigned long long preprocesscalls;
-		unsigned long long processcalls;
-		unsigned long long postprocesscalls;
+	virtual void LoadCustomCuts(const pugi::xml_node&) final;
 
-		std::string ProcessorName;
-		std::string LogName;
+	enum STEP {
+		PREPROCESS,
+		PROCESS,
+		POSTPROCESS,
+		UNKNOWN
+	};
 
-		std::string DefaultRegexString;
-		boost::regex DefaultRegex;
-		std::unordered_map<std::string,boost::regex> AllDefaultRegex;
+	STEP currstep;
 
-		std::set<std::string> Types;
+	std::chrono::time_point<std::chrono::high_resolution_clock> start_time;
+	std::chrono::time_point<std::chrono::high_resolution_clock> stop_time;
+	double preprocesstime;
+	double processtime;
+	double postprocesstime;
 
-		std::shared_ptr<spdlog::logger> console;
-		
-		std::vector<PhysicsData*> SummaryData;
+	unsigned long long preprocesscalls;
+	unsigned long long processcalls;
+	unsigned long long postprocesscalls;
 
-		unsigned long long Eventidx;
-		TTree* OutputTree;
+	std::string ProcessorName;
+	std::string LogName;
 
-		std::map<int,PLOTS::HisHelper1D> h1dsettings;
-		std::map<int,PLOTS::HisHelper2D> h2dsettings;
-		std::map<std::string,std::string> customcuts;
+	std::string DefaultRegexString;
+	boost::regex DefaultRegex;
+	std::unordered_map<std::string, boost::regex> AllDefaultRegex;
 
-		bool ExpProcessorMode;
+	std::set<std::string> Types;
+
+	std::shared_ptr<spdlog::logger> console;
+
+	std::vector<PhysicsData*> SummaryData;
+
+	unsigned long long Eventidx;
+	TTree* OutputTree;
+
+	std::map<int, PLOTS::HisHelper1D> h1dsettings;
+	std::map<int, PLOTS::HisHelper2D> h2dsettings;
+	std::map<std::string, std::string> customcuts;
+
+	bool ExpProcessorMode;
 };
 
 #endif

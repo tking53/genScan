@@ -3,7 +3,7 @@
 
 #include <TString.h>
 
-namespace ProcessorStruct{
+namespace ProcessorStruct {
 	struct PSPMT {
 		double xpos = -999.0;
 		double ypos = -999.0;
@@ -14,6 +14,6 @@ namespace ProcessorStruct{
 		double dynodets = -1.0;
 	};
 	static const PSPMT DEFAULT_PSPMT_STRUCT;
-}
+} // namespace ProcessorStruct
 
 #endif

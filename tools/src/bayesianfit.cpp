@@ -13,25 +13,22 @@
 
 #include <boost/program_options.hpp>
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
 	boost::program_options::options_description cmdline_options("Generic Options");
-	cmdline_options.add_options()
-		("help,h", "produce help message")
-		;
-
+	cmdline_options.add_options()("help,h", "produce help message");
 
 	boost::program_options::positional_options_description p;
 
-	try{
+	try {
 		boost::program_options::variables_map vm;
 		store(boost::program_options::command_line_parser(argc, argv).options(cmdline_options).positional(p).run(), vm);
-        	notify(vm);
-		if( vm.count("help") or argc <= 2 ){
+		notify(vm);
+		if (vm.count("help") or argc <= 2) {
 			spdlog::info(cmdline_options);
 			exit(EXIT_SUCCESS);
 		}
-	}catch( std::exception& e){
+	} catch (std::exception& e) {
 		spdlog::error(e.what());
 		exit(EXIT_FAILURE);
-	}    
+	}
 }

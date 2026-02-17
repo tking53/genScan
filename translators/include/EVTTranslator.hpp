@@ -9,34 +9,35 @@
 
 #include "PhysicsData.hpp"
 
-class EVTTranslator : public Translator{
-	public:
-		EVTTranslator(const std::string&,const std::string&);
-		~EVTTranslator();
-		Translator::TRANSLATORSTATE Parse(boost::container::devector<PhysicsData>&);
-	private:
-		struct EVT_BUILT_INFO{
-			int rib_size;
-			int ri_size;
-			int ri_type;
-		};
+class EVTTranslator : public Translator {
+public:
+	EVTTranslator(const std::string&, const std::string&);
+	~EVTTranslator();
+	Translator::TRANSLATORSTATE Parse(boost::container::devector<PhysicsData>&);
 
-		unsigned int CurrHeaderLength;
-		unsigned int CurrTraceLength;
-		uint32_t firstWords[4];
-		uint32_t otherWords[12];
-		
-		EVT_BUILT_INFO CurrEVTBuiltInfo;
+private:
+	struct EVT_BUILT_INFO {
+		int rib_size;
+		int ri_size;
+		int ri_type;
+	};
 
-		uint64_t PrevTimeStamp;
+	unsigned int CurrHeaderLength;
+	unsigned int CurrTraceLength;
+	uint32_t firstWords[4];
+	uint32_t otherWords[12];
 
-		int ReadRingItemHeader();
-		int ReadRingItemBodyHeader();
-		int ReadRingItemBody();
-		int FindNextFragment();
-		int ReadNextFragment();
-		int ReadHeader(boost::container::devector<PhysicsData>&);
-		int ReadFull(boost::container::devector<PhysicsData>&);
+	EVT_BUILT_INFO CurrEVTBuiltInfo;
+
+	uint64_t PrevTimeStamp;
+
+	int ReadRingItemHeader();
+	int ReadRingItemBodyHeader();
+	int ReadRingItemBody();
+	int FindNextFragment();
+	int ReadNextFragment();
+	int ReadHeader(boost::container::devector<PhysicsData>&);
+	int ReadFull(boost::container::devector<PhysicsData>&);
 };
 
 #endif

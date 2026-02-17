@@ -15,7 +15,7 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <string>
 
-Processor::Processor(const std::string& log,const std::string& proc,const std::initializer_list<std::string>& types){
+Processor::Processor(const std::string& log, const std::string& proc, const std::initializer_list<std::string>& types) {
 	this->LogName = log;
 	this->ProcessorName = proc;
 	this->console = spdlog::get(this->LogName)->clone(this->ProcessorName);
@@ -27,54 +27,54 @@ Processor::Processor(const std::string& log,const std::string& proc,const std::i
 	this->postprocesstime = 0.0;
 	this->currstep = STEP::UNKNOWN;
 	this->Types = types;
-	this->console->info("Created Processor : {}",this->ProcessorName);
+	this->console->info("Created Processor : {}", this->ProcessorName);
 	this->DefaultRegexString = "(";
-	for( const auto& t : this->Types ){
-		this->DefaultRegexString += t+":.*|";
-		this->console->info("Type : [{}] has been associated with this Processor",t);
-		this->AllDefaultRegex[t] = boost::regex(t+":.*",boost::regex_constants::optimize|boost::regex_constants::nosubs);
-		this->console->info("Type Regex for {}, has been generated and is available",t);
+	for (const auto& t : this->Types) {
+		this->DefaultRegexString += t + ":.*|";
+		this->console->info("Type : [{}] has been associated with this Processor", t);
+		this->AllDefaultRegex[t] = boost::regex(t + ":.*", boost::regex_constants::optimize | boost::regex_constants::nosubs);
+		this->console->info("Type Regex for {}, has been generated and is available", t);
 	}
-	if( this->DefaultRegexString.size() > 1 ){
+	if (this->DefaultRegexString.size() > 1) {
 		this->DefaultRegexString.pop_back();
 	}
 	this->DefaultRegexString += ")";
-	this->DefaultRegex = boost::regex(this->DefaultRegexString,boost::regex_constants::optimize|boost::regex_constants::nosubs);
+	this->DefaultRegex = boost::regex(this->DefaultRegexString, boost::regex_constants::optimize | boost::regex_constants::nosubs);
 	this->AllDefaultRegex["ALL"] = this->DefaultRegex;
-	this->console->info("Default Type Regex established to be {}",this->DefaultRegexString);
+	this->console->info("Default Type Regex established to be {}", this->DefaultRegexString);
 	this->ExpProcessorMode = true;
 }
 
-std::string Processor::GetProcessorName() const{
+std::string Processor::GetProcessorName() const {
 	return this->ProcessorName;
 }
 
-void Processor::RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>& outputtrees){
+void Processor::RegisterTree([[maybe_unused]] std::unordered_map<std::string, TTree*>& outputtrees) {
 }
 
-Processor::~Processor(){
-	this->console->info("PreProcessCalls : {} ProcessCalls : {} PostProcessCalls : {}",this->preprocesscalls,this->processcalls,this->postprocesscalls);
-	this->console->info("PreProcess : {:.3f}s Process: {:.3f}s PostProcess : {:.3f}s",this->preprocesstime/1000.0,this->processtime/1000.0,this->postprocesstime/1000.0);
+Processor::~Processor() {
+	this->console->info("PreProcessCalls : {} ProcessCalls : {} PostProcessCalls : {}", this->preprocesscalls, this->processcalls, this->postprocesscalls);
+	this->console->info("PreProcess : {:.3f}s Process: {:.3f}s PostProcess : {:.3f}s", this->preprocesstime / 1000.0, this->processtime / 1000.0, this->postprocesstime / 1000.0);
 }
 
-std::shared_ptr<Processor> Processor::GetPtr(){
+std::shared_ptr<Processor> Processor::GetPtr() {
 	return shared_from_this();
 }
 
-[[nodiscard]] bool Processor::ContainsType(const std::string& type) const{
-	if( this->Types.empty() ){
+[[nodiscard]] bool Processor::ContainsType(const std::string& type) const {
+	if (this->Types.empty()) {
 		return false;
-	}else{
+	} else {
 		return this->Types.find(type) != this->Types.end();
 	}
 }
 
-[[nodiscard]] bool Processor::ContainsAnyType(const std::set<std::string>& type) const{
-	if( this->Types.empty() ){
+[[nodiscard]] bool Processor::ContainsAnyType(const std::set<std::string>& type) const {
+	if (this->Types.empty()) {
 		return false;
-	}else{
-		for( const auto& t : type ){
-			if( this->Types.find(t) != this->Types.end() ){
+	} else {
+		for (const auto& t : type) {
+			if (this->Types.find(t) != this->Types.end()) {
 				return true;
 			}
 		}
@@ -82,167 +82,167 @@ std::shared_ptr<Processor> Processor::GetPtr(){
 	}
 }
 
-[[noreturn]] void Processor::Init([[maybe_unused]] const pugi::xml_node& node){
+[[noreturn]] void Processor::Init([[maybe_unused]] const pugi::xml_node& node) {
 	this->console->error("Called Processor::Init(pugi::xml_node& node), not the overload");
 	throw std::runtime_error("Called Processor::Init(pugi::xml_node& node), not the overload");
 }
 
-void Processor::AssociateType(const std::string& t){
-	if( this->Types.find(t) == this->Types.end() ){
+void Processor::AssociateType(const std::string& t) {
+	if (this->Types.find(t) == this->Types.end()) {
 		this->DefaultRegexString.pop_back();
-		if( this->DefaultRegexString.size() > 1 ){
-			this->DefaultRegexString += "|"+t+":.*)";
-		}else{
-			this->DefaultRegexString += t+":.*)";
+		if (this->DefaultRegexString.size() > 1) {
+			this->DefaultRegexString += "|" + t + ":.*)";
+		} else {
+			this->DefaultRegexString += t + ":.*)";
 		}
-		this->DefaultRegex = boost::regex(this->DefaultRegexString,boost::regex_constants::optimize|boost::regex_constants::nosubs);
+		this->DefaultRegex = boost::regex(this->DefaultRegexString, boost::regex_constants::optimize | boost::regex_constants::nosubs);
 		this->Types.insert(t);
-		this->console->info("Type : [{}] has been associated with this Processor",t);
-		this->console->info("Default Type Regex updated to be {}",this->DefaultRegexString);
-		this->AllDefaultRegex[t] = boost::regex(t+":.*",boost::regex_constants::optimize|boost::regex_constants::nosubs);
-		this->console->info("Type Regex for {}, has been generated and is available",t);
+		this->console->info("Type : [{}] has been associated with this Processor", t);
+		this->console->info("Default Type Regex updated to be {}", this->DefaultRegexString);
+		this->AllDefaultRegex[t] = boost::regex(t + ":.*", boost::regex_constants::optimize | boost::regex_constants::nosubs);
+		this->console->info("Type Regex for {}, has been generated and is available", t);
 		this->AllDefaultRegex["ALL"] = this->DefaultRegex;
-	}else{
-		this->console->critical("Type : [{}] is already associated with this Processor",t);
+	} else {
+		this->console->critical("Type : [{}] is already associated with this Processor", t);
 	}
 }
 
-[[noreturn]] void Processor::Finalize(){
+[[noreturn]] void Processor::Finalize() {
 	this->console->error("Called Processor::Finalize(), not the overload. Likely means function definition doesn't match in your new processor class");
 	throw std::runtime_error("Called Processor::Finalize(), not the overload. Likely means function definition doesn't match in your new processor class");
 }
 
-[[maybe_unused]] bool Processor::PreProcess(){
+[[maybe_unused]] bool Processor::PreProcess() {
 	this->start_time = std::chrono::high_resolution_clock::now();
 	this->currstep = STEP::PREPROCESS;
 	++(this->preprocesscalls);
 	return true;
 }
 
-[[maybe_unused]] bool Processor::Process(){
+[[maybe_unused]] bool Processor::Process() {
 	this->start_time = std::chrono::high_resolution_clock::now();
 	this->currstep = STEP::PROCESS;
 	++(this->processcalls);
 	return true;
 }
 
-[[maybe_unused]] bool Processor::PostProcess(){
+[[maybe_unused]] bool Processor::PostProcess() {
 	this->start_time = std::chrono::high_resolution_clock::now();
 	this->currstep = STEP::POSTPROCESS;
 	++(this->postprocesscalls);
 	return true;
 }
 
-[[noreturn]] bool Processor::PreProcess([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]]CUTS::CutRegistry* cutmanager){
+[[noreturn]] bool Processor::PreProcess([[maybe_unused]] EventHistoryManager* eventhistory, [[maybe_unused]] PLOTS::PlotRegistry* hismanager, [[maybe_unused]] CUTS::CutRegistry* cutmanager) {
 	this->console->error("Called Processor::PreProcess(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*), not the overload. Likely means function definition doesn't match in your new processor class");
 	throw std::runtime_error("Called Processor::PreProcess(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*), not the overload. Likely means function definition doesn't match in your new processor class");
 }
 
-[[noreturn]] bool Processor::Process([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]]CUTS::CutRegistry* cutmanager){
+[[noreturn]] bool Processor::Process([[maybe_unused]] EventHistoryManager* eventhistory, [[maybe_unused]] PLOTS::PlotRegistry* hismanager, [[maybe_unused]] CUTS::CutRegistry* cutmanager) {
 	this->console->error("Called Processor::Process(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*), not the overload. Likely means function definition doesn't match in your new processor class");
 	throw std::runtime_error("Called Processor::Process(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*), not the overload. Likely means function definition doesn't match in your new processor class");
 }
 
-[[noreturn]] bool Processor::PostProcess([[maybe_unused]] EventHistoryManager* eventhistory,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]]CUTS::CutRegistry* cutmanager){
+[[noreturn]] bool Processor::PostProcess([[maybe_unused]] EventHistoryManager* eventhistory, [[maybe_unused]] PLOTS::PlotRegistry* hismanager, [[maybe_unused]] CUTS::CutRegistry* cutmanager) {
 	this->console->error("Called Processor::PostProcess(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*), not the overload. Likely means function definition doesn't match in your new processor class");
 	throw std::runtime_error("Called Processor::PostProcess(EventHistoryManager*,PLOTS::PlotRegistry*,CUTS::CutRegistry*), not the overload. Likely means function definition doesn't match in your new processor class");
 }
 
-void Processor::EndProcess(){
+void Processor::EndProcess() {
 	this->stop_time = std::chrono::high_resolution_clock::now();
-	std::chrono::duration<double,std::milli> dur = this->stop_time - this->start_time;
+	std::chrono::duration<double, std::milli> dur = this->stop_time - this->start_time;
 	switch (this->currstep) {
-		case STEP::PREPROCESS:
-			this->preprocesstime += dur.count();
-			break;
-		case STEP::PROCESS:
-			this->processtime += dur.count();
-			break;
-		case STEP::POSTPROCESS:
-			this->postprocesstime += dur.count();
-			break;
-		[[unlikely]] default:
-			break;
+	case STEP::PREPROCESS:
+		this->preprocesstime += dur.count();
+		break;
+	case STEP::PROCESS:
+		this->processtime += dur.count();
+		break;
+	case STEP::POSTPROCESS:
+		this->postprocesstime += dur.count();
+		break;
+	[[unlikely]] default:
+		break;
 	}
 }
 
-[[nodiscard]] const boost::regex& Processor::GetDefaultRegex() const{
+[[nodiscard]] const boost::regex& Processor::GetDefaultRegex() const {
 	return this->DefaultRegex;
 }
 
-[[nodiscard]] const std::unordered_map<std::string,boost::regex>& Processor::GetAllDefaultRegex() const{
+[[nodiscard]] const std::unordered_map<std::string, boost::regex>& Processor::GetAllDefaultRegex() const {
 	return this->AllDefaultRegex;
 }
-		
-[[noreturn]] void Processor::DeclarePlots([[maybe_unused]] PLOTS::PlotRegistry* hismanager){
+
+[[noreturn]] void Processor::DeclarePlots([[maybe_unused]] PLOTS::PlotRegistry* hismanager) {
 	this->console->error("Called Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager), not the overload. Likely means function definition doesn't match in your new processor class");
 	throw std::runtime_error("Called Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager), not the overload. Likely means function definition doesn't match in your new processor class");
 }
 
-[[nodiscard]] std::set<std::string> Processor::GetKnownTypes() const{
+[[nodiscard]] std::set<std::string> Processor::GetKnownTypes() const {
 	return this->Types;
 }
 
-void Processor::CleanupTree(){
+void Processor::CleanupTree() {
 }
 
-void Processor::LoadHistogramSettings(const pugi::xml_node& config){
-	for( pugi::xml_node histogram = config.child("Histogram"); histogram; histogram = histogram.next_sibling("Histogram") ){
+void Processor::LoadHistogramSettings(const pugi::xml_node& config) {
+	for (pugi::xml_node histogram = config.child("Histogram"); histogram; histogram = histogram.next_sibling("Histogram")) {
 		int id = histogram.attribute("id").as_int(0);
 		auto currh1d = this->h1dsettings.find(id);
 		auto currh2d = this->h2dsettings.find(id);
-		if( currh1d != this->h1dsettings.end()){
-			this->console->info("Found Different his settings for 1D histogram : {} More Info output in dbg",id);
-			this->console->debug("original X: {} {} {}",currh1d->second.nbinsx,currh1d->second.xlow,currh1d->second.xhigh);
+		if (currh1d != this->h1dsettings.end()) {
+			this->console->info("Found Different his settings for 1D histogram : {} More Info output in dbg", id);
+			this->console->debug("original X: {} {} {}", currh1d->second.nbinsx, currh1d->second.xlow, currh1d->second.xhigh);
 			this->h1dsettings[id].nbinsx = histogram.attribute("nbinsx").as_int(currh1d->second.nbinsx);
 			this->h1dsettings[id].xlow = histogram.attribute("xlow").as_double(currh1d->second.xlow);
 			this->h1dsettings[id].xhigh = histogram.attribute("xhigh").as_double(currh1d->second.xhigh);
-			this->console->debug("X: {} {} {}",this->h1dsettings[id].nbinsx,this->h1dsettings[id].xlow,this->h1dsettings[id].xhigh);
-		}else if( currh2d != this->h2dsettings.end() ){
-			this->console->info("Found Different his settings for 2D histogram : {} More Info output in dbg",id);
-			this->console->debug("original X: {} {} {}",currh2d->second.nbinsx,currh2d->second.xlow,currh2d->second.xhigh);
-			this->console->debug("original Y: {} {} {}",currh2d->second.nbinsy,currh2d->second.ylow,currh2d->second.yhigh);
+			this->console->debug("X: {} {} {}", this->h1dsettings[id].nbinsx, this->h1dsettings[id].xlow, this->h1dsettings[id].xhigh);
+		} else if (currh2d != this->h2dsettings.end()) {
+			this->console->info("Found Different his settings for 2D histogram : {} More Info output in dbg", id);
+			this->console->debug("original X: {} {} {}", currh2d->second.nbinsx, currh2d->second.xlow, currh2d->second.xhigh);
+			this->console->debug("original Y: {} {} {}", currh2d->second.nbinsy, currh2d->second.ylow, currh2d->second.yhigh);
 			this->h2dsettings[id].nbinsx = histogram.attribute("nbinsx").as_int(currh2d->second.nbinsx);
 			this->h2dsettings[id].xlow = histogram.attribute("xlow").as_double(currh2d->second.xlow);
 			this->h2dsettings[id].xhigh = histogram.attribute("xhigh").as_double(currh2d->second.xhigh);
 			this->h2dsettings[id].nbinsy = histogram.attribute("nbinsy").as_int(currh2d->second.nbinsy);
 			this->h2dsettings[id].ylow = histogram.attribute("ylow").as_double(currh2d->second.ylow);
 			this->h2dsettings[id].yhigh = histogram.attribute("yhigh").as_double(currh2d->second.yhigh);
-			this->console->debug("New his settings for {}",id);
-			this->console->debug("X: {} {} {}",this->h2dsettings[id].nbinsx,this->h2dsettings[id].xlow,this->h2dsettings[id].xhigh);
-			this->console->debug("Y: {} {} {}",this->h2dsettings[id].nbinsy,this->h2dsettings[id].ylow,this->h2dsettings[id].yhigh);
-		}else{
-			std::string mess = "Unknown histogram id: "+std::to_string(id)+" for "+this->ProcessorName;
+			this->console->debug("New his settings for {}", id);
+			this->console->debug("X: {} {} {}", this->h2dsettings[id].nbinsx, this->h2dsettings[id].xlow, this->h2dsettings[id].xhigh);
+			this->console->debug("Y: {} {} {}", this->h2dsettings[id].nbinsy, this->h2dsettings[id].ylow, this->h2dsettings[id].yhigh);
+		} else {
+			std::string mess = "Unknown histogram id: " + std::to_string(id) + " for " + this->ProcessorName;
 			throw std::runtime_error(mess);
 		}
 	}
 }
 
-void Processor::RegisterCuts(CUTS::CutRegistry* CutManager){
-	for( const auto& kv : this->customcuts ){
-		this->console->info("Cut {} using {}",kv.first,kv.second);
-		CutManager->AddCut(kv.first,kv.second);
+void Processor::RegisterCuts(CUTS::CutRegistry* CutManager) {
+	for (const auto& kv : this->customcuts) {
+		this->console->info("Cut {} using {}", kv.first, kv.second);
+		CutManager->AddCut(kv.first, kv.second);
 	}
 }
 
-void Processor::LoadCustomCuts(const pugi::xml_node& config){
-	for(pugi::xml_node cut = config.child("Cut"); cut; cut = cut.next_sibling("Cut")){
+void Processor::LoadCustomCuts(const pugi::xml_node& config) {
+	for (pugi::xml_node cut = config.child("Cut"); cut; cut = cut.next_sibling("Cut")) {
 		std::string id = cut.attribute("name").as_string("");
 		std::string file = cut.attribute("filename").as_string("");
 		this->customcuts[id] = file;
-		this->console->info("Found Cut {} : {}",id,file);
+		this->console->info("Found Cut {} : {}", id, file);
 	}
 }
 
-[[nodiscard]] PLOTS::HisHelper1D Processor::Get1DSetting(int idx) const{
+[[nodiscard]] PLOTS::HisHelper1D Processor::Get1DSetting(int idx) const {
 	return this->h1dsettings.at(idx);
 }
 
-[[nodiscard]] PLOTS::HisHelper2D Processor::Get2DSetting(int idx) const{
+[[nodiscard]] PLOTS::HisHelper2D Processor::Get2DSetting(int idx) const {
 	return this->h2dsettings.at(idx);
 }
 
-void Processor::SetEventIdx(unsigned long long idx){
+void Processor::SetEventIdx(unsigned long long idx) {
 	this->Eventidx = idx;
 }
 

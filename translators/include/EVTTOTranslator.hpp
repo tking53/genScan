@@ -9,21 +9,22 @@
 
 #include "PhysicsData.hpp"
 
-class EVTTOTranslator : public Translator{
-	public:
-		EVTTOTranslator(const std::string&,const std::string&);
-		~EVTTOTranslator();
-		Translator::TRANSLATORSTATE Parse(boost::container::devector<PhysicsData>&);
-	private:
-		unsigned int CurrHeaderLength;
-		unsigned int CurrTraceLength;
-		uint32_t firstWords[4];
-		uint32_t otherWords[12];
-		
-		uint64_t PrevTimeStamp;
+class EVTTOTranslator : public Translator {
+public:
+	EVTTOTranslator(const std::string&, const std::string&);
+	~EVTTOTranslator();
+	Translator::TRANSLATORSTATE Parse(boost::container::devector<PhysicsData>&);
 
-		int ReadHeader(boost::container::devector<PhysicsData>&);
-		int ReadFull(boost::container::devector<PhysicsData>&);
+private:
+	unsigned int CurrHeaderLength;
+	unsigned int CurrTraceLength;
+	uint32_t firstWords[4];
+	uint32_t otherWords[12];
+
+	uint64_t PrevTimeStamp;
+
+	int ReadHeader(boost::container::devector<PhysicsData>&);
+	int ReadFull(boost::container::devector<PhysicsData>&);
 };
 
 #endif

@@ -12,26 +12,25 @@
 
 #include "Correlator.hpp"
 
-class RollingWindowCorrelator : public Correlator{
-	public:
-		RollingWindowCorrelator(const std::string&,double);
-		~RollingWindowCorrelator() = default;
+class RollingWindowCorrelator : public Correlator {
+public:
+	RollingWindowCorrelator(const std::string&, double);
+	~RollingWindowCorrelator() = default;
 
-		//switch based on the type of correlation we were constructed with
-		//what's passed in is the timestamp (in ns), crate, module, channel of the last parsed event
-		virtual bool IsWithinCorrelationWindow(const double&,const int&,const int&,const int&) final;
-		
-		virtual void DumpSelf() const final;
+	// switch based on the type of correlation we were constructed with
+	// what's passed in is the timestamp (in ns), crate, module, channel of the last parsed event
+	virtual bool IsWithinCorrelationWindow(const double&, const int&, const int&, const int&) final;
 
-		virtual void Pop() final;
-		virtual void Clear() final;
+	virtual void DumpSelf() const final;
 
-		template<typename OStream>
-		friend OStream& operator<<(OStream& os,const RollingWindowCorrelator& corr){
-			os << "RollingWindowCorrelator( Window: " << corr.Width << " ns";
-			return os;
-		}
+	virtual void Pop() final;
+	virtual void Clear() final;
 
+	template<typename OStream>
+	friend OStream& operator<<(OStream& os, const RollingWindowCorrelator& corr) {
+		os << "RollingWindowCorrelator( Window: " << corr.Width << " ns";
+		return os;
+	}
 };
 
 #endif

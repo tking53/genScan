@@ -5,59 +5,59 @@
 
 #include "Processor.hpp"
 
-class RIKENIonizationChamberProcessor : public Processor{
-	public:
-		RIKENIonizationChamberProcessor(const std::string&);
-		virtual ~RIKENIonizationChamberProcessor() = default;
-		[[maybe_unused]] bool PreProcess([[maybe_unused]] EventHistoryManager*,[[maybe_unused]] PLOTS::PlotRegistry*,[[maybe_unused]] CUTS::CutRegistry*) final;
-		[[maybe_unused]] bool Process(EventHistoryManager*,[[maybe_unused]] PLOTS::PlotRegistry*,[[maybe_unused]] CUTS::CutRegistry*) final;
-		[[maybe_unused]] bool PostProcess([[maybe_unused]] EventHistoryManager*,[[maybe_unused]] PLOTS::PlotRegistry*,[[maybe_unused]] CUTS::CutRegistry*) final;
+class RIKENIonizationChamberProcessor : public Processor {
+public:
+	RIKENIonizationChamberProcessor(const std::string&);
+	virtual ~RIKENIonizationChamberProcessor() = default;
+	[[maybe_unused]] bool PreProcess([[maybe_unused]] EventHistoryManager*, [[maybe_unused]] PLOTS::PlotRegistry*, [[maybe_unused]] CUTS::CutRegistry*) final;
+	[[maybe_unused]] bool Process(EventHistoryManager*, [[maybe_unused]] PLOTS::PlotRegistry*, [[maybe_unused]] CUTS::CutRegistry*) final;
+	[[maybe_unused]] bool PostProcess([[maybe_unused]] EventHistoryManager*, [[maybe_unused]] PLOTS::PlotRegistry*, [[maybe_unused]] CUTS::CutRegistry*) final;
 
-		virtual void Finalize() final;
+	virtual void Finalize() final;
 
-		void Init(const pugi::xml_node&);
+	void Init(const pugi::xml_node&);
 
-		void DeclarePlots(PLOTS::PlotRegistry*);
-		virtual void RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>&) final;
-		virtual void CleanupTree() final;
+	void DeclarePlots(PLOTS::PlotRegistry*);
+	virtual void RegisterTree([[maybe_unused]] std::unordered_map<std::string, TTree*>&) final;
+	virtual void CleanupTree() final;
 
-		struct EventInfo{
-			std::vector<double> AnodeEnergy;
-			std::vector<double> AnodeTimeStamp;
-			std::vector<double> AnodeCFDTimeStamp;
-			double TotalAnodeEnergy;
-			double MaxAnodeEnergy;
-			double AverageEnergy;
-			double FirstPSD;
-			double MaxPSD;
-			double FirstTimeStamp;
-			double FinalTimeStamp;
-			double FirstCFDTimeStamp;
-			double FinalCFDTimeStamp;
-			bool Saturate;
-			bool Pileup;
-			bool RealEvent;
-		};
+	struct EventInfo {
+		std::vector<double> AnodeEnergy;
+		std::vector<double> AnodeTimeStamp;
+		std::vector<double> AnodeCFDTimeStamp;
+		double TotalAnodeEnergy;
+		double MaxAnodeEnergy;
+		double AverageEnergy;
+		double FirstPSD;
+		double MaxPSD;
+		double FirstTimeStamp;
+		double FinalTimeStamp;
+		double FirstCFDTimeStamp;
+		double FinalCFDTimeStamp;
+		bool Saturate;
+		bool Pileup;
+		bool RealEvent;
+	};
 
-		EventInfo& GetCurrEvt();
-		EventInfo& GetPrevEvt();
+	EventInfo& GetCurrEvt();
+	EventInfo& GetPrevEvt();
 
-	private:
-		void Reset();
-		void InitHelpers();
+private:
+	void Reset();
+	void InitHelpers();
 
-		EventInfo NewEvt;
-		EventInfo CurrEvt;
-		EventInfo PrevEvt;
+	EventInfo NewEvt;
+	EventInfo CurrEvt;
+	EventInfo PrevEvt;
 
-		bool FoundFirstEvt;
-		double FirstEvtTime;
+	bool FoundFirstEvt;
+	double FirstEvtTime;
 
-		std::vector<std::tuple<double,double,double>> IC;
-		std::vector<double> TimeStamps;
-		std::vector<double> CFDTimeStamps;
-		
-		int NumAnode;
+	std::vector<std::tuple<double, double, double>> IC;
+	std::vector<double> TimeStamps;
+	std::vector<double> CFDTimeStamps;
+
+	int NumAnode;
 };
 
 #endif

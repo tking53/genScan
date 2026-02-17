@@ -7,162 +7,163 @@
 #include <stdexcept>
 #include <string>
 
-anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2021Processor",{}){
+anl2021Processor::anl2021Processor(const std::string& log)
+	: Processor(log, "anl2021Processor", {}) {
 	this->MtasProc = std::make_shared<MtasProcessor>(log);
 	this->SiliconProc = std::make_shared<MtasSSDProcessor>(log);
 	this->TapeProc = std::make_shared<MtasTapeProcessor>(log);
 	this->HPGeProc = std::make_shared<SimpleHPGeProcessor>(log);
 	this->ImplantProc = std::make_shared<PSPMTProcessor>(log);
-	this->IsomerProc = std::make_shared<MtasIsomerProcessor>(log,this);
+	this->IsomerProc = std::make_shared<MtasIsomerProcessor>(log, this);
 
-	//need also the hpge and two implants
-	for( const auto& type : this->MtasProc->GetKnownTypes() ){
+	// need also the hpge and two implants
+	for (const auto& type : this->MtasProc->GetKnownTypes()) {
 		this->AssociateType(type);
 	}
 
-	for( const auto& type : this->SiliconProc->GetKnownTypes() ){
+	for (const auto& type : this->SiliconProc->GetKnownTypes()) {
 		this->AssociateType(type);
 	}
 
-	for( const auto& type : this->TapeProc->GetKnownTypes() ){
+	for (const auto& type : this->TapeProc->GetKnownTypes()) {
 		this->AssociateType(type);
 	}
 
-	for( const auto& type : this->HPGeProc->GetKnownTypes() ){
+	for (const auto& type : this->HPGeProc->GetKnownTypes()) {
 		this->AssociateType(type);
 	}
 
-	for( const auto& type : this->ImplantProc->GetKnownTypes() ){
+	for (const auto& type : this->ImplantProc->GetKnownTypes()) {
 		this->AssociateType(type);
 	}
 
 	this->h1dsettings = {
-		{1000,{16384,0,16384}},
-		{1001,{16384,0,16384}},
-		{1002,{16384,0,16384}},
-		{1003,{16384,0,16384}},
-		
-		{1010,{16384,-8192,8191}},
+		{1000, {16384, 0, 16384}},
+		{1001, {16384, 0, 16384}},
+		{1002, {16384, 0, 16384}},
+		{1003, {16384, 0, 16384}},
 
-		{3100,{16384,0,16384}},
-		{3110,{16384,0,16384}},
-		{3120,{16384,0,16384}},
-		{3130,{16384,0,16384}},
-		{3140,{16384,0,16384}},
-		{3115,{16384,0,16384}},
-		{3125,{16384,0,16384}},
-		{3135,{16384,0,16384}},
-		{3145,{16384,0,16384}},
+		{1010, {16384, -8192, 8191}},
 
-		{3200,{16384,0,16384}},
-		{3210,{16384,0,16384}},
-		{3220,{16384,0,16384}},
-		{3230,{16384,0,16384}},
-		{3240,{16384,0,16384}},
-		{3215,{16384,0,16384}},
-		{3225,{16384,0,16384}},
-		{3235,{16384,0,16384}},
-		{3245,{16384,0,16384}},
+		{3100, {16384, 0, 16384}},
+		{3110, {16384, 0, 16384}},
+		{3120, {16384, 0, 16384}},
+		{3130, {16384, 0, 16384}},
+		{3140, {16384, 0, 16384}},
+		{3115, {16384, 0, 16384}},
+		{3125, {16384, 0, 16384}},
+		{3135, {16384, 0, 16384}},
+		{3145, {16384, 0, 16384}},
 
-		{3300,{16384,0,16384}},
-		{3310,{16384,0,16384}},
-		{3320,{16384,0,16384}},
-		{3330,{16384,0,16384}},
-		{3340,{16384,0,16384}},
-		{3315,{16384,0,16384}},
-		{3325,{16384,0,16384}},
-		{3335,{16384,0,16384}},
-		{3345,{16384,0,16384}},
-	
-		{3730,{16384,0,16384}}
+		{3200, {16384, 0, 16384}},
+		{3210, {16384, 0, 16384}},
+		{3220, {16384, 0, 16384}},
+		{3230, {16384, 0, 16384}},
+		{3240, {16384, 0, 16384}},
+		{3215, {16384, 0, 16384}},
+		{3225, {16384, 0, 16384}},
+		{3235, {16384, 0, 16384}},
+		{3245, {16384, 0, 16384}},
+
+		{3300, {16384, 0, 16384}},
+		{3310, {16384, 0, 16384}},
+		{3320, {16384, 0, 16384}},
+		{3330, {16384, 0, 16384}},
+		{3340, {16384, 0, 16384}},
+		{3315, {16384, 0, 16384}},
+		{3325, {16384, 0, 16384}},
+		{3335, {16384, 0, 16384}},
+		{3345, {16384, 0, 16384}},
+
+		{3730, {16384, 0, 16384}}
 
 	};
 
 	this->h2dsettings = {
-		{2100,{8192,0,8192,4,0,4}},
+		{2100, {8192, 0, 8192, 4, 0, 4}},
 
-		{2160,{8192,0,8192,512,0,512}},
-		{2161,{8192,0,8192,512,0,512}},
-		{2162,{8192,0,8192,512,0,512}},
-		{2163,{8192,0,8192,512,0,512}},
+		{2160, {8192, 0, 8192, 512, 0, 512}},
+		{2161, {8192, 0, 8192, 512, 0, 512}},
+		{2162, {8192, 0, 8192, 512, 0, 512}},
+		{2163, {8192, 0, 8192, 512, 0, 512}},
 
-		{2200,{8192,0,8192,4,0,4}},
+		{2200, {8192, 0, 8192, 4, 0, 4}},
 
-		{2260,{8192,0,8192,512,0,512}},
-		{2261,{8192,0,8192,512,0,512}},
-		{2262,{8192,0,8192,512,0,512}},
-		{2263,{8192,0,8192,512,0,512}},
+		{2260, {8192, 0, 8192, 512, 0, 512}},
+		{2261, {8192, 0, 8192, 512, 0, 512}},
+		{2262, {8192, 0, 8192, 512, 0, 512}},
+		{2263, {8192, 0, 8192, 512, 0, 512}},
 
-		{2300,{8192,0,8192,4,0,4}},
+		{2300, {8192, 0, 8192, 4, 0, 4}},
 
-		{2360,{8192,0,8192,512,0,512}},
-		{2361,{8192,0,8192,512,0,512}},
-		{2362,{8192,0,8192,512,0,512}},
-		{2363,{8192,0,8192,512,0,512}},
+		{2360, {8192, 0, 8192, 512, 0, 512}},
+		{2361, {8192, 0, 8192, 512, 0, 512}},
+		{2362, {8192, 0, 8192, 512, 0, 512}},
+		{2363, {8192, 0, 8192, 512, 0, 512}},
 
-		{2500,{4096,0,4096,4096,0,4096}},
-		{2600,{4096,0,4096,4096,0,4096}},
-		{2700,{4096,0,4096,4096,0,4096}},
+		{2500, {4096, 0, 4096, 4096, 0, 4096}},
+		{2600, {4096, 0, 4096, 4096, 0, 4096}},
+		{2700, {4096, 0, 4096, 4096, 0, 4096}},
 
-		{3160,{8192,0,8192,512,0,512}},
-		{3161,{8192,0,8192,512,0,512}},
-		{3162,{8192,0,8192,512,0,512}},
-		{3163,{8192,0,8192,512,0,512}},
+		{3160, {8192, 0, 8192, 512, 0, 512}},
+		{3161, {8192, 0, 8192, 512, 0, 512}},
+		{3162, {8192, 0, 8192, 512, 0, 512}},
+		{3163, {8192, 0, 8192, 512, 0, 512}},
 
-		{3260,{8192,0,8192,512,0,512}},
-		{3261,{8192,0,8192,512,0,512}},
-		{3262,{8192,0,8192,512,0,512}},
-		{3263,{8192,0,8192,512,0,512}},
-		
-		{3350,{4096,0,4096,4096,0,4096}},
-		{33508,{2048,0,8192,2048,0,8192}},
-		{3351,{4096,0,4096,4096,0,4096}},
-		{33518,{2048,0,8192,2048,0,8192}},
+		{3260, {8192, 0, 8192, 512, 0, 512}},
+		{3261, {8192, 0, 8192, 512, 0, 512}},
+		{3262, {8192, 0, 8192, 512, 0, 512}},
+		{3263, {8192, 0, 8192, 512, 0, 512}},
 
-		{3360,{8192,0,8192,512,0,512}},
-		{3361,{8192,0,8192,512,0,512}},
-		{3362,{8192,0,8192,512,0,512}},
-		{3363,{8192,0,8192,512,0,512}},
+		{3350, {4096, 0, 4096, 4096, 0, 4096}},
+		{33508, {2048, 0, 8192, 2048, 0, 8192}},
+		{3351, {4096, 0, 4096, 4096, 0, 4096}},
+		{33518, {2048, 0, 8192, 2048, 0, 8192}},
 
-		{31608,{2048,0,16384,512,0,512}},
-		{31618,{2048,0,16384,512,0,512}},
-		{31628,{2048,0,16384,512,0,512}},
-		{31638,{2048,0,16384,512,0,512}},
+		{3360, {8192, 0, 8192, 512, 0, 512}},
+		{3361, {8192, 0, 8192, 512, 0, 512}},
+		{3362, {8192, 0, 8192, 512, 0, 512}},
+		{3363, {8192, 0, 8192, 512, 0, 512}},
 
-		{32608,{2048,0,16384,512,0,512}},
-		{32618,{2048,0,16384,512,0,512}},
-		{32628,{2048,0,16384,512,0,512}},
-		{32638,{2048,0,16384,512,0,512}},
+		{31608, {2048, 0, 16384, 512, 0, 512}},
+		{31618, {2048, 0, 16384, 512, 0, 512}},
+		{31628, {2048, 0, 16384, 512, 0, 512}},
+		{31638, {2048, 0, 16384, 512, 0, 512}},
 
-		{33608,{2048,0,16384,512,0,512}},
-		{33618,{2048,0,16384,512,0,512}},
-		{33628,{2048,0,16384,512,0,512}},
-		{33638,{2048,0,16384,512,0,512}},
+		{32608, {2048, 0, 16384, 512, 0, 512}},
+		{32618, {2048, 0, 16384, 512, 0, 512}},
+		{32628, {2048, 0, 16384, 512, 0, 512}},
+		{32638, {2048, 0, 16384, 512, 0, 512}},
 
-		{3411, {8192,0.0,8192.0,12,0,12}},
-		{3412, {8192,0.0,8192.0,12,0,12}},
-		{3413, {8192,0.0,8192.0,12,0,12}},
-		{3414, {8192,0.0,8192.0,12,0,12}},
+		{33608, {2048, 0, 16384, 512, 0, 512}},
+		{33618, {2048, 0, 16384, 512, 0, 512}},
+		{33628, {2048, 0, 16384, 512, 0, 512}},
+		{33638, {2048, 0, 16384, 512, 0, 512}},
 
-		{3511, {8192,0.0,8192.0,12,0,12}},
-		{3512, {8192,0.0,8192.0,12,0,12}},
-		{3513, {8192,0.0,8192.0,12,0,12}},
-		{3514, {8192,0.0,8192.0,12,0,12}},
-	
-		//Si Max vs Total
-		{3650,{4096,0,4096,4096,0,4096}},
-		{36508,{2048,0,8192,2048,0,8192}},
+		{3411, {8192, 0.0, 8192.0, 12, 0, 12}},
+		{3412, {8192, 0.0, 8192.0, 12, 0, 12}},
+		{3413, {8192, 0.0, 8192.0, 12, 0, 12}},
+		{3414, {8192, 0.0, 8192.0, 12, 0, 12}},
 
-		//Si Max vs Cycle Time
-		{5360,{8192,0,8192,512,0,512}},
-		{5361,{8192,0,8192,512,0,512}},
-		{5362,{8192,0,8192,512,0,512}},
-		{5363,{8192,0,8192,512,0,512}},
+		{3511, {8192, 0.0, 8192.0, 12, 0, 12}},
+		{3512, {8192, 0.0, 8192.0, 12, 0, 12}},
+		{3513, {8192, 0.0, 8192.0, 12, 0, 12}},
+		{3514, {8192, 0.0, 8192.0, 12, 0, 12}},
 
-		{53608,{2048,0,16384,512,0,512}},
-		{53618,{2048,0,16384,512,0,512}},
-		{53628,{2048,0,16384,512,0,512}},
-		{53638,{2048,0,16384,512,0,512}}
+		// Si Max vs Total
+		{3650, {4096, 0, 4096, 4096, 0, 4096}},
+		{36508, {2048, 0, 8192, 2048, 0, 8192}},
+
+		// Si Max vs Cycle Time
+		{5360, {8192, 0, 8192, 512, 0, 512}},
+		{5361, {8192, 0, 8192, 512, 0, 512}},
+		{5362, {8192, 0, 8192, 512, 0, 512}},
+		{5363, {8192, 0, 8192, 512, 0, 512}},
+
+		{53608, {2048, 0, 16384, 512, 0, 512}},
+		{53618, {2048, 0, 16384, 512, 0, 512}},
+		{53628, {2048, 0, 16384, 512, 0, 512}},
+		{53638, {2048, 0, 16384, 512, 0, 512}}
 
 	};
 
@@ -186,17 +187,17 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 	this->Reset();
 }
 
-[[maybe_unused]] bool anl2021Processor::PreProcess(EventHistoryManager* eventhistory, PLOTS::PlotRegistry* hismanager, CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool anl2021Processor::PreProcess(EventHistoryManager* eventhistory, PLOTS::PlotRegistry* hismanager, CUTS::CutRegistry* cutmanager) {
 	Processor::PreProcess();
 
-	hismanager->Fill("EARLY_1010",this->EarlyCycle.GetLowerBound());
-	hismanager->Fill("EARLY_1010",this->EarlyCycle.GetUpperBound());
+	hismanager->Fill("EARLY_1010", this->EarlyCycle.GetLowerBound());
+	hismanager->Fill("EARLY_1010", this->EarlyCycle.GetUpperBound());
 
-	hismanager->Fill("MID_1010",this->MidCycle.GetLowerBound());
-	hismanager->Fill("MID_1010",this->MidCycle.GetUpperBound());
+	hismanager->Fill("MID_1010", this->MidCycle.GetLowerBound());
+	hismanager->Fill("MID_1010", this->MidCycle.GetUpperBound());
 
-	hismanager->Fill("LATE_1010",this->LateCycle.GetLowerBound());
-	hismanager->Fill("LATE_1010",this->LateCycle.GetUpperBound());
+	hismanager->Fill("LATE_1010", this->LateCycle.GetLowerBound());
+	hismanager->Fill("LATE_1010", this->LateCycle.GetUpperBound());
 
 	auto summary = eventhistory->GetCurrentEventSummary();
 	auto types = summary->GetKnownTypes();
@@ -204,199 +205,199 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 	this->HasMTAS = (types.find("mtas") != types.end());
 	this->HasSilicon = (types.find("silicon") != types.end());
 	this->HasTape = (types.find("tape") != types.end());
-	this->HasHPGe = (types.find("hpge") != types.end()); 
-	this->HasPSPMT = (types.find("pspmt") != types.end()); 
+	this->HasHPGe = (types.find("hpge") != types.end());
+	this->HasPSPMT = (types.find("pspmt") != types.end());
 
-	if( this->HasTape ){
-		this->TapeProc->PreProcess(eventhistory,hismanager,cutmanager);
+	if (this->HasTape) {
+		this->TapeProc->PreProcess(eventhistory, hismanager, cutmanager);
 	}
 
-	if( this->HasPSPMT ){
-		this->ImplantProc->PreProcess(eventhistory,hismanager,cutmanager);
+	if (this->HasPSPMT) {
+		this->ImplantProc->PreProcess(eventhistory, hismanager, cutmanager);
 		auto lgImage = this->ImplantProc->GetLowGainImage();
-		if( lgImage.anodesum > this->ImplantThreshold ){
+		if (lgImage.anodesum > this->ImplantThreshold) {
 			summary->AddEventTag(this->implant);
-			summary->AddEventObservable("LGAnodeSum",lgImage.anodesum);
+			summary->AddEventObservable("LGAnodeSum", lgImage.anodesum);
 		}
 	}
 
-	if( this->HasHPGe ){
-		this->HPGeProc->PreProcess(eventhistory,hismanager,cutmanager);
-		for( auto ii = 0; ii < this->HPGeProc->GetNumCrystals(); ++ii ){
+	if (this->HasHPGe) {
+		this->HPGeProc->PreProcess(eventhistory, hismanager, cutmanager);
+		for (auto ii = 0; ii < this->HPGeProc->GetNumCrystals(); ++ii) {
 			auto erg = this->HPGeProc->GetEnergy(ii);
-			if( erg > this->HPGeThreshold ){
+			if (erg > this->HPGeThreshold) {
 				summary->AddEventTag(this->hpge);
-				summary->AddEventObservable("HPGe_"+std::to_string(ii),erg);
+				summary->AddEventObservable("HPGe_" + std::to_string(ii), erg);
 			}
 		}
 	}
 
-	if( this->HasSilicon ){
-		this->SiliconProc->PreProcess(eventhistory,hismanager,cutmanager);
+	if (this->HasSilicon) {
+		this->SiliconProc->PreProcess(eventhistory, hismanager, cutmanager);
 		auto simax = this->SiliconProc->GetMaxEnergy();
-		if( simax > this->SiliconThreshold ){
+		if (simax > this->SiliconThreshold) {
 			summary->AddEventTag(this->beta);
-			summary->AddEventObservable("SiMax",simax);
+			summary->AddEventObservable("SiMax", simax);
 		}
 	}
 
-	if( this->HasMTAS ){
-		this->MtasProc->PreProcess(eventhistory,hismanager,cutmanager);
-		//mtas already adds its own observables and tags
+	if (this->HasMTAS) {
+		this->MtasProc->PreProcess(eventhistory, hismanager, cutmanager);
+		// mtas already adds its own observables and tags
 	}
 
 	Processor::EndProcess();
 	return true;
 }
 
-[[maybe_unused]] bool anl2021Processor::Process( EventHistoryManager* eventhistory, PLOTS::PlotRegistry* hismanager, CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool anl2021Processor::Process(EventHistoryManager* eventhistory, PLOTS::PlotRegistry* hismanager, CUTS::CutRegistry* cutmanager) {
 	Processor::Process();
-	//determine if we had a beta trigger in MTAS and are in the correct cycle
+	// determine if we had a beta trigger in MTAS and are in the correct cycle
 	auto summary = eventhistory->GetCurrentEventSummary();
 	bool hasmuon = summary->ContainsEventTag(this->muon);
 
-	if( not hasmuon ){
+	if (not hasmuon) {
 		auto numhist = eventhistory->GetMaxHistoryID();
 		auto erg = MtasProc->GetTotalEnergy(0);
 		auto cerg = MtasProc->GetTotalEnergy(1);
 		auto cyclestarttime = TapeProc->GetCycleTimeInSeconds();
-		//mtas gives the time in ns
-		auto firstmtastime = MtasProc->GetFirstFireTime()*1.0e-9;
+		// mtas gives the time in ns
+		auto firstmtastime = MtasProc->GetFirstFireTime() * 1.0e-9;
 		auto cycletime = firstmtastime - cyclestarttime;
 
 		bool hasbeta = summary->ContainsEventTag(this->beta);
 		bool hasgamma = summary->ContainsEventTag(this->gamma);
 
-		if( TapeProc->GetCurrentCycleState() == TAPE::MEASURE ){
-			hismanager->Fill("CYCLE_1000",cycletime*1.0e3);
-			hismanager->Fill("CYCLE_1001",cycletime);
-			hismanager->Fill("CYCLE_1002",cycletime/60.0);
-			hismanager->Fill("CYCLE_1003",cycletime/(60.0*60.0));
+		if (TapeProc->GetCurrentCycleState() == TAPE::MEASURE) {
+			hismanager->Fill("CYCLE_1000", cycletime * 1.0e3);
+			hismanager->Fill("CYCLE_1001", cycletime);
+			hismanager->Fill("CYCLE_1002", cycletime / 60.0);
+			hismanager->Fill("CYCLE_1003", cycletime / (60.0 * 60.0));
 
-			hismanager->Fill("MEASURE_3260",erg,cycletime*1.0e3);
-			hismanager->Fill("MEASURE_3261",erg,cycletime);
-			hismanager->Fill("MEASURE_3262",erg,cycletime/60.0);
-			hismanager->Fill("MEASURE_3263",erg,cycletime/(60.0*60.0));
+			hismanager->Fill("MEASURE_3260", erg, cycletime * 1.0e3);
+			hismanager->Fill("MEASURE_3261", erg, cycletime);
+			hismanager->Fill("MEASURE_3262", erg, cycletime / 60.0);
+			hismanager->Fill("MEASURE_3263", erg, cycletime / (60.0 * 60.0));
 
-			hismanager->Fill("MEASURE_32608",erg,cycletime*1.0e3);
-			hismanager->Fill("MEASURE_32618",erg,cycletime);
-			hismanager->Fill("MEASURE_32628",erg,cycletime/60.0);
-			hismanager->Fill("MEASURE_32638",erg,cycletime/(60.0*60.0));
+			hismanager->Fill("MEASURE_32608", erg, cycletime * 1.0e3);
+			hismanager->Fill("MEASURE_32618", erg, cycletime);
+			hismanager->Fill("MEASURE_32628", erg, cycletime / 60.0);
+			hismanager->Fill("MEASURE_32638", erg, cycletime / (60.0 * 60.0));
 
-			//handle filling the isomer things
+			// handle filling the isomer things
 			auto internaltdiff = (this->MtasProc->GetLastFireTime() - this->SiliconProc->GetFirstFireTime());
 			this->IsomerProc->SetInternalTDiff(internaltdiff);
-			this->IsomerProc->FillMtasPlots(eventhistory,hismanager,cutmanager,this->MtasProc.get(),this->SiliconProc.get());
+			this->IsomerProc->FillMtasPlots(eventhistory, hismanager, cutmanager, this->MtasProc.get(), this->SiliconProc.get());
 
-			if( hasbeta ){
+			if (hasbeta) {
 				auto sierg = summary->GetEventObservable("SiMax").value_or(0.0);
-				if( this->EarlyCycle.IsWithin(cycletime) ){
-					hismanager->Fill("EARLY_3300",erg);
-					hismanager->Fill("EARLY_3351",erg,cerg);
+				if (this->EarlyCycle.IsWithin(cycletime)) {
+					hismanager->Fill("EARLY_3300", erg);
+					hismanager->Fill("EARLY_3351", erg, cerg);
 					auto EARLY_3350 = hismanager->GetPlot<TH2*>("EARLY_3350");
-					for( size_t ii = 6; ii < 24; ++ii ){
-						EARLY_3350->Fill(erg,MtasProc->GetCrystalEnergy(ii));
+					for (size_t ii = 6; ii < 24; ++ii) {
+						EARLY_3350->Fill(erg, MtasProc->GetCrystalEnergy(ii));
 					}
 				}
-				if( this->MidCycle.IsWithin(cycletime) ){
-					hismanager->Fill("MID_3300",erg);
-					hismanager->Fill("MID_3351",erg,cerg);
+				if (this->MidCycle.IsWithin(cycletime)) {
+					hismanager->Fill("MID_3300", erg);
+					hismanager->Fill("MID_3351", erg, cerg);
 					auto MID_3350 = hismanager->GetPlot<TH2*>("MID_3350");
-					for( size_t ii = 6; ii < 24; ++ii ){
-						MID_3350->Fill(erg,MtasProc->GetCrystalEnergy(ii));
+					for (size_t ii = 6; ii < 24; ++ii) {
+						MID_3350->Fill(erg, MtasProc->GetCrystalEnergy(ii));
 					}
 				}
-				if( this->LateCycle.IsWithin(cycletime) ){
-					hismanager->Fill("LATE_3300",erg);
-					hismanager->Fill("LATE_3351",erg,cerg);
+				if (this->LateCycle.IsWithin(cycletime)) {
+					hismanager->Fill("LATE_3300", erg);
+					hismanager->Fill("LATE_3351", erg, cerg);
 					auto LATE_3350 = hismanager->GetPlot<TH2*>("LATE_3350");
-					for( size_t ii = 6; ii < 24; ++ii ){
-						LATE_3350->Fill(erg,MtasProc->GetCrystalEnergy(ii));
+					for (size_t ii = 6; ii < 24; ++ii) {
+						LATE_3350->Fill(erg, MtasProc->GetCrystalEnergy(ii));
 					}
 				}
 				this->MtasProc->FillBetaPlots(hismanager);
-				hismanager->Fill("MEASURE_3650",erg,sierg);
-				hismanager->Fill("MEASURE_36508",erg,sierg);
+				hismanager->Fill("MEASURE_3650", erg, sierg);
+				hismanager->Fill("MEASURE_36508", erg, sierg);
 
-				hismanager->Fill("MEASURE_3360",erg,cycletime*1.0e3);
-				hismanager->Fill("MEASURE_3361",erg,cycletime);
-				hismanager->Fill("MEASURE_3362",erg,cycletime/60.0);
-				hismanager->Fill("MEASURE_3363",erg,cycletime/(60.0*60.0));
+				hismanager->Fill("MEASURE_3360", erg, cycletime * 1.0e3);
+				hismanager->Fill("MEASURE_3361", erg, cycletime);
+				hismanager->Fill("MEASURE_3362", erg, cycletime / 60.0);
+				hismanager->Fill("MEASURE_3363", erg, cycletime / (60.0 * 60.0));
 
-				hismanager->Fill("MEASURE_33608",erg,cycletime*1.0e3);
-				hismanager->Fill("MEASURE_33618",erg,cycletime);
-				hismanager->Fill("MEASURE_33628",erg,cycletime/60.0);
-				hismanager->Fill("MEASURE_33638",erg,cycletime/(60.0*60.0));
-				
-				hismanager->Fill("MEASURE_5360",sierg,cycletime*1.0e3);
-				hismanager->Fill("MEASURE_5361",sierg,cycletime);
-				hismanager->Fill("MEASURE_5362",sierg,cycletime/60.0);
-				hismanager->Fill("MEASURE_5363",sierg,cycletime/(60.0*60.0));
+				hismanager->Fill("MEASURE_33608", erg, cycletime * 1.0e3);
+				hismanager->Fill("MEASURE_33618", erg, cycletime);
+				hismanager->Fill("MEASURE_33628", erg, cycletime / 60.0);
+				hismanager->Fill("MEASURE_33638", erg, cycletime / (60.0 * 60.0));
 
-				hismanager->Fill("MEASURE_53608",sierg,cycletime*1.0e3);
-				hismanager->Fill("MEASURE_53618",sierg,cycletime);
-				hismanager->Fill("MEASURE_53628",sierg,cycletime/60.0);
-				hismanager->Fill("MEASURE_53638",sierg,cycletime/(60.0*60.0));
-			}else{
+				hismanager->Fill("MEASURE_5360", sierg, cycletime * 1.0e3);
+				hismanager->Fill("MEASURE_5361", sierg, cycletime);
+				hismanager->Fill("MEASURE_5362", sierg, cycletime / 60.0);
+				hismanager->Fill("MEASURE_5363", sierg, cycletime / (60.0 * 60.0));
+
+				hismanager->Fill("MEASURE_53608", sierg, cycletime * 1.0e3);
+				hismanager->Fill("MEASURE_53618", sierg, cycletime);
+				hismanager->Fill("MEASURE_53628", sierg, cycletime / 60.0);
+				hismanager->Fill("MEASURE_53638", sierg, cycletime / (60.0 * 60.0));
+			} else {
 				this->MtasProc->FillNonBetaPlots(hismanager);
-				hismanager->Fill("MEASURE_3160",erg,cycletime*1.0e3);
-				hismanager->Fill("MEASURE_3161",erg,cycletime);
-				hismanager->Fill("MEASURE_3162",erg,cycletime/60.0);
-				hismanager->Fill("MEASURE_3163",erg,cycletime/(60.0*60.0));
+				hismanager->Fill("MEASURE_3160", erg, cycletime * 1.0e3);
+				hismanager->Fill("MEASURE_3161", erg, cycletime);
+				hismanager->Fill("MEASURE_3162", erg, cycletime / 60.0);
+				hismanager->Fill("MEASURE_3163", erg, cycletime / (60.0 * 60.0));
 
-				hismanager->Fill("MEASURE_31608",erg,cycletime*1.0e3);
-				hismanager->Fill("MEASURE_31618",erg,cycletime);
-				hismanager->Fill("MEASURE_31628",erg,cycletime/60.0);
-				hismanager->Fill("MEASURE_31638",erg,cycletime/(60.0*60.0));
+				hismanager->Fill("MEASURE_31608", erg, cycletime * 1.0e3);
+				hismanager->Fill("MEASURE_31618", erg, cycletime);
+				hismanager->Fill("MEASURE_31628", erg, cycletime / 60.0);
+				hismanager->Fill("MEASURE_31638", erg, cycletime / (60.0 * 60.0));
 			}
-		}else if( TapeProc->GetCurrentCycleState() == TAPE::BACKGROUND ){
-			if( not this->MtasProc->DidAnyPileup() and not this->MtasProc->DidAnySaturate() ){
-				hismanager->Fill("BKG_3200",this->MtasProc->GetTotalEnergy(0));
-				hismanager->Fill("BKG_3210",this->MtasProc->GetTotalEnergy(1));
-				hismanager->Fill("BKG_3220",this->MtasProc->GetTotalEnergy(2));
-				hismanager->Fill("BKG_3230",this->MtasProc->GetTotalEnergy(3));
-				hismanager->Fill("BKG_3240",this->MtasProc->GetTotalEnergy(4));
+		} else if (TapeProc->GetCurrentCycleState() == TAPE::BACKGROUND) {
+			if (not this->MtasProc->DidAnyPileup() and not this->MtasProc->DidAnySaturate()) {
+				hismanager->Fill("BKG_3200", this->MtasProc->GetTotalEnergy(0));
+				hismanager->Fill("BKG_3210", this->MtasProc->GetTotalEnergy(1));
+				hismanager->Fill("BKG_3220", this->MtasProc->GetTotalEnergy(2));
+				hismanager->Fill("BKG_3230", this->MtasProc->GetTotalEnergy(3));
+				hismanager->Fill("BKG_3240", this->MtasProc->GetTotalEnergy(4));
 				auto BKG_3215 = hismanager->GetPlot<TH1*>("BKG_3215");
 				auto BKG_3225 = hismanager->GetPlot<TH1*>("BKG_3225");
 				auto BKG_3235 = hismanager->GetPlot<TH1*>("BKG_3235");
 				auto BKG_3245 = hismanager->GetPlot<TH1*>("BKG_3245");
-				for( size_t ii = 0; ii < 6; ++ii ){
+				for (size_t ii = 0; ii < 6; ++ii) {
 					BKG_3215->Fill(this->MtasProc->GetCrystalEnergy(ii));
-					BKG_3225->Fill(this->MtasProc->GetCrystalEnergy(ii+6));
-					BKG_3235->Fill(this->MtasProc->GetCrystalEnergy(ii+12));
-					BKG_3245->Fill(this->MtasProc->GetCrystalEnergy(ii+18));
+					BKG_3225->Fill(this->MtasProc->GetCrystalEnergy(ii + 6));
+					BKG_3235->Fill(this->MtasProc->GetCrystalEnergy(ii + 12));
+					BKG_3245->Fill(this->MtasProc->GetCrystalEnergy(ii + 18));
 				}
-				if( summary->ContainsEventTag(this->beta) ){
-					hismanager->Fill("BKG_3300",this->MtasProc->GetTotalEnergy(0));
-					hismanager->Fill("BKG_3310",this->MtasProc->GetTotalEnergy(1));
-					hismanager->Fill("BKG_3320",this->MtasProc->GetTotalEnergy(2));
-					hismanager->Fill("BKG_3330",this->MtasProc->GetTotalEnergy(3));
-					hismanager->Fill("BKG_3340",this->MtasProc->GetTotalEnergy(4));
+				if (summary->ContainsEventTag(this->beta)) {
+					hismanager->Fill("BKG_3300", this->MtasProc->GetTotalEnergy(0));
+					hismanager->Fill("BKG_3310", this->MtasProc->GetTotalEnergy(1));
+					hismanager->Fill("BKG_3320", this->MtasProc->GetTotalEnergy(2));
+					hismanager->Fill("BKG_3330", this->MtasProc->GetTotalEnergy(3));
+					hismanager->Fill("BKG_3340", this->MtasProc->GetTotalEnergy(4));
 					auto BKG_3315 = hismanager->GetPlot<TH1*>("BKG_3315");
 					auto BKG_3325 = hismanager->GetPlot<TH1*>("BKG_3325");
 					auto BKG_3335 = hismanager->GetPlot<TH1*>("BKG_3335");
 					auto BKG_3345 = hismanager->GetPlot<TH1*>("BKG_3345");
-					for( size_t ii = 0; ii < 6; ++ii ){
+					for (size_t ii = 0; ii < 6; ++ii) {
 						BKG_3315->Fill(this->MtasProc->GetCrystalEnergy(ii));
-						BKG_3325->Fill(this->MtasProc->GetCrystalEnergy(ii+6));
-						BKG_3335->Fill(this->MtasProc->GetCrystalEnergy(ii+12));
-						BKG_3345->Fill(this->MtasProc->GetCrystalEnergy(ii+18));
+						BKG_3325->Fill(this->MtasProc->GetCrystalEnergy(ii + 6));
+						BKG_3335->Fill(this->MtasProc->GetCrystalEnergy(ii + 12));
+						BKG_3345->Fill(this->MtasProc->GetCrystalEnergy(ii + 18));
 					}
-				}else{
-					hismanager->Fill("BKG_3100",this->MtasProc->GetTotalEnergy(0));
-					hismanager->Fill("BKG_3110",this->MtasProc->GetTotalEnergy(1));
-					hismanager->Fill("BKG_3120",this->MtasProc->GetTotalEnergy(2));
-					hismanager->Fill("BKG_3130",this->MtasProc->GetTotalEnergy(3));
-					hismanager->Fill("BKG_3140",this->MtasProc->GetTotalEnergy(4));
+				} else {
+					hismanager->Fill("BKG_3100", this->MtasProc->GetTotalEnergy(0));
+					hismanager->Fill("BKG_3110", this->MtasProc->GetTotalEnergy(1));
+					hismanager->Fill("BKG_3120", this->MtasProc->GetTotalEnergy(2));
+					hismanager->Fill("BKG_3130", this->MtasProc->GetTotalEnergy(3));
+					hismanager->Fill("BKG_3140", this->MtasProc->GetTotalEnergy(4));
 					auto BKG_3115 = hismanager->GetPlot<TH1*>("BKG_3115");
 					auto BKG_3125 = hismanager->GetPlot<TH1*>("BKG_3125");
 					auto BKG_3135 = hismanager->GetPlot<TH1*>("BKG_3135");
 					auto BKG_3145 = hismanager->GetPlot<TH1*>("BKG_3145");
-					for( size_t ii = 0; ii < 6; ++ii ){
+					for (size_t ii = 0; ii < 6; ++ii) {
 						BKG_3115->Fill(this->MtasProc->GetCrystalEnergy(ii));
-						BKG_3125->Fill(this->MtasProc->GetCrystalEnergy(ii+6));
-						BKG_3135->Fill(this->MtasProc->GetCrystalEnergy(ii+12));
-						BKG_3145->Fill(this->MtasProc->GetCrystalEnergy(ii+18));
+						BKG_3125->Fill(this->MtasProc->GetCrystalEnergy(ii + 6));
+						BKG_3135->Fill(this->MtasProc->GetCrystalEnergy(ii + 12));
+						BKG_3145->Fill(this->MtasProc->GetCrystalEnergy(ii + 18));
 					}
 				}
 
@@ -408,114 +409,113 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 				auto BKG_3512 = hismanager->GetPlot<TH2*>("BKG_3512");
 				auto BKG_3513 = hismanager->GetPlot<TH2*>("BKG_3513");
 				auto BKG_3514 = hismanager->GetPlot<TH2*>("BKG_3514");
-				for( int ii = 0; ii < 6; ++ii ){
-					BKG_3411->Fill(this->MtasProc->GetIndividualCenterPMTRawEnergy(2*ii),2*ii);
-					BKG_3411->Fill(this->MtasProc->GetIndividualCenterPMTRawEnergy(2*ii + 1),2*ii + 1);
+				for (int ii = 0; ii < 6; ++ii) {
+					BKG_3411->Fill(this->MtasProc->GetIndividualCenterPMTRawEnergy(2 * ii), 2 * ii);
+					BKG_3411->Fill(this->MtasProc->GetIndividualCenterPMTRawEnergy(2 * ii + 1), 2 * ii + 1);
 
-					BKG_3412->Fill(this->MtasProc->GetIndividualInnerPMTRawEnergy(2*ii),2*ii);
-					BKG_3412->Fill(this->MtasProc->GetIndividualInnerPMTRawEnergy(2*ii + 1),2*ii + 1);
+					BKG_3412->Fill(this->MtasProc->GetIndividualInnerPMTRawEnergy(2 * ii), 2 * ii);
+					BKG_3412->Fill(this->MtasProc->GetIndividualInnerPMTRawEnergy(2 * ii + 1), 2 * ii + 1);
 
-					BKG_3413->Fill(this->MtasProc->GetIndividualMiddlePMTRawEnergy(2*ii),2*ii);
-					BKG_3413->Fill(this->MtasProc->GetIndividualMiddlePMTRawEnergy(2*ii + 1),2*ii + 1);
+					BKG_3413->Fill(this->MtasProc->GetIndividualMiddlePMTRawEnergy(2 * ii), 2 * ii);
+					BKG_3413->Fill(this->MtasProc->GetIndividualMiddlePMTRawEnergy(2 * ii + 1), 2 * ii + 1);
 
-					BKG_3414->Fill(this->MtasProc->GetIndividualOuterPMTRawEnergy(2*ii),2*ii);
-					BKG_3414->Fill(this->MtasProc->GetIndividualOuterPMTRawEnergy(2*ii + 1),2*ii + 1);
+					BKG_3414->Fill(this->MtasProc->GetIndividualOuterPMTRawEnergy(2 * ii), 2 * ii);
+					BKG_3414->Fill(this->MtasProc->GetIndividualOuterPMTRawEnergy(2 * ii + 1), 2 * ii + 1);
 
-					BKG_3511->Fill(this->MtasProc->GetIndividualCenterPMTEnergy(2*ii),2*ii);
-					BKG_3511->Fill(this->MtasProc->GetIndividualCenterPMTEnergy(2*ii + 1),2*ii + 1);
+					BKG_3511->Fill(this->MtasProc->GetIndividualCenterPMTEnergy(2 * ii), 2 * ii);
+					BKG_3511->Fill(this->MtasProc->GetIndividualCenterPMTEnergy(2 * ii + 1), 2 * ii + 1);
 
-					BKG_3512->Fill(this->MtasProc->GetIndividualInnerPMTEnergy(2*ii),2*ii);
-					BKG_3512->Fill(this->MtasProc->GetIndividualInnerPMTEnergy(2*ii + 1),2*ii + 1);
+					BKG_3512->Fill(this->MtasProc->GetIndividualInnerPMTEnergy(2 * ii), 2 * ii);
+					BKG_3512->Fill(this->MtasProc->GetIndividualInnerPMTEnergy(2 * ii + 1), 2 * ii + 1);
 
-					BKG_3513->Fill(this->MtasProc->GetIndividualMiddlePMTEnergy(2*ii),2*ii);
-					BKG_3513->Fill(this->MtasProc->GetIndividualMiddlePMTEnergy(2*ii + 1),2*ii + 1);
+					BKG_3513->Fill(this->MtasProc->GetIndividualMiddlePMTEnergy(2 * ii), 2 * ii);
+					BKG_3513->Fill(this->MtasProc->GetIndividualMiddlePMTEnergy(2 * ii + 1), 2 * ii + 1);
 
-					BKG_3514->Fill(this->MtasProc->GetIndividualOuterPMTEnergy(2*ii),2*ii);
-					BKG_3514->Fill(this->MtasProc->GetIndividualOuterPMTEnergy(2*ii + 1),2*ii + 1);
+					BKG_3514->Fill(this->MtasProc->GetIndividualOuterPMTEnergy(2 * ii), 2 * ii);
+					BKG_3514->Fill(this->MtasProc->GetIndividualOuterPMTEnergy(2 * ii + 1), 2 * ii + 1);
 				}
 			}
-		}else if( TapeProc->GetCurrentCycleState() == TAPE::IRRADIATION ){
+		} else if (TapeProc->GetCurrentCycleState() == TAPE::IRRADIATION) {
 			bool hashpge = summary->ContainsEventTag(this->hpge);
 			bool hasimplant = summary->ContainsEventTag(this->implant);
 
-			//add in HPGe monitor
+			// add in HPGe monitor
 			auto IRRAD_2200 = hismanager->GetPlot<TH2*>("IRRAD_2200");
 			auto IRRAD_2260 = hismanager->GetPlot<TH2*>("IRRAD_2260");
 			auto IRRAD_2261 = hismanager->GetPlot<TH2*>("IRRAD_2261");
 			auto IRRAD_2262 = hismanager->GetPlot<TH2*>("IRRAD_2262");
 			auto IRRAD_2263 = hismanager->GetPlot<TH2*>("IRRAD_2263");
 			auto IRRAD_2600 = hismanager->GetPlot<TH2*>("IRRAD_2600");
-			for( auto ii = 0; ii < this->HPGeProc->GetNumCrystals(); ++ii ){
+			for (auto ii = 0; ii < this->HPGeProc->GetNumCrystals(); ++ii) {
 				auto hpge_erg = this->HPGeProc->GetEnergy(ii);
-				IRRAD_2200->Fill(hpge_erg,ii);
-				for( auto jj = ii+1; jj < this->HPGeProc->GetNumCrystals(); ++jj ){
-					IRRAD_2600->Fill(hpge_erg,this->HPGeProc->GetEnergy(jj));
-					IRRAD_2600->Fill(this->HPGeProc->GetEnergy(jj),hpge_erg);
+				IRRAD_2200->Fill(hpge_erg, ii);
+				for (auto jj = ii + 1; jj < this->HPGeProc->GetNumCrystals(); ++jj) {
+					IRRAD_2600->Fill(hpge_erg, this->HPGeProc->GetEnergy(jj));
+					IRRAD_2600->Fill(this->HPGeProc->GetEnergy(jj), hpge_erg);
 				}
-				IRRAD_2260->Fill(hpge_erg,cycletime*1.0e3);
-				IRRAD_2261->Fill(hpge_erg,cycletime);
-				IRRAD_2262->Fill(hpge_erg,cycletime/60.0);
-				IRRAD_2263->Fill(hpge_erg,cycletime/(60.0*60.0));
+				IRRAD_2260->Fill(hpge_erg, cycletime * 1.0e3);
+				IRRAD_2261->Fill(hpge_erg, cycletime);
+				IRRAD_2262->Fill(hpge_erg, cycletime / 60.0);
+				IRRAD_2263->Fill(hpge_erg, cycletime / (60.0 * 60.0));
 			}
 
-			
-			//this is the nose implant plastic, was either 2x1 or 2x2
-			//this is the logic that makes PSPMT_1902 show up, use it here too
+			// this is the nose implant plastic, was either 2x1 or 2x2
+			// this is the logic that makes PSPMT_1902 show up, use it here too
 			auto hgimage = this->ImplantProc->GetHighGainImage();
-			if( hgimage.anodesum > this->ImplantThreshold ){
+			if (hgimage.anodesum > this->ImplantThreshold) {
 				auto IRRAD_2300 = hismanager->GetPlot<TH2*>("IRRAD_2300");
 				auto IRRAD_2360 = hismanager->GetPlot<TH2*>("IRRAD_2360");
 				auto IRRAD_2361 = hismanager->GetPlot<TH2*>("IRRAD_2361");
 				auto IRRAD_2362 = hismanager->GetPlot<TH2*>("IRRAD_2362");
 				auto IRRAD_2363 = hismanager->GetPlot<TH2*>("IRRAD_2363");
 				auto IRRAD_2700 = hismanager->GetPlot<TH2*>("IRRAD_2700");
-				for( auto ii = 0; ii < this->HPGeProc->GetNumCrystals(); ++ii ){
+				for (auto ii = 0; ii < this->HPGeProc->GetNumCrystals(); ++ii) {
 					auto hpge_erg = this->HPGeProc->GetEnergy(ii);
-					IRRAD_2300->Fill(hpge_erg,ii);
-					for( auto jj = ii+1; jj < this->HPGeProc->GetNumCrystals(); ++jj ){
-						IRRAD_2700->Fill(hpge_erg,this->HPGeProc->GetEnergy(jj));
-						IRRAD_2700->Fill(this->HPGeProc->GetEnergy(jj),hpge_erg);
+					IRRAD_2300->Fill(hpge_erg, ii);
+					for (auto jj = ii + 1; jj < this->HPGeProc->GetNumCrystals(); ++jj) {
+						IRRAD_2700->Fill(hpge_erg, this->HPGeProc->GetEnergy(jj));
+						IRRAD_2700->Fill(this->HPGeProc->GetEnergy(jj), hpge_erg);
 					}
-					IRRAD_2360->Fill(hpge_erg,cycletime*1.0e3);
-					IRRAD_2361->Fill(hpge_erg,cycletime);
-					IRRAD_2362->Fill(hpge_erg,cycletime/60.0);
-					IRRAD_2363->Fill(hpge_erg,cycletime/(60.0*60.0));
+					IRRAD_2360->Fill(hpge_erg, cycletime * 1.0e3);
+					IRRAD_2361->Fill(hpge_erg, cycletime);
+					IRRAD_2362->Fill(hpge_erg, cycletime / 60.0);
+					IRRAD_2363->Fill(hpge_erg, cycletime / (60.0 * 60.0));
 				}
-			}else{
+			} else {
 				auto IRRAD_2100 = hismanager->GetPlot<TH2*>("IRRAD_2100");
 				auto IRRAD_2160 = hismanager->GetPlot<TH2*>("IRRAD_2160");
 				auto IRRAD_2161 = hismanager->GetPlot<TH2*>("IRRAD_2161");
 				auto IRRAD_2162 = hismanager->GetPlot<TH2*>("IRRAD_2162");
 				auto IRRAD_2163 = hismanager->GetPlot<TH2*>("IRRAD_2163");
 				auto IRRAD_2500 = hismanager->GetPlot<TH2*>("IRRAD_2500");
-				for( auto ii = 0; ii < this->HPGeProc->GetNumCrystals(); ++ii ){
+				for (auto ii = 0; ii < this->HPGeProc->GetNumCrystals(); ++ii) {
 					auto hpge_erg = this->HPGeProc->GetEnergy(ii);
-					IRRAD_2100->Fill(hpge_erg,ii);
-					for( auto jj = ii+1; jj < this->HPGeProc->GetNumCrystals(); ++jj ){
-						IRRAD_2500->Fill(hpge_erg,this->HPGeProc->GetEnergy(jj));
-						IRRAD_2500->Fill(this->HPGeProc->GetEnergy(jj),hpge_erg);
+					IRRAD_2100->Fill(hpge_erg, ii);
+					for (auto jj = ii + 1; jj < this->HPGeProc->GetNumCrystals(); ++jj) {
+						IRRAD_2500->Fill(hpge_erg, this->HPGeProc->GetEnergy(jj));
+						IRRAD_2500->Fill(this->HPGeProc->GetEnergy(jj), hpge_erg);
 					}
-					IRRAD_2160->Fill(hpge_erg,cycletime*1.0e3);
-					IRRAD_2161->Fill(hpge_erg,cycletime);
-					IRRAD_2162->Fill(hpge_erg,cycletime/60.0);
-					IRRAD_2163->Fill(hpge_erg,cycletime/(60.0*60.0));
+					IRRAD_2160->Fill(hpge_erg, cycletime * 1.0e3);
+					IRRAD_2161->Fill(hpge_erg, cycletime);
+					IRRAD_2162->Fill(hpge_erg, cycletime / 60.0);
+					IRRAD_2163->Fill(hpge_erg, cycletime / (60.0 * 60.0));
 				}
 			}
 
-			//fill in isomer plots 
-			this->IsomerProc->FillImplantPlots(eventhistory,hismanager,cutmanager,this->HPGeProc.get(),this->ImplantProc.get());
-			
-			//this is the diagnostic cross implant plastic, was always a 2x2
-			//auto lgimage = this->ImplantProc->GetLowGainImage();
-		}else{
-			//no-op
-			//these are when we're in move or irradiate which we probably should check irradiate
-			//we can find beam isomers from the implant if we do this
+			// fill in isomer plots
+			this->IsomerProc->FillImplantPlots(eventhistory, hismanager, cutmanager, this->HPGeProc.get(), this->ImplantProc.get());
+
+			// this is the diagnostic cross implant plastic, was always a 2x2
+			// auto lgimage = this->ImplantProc->GetLowGainImage();
+		} else {
+			// no-op
+			// these are when we're in move or irradiate which we probably should check irradiate
+			// we can find beam isomers from the implant if we do this
 		}
 
-		if( hasbeta ){
+		if (hasbeta) {
 			this->MtasProc->FillNoLogicBetaPlots(hismanager);
-		}else{
+		} else {
 			this->MtasProc->FillNoLogicNonBetaPlots(hismanager);
 		}
 	}
@@ -524,22 +524,22 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 	return true;
 }
 
-[[maybe_unused]] bool anl2021Processor::PostProcess( EventHistoryManager* eventhistory, PLOTS::PlotRegistry* hismanager, CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool anl2021Processor::PostProcess(EventHistoryManager* eventhistory, PLOTS::PlotRegistry* hismanager, CUTS::CutRegistry* cutmanager) {
 	Processor::PostProcess();
-	if( this->HasTape ){
-		this->TapeProc->PostProcess(eventhistory,hismanager,cutmanager);
+	if (this->HasTape) {
+		this->TapeProc->PostProcess(eventhistory, hismanager, cutmanager);
 	}
-	if( this->HasPSPMT ){
-		this->ImplantProc->PostProcess(eventhistory,hismanager,cutmanager);
+	if (this->HasPSPMT) {
+		this->ImplantProc->PostProcess(eventhistory, hismanager, cutmanager);
 	}
-	if( this->HasHPGe ){
-		this->HPGeProc->PostProcess(eventhistory,hismanager,cutmanager);
+	if (this->HasHPGe) {
+		this->HPGeProc->PostProcess(eventhistory, hismanager, cutmanager);
 	}
-	if( this->HasSilicon ){
-		this->SiliconProc->PostProcess(eventhistory,hismanager,cutmanager);
+	if (this->HasSilicon) {
+		this->SiliconProc->PostProcess(eventhistory, hismanager, cutmanager);
 	}
-	if( this->HasMTAS ){
-		this->MtasProc->PostProcess(eventhistory,hismanager,cutmanager);
+	if (this->HasMTAS) {
+		this->MtasProc->PostProcess(eventhistory, hismanager, cutmanager);
 	}
 	this->Reset();
 
@@ -547,31 +547,31 @@ anl2021Processor::anl2021Processor(const std::string& log) : Processor(log,"anl2
 	return true;
 }
 
-void anl2021Processor::Init(const pugi::xml_node& config){
-	for( pugi::xml_node proc = config.child("Processor"); proc; proc = proc.next_sibling("Processor") ){
+void anl2021Processor::Init(const pugi::xml_node& config) {
+	for (pugi::xml_node proc = config.child("Processor"); proc; proc = proc.next_sibling("Processor")) {
 		std::string name = proc.attribute("name").as_string();
-		if( name.compare("MtasProcessor") == 0 ){
-			if( not proc.attribute("oldcenter").as_bool(false) ){
-				throw std::runtime_error("Need oldcenter=\"true\" on the MtasProcessor child tag for anl2021Processor"); 
+		if (name.compare("MtasProcessor") == 0) {
+			if (not proc.attribute("oldcenter").as_bool(false)) {
+				throw std::runtime_error("Need oldcenter=\"true\" on the MtasProcessor child tag for anl2021Processor");
 			}
 			this->MtasProc->Init(proc);
 			this->HasMTAS = true;
-		}else if( name.compare("MtasSSDProcessor") == 0 ){
+		} else if (name.compare("MtasSSDProcessor") == 0) {
 			this->SiliconProc->Init(proc);
 			this->HasSilicon = true;
-		}else if( name.compare("MtasTapeProcessor") == 0 ){
+		} else if (name.compare("MtasTapeProcessor") == 0) {
 			this->TapeProc->Init(proc);
 			this->HasTape = true;
-		}else if( name.compare("PSPMTProcessor") == 0 ){
+		} else if (name.compare("PSPMTProcessor") == 0) {
 			this->ImplantProc->Init(proc);
 			this->HasPSPMT = true;
-		}else if( name.compare("SimpleHPGeProcessor") == 0 ){
+		} else if (name.compare("SimpleHPGeProcessor") == 0) {
 			this->HPGeProc->Init(proc);
 			this->HasHPGe = true;
-		}else if( name.compare("MtasIsomerProcessor") == 0 ){
+		} else if (name.compare("MtasIsomerProcessor") == 0) {
 			this->IsomerProc->Init(proc);
 			this->HasIsomer = true;
-		}else{
+		} else {
 			throw std::runtime_error("unknown subprocessor declared in anl2021Processor");
 		}
 	}
@@ -579,63 +579,63 @@ void anl2021Processor::Init(const pugi::xml_node& config){
 	this->SiliconThreshold = config.attribute("siliconthresh").as_double(0.0);
 	this->ImplantThreshold = config.attribute("implantthresh").as_double(0.0);
 	this->HPGeThreshold = config.attribute("hpgethresh").as_double(0.0);
-	//need to load in early and late time gate for generating duplicates of 3350 3351 since they're not easy to make without a shitload of memory
+	// need to load in early and late time gate for generating duplicates of 3350 3351 since they're not easy to make without a shitload of memory
 	auto earlygate = config.child("EarlyCycle");
-	if( earlygate ){
-		this->EarlyCycle = Gate<double>(earlygate.attribute("lowerbound").as_double(0.0),earlygate.attribute("upperbound").as_double(0.0));
-	}else{
-		this->EarlyCycle = Gate<double>(0.0,0.0);
+	if (earlygate) {
+		this->EarlyCycle = Gate<double>(earlygate.attribute("lowerbound").as_double(0.0), earlygate.attribute("upperbound").as_double(0.0));
+	} else {
+		this->EarlyCycle = Gate<double>(0.0, 0.0);
 	}
 
 	auto midgate = config.child("MidCycle");
-	if( midgate ){
-		this->MidCycle = Gate<double>(midgate.attribute("lowerbound").as_double(0.0),midgate.attribute("upperbound").as_double(0.0));
-	}else{
-		this->MidCycle = Gate<double>(0.0,0.0);
+	if (midgate) {
+		this->MidCycle = Gate<double>(midgate.attribute("lowerbound").as_double(0.0), midgate.attribute("upperbound").as_double(0.0));
+	} else {
+		this->MidCycle = Gate<double>(0.0, 0.0);
 	}
 
 	auto lategate = config.child("LateCycle");
-	if( lategate ){
-		this->LateCycle = Gate<double>(lategate.attribute("lowerbound").as_double(0.0),lategate.attribute("upperbound").as_double(0.0));
-	}else{
-		this->LateCycle = Gate<double>(0.0,0.0);
+	if (lategate) {
+		this->LateCycle = Gate<double>(lategate.attribute("lowerbound").as_double(0.0), lategate.attribute("upperbound").as_double(0.0));
+	} else {
+		this->LateCycle = Gate<double>(0.0, 0.0);
 	}
 
-	if( not this->HasMTAS ){
+	if (not this->HasMTAS) {
 		throw std::runtime_error("missing MtasProcessor in anl2021Processor");
 	}
 
-	if( not this->HasSilicon ){
+	if (not this->HasSilicon) {
 		throw std::runtime_error("missing MtasSSDProcessor in anl2021Processor");
 	}
 
-	if( not this->HasTape ){
+	if (not this->HasTape) {
 		throw std::runtime_error("missing MtasTapeProcessor in anl2021Processor");
 	}
 
-	if( not this->HasHPGe ){
+	if (not this->HasHPGe) {
 		throw std::runtime_error("missing SimpleHPGeProcessor in anl2021Processor");
 	}
 
-	if( not this->HasPSPMT ){
+	if (not this->HasPSPMT) {
 		throw std::runtime_error("missing PSPMTProcessor in anl2021Processor");
 	}
 
 	this->LoadHistogramSettings(config);
 	this->LoadCustomCuts(config);
 }
-		
-void anl2021Processor::Finalize(){
+
+void anl2021Processor::Finalize() {
 	this->MtasProc->Finalize();
 	this->TapeProc->Finalize();
 	this->SiliconProc->Finalize();
 	this->HPGeProc->Finalize();
 	this->ImplantProc->Finalize();
 
-	this->console->info("{} has been finalized",this->ProcessorName);
+	this->console->info("{} has been finalized", this->ProcessorName);
 }
 
-void anl2021Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
+void anl2021Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager) {
 	this->MtasProc->DeclarePlots(hismanager);
 	this->TapeProc->DeclarePlots(hismanager);
 	this->SiliconProc->DeclarePlots(hismanager);
@@ -643,145 +643,145 @@ void anl2021Processor::DeclarePlots(PLOTS::PlotRegistry* hismanager){
 	this->ImplantProc->DeclarePlots(hismanager);
 	this->IsomerProc->DeclarePlots(hismanager);
 
-	hismanager->RegisterPlot<TH1F>("BKG_3100","Mtas Total Background Cycle Gated anti-#beta Gated; Energy (keV)",this->h1dsettings.at(3100));
-	hismanager->RegisterPlot<TH1F>("BKG_3110","Mtas Center Sum Background Cycle Gated anti-#beta Gated; Energy (keV)",this->h1dsettings.at(3110));
-	hismanager->RegisterPlot<TH1F>("BKG_3120","Mtas Inner Sum Background Cycle Gated anti-#beta Gated; Energy (keV)",this->h1dsettings.at(3120));
-	hismanager->RegisterPlot<TH1F>("BKG_3130","Mtas Middle Sum Background Cycle Gated anti-#beta Gated; Energy (keV)",this->h1dsettings.at(3130));
-	hismanager->RegisterPlot<TH1F>("BKG_3140","Mtas Outer Sum Background Cycle Gated anti-#beta Gated; Energy (keV)",this->h1dsettings.at(3140));
-	hismanager->RegisterPlot<TH1F>("BKG_3115","Mtas Center Stack Background Cycle Gated anti-#beta Gated; Energy (keV)",this->h1dsettings.at(3115));
-	hismanager->RegisterPlot<TH1F>("BKG_3125","Mtas Inner Stack Background Cycle Gated anti-#beta Gated; Energy (keV)",this->h1dsettings.at(3125));
-	hismanager->RegisterPlot<TH1F>("BKG_3135","Mtas Middle Stack Background Cycle Gated anti-#beta Gated; Energy (keV)",this->h1dsettings.at(3135));
-	hismanager->RegisterPlot<TH1F>("BKG_3145","Mtas Outer Stack Background Cycle Gated anti-#beta Gated; Energy (keV)",this->h1dsettings.at(3145));
+	hismanager->RegisterPlot<TH1F>("BKG_3100", "Mtas Total Background Cycle Gated anti-#beta Gated; Energy (keV)", this->h1dsettings.at(3100));
+	hismanager->RegisterPlot<TH1F>("BKG_3110", "Mtas Center Sum Background Cycle Gated anti-#beta Gated; Energy (keV)", this->h1dsettings.at(3110));
+	hismanager->RegisterPlot<TH1F>("BKG_3120", "Mtas Inner Sum Background Cycle Gated anti-#beta Gated; Energy (keV)", this->h1dsettings.at(3120));
+	hismanager->RegisterPlot<TH1F>("BKG_3130", "Mtas Middle Sum Background Cycle Gated anti-#beta Gated; Energy (keV)", this->h1dsettings.at(3130));
+	hismanager->RegisterPlot<TH1F>("BKG_3140", "Mtas Outer Sum Background Cycle Gated anti-#beta Gated; Energy (keV)", this->h1dsettings.at(3140));
+	hismanager->RegisterPlot<TH1F>("BKG_3115", "Mtas Center Stack Background Cycle Gated anti-#beta Gated; Energy (keV)", this->h1dsettings.at(3115));
+	hismanager->RegisterPlot<TH1F>("BKG_3125", "Mtas Inner Stack Background Cycle Gated anti-#beta Gated; Energy (keV)", this->h1dsettings.at(3125));
+	hismanager->RegisterPlot<TH1F>("BKG_3135", "Mtas Middle Stack Background Cycle Gated anti-#beta Gated; Energy (keV)", this->h1dsettings.at(3135));
+	hismanager->RegisterPlot<TH1F>("BKG_3145", "Mtas Outer Stack Background Cycle Gated anti-#beta Gated; Energy (keV)", this->h1dsettings.at(3145));
 
-	hismanager->RegisterPlot<TH1F>("BKG_3200","Mtas Total Background Cycle Gated; Energy (keV)",this->h1dsettings.at(3200));
-	hismanager->RegisterPlot<TH1F>("BKG_3210","Mtas Center Sum Background Cycle Gated; Energy (keV)",this->h1dsettings.at(3210));
-	hismanager->RegisterPlot<TH1F>("BKG_3220","Mtas Inner Sum Background Cycle Gated; Energy (keV)",this->h1dsettings.at(3220));
-	hismanager->RegisterPlot<TH1F>("BKG_3230","Mtas Middle Sum Background Cycle Gated; Energy (keV)",this->h1dsettings.at(3230));
-	hismanager->RegisterPlot<TH1F>("BKG_3240","Mtas Outer Sum Background Cycle Gated; Energy (keV)",this->h1dsettings.at(3240));
-	hismanager->RegisterPlot<TH1F>("BKG_3215","Mtas Center Stack Background Cycle Gated; Energy (keV)",this->h1dsettings.at(3215));
-	hismanager->RegisterPlot<TH1F>("BKG_3225","Mtas Inner Stack Background Cycle Gated; Energy (keV)",this->h1dsettings.at(3225));
-	hismanager->RegisterPlot<TH1F>("BKG_3235","Mtas Middle Stack Background Cycle Gated; Energy (keV)",this->h1dsettings.at(3235));
-	hismanager->RegisterPlot<TH1F>("BKG_3245","Mtas Outer Stack Background Cycle Gated; Energy (keV)",this->h1dsettings.at(3245));
+	hismanager->RegisterPlot<TH1F>("BKG_3200", "Mtas Total Background Cycle Gated; Energy (keV)", this->h1dsettings.at(3200));
+	hismanager->RegisterPlot<TH1F>("BKG_3210", "Mtas Center Sum Background Cycle Gated; Energy (keV)", this->h1dsettings.at(3210));
+	hismanager->RegisterPlot<TH1F>("BKG_3220", "Mtas Inner Sum Background Cycle Gated; Energy (keV)", this->h1dsettings.at(3220));
+	hismanager->RegisterPlot<TH1F>("BKG_3230", "Mtas Middle Sum Background Cycle Gated; Energy (keV)", this->h1dsettings.at(3230));
+	hismanager->RegisterPlot<TH1F>("BKG_3240", "Mtas Outer Sum Background Cycle Gated; Energy (keV)", this->h1dsettings.at(3240));
+	hismanager->RegisterPlot<TH1F>("BKG_3215", "Mtas Center Stack Background Cycle Gated; Energy (keV)", this->h1dsettings.at(3215));
+	hismanager->RegisterPlot<TH1F>("BKG_3225", "Mtas Inner Stack Background Cycle Gated; Energy (keV)", this->h1dsettings.at(3225));
+	hismanager->RegisterPlot<TH1F>("BKG_3235", "Mtas Middle Stack Background Cycle Gated; Energy (keV)", this->h1dsettings.at(3235));
+	hismanager->RegisterPlot<TH1F>("BKG_3245", "Mtas Outer Stack Background Cycle Gated; Energy (keV)", this->h1dsettings.at(3245));
 
-	hismanager->RegisterPlot<TH1F>("BKG_3300","Mtas Total Background Cycle Gated #beta Gated; Energy (keV)",this->h1dsettings.at(3300));
-	hismanager->RegisterPlot<TH1F>("BKG_3310","Mtas Center Sum Background Cycle Gated #beta Gated; Energy (keV)",this->h1dsettings.at(3310));
-	hismanager->RegisterPlot<TH1F>("BKG_3320","Mtas Inner Sum Background Cycle Gated #beta Gated; Energy (keV)",this->h1dsettings.at(3320));
-	hismanager->RegisterPlot<TH1F>("BKG_3330","Mtas Middle Sum Background Cycle Gated #beta Gated; Energy (keV)",this->h1dsettings.at(3330));
-	hismanager->RegisterPlot<TH1F>("BKG_3340","Mtas Outer Sum Background Cycle Gated #beta Gated; Energy (keV)",this->h1dsettings.at(3340));
-	hismanager->RegisterPlot<TH1F>("BKG_3315","Mtas Center Stack Background Cycle Gated #beta Gated; Energy (keV)",this->h1dsettings.at(3315));
-	hismanager->RegisterPlot<TH1F>("BKG_3325","Mtas Inner Stack Background Cycle Gated #beta Gated; Energy (keV)",this->h1dsettings.at(3325));
-	hismanager->RegisterPlot<TH1F>("BKG_3335","Mtas Middle Stack Background Cycle Gated #beta Gated; Energy (keV)",this->h1dsettings.at(3335));
-	hismanager->RegisterPlot<TH1F>("BKG_3345","Mtas Outer Stack Background Cycle Gated #beta Gated; Energy (keV)",this->h1dsettings.at(3345));
+	hismanager->RegisterPlot<TH1F>("BKG_3300", "Mtas Total Background Cycle Gated #beta Gated; Energy (keV)", this->h1dsettings.at(3300));
+	hismanager->RegisterPlot<TH1F>("BKG_3310", "Mtas Center Sum Background Cycle Gated #beta Gated; Energy (keV)", this->h1dsettings.at(3310));
+	hismanager->RegisterPlot<TH1F>("BKG_3320", "Mtas Inner Sum Background Cycle Gated #beta Gated; Energy (keV)", this->h1dsettings.at(3320));
+	hismanager->RegisterPlot<TH1F>("BKG_3330", "Mtas Middle Sum Background Cycle Gated #beta Gated; Energy (keV)", this->h1dsettings.at(3330));
+	hismanager->RegisterPlot<TH1F>("BKG_3340", "Mtas Outer Sum Background Cycle Gated #beta Gated; Energy (keV)", this->h1dsettings.at(3340));
+	hismanager->RegisterPlot<TH1F>("BKG_3315", "Mtas Center Stack Background Cycle Gated #beta Gated; Energy (keV)", this->h1dsettings.at(3315));
+	hismanager->RegisterPlot<TH1F>("BKG_3325", "Mtas Inner Stack Background Cycle Gated #beta Gated; Energy (keV)", this->h1dsettings.at(3325));
+	hismanager->RegisterPlot<TH1F>("BKG_3335", "Mtas Middle Stack Background Cycle Gated #beta Gated; Energy (keV)", this->h1dsettings.at(3335));
+	hismanager->RegisterPlot<TH1F>("BKG_3345", "Mtas Outer Stack Background Cycle Gated #beta Gated; Energy (keV)", this->h1dsettings.at(3345));
 
-	hismanager->RegisterPlot<TH2F>("BKG_3411","Raw IndividualPMT C PMTs Background Cycle gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3411));
-	hismanager->RegisterPlot<TH2F>("BKG_3412","Raw IndividualPMT I PMTs Background Cycle gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3412));
-	hismanager->RegisterPlot<TH2F>("BKG_3413","Raw IndividualPMT M PMTs Background Cycle gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3413));
-	hismanager->RegisterPlot<TH2F>("BKG_3414","Raw IndividualPMT O PMTs Background Cycle gated; Energy (channel); PMT (arb.)",this->h2dsettings.at(3414));
+	hismanager->RegisterPlot<TH2F>("BKG_3411", "Raw IndividualPMT C PMTs Background Cycle gated; Energy (channel); PMT (arb.)", this->h2dsettings.at(3411));
+	hismanager->RegisterPlot<TH2F>("BKG_3412", "Raw IndividualPMT I PMTs Background Cycle gated; Energy (channel); PMT (arb.)", this->h2dsettings.at(3412));
+	hismanager->RegisterPlot<TH2F>("BKG_3413", "Raw IndividualPMT M PMTs Background Cycle gated; Energy (channel); PMT (arb.)", this->h2dsettings.at(3413));
+	hismanager->RegisterPlot<TH2F>("BKG_3414", "Raw IndividualPMT O PMTs Background Cycle gated; Energy (channel); PMT (arb.)", this->h2dsettings.at(3414));
 
-	hismanager->RegisterPlot<TH2F>("BKG_3511","Calibrated IndividualPMT C PMTs Background Cycle gated; Energy (keV); PMT (arb.)",this->h2dsettings.at(3511));
-	hismanager->RegisterPlot<TH2F>("BKG_3512","Calibrated IndividualPMT I PMTs Background Cycle gated; Energy (keV); PMT (arb.)",this->h2dsettings.at(3512));
-	hismanager->RegisterPlot<TH2F>("BKG_3513","Calibrated IndividualPMT M PMTs Background Cycle gated; Energy (keV); PMT (arb.)",this->h2dsettings.at(3513));
-	hismanager->RegisterPlot<TH2F>("BKG_3514","Calibrated IndividualPMT O PMTs Background Cycle gated; Energy (keV); PMT (arb.)",this->h2dsettings.at(3514));
+	hismanager->RegisterPlot<TH2F>("BKG_3511", "Calibrated IndividualPMT C PMTs Background Cycle gated; Energy (keV); PMT (arb.)", this->h2dsettings.at(3511));
+	hismanager->RegisterPlot<TH2F>("BKG_3512", "Calibrated IndividualPMT I PMTs Background Cycle gated; Energy (keV); PMT (arb.)", this->h2dsettings.at(3512));
+	hismanager->RegisterPlot<TH2F>("BKG_3513", "Calibrated IndividualPMT M PMTs Background Cycle gated; Energy (keV); PMT (arb.)", this->h2dsettings.at(3513));
+	hismanager->RegisterPlot<TH2F>("BKG_3514", "Calibrated IndividualPMT O PMTs Background Cycle gated; Energy (keV); PMT (arb.)", this->h2dsettings.at(3514));
 
-	hismanager->RegisterPlot<TH2F>("IRRAD_2100","HPGe Irradiation Cycle Gated anti-#beta Gated; Energy (keV); Crystal Number (arb.)",this->h2dsettings.at(2100));
-	hismanager->RegisterPlot<TH2F>("IRRAD_2160","HPGe vs Cycle Time (ms) anti-#beta-gated; Energy (keV); Cycle Time (ms)",this->h2dsettings.at(2160));
-	hismanager->RegisterPlot<TH2F>("IRRAD_2161","HPGe vs Cycle Time (s) anti-#beta-gated; Energy (keV); Cycle Time (s)",this->h2dsettings.at(2161));
-	hismanager->RegisterPlot<TH2F>("IRRAD_2162","HPGe vs Cycle Time (min) anti-#beta-gated; Energy (keV); Cycle Time (min)",this->h2dsettings.at(2162));
-	hismanager->RegisterPlot<TH2F>("IRRAD_2163","HPGe vs Cycle Time (hr) anti-#beta-gated; Energy (keV); Cycle Time (hr)",this->h2dsettings.at(2163));
+	hismanager->RegisterPlot<TH2F>("IRRAD_2100", "HPGe Irradiation Cycle Gated anti-#beta Gated; Energy (keV); Crystal Number (arb.)", this->h2dsettings.at(2100));
+	hismanager->RegisterPlot<TH2F>("IRRAD_2160", "HPGe vs Cycle Time (ms) anti-#beta-gated; Energy (keV); Cycle Time (ms)", this->h2dsettings.at(2160));
+	hismanager->RegisterPlot<TH2F>("IRRAD_2161", "HPGe vs Cycle Time (s) anti-#beta-gated; Energy (keV); Cycle Time (s)", this->h2dsettings.at(2161));
+	hismanager->RegisterPlot<TH2F>("IRRAD_2162", "HPGe vs Cycle Time (min) anti-#beta-gated; Energy (keV); Cycle Time (min)", this->h2dsettings.at(2162));
+	hismanager->RegisterPlot<TH2F>("IRRAD_2163", "HPGe vs Cycle Time (hr) anti-#beta-gated; Energy (keV); Cycle Time (hr)", this->h2dsettings.at(2163));
 
-	hismanager->RegisterPlot<TH2F>("IRRAD_2200","HPGe Irradiation Cycle Gated; Energy (keV); Crystal Number (arb.)",this->h2dsettings.at(2200));
-	hismanager->RegisterPlot<TH2F>("IRRAD_2260","HPGe vs Cycle Time (ms); Energy (keV); Cycle Time (ms)",this->h2dsettings.at(2260));
-	hismanager->RegisterPlot<TH2F>("IRRAD_2261","HPGe vs Cycle Time (s); Energy (keV); Cycle Time (s)",this->h2dsettings.at(2261));
-	hismanager->RegisterPlot<TH2F>("IRRAD_2262","HPGe vs Cycle Time (min); Energy (keV); Cycle Time (min)",this->h2dsettings.at(2262));
-	hismanager->RegisterPlot<TH2F>("IRRAD_2263","HPGe vs Cycle Time (hr); Energy (keV); Cycle Time (hr)",this->h2dsettings.at(2263));
+	hismanager->RegisterPlot<TH2F>("IRRAD_2200", "HPGe Irradiation Cycle Gated; Energy (keV); Crystal Number (arb.)", this->h2dsettings.at(2200));
+	hismanager->RegisterPlot<TH2F>("IRRAD_2260", "HPGe vs Cycle Time (ms); Energy (keV); Cycle Time (ms)", this->h2dsettings.at(2260));
+	hismanager->RegisterPlot<TH2F>("IRRAD_2261", "HPGe vs Cycle Time (s); Energy (keV); Cycle Time (s)", this->h2dsettings.at(2261));
+	hismanager->RegisterPlot<TH2F>("IRRAD_2262", "HPGe vs Cycle Time (min); Energy (keV); Cycle Time (min)", this->h2dsettings.at(2262));
+	hismanager->RegisterPlot<TH2F>("IRRAD_2263", "HPGe vs Cycle Time (hr); Energy (keV); Cycle Time (hr)", this->h2dsettings.at(2263));
 
-	hismanager->RegisterPlot<TH2F>("IRRAD_2300","HPGe Irradiation Cycle Gated #beta Gated; Energy (keV); Crystal Number (arb.)",this->h2dsettings.at(2300));
-	
-	hismanager->RegisterPlot<TH2F>("IRRAD_2360","HPGe vs Cycle Time (ms) #beta-gated; Energy (keV); Cycle Time (ms)",this->h2dsettings.at(2360));
-	hismanager->RegisterPlot<TH2F>("IRRAD_2361","HPGe vs Cycle Time (s) #beta-gated; Energy (keV); Cycle Time (s)",this->h2dsettings.at(2361));
-	hismanager->RegisterPlot<TH2F>("IRRAD_2362","HPGe vs Cycle Time (min) #beta-gated; Energy (keV); Cycle Time (min)",this->h2dsettings.at(2362));
-	hismanager->RegisterPlot<TH2F>("IRRAD_2363","HPGe vs Cycle Time (hr) #beta-gated; Energy (keV); Cycle Time (hr)",this->h2dsettings.at(2363));
+	hismanager->RegisterPlot<TH2F>("IRRAD_2300", "HPGe Irradiation Cycle Gated #beta Gated; Energy (keV); Crystal Number (arb.)", this->h2dsettings.at(2300));
 
-	hismanager->RegisterPlot<TH2F>("IRRAD_2500","HPGe Gamma-Gamma Irradiation Cycle Gated anti-#beta Gated; Energy (keV); Energy (keV)",this->h2dsettings.at(2500));
-	hismanager->RegisterPlot<TH2F>("IRRAD_2600","HPGe Gamma-Gamma Irradiation Cycle Gated; Energy (keV); Energy (keV)",this->h2dsettings.at(2600));
-	hismanager->RegisterPlot<TH2F>("IRRAD_2700","HPGe Gamma-Gamma Irradiation Cycle Gated #beta Gated; Energy (keV); Energy (keV)",this->h2dsettings.at(2700));
-	
-	hismanager->RegisterPlot<TH2F>("MEASURE_3160","Mtas Total vs Cycle Time (ms) anti-#beta-gated; Mtas Total Energy (keV); Cycle Time (ms)",this->h2dsettings.at(3160));
-	hismanager->RegisterPlot<TH2F>("MEASURE_3161","Mtas Total vs Cycle Time (s) anti-#beta-gated; Mtas Total Energy (keV); Cycle Time (s)",this->h2dsettings.at(3161));
-	hismanager->RegisterPlot<TH2F>("MEASURE_3162","Mtas Total vs Cycle Time (min) anti-#beta-gated; Mtas Total Energy (keV); Cycle Time (min)",this->h2dsettings.at(3162));
-	hismanager->RegisterPlot<TH2F>("MEASURE_3163","Mtas Total vs Cycle Time (hr) anti-#beta-gated; Mtas Total Energy (keV); Cycle Time (hr)",this->h2dsettings.at(3163));
+	hismanager->RegisterPlot<TH2F>("IRRAD_2360", "HPGe vs Cycle Time (ms) #beta-gated; Energy (keV); Cycle Time (ms)", this->h2dsettings.at(2360));
+	hismanager->RegisterPlot<TH2F>("IRRAD_2361", "HPGe vs Cycle Time (s) #beta-gated; Energy (keV); Cycle Time (s)", this->h2dsettings.at(2361));
+	hismanager->RegisterPlot<TH2F>("IRRAD_2362", "HPGe vs Cycle Time (min) #beta-gated; Energy (keV); Cycle Time (min)", this->h2dsettings.at(2362));
+	hismanager->RegisterPlot<TH2F>("IRRAD_2363", "HPGe vs Cycle Time (hr) #beta-gated; Energy (keV); Cycle Time (hr)", this->h2dsettings.at(2363));
 
-	hismanager->RegisterPlot<TH2F>("MEASURE_3260","Mtas Total vs Cycle Time (ms); Mtas Total Energy (keV); Cycle Time (ms)",this->h2dsettings.at(3260));
-	hismanager->RegisterPlot<TH2F>("MEASURE_3261","Mtas Total vs Cycle Time (s); Mtas Total Energy (keV); Cycle Time (s)",this->h2dsettings.at(3261));
-	hismanager->RegisterPlot<TH2F>("MEASURE_3262","Mtas Total vs Cycle Time (min); Mtas Total Energy (keV); Cycle Time (min)",this->h2dsettings.at(3262));
-	hismanager->RegisterPlot<TH2F>("MEASURE_3263","Mtas Total vs Cycle Time (hr); Mtas Total Energy (keV); Cycle Time (hr)",this->h2dsettings.at(3263));
+	hismanager->RegisterPlot<TH2F>("IRRAD_2500", "HPGe Gamma-Gamma Irradiation Cycle Gated anti-#beta Gated; Energy (keV); Energy (keV)", this->h2dsettings.at(2500));
+	hismanager->RegisterPlot<TH2F>("IRRAD_2600", "HPGe Gamma-Gamma Irradiation Cycle Gated; Energy (keV); Energy (keV)", this->h2dsettings.at(2600));
+	hismanager->RegisterPlot<TH2F>("IRRAD_2700", "HPGe Gamma-Gamma Irradiation Cycle Gated #beta Gated; Energy (keV); Energy (keV)", this->h2dsettings.at(2700));
 
-	hismanager->RegisterPlot<TH2F>("MEASURE_3360","Mtas Total vs Cycle Time (ms) #beta-gated; Mtas Total Energy (keV); Cycle Time (ms)",this->h2dsettings.at(3360));
-	hismanager->RegisterPlot<TH2F>("MEASURE_3361","Mtas Total vs Cycle Time (s) #beta-gated; Mtas Total Energy (keV); Cycle Time (s)",this->h2dsettings.at(3361));
-	hismanager->RegisterPlot<TH2F>("MEASURE_3362","Mtas Total vs Cycle Time (min) #beta-gated; Mtas Total Energy (keV); Cycle Time (min)",this->h2dsettings.at(3362));
-	hismanager->RegisterPlot<TH2F>("MEASURE_3363","Mtas Total vs Cycle Time (hr) #beta-gated; Mtas Total Energy (keV); Cycle Time (hr)",this->h2dsettings.at(3363));
+	hismanager->RegisterPlot<TH2F>("MEASURE_3160", "Mtas Total vs Cycle Time (ms) anti-#beta-gated; Mtas Total Energy (keV); Cycle Time (ms)", this->h2dsettings.at(3160));
+	hismanager->RegisterPlot<TH2F>("MEASURE_3161", "Mtas Total vs Cycle Time (s) anti-#beta-gated; Mtas Total Energy (keV); Cycle Time (s)", this->h2dsettings.at(3161));
+	hismanager->RegisterPlot<TH2F>("MEASURE_3162", "Mtas Total vs Cycle Time (min) anti-#beta-gated; Mtas Total Energy (keV); Cycle Time (min)", this->h2dsettings.at(3162));
+	hismanager->RegisterPlot<TH2F>("MEASURE_3163", "Mtas Total vs Cycle Time (hr) anti-#beta-gated; Mtas Total Energy (keV); Cycle Time (hr)", this->h2dsettings.at(3163));
 
-	hismanager->RegisterPlot<TH2F>("MEASURE_31608","Mtas Total vs Cycle Time (ms) anti-#beta-gated; Mtas Total Energy (8 keV/bin); Cycle Time (ms)",this->h2dsettings.at(31608));
-	hismanager->RegisterPlot<TH2F>("MEASURE_31618","Mtas Total vs Cycle Time (s) anti-#beta-gated; Mtas Total Energy (8 keV/bin); Cycle Time (s)",this->h2dsettings.at(31618));
-	hismanager->RegisterPlot<TH2F>("MEASURE_31628","Mtas Total vs Cycle Time (min) anti-#beta-gated; Mtas Total Energy (8 keV/bin); Cycle Time (min)",this->h2dsettings.at(31628));
-	hismanager->RegisterPlot<TH2F>("MEASURE_31638","Mtas Total vs Cycle Time (hr) anti-#beta-gated; Mtas Total Energy (8 keV/bin); Cycle Time (hr)",this->h2dsettings.at(31638));
+	hismanager->RegisterPlot<TH2F>("MEASURE_3260", "Mtas Total vs Cycle Time (ms); Mtas Total Energy (keV); Cycle Time (ms)", this->h2dsettings.at(3260));
+	hismanager->RegisterPlot<TH2F>("MEASURE_3261", "Mtas Total vs Cycle Time (s); Mtas Total Energy (keV); Cycle Time (s)", this->h2dsettings.at(3261));
+	hismanager->RegisterPlot<TH2F>("MEASURE_3262", "Mtas Total vs Cycle Time (min); Mtas Total Energy (keV); Cycle Time (min)", this->h2dsettings.at(3262));
+	hismanager->RegisterPlot<TH2F>("MEASURE_3263", "Mtas Total vs Cycle Time (hr); Mtas Total Energy (keV); Cycle Time (hr)", this->h2dsettings.at(3263));
 
-	hismanager->RegisterPlot<TH2F>("MEASURE_32608","Mtas Total vs Cycle Time (ms); Mtas Total Energy (8 keV/bin); Cycle Time (ms)",this->h2dsettings.at(32608));
-	hismanager->RegisterPlot<TH2F>("MEASURE_32618","Mtas Total vs Cycle Time (s); Mtas Total Energy (8 keV/bin); Cycle Time (s)",this->h2dsettings.at(32618));
-	hismanager->RegisterPlot<TH2F>("MEASURE_32628","Mtas Total vs Cycle Time (min); Mtas Total Energy (8 keV/bin); Cycle Time (min)",this->h2dsettings.at(32628));
-	hismanager->RegisterPlot<TH2F>("MEASURE_32638","Mtas Total vs Cycle Time (hr); Mtas Total Energy (8 keV/bin); Cycle Time (hr)",this->h2dsettings.at(32638));
+	hismanager->RegisterPlot<TH2F>("MEASURE_3360", "Mtas Total vs Cycle Time (ms) #beta-gated; Mtas Total Energy (keV); Cycle Time (ms)", this->h2dsettings.at(3360));
+	hismanager->RegisterPlot<TH2F>("MEASURE_3361", "Mtas Total vs Cycle Time (s) #beta-gated; Mtas Total Energy (keV); Cycle Time (s)", this->h2dsettings.at(3361));
+	hismanager->RegisterPlot<TH2F>("MEASURE_3362", "Mtas Total vs Cycle Time (min) #beta-gated; Mtas Total Energy (keV); Cycle Time (min)", this->h2dsettings.at(3362));
+	hismanager->RegisterPlot<TH2F>("MEASURE_3363", "Mtas Total vs Cycle Time (hr) #beta-gated; Mtas Total Energy (keV); Cycle Time (hr)", this->h2dsettings.at(3363));
 
-	hismanager->RegisterPlot<TH2F>("MEASURE_33608","Mtas Total vs Cycle Time (ms) #beta-gated; Mtas Total Energy (8 keV/bin); Cycle Time (ms)",this->h2dsettings.at(33608));
-	hismanager->RegisterPlot<TH2F>("MEASURE_33618","Mtas Total vs Cycle Time (s) #beta-gated; Mtas Total Energy (8 keV/bin); Cycle Time (s)",this->h2dsettings.at(33618));
-	hismanager->RegisterPlot<TH2F>("MEASURE_33628","Mtas Total vs Cycle Time (min) #beta-gated; Mtas Total Energy (8 keV/bin); Cycle Time (min)",this->h2dsettings.at(33628));
-	hismanager->RegisterPlot<TH2F>("MEASURE_33638","Mtas Total vs Cycle Time (hr) #beta-gated; Mtas Total Energy (8 keV/bin); Cycle Time (hr)",this->h2dsettings.at(33638));
+	hismanager->RegisterPlot<TH2F>("MEASURE_31608", "Mtas Total vs Cycle Time (ms) anti-#beta-gated; Mtas Total Energy (8 keV/bin); Cycle Time (ms)", this->h2dsettings.at(31608));
+	hismanager->RegisterPlot<TH2F>("MEASURE_31618", "Mtas Total vs Cycle Time (s) anti-#beta-gated; Mtas Total Energy (8 keV/bin); Cycle Time (s)", this->h2dsettings.at(31618));
+	hismanager->RegisterPlot<TH2F>("MEASURE_31628", "Mtas Total vs Cycle Time (min) anti-#beta-gated; Mtas Total Energy (8 keV/bin); Cycle Time (min)", this->h2dsettings.at(31628));
+	hismanager->RegisterPlot<TH2F>("MEASURE_31638", "Mtas Total vs Cycle Time (hr) anti-#beta-gated; Mtas Total Energy (8 keV/bin); Cycle Time (hr)", this->h2dsettings.at(31638));
 
-	hismanager->RegisterPlot<TH2F>("MEASURE_3650","Si Max vs Mtas Total; Mtas Total Energy (keV); Si Max (keV)",this->h2dsettings.at(3650));
-	hismanager->RegisterPlot<TH2F>("MEASURE_36508","Si Max vs Mtas Total; Mtas Total Energy (8 keV/bin); Si Max (8 keV/bin)",this->h2dsettings.at(36508));
+	hismanager->RegisterPlot<TH2F>("MEASURE_32608", "Mtas Total vs Cycle Time (ms); Mtas Total Energy (8 keV/bin); Cycle Time (ms)", this->h2dsettings.at(32608));
+	hismanager->RegisterPlot<TH2F>("MEASURE_32618", "Mtas Total vs Cycle Time (s); Mtas Total Energy (8 keV/bin); Cycle Time (s)", this->h2dsettings.at(32618));
+	hismanager->RegisterPlot<TH2F>("MEASURE_32628", "Mtas Total vs Cycle Time (min); Mtas Total Energy (8 keV/bin); Cycle Time (min)", this->h2dsettings.at(32628));
+	hismanager->RegisterPlot<TH2F>("MEASURE_32638", "Mtas Total vs Cycle Time (hr); Mtas Total Energy (8 keV/bin); Cycle Time (hr)", this->h2dsettings.at(32638));
 
-	hismanager->RegisterPlot<TH1F>("CYCLE_1000","Cycle Time; Cycle Time (ms);",this->h1dsettings.at(1000));
-	hismanager->RegisterPlot<TH1F>("CYCLE_1001","Cycle Time; Cycle Time (s);",this->h1dsettings.at(1001));
-	hismanager->RegisterPlot<TH1F>("CYCLE_1002","Cycle Time; Cycle Time (min);",this->h1dsettings.at(1002));
-	hismanager->RegisterPlot<TH1F>("CYCLE_1003","Cycle Time; Cycle Time (hr);",this->h1dsettings.at(1003));
+	hismanager->RegisterPlot<TH2F>("MEASURE_33608", "Mtas Total vs Cycle Time (ms) #beta-gated; Mtas Total Energy (8 keV/bin); Cycle Time (ms)", this->h2dsettings.at(33608));
+	hismanager->RegisterPlot<TH2F>("MEASURE_33618", "Mtas Total vs Cycle Time (s) #beta-gated; Mtas Total Energy (8 keV/bin); Cycle Time (s)", this->h2dsettings.at(33618));
+	hismanager->RegisterPlot<TH2F>("MEASURE_33628", "Mtas Total vs Cycle Time (min) #beta-gated; Mtas Total Energy (8 keV/bin); Cycle Time (min)", this->h2dsettings.at(33628));
+	hismanager->RegisterPlot<TH2F>("MEASURE_33638", "Mtas Total vs Cycle Time (hr) #beta-gated; Mtas Total Energy (8 keV/bin); Cycle Time (hr)", this->h2dsettings.at(33638));
 
-	hismanager->RegisterPlot<TH1F>("EARLY_1010","Early Cycle Gate; Value (arb.)",this->h1dsettings.at(1010));
-	hismanager->RegisterPlot<TH1F>("MID_1010","Mid Cycle Gate; Value (arb.)",this->h1dsettings.at(1010));
-	hismanager->RegisterPlot<TH1F>("LATE_1010","Late Cycle Gate; Value (arb.)",this->h1dsettings.at(1010));
+	hismanager->RegisterPlot<TH2F>("MEASURE_3650", "Si Max vs Mtas Total; Mtas Total Energy (keV); Si Max (keV)", this->h2dsettings.at(3650));
+	hismanager->RegisterPlot<TH2F>("MEASURE_36508", "Si Max vs Mtas Total; Mtas Total Energy (8 keV/bin); Si Max (8 keV/bin)", this->h2dsettings.at(36508));
 
-	hismanager->RegisterPlot<TH1F>("EARLY_3300","Mtas Total #beta-gated Early Cycle Time",this->h1dsettings.at(3300));
-	hismanager->RegisterPlot<TH1F>("MID_3300","Mtas Total #beta-gated MID Cycle Time",this->h1dsettings.at(3300));
-	hismanager->RegisterPlot<TH1F>("LATE_3300","Mtas Total #beta-gated LATE Cycle Time",this->h1dsettings.at(3300));
+	hismanager->RegisterPlot<TH1F>("CYCLE_1000", "Cycle Time; Cycle Time (ms);", this->h1dsettings.at(1000));
+	hismanager->RegisterPlot<TH1F>("CYCLE_1001", "Cycle Time; Cycle Time (s);", this->h1dsettings.at(1001));
+	hismanager->RegisterPlot<TH1F>("CYCLE_1002", "Cycle Time; Cycle Time (min);", this->h1dsettings.at(1002));
+	hismanager->RegisterPlot<TH1F>("CYCLE_1003", "Cycle Time; Cycle Time (hr);", this->h1dsettings.at(1003));
 
-	hismanager->RegisterPlot<TH2F>("EARLY_3350","I,M,O vs Mtas Total #beta-gated Early Cycle Time",this->h2dsettings.at(3350));
-	hismanager->RegisterPlot<TH2F>("MID_3350","I,M,O vs Mtas Total #beta-gated MID Cycle Time",this->h2dsettings.at(3350));
-	hismanager->RegisterPlot<TH2F>("LATE_3350","I,M,O vs Mtas Total #beta-gated LATE Cycle Time",this->h2dsettings.at(3350));
+	hismanager->RegisterPlot<TH1F>("EARLY_1010", "Early Cycle Gate; Value (arb.)", this->h1dsettings.at(1010));
+	hismanager->RegisterPlot<TH1F>("MID_1010", "Mid Cycle Gate; Value (arb.)", this->h1dsettings.at(1010));
+	hismanager->RegisterPlot<TH1F>("LATE_1010", "Late Cycle Gate; Value (arb.)", this->h1dsettings.at(1010));
 
-	hismanager->RegisterPlot<TH2F>("EARLY_33508","I,M,O vs Mtas Total #beta-gated Early Cycle Time; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(33508));
-	hismanager->RegisterPlot<TH2F>("MID_33508","I,M,O vs Mtas Total #beta-gated MID Cycle Time; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(33508));
-	hismanager->RegisterPlot<TH2F>("LATE_33508","I,M,O vs Mtas Total #beta-gated LATE Cycle Time; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(33508));
+	hismanager->RegisterPlot<TH1F>("EARLY_3300", "Mtas Total #beta-gated Early Cycle Time", this->h1dsettings.at(3300));
+	hismanager->RegisterPlot<TH1F>("MID_3300", "Mtas Total #beta-gated MID Cycle Time", this->h1dsettings.at(3300));
+	hismanager->RegisterPlot<TH1F>("LATE_3300", "Mtas Total #beta-gated LATE Cycle Time", this->h1dsettings.at(3300));
 
-	hismanager->RegisterPlot<TH2F>("EARLY_3351","C vs Mtas Total #beta-gated Early Cycle Time",this->h2dsettings.at(3351));
-	hismanager->RegisterPlot<TH2F>("MID_3351","C vs Mtas Total #beta-gated MID Cycle Time",this->h2dsettings.at(3351));
-	hismanager->RegisterPlot<TH2F>("LATE_3351","C vs Mtas Total #beta-gated LATE Cycle Time",this->h2dsettings.at(3351));
+	hismanager->RegisterPlot<TH2F>("EARLY_3350", "I,M,O vs Mtas Total #beta-gated Early Cycle Time", this->h2dsettings.at(3350));
+	hismanager->RegisterPlot<TH2F>("MID_3350", "I,M,O vs Mtas Total #beta-gated MID Cycle Time", this->h2dsettings.at(3350));
+	hismanager->RegisterPlot<TH2F>("LATE_3350", "I,M,O vs Mtas Total #beta-gated LATE Cycle Time", this->h2dsettings.at(3350));
 
-	hismanager->RegisterPlot<TH2F>("EARLY_33518","C vs Mtas Total #beta-gated Early Cycle Time; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(33518));
-	hismanager->RegisterPlot<TH2F>("MID_33518","C vs Mtas Total #beta-gated MID Cycle Time; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(33518));
-	hismanager->RegisterPlot<TH2F>("LATE_33518","C vs Mtas Total #beta-gated LATE Cycle Time; Energy (8 keV/bin); Energy (8 keV/bin)",this->h2dsettings.at(33518));
+	hismanager->RegisterPlot<TH2F>("EARLY_33508", "I,M,O vs Mtas Total #beta-gated Early Cycle Time; Energy (8 keV/bin); Energy (8 keV/bin)", this->h2dsettings.at(33508));
+	hismanager->RegisterPlot<TH2F>("MID_33508", "I,M,O vs Mtas Total #beta-gated MID Cycle Time; Energy (8 keV/bin); Energy (8 keV/bin)", this->h2dsettings.at(33508));
+	hismanager->RegisterPlot<TH2F>("LATE_33508", "I,M,O vs Mtas Total #beta-gated LATE Cycle Time; Energy (8 keV/bin); Energy (8 keV/bin)", this->h2dsettings.at(33508));
 
-	hismanager->RegisterPlot<TH2F>("MEASURE_5360","Si Max vs Cycle Time (ms) #beta-gated; Si Max Energy (keV); Cycle Time (ms)",this->h2dsettings.at(5360));
-	hismanager->RegisterPlot<TH2F>("MEASURE_5361","Si Max vs Cycle Time (s) #beta-gated; Si Max Energy (keV); Cycle Time (s)",this->h2dsettings.at(5361));
-	hismanager->RegisterPlot<TH2F>("MEASURE_5362","Si Max vs Cycle Time (min) #beta-gated; Si Max Energy (keV); Cycle Time (min)",this->h2dsettings.at(5362));
-	hismanager->RegisterPlot<TH2F>("MEASURE_5363","Si Max vs Cycle Time (hr) #beta-gated; Si Max Energy (keV); Cycle Time (hr)",this->h2dsettings.at(5363));
+	hismanager->RegisterPlot<TH2F>("EARLY_3351", "C vs Mtas Total #beta-gated Early Cycle Time", this->h2dsettings.at(3351));
+	hismanager->RegisterPlot<TH2F>("MID_3351", "C vs Mtas Total #beta-gated MID Cycle Time", this->h2dsettings.at(3351));
+	hismanager->RegisterPlot<TH2F>("LATE_3351", "C vs Mtas Total #beta-gated LATE Cycle Time", this->h2dsettings.at(3351));
 
-	hismanager->RegisterPlot<TH2F>("MEASURE_53608","Si Max vs Cycle Time (ms) #beta-gated; Si Max Energy (8 keV/bin); Cycle Time (ms)",this->h2dsettings.at(53608));
-	hismanager->RegisterPlot<TH2F>("MEASURE_53618","Si Max vs Cycle Time (s) #beta-gated; Si Max Energy (8 keV/bin); Cycle Time (s)",this->h2dsettings.at(53618));
-	hismanager->RegisterPlot<TH2F>("MEASURE_53628","Si Max vs Cycle Time (min) #beta-gated; Si Max Energy (8 keV/bin); Cycle Time (min)",this->h2dsettings.at(53628));
-	hismanager->RegisterPlot<TH2F>("MEASURE_53638","Si Max vs Cycle Time (hr) #beta-gated; Si Max Energy (8 keV/bin); Cycle Time (hr)",this->h2dsettings.at(53638));
+	hismanager->RegisterPlot<TH2F>("EARLY_33518", "C vs Mtas Total #beta-gated Early Cycle Time; Energy (8 keV/bin); Energy (8 keV/bin)", this->h2dsettings.at(33518));
+	hismanager->RegisterPlot<TH2F>("MID_33518", "C vs Mtas Total #beta-gated MID Cycle Time; Energy (8 keV/bin); Energy (8 keV/bin)", this->h2dsettings.at(33518));
+	hismanager->RegisterPlot<TH2F>("LATE_33518", "C vs Mtas Total #beta-gated LATE Cycle Time; Energy (8 keV/bin); Energy (8 keV/bin)", this->h2dsettings.at(33518));
+
+	hismanager->RegisterPlot<TH2F>("MEASURE_5360", "Si Max vs Cycle Time (ms) #beta-gated; Si Max Energy (keV); Cycle Time (ms)", this->h2dsettings.at(5360));
+	hismanager->RegisterPlot<TH2F>("MEASURE_5361", "Si Max vs Cycle Time (s) #beta-gated; Si Max Energy (keV); Cycle Time (s)", this->h2dsettings.at(5361));
+	hismanager->RegisterPlot<TH2F>("MEASURE_5362", "Si Max vs Cycle Time (min) #beta-gated; Si Max Energy (keV); Cycle Time (min)", this->h2dsettings.at(5362));
+	hismanager->RegisterPlot<TH2F>("MEASURE_5363", "Si Max vs Cycle Time (hr) #beta-gated; Si Max Energy (keV); Cycle Time (hr)", this->h2dsettings.at(5363));
+
+	hismanager->RegisterPlot<TH2F>("MEASURE_53608", "Si Max vs Cycle Time (ms) #beta-gated; Si Max Energy (8 keV/bin); Cycle Time (ms)", this->h2dsettings.at(53608));
+	hismanager->RegisterPlot<TH2F>("MEASURE_53618", "Si Max vs Cycle Time (s) #beta-gated; Si Max Energy (8 keV/bin); Cycle Time (s)", this->h2dsettings.at(53618));
+	hismanager->RegisterPlot<TH2F>("MEASURE_53628", "Si Max vs Cycle Time (min) #beta-gated; Si Max Energy (8 keV/bin); Cycle Time (min)", this->h2dsettings.at(53628));
+	hismanager->RegisterPlot<TH2F>("MEASURE_53638", "Si Max vs Cycle Time (hr) #beta-gated; Si Max Energy (8 keV/bin); Cycle Time (hr)", this->h2dsettings.at(53638));
 
 	this->console->info("Finished Declaring Plots");
 }
 
-void anl2021Processor::RegisterTree(std::unordered_map<std::string,TTree*>& outputtrees){
+void anl2021Processor::RegisterTree(std::unordered_map<std::string, TTree*>& outputtrees) {
 	this->MtasProc->RegisterTree(outputtrees);
 	this->TapeProc->RegisterTree(outputtrees);
 	this->SiliconProc->RegisterTree(outputtrees);
@@ -790,7 +790,7 @@ void anl2021Processor::RegisterTree(std::unordered_map<std::string,TTree*>& outp
 	this->IsomerProc->RegisterTree(outputtrees);
 }
 
-void anl2021Processor::CleanupTree(){
+void anl2021Processor::CleanupTree() {
 	this->MtasProc->CleanupTree();
 	this->TapeProc->CleanupTree();
 	this->SiliconProc->CleanupTree();
@@ -799,5 +799,5 @@ void anl2021Processor::CleanupTree(){
 	this->IsomerProc->CleanupTree();
 }
 
-void anl2021Processor::Reset(){
+void anl2021Processor::Reset() {
 }
