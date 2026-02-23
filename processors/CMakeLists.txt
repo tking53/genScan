@@ -110,8 +110,8 @@ list(APPEND PROCESSOR_STRUCT_LIBS PidStruct)
 list(APPEND PROCESSOR_STRUCT_PCM ${CMAKE_CURRENT_BINARY_DIR}/libPidStruct_root_rdict.pcm)
 list(APPEND PROCESSOR_STRUCT_RMAP ${CMAKE_CURRENT_BINARY_DIR}/libPidStruct_root.rootmap)
 
-ROOT_GENERATE_DICTIONARY(PSPMTStruct_root 
-	PSPMTStruct.hpp ${ROOT_CONTAINER_PATHS} 
+ROOT_GENERATE_DICTIONARY(PSPMTStruct_root
+	PSPMTStruct.hpp ${ROOT_CONTAINER_PATHS}
 	LINKDEF include/PSPMTStructLinkDef.hpp )
 add_library(PSPMTStruct SHARED PSPMTStruct_root.cxx PSPMTStruct_root)
 target_link_libraries(PSPMTStruct ${ROOT_LIBRARIES})
@@ -119,6 +119,16 @@ add_dependencies(PSPMTStruct ${EXTERNAL_PROCESSOR_DEPS} ${EXTERNAL_LOG_DEPS})
 list(APPEND PROCESSOR_STRUCT_LIBS PSPMTStruct)
 list(APPEND PROCESSOR_STRUCT_PCM ${CMAKE_CURRENT_BINARY_DIR}/libPSPMTStruct_root_rdict.pcm)
 list(APPEND PROCESSOR_STRUCT_RMAP ${CMAKE_CURRENT_BINARY_DIR}/libPSPMTStruct_root.rootmap)
+
+ROOT_GENERATE_DICTIONARY(CloverStruct_root
+	CloverStruct.hpp ${ROOT_CONTAINER_PATHS}
+	LINKDEF include/CloverStructLinkDef.hpp )
+add_library(CloverStruct SHARED CloverStruct_root.cxx CloverStruct_root)
+target_link_libraries(CloverStruct ${ROOT_LIBRARIES})
+add_dependencies(CloverStruct ${EXTERNAL_PROCESSOR_DEPS} ${EXTERNAL_LOG_DEPS})
+list(APPEND PROCESSOR_STRUCT_LIBS CloverStruct)
+list(APPEND PROCESSOR_STRUCT_PCM ${CMAKE_CURRENT_BINARY_DIR}/libCloverStruct_root_rdict.pcm)
+list(APPEND PROCESSOR_STRUCT_RMAP ${CMAKE_CURRENT_BINARY_DIR}/libCloverStruct_root.rootmap)
 
 add_library(GenScanProcessors ${src_files})
 target_link_libraries(GenScanProcessors PUBLIC ${ROOT_LIBRARIES} GenScanFitters GenScanUtility pugixml)
