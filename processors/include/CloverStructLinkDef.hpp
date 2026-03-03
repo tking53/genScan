@@ -4,7 +4,7 @@
 
 #pragma link C++ struct ProcessorStruct::Leaf+;
 #pragma link C++ class std::vector<ProcessorStruct::Leaf>+;
-#pragma link C++ class ROOT::VecOps::RVec<ProcessorStruct::Leaf>+
+#pragma link C++ class ROOT::VecOps::RVec<ProcessorStruct::Leaf>+;
 
 #pragma link C++ struct ProcessorStruct::Clover+;
 #pragma link C++ class std::vector<ProcessorStruct::Clover>+;
