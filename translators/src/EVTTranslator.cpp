@@ -135,7 +135,7 @@ int EVTTranslator::ReadHeader(boost::container::devector<PhysicsData>& RawEvents
 	RawEvents.back().SetCFDTimeStamp(CFDTimeStampInNS);
 
 	if (TimeStamp < this->PrevTimeStamp) {
-		this->console->critical("Timestamp out of order current : {}, previous : {}", TimeStamp, this->PrevTimeStamp);
+		this->console->critical("Timestamp out of order from Cra:Mod:Cha {}:{}:{}, current TS : {}, previous TS : {}", CrateNumber, ModuleNumber, ChannelNumber, TimeStamp, this->PrevTimeStamp);
 	}
 	this->PrevTimeStamp = TimeStamp;
 
