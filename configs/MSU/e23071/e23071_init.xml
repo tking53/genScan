@@ -7,13 +7,64 @@
 	</Author>
 	<Description> Initial XML for E23071</Description>
 	<Global EventWidth="500" EventWidthUnit="ns" CorrelationType="rolling-trigger" />
-	<DetectorDriver >
-		<!-- <Processor name="RootDevProcessor" included_types="clover" /> -->
+	<DetectorDriver>
+		<Processor name="RootDevProcessor" included_types="dssd" />
+		<!-- <Analyzer name="WaveformAnalyzer" included_types="dssd"> -->
+			<!-- <settings Crate="[0]" Module="([0,5-8])" Channel="(0|[0-9]|1[0-5])"
+			CalcDerivative="true"> -->
+			<!-- <settings Crate="([1-3])" Module="0" Channel="(0|[0-9]|1[0-5])" CalcDerivative="true"> -->
+				<!-- <PreTrigger min="5" max="43" /> -->
+				<!-- <PostTrigger min="200" max="249" /> -->
+				<!-- <QDC bounds="0,10,20,30,40,50,60" /> -->
+				<!-- <PSD begin="45" middle="85" end="240" pre="5" post="10" fraction="0.75" /> -->
+			<!-- </settings> -->
+		<!-- </Analyzer> -->
+		<Processor name="DSSDProcessor" NumDSSDs="2" NumStrips="64"/>
 		<Processor name="CloverProcessor" />
+
 	</DetectorDriver>
 	<Map>
 		<Crate number="0">
 			<Module number="0" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
+				<Channel number="0" type="generic" subtype="generic" group="rando" tags="">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="1" type="generic" subtype="generic" group="rando2" tags="">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="2" type="generic" subtype="generic" group="rando3" tags="">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="3" type="generic" subtype="generic" group="rando4" tags="">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="4" type="generic" subtype="generic" group="rando5" tags="">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="5" type="generic" subtype="generic" group="rando6" tags="">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="6" type="generic" subtype="generic" group="rando7" tags="">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="7" type="generic" subtype="generic" group="rando8" tags="">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="8" type="generic" subtype="generic" group="rando9" tags="">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="9" type="generic" subtype="generic" group="rando10" tags="">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="10" type="generic" subtype="generic" group="rando11" tags="">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="11" type="generic" subtype="generic" group="rando12" tags="">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="12" type="generic" subtype="vetoscint" group="" tags="">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
 				<Channel number="13" type="pid" subtype="scint" group="" tags="fp1,left">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
@@ -32,10 +83,10 @@
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 				<Channel number="12" type="pid" subtype="ppac" group="0" tags="db3,anode">
-					<Calibration model="linear">0.0 1.0	</Calibration>
+					<Calibration model="linear">0.0 1.0 </Calibration>
 				</Channel>
 				<Channel number="13" type="pid" subtype="ppac" group="1" tags="db3,anode">
-					<Calibration model="linear">0.0 1.0	</Calibration>
+					<Calibration model="linear">0.0 1.0 </Calibration>
 				</Channel>
 
 				<Channel number="4" type="pid" subtype="ppac" group="0" tags="db4,left">
@@ -442,1208 +493,1208 @@
 		</Crate>
 
 
-		<Crate number="1">			<!-- spdaq77	LinLogs --> 
+		<Crate number="1">			<!-- spdaq77	LinLogs -->
 			<Module number="0" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
-				<Channel number="0" type="DSSD" subtype="LL" group="0" tags="0">
+				<Channel number="0" type="dssd" subtype="LL" group="0" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="1" type="DSSD" subtype="LL" group="1" tags="0">
+				<Channel number="1" type="dssd" subtype="LL" group="1" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="2" type="DSSD" subtype="LL" group="2" tags="0">
+				<Channel number="2" type="dssd" subtype="LL" group="2" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="3" type="DSSD" subtype="LL" group="3" tags="0">
+				<Channel number="3" type="dssd" subtype="LL" group="3" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="4" type="DSSD" subtype="LL" group="4" tags="0">
+				<Channel number="4" type="dssd" subtype="LL" group="4" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="5" type="DSSD" subtype="LL" group="5" tags="0">
+				<Channel number="5" type="dssd" subtype="LL" group="5" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="6" type="DSSD" subtype="LL" group="6" tags="0">
+				<Channel number="6" type="dssd" subtype="LL" group="6" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="7" type="DSSD" subtype="LL" group="7" tags="0">
+				<Channel number="7" type="dssd" subtype="LL" group="7" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="8" type="DSSD" subtype="LL" group="8" tags="0">
+				<Channel number="8" type="dssd" subtype="LL" group="8" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="9" type="DSSD" subtype="LL" group="9" tags="0">
+				<Channel number="9" type="dssd" subtype="LL" group="9" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="10" type="DSSD" subtype="LL" group="10" tags="0">
+				<Channel number="10" type="dssd" subtype="LL" group="10" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="11" type="DSSD" subtype="LL" group="11" tags="0">
+				<Channel number="11" type="dssd" subtype="LL" group="11" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="12" type="DSSD" subtype="LL" group="12" tags="0">
+				<Channel number="12" type="dssd" subtype="LL" group="12" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="13" type="DSSD" subtype="LL" group="13" tags="0">
+				<Channel number="13" type="dssd" subtype="LL" group="13" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="14" type="DSSD" subtype="LL" group="14" tags="0">
+				<Channel number="14" type="dssd" subtype="LL" group="14" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="15" type="DSSD" subtype="LL" group="15" tags="0">
+				<Channel number="15" type="dssd" subtype="LL" group="15" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 			</Module>
 			<Module number="1" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
-				<Channel number="0" type="DSSD" subtype="LL" group="16" tags="0">
+				<Channel number="0" type="dssd" subtype="LL" group="16" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="1" type="DSSD" subtype="LL" group="17" tags="0">
+				<Channel number="1" type="dssd" subtype="LL" group="17" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="2" type="DSSD" subtype="LL" group="18" tags="0">
+				<Channel number="2" type="dssd" subtype="LL" group="18" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="3" type="DSSD" subtype="LL" group="19" tags="0">
+				<Channel number="3" type="dssd" subtype="LL" group="19" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="4" type="DSSD" subtype="LL" group="20" tags="0">
+				<Channel number="4" type="dssd" subtype="LL" group="20" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="5" type="DSSD" subtype="LL" group="21" tags="0">
+				<Channel number="5" type="dssd" subtype="LL" group="21" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="6" type="DSSD" subtype="LL" group="22" tags="0">
+				<Channel number="6" type="dssd" subtype="LL" group="22" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="7" type="DSSD" subtype="LL" group="23" tags="0">
+				<Channel number="7" type="dssd" subtype="LL" group="23" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="8" type="DSSD" subtype="LL" group="24" tags="0">
+				<Channel number="8" type="dssd" subtype="LL" group="24" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="9" type="DSSD" subtype="LL" group="25" tags="0">
+				<Channel number="9" type="dssd" subtype="LL" group="25" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="10" type="DSSD" subtype="LL" group="26" tags="0">
+				<Channel number="10" type="dssd" subtype="LL" group="26" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="11" type="DSSD" subtype="LL" group="27" tags="0">
+				<Channel number="11" type="dssd" subtype="LL" group="27" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="12" type="DSSD" subtype="LL" group="28" tags="0">
+				<Channel number="12" type="dssd" subtype="LL" group="28" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="13" type="DSSD" subtype="LL" group="29" tags="0">
+				<Channel number="13" type="dssd" subtype="LL" group="29" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="14" type="DSSD" subtype="LL" group="30" tags="0">
+				<Channel number="14" type="dssd" subtype="LL" group="30" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="15" type="DSSD" subtype="LL" group="31" tags="0">
+				<Channel number="15" type="dssd" subtype="LL" group="31" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 			</Module>
 			<Module number="2" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
-				<Channel number="0" type="DSSD" subtype="LL" group="32" tags="0">
+				<Channel number="0" type="dssd" subtype="LL" group="32" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="1" type="DSSD" subtype="LL" group="33" tags="0">
+				<Channel number="1" type="dssd" subtype="LL" group="33" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="2" type="DSSD" subtype="LL" group="34" tags="0">
+				<Channel number="2" type="dssd" subtype="LL" group="34" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="3" type="DSSD" subtype="LL" group="35" tags="0">
+				<Channel number="3" type="dssd" subtype="LL" group="35" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="4" type="DSSD" subtype="LL" group="36" tags="0">
+				<Channel number="4" type="dssd" subtype="LL" group="36" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="5" type="DSSD" subtype="LL" group="37" tags="0">
+				<Channel number="5" type="dssd" subtype="LL" group="37" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="6" type="DSSD" subtype="LL" group="38" tags="0">
+				<Channel number="6" type="dssd" subtype="LL" group="38" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="7" type="DSSD" subtype="LL" group="39" tags="0">
+				<Channel number="7" type="dssd" subtype="LL" group="39" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="8" type="DSSD" subtype="LL" group="40" tags="0">
+				<Channel number="8" type="dssd" subtype="LL" group="40" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="9" type="DSSD" subtype="LL" group="41" tags="0">
+				<Channel number="9" type="dssd" subtype="LL" group="41" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="10" type="DSSD" subtype="LL" group="42" tags="0">
+				<Channel number="10" type="dssd" subtype="LL" group="42" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="11" type="DSSD" subtype="LL" group="43" tags="0">
+				<Channel number="11" type="dssd" subtype="LL" group="43" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="12" type="DSSD" subtype="LL" group="44" tags="0">
+				<Channel number="12" type="dssd" subtype="LL" group="44" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="13" type="DSSD" subtype="LL" group="45" tags="0">
+				<Channel number="13" type="dssd" subtype="LL" group="45" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="14" type="DSSD" subtype="LL" group="46" tags="0">
+				<Channel number="14" type="dssd" subtype="LL" group="46" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="15" type="DSSD" subtype="LL" group="47" tags="0">
+				<Channel number="15" type="dssd" subtype="LL" group="47" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 			</Module>
 			<Module number="3" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
-				<Channel number="0" type="DSSD" subtype="LL" group="48" tags="0">
+				<Channel number="0" type="dssd" subtype="LL" group="48" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="1" type="DSSD" subtype="LL" group="49" tags="0">
+				<Channel number="1" type="dssd" subtype="LL" group="49" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="2" type="DSSD" subtype="LL" group="50" tags="0">
+				<Channel number="2" type="dssd" subtype="LL" group="50" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="3" type="DSSD" subtype="LL" group="51" tags="0">
+				<Channel number="3" type="dssd" subtype="LL" group="51" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="4" type="DSSD" subtype="LL" group="52" tags="0">
+				<Channel number="4" type="dssd" subtype="LL" group="52" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="5" type="DSSD" subtype="LL" group="53" tags="0">
+				<Channel number="5" type="dssd" subtype="LL" group="53" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="6" type="DSSD" subtype="LL" group="54" tags="0">
+				<Channel number="6" type="dssd" subtype="LL" group="54" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="7" type="DSSD" subtype="LL" group="55" tags="0">
+				<Channel number="7" type="dssd" subtype="LL" group="55" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="8" type="DSSD" subtype="LL" group="56" tags="0">
+				<Channel number="8" type="dssd" subtype="LL" group="56" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="9" type="DSSD" subtype="LL" group="57" tags="0">
+				<Channel number="9" type="dssd" subtype="LL" group="57" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="10" type="DSSD" subtype="LL" group="58" tags="0">
+				<Channel number="10" type="dssd" subtype="LL" group="58" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="11" type="DSSD" subtype="LL" group="59" tags="0">
+				<Channel number="11" type="dssd" subtype="LL" group="59" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="12" type="DSSD" subtype="LL" group="60" tags="0">
+				<Channel number="12" type="dssd" subtype="LL" group="60" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="13" type="DSSD" subtype="LL" group="61" tags="0">
+				<Channel number="13" type="dssd" subtype="LL" group="61" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="14" type="DSSD" subtype="LL" group="62" tags="0">
+				<Channel number="14" type="dssd" subtype="LL" group="62" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="15" type="DSSD" subtype="LL" group="63" tags="0">
+				<Channel number="15" type="dssd" subtype="LL" group="63" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 			</Module>
 			<Module number="4" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
-				<Channel number="0" type="DSSD" subtype="LL" group="0" tags="1">
+				<Channel number="0" type="dssd" subtype="LL" group="0" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="1" type="DSSD" subtype="LL" group="1" tags="1">
+				<Channel number="1" type="dssd" subtype="LL" group="1" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="2" type="DSSD" subtype="LL" group="2" tags="1">
+				<Channel number="2" type="dssd" subtype="LL" group="2" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="3" type="DSSD" subtype="LL" group="3" tags="1">
+				<Channel number="3" type="dssd" subtype="LL" group="3" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="4" type="DSSD" subtype="LL" group="4" tags="1">
+				<Channel number="4" type="dssd" subtype="LL" group="4" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="5" type="DSSD" subtype="LL" group="5" tags="1">
+				<Channel number="5" type="dssd" subtype="LL" group="5" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="6" type="DSSD" subtype="LL" group="6" tags="1">
+				<Channel number="6" type="dssd" subtype="LL" group="6" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="7" type="DSSD" subtype="LL" group="7" tags="1">
+				<Channel number="7" type="dssd" subtype="LL" group="7" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="8" type="DSSD" subtype="LL" group="8" tags="1">
+				<Channel number="8" type="dssd" subtype="LL" group="8" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="9" type="DSSD" subtype="LL" group="9" tags="1">
+				<Channel number="9" type="dssd" subtype="LL" group="9" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="10" type="DSSD" subtype="LL" group="10" tags="1">
+				<Channel number="10" type="dssd" subtype="LL" group="10" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="11" type="DSSD" subtype="LL" group="11" tags="1">
+				<Channel number="11" type="dssd" subtype="LL" group="11" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="12" type="DSSD" subtype="LL" group="12" tags="1">
+				<Channel number="12" type="dssd" subtype="LL" group="12" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="13" type="DSSD" subtype="LL" group="13" tags="1">
+				<Channel number="13" type="dssd" subtype="LL" group="13" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="14" type="DSSD" subtype="LL" group="14" tags="1">
+				<Channel number="14" type="dssd" subtype="LL" group="14" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="15" type="DSSD" subtype="LL" group="15" tags="1">
+				<Channel number="15" type="dssd" subtype="LL" group="15" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 			</Module>
 			<Module number="5" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
-				<Channel number="0" type="DSSD" subtype="LL" group="16" tags="1">
+				<Channel number="0" type="dssd" subtype="LL" group="16" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="1" type="DSSD" subtype="LL" group="17" tags="1">
+				<Channel number="1" type="dssd" subtype="LL" group="17" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="2" type="DSSD" subtype="LL" group="18" tags="1">
+				<Channel number="2" type="dssd" subtype="LL" group="18" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="3" type="DSSD" subtype="LL" group="19" tags="1">
+				<Channel number="3" type="dssd" subtype="LL" group="19" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="4" type="DSSD" subtype="LL" group="20" tags="1">
+				<Channel number="4" type="dssd" subtype="LL" group="20" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="5" type="DSSD" subtype="LL" group="21" tags="1">
+				<Channel number="5" type="dssd" subtype="LL" group="21" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="6" type="DSSD" subtype="LL" group="22" tags="1">
+				<Channel number="6" type="dssd" subtype="LL" group="22" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="7" type="DSSD" subtype="LL" group="23" tags="1">
+				<Channel number="7" type="dssd" subtype="LL" group="23" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="8" type="DSSD" subtype="LL" group="24" tags="1">
+				<Channel number="8" type="dssd" subtype="LL" group="24" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="9" type="DSSD" subtype="LL" group="25" tags="1">
+				<Channel number="9" type="dssd" subtype="LL" group="25" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="10" type="DSSD" subtype="LL" group="26" tags="1">
+				<Channel number="10" type="dssd" subtype="LL" group="26" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="11" type="DSSD" subtype="LL" group="27" tags="1">
+				<Channel number="11" type="dssd" subtype="LL" group="27" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="12" type="DSSD" subtype="LL" group="28" tags="1">
+				<Channel number="12" type="dssd" subtype="LL" group="28" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="13" type="DSSD" subtype="LL" group="29" tags="1">
+				<Channel number="13" type="dssd" subtype="LL" group="29" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="14" type="DSSD" subtype="LL" group="30" tags="1">
+				<Channel number="14" type="dssd" subtype="LL" group="30" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="15" type="DSSD" subtype="LL" group="31" tags="1">
+				<Channel number="15" type="dssd" subtype="LL" group="31" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 			</Module>
 			<Module number="6" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
-				<Channel number="0" type="DSSD" subtype="LL" group="32" tags="1">
+				<Channel number="0" type="dssd" subtype="LL" group="32" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="1" type="DSSD" subtype="LL" group="33" tags="1">
+				<Channel number="1" type="dssd" subtype="LL" group="33" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="2" type="DSSD" subtype="LL" group="34" tags="1">
+				<Channel number="2" type="dssd" subtype="LL" group="34" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="3" type="DSSD" subtype="LL" group="35" tags="1">
+				<Channel number="3" type="dssd" subtype="LL" group="35" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="4" type="DSSD" subtype="LL" group="36" tags="1">
+				<Channel number="4" type="dssd" subtype="LL" group="36" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="5" type="DSSD" subtype="LL" group="37" tags="1">
+				<Channel number="5" type="dssd" subtype="LL" group="37" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="6" type="DSSD" subtype="LL" group="38" tags="1">
+				<Channel number="6" type="dssd" subtype="LL" group="38" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="7" type="DSSD" subtype="LL" group="39" tags="1">
+				<Channel number="7" type="dssd" subtype="LL" group="39" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="8" type="DSSD" subtype="LL" group="40" tags="1">
+				<Channel number="8" type="dssd" subtype="LL" group="40" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="9" type="DSSD" subtype="LL" group="41" tags="1">
+				<Channel number="9" type="dssd" subtype="LL" group="41" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="10" type="DSSD" subtype="LL" group="42" tags="1">
+				<Channel number="10" type="dssd" subtype="LL" group="42" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="11" type="DSSD" subtype="LL" group="43" tags="1">
+				<Channel number="11" type="dssd" subtype="LL" group="43" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="12" type="DSSD" subtype="LL" group="44" tags="1">
+				<Channel number="12" type="dssd" subtype="LL" group="44" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="13" type="DSSD" subtype="LL" group="45" tags="1">
+				<Channel number="13" type="dssd" subtype="LL" group="45" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="14" type="DSSD" subtype="LL" group="46" tags="1">
+				<Channel number="14" type="dssd" subtype="LL" group="46" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="15" type="DSSD" subtype="LL" group="47" tags="1">
+				<Channel number="15" type="dssd" subtype="LL" group="47" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 			</Module>
 			<Module number="7" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
-				<Channel number="0" type="DSSD" subtype="LL" group="48" tags="1">
+				<Channel number="0" type="dssd" subtype="LL" group="48" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="1" type="DSSD" subtype="LL" group="49" tags="1">
+				<Channel number="1" type="dssd" subtype="LL" group="49" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="2" type="DSSD" subtype="LL" group="50" tags="1">
+				<Channel number="2" type="dssd" subtype="LL" group="50" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="3" type="DSSD" subtype="LL" group="51" tags="1">
+				<Channel number="3" type="dssd" subtype="LL" group="51" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="4" type="DSSD" subtype="LL" group="52" tags="1">
+				<Channel number="4" type="dssd" subtype="LL" group="52" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="5" type="DSSD" subtype="LL" group="53" tags="1">
+				<Channel number="5" type="dssd" subtype="LL" group="53" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="6" type="DSSD" subtype="LL" group="54" tags="1">
+				<Channel number="6" type="dssd" subtype="LL" group="54" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="7" type="DSSD" subtype="LL" group="55" tags="1">
+				<Channel number="7" type="dssd" subtype="LL" group="55" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="8" type="DSSD" subtype="LL" group="56" tags="1">
+				<Channel number="8" type="dssd" subtype="LL" group="56" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="9" type="DSSD" subtype="LL" group="57" tags="1">
+				<Channel number="9" type="dssd" subtype="LL" group="57" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="10" type="DSSD" subtype="LL" group="58" tags="1">
+				<Channel number="10" type="dssd" subtype="LL" group="58" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="11" type="DSSD" subtype="LL" group="59" tags="1">
+				<Channel number="11" type="dssd" subtype="LL" group="59" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="12" type="DSSD" subtype="LL" group="60" tags="1">
+				<Channel number="12" type="dssd" subtype="LL" group="60" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="13" type="DSSD" subtype="LL" group="61" tags="1">
+				<Channel number="13" type="dssd" subtype="LL" group="61" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="14" type="DSSD" subtype="LL" group="62" tags="1">
+				<Channel number="14" type="dssd" subtype="LL" group="62" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="15" type="DSSD" subtype="LL" group="63" tags="1">
+				<Channel number="15" type="dssd" subtype="LL" group="63" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 			</Module>
 		</Crate>
 		<Crate number="2">			<!-- Calling HG -> HG side of the DualGains; spdaq62-->
 			<Module number="0" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
-				<Channel number="0" type="DSSD" subtype="HG" group="0" tags="0">
+				<Channel number="0" type="dssd" subtype="HG" group="0" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="1" type="DSSD" subtype="HG" group="1" tags="0">
+				<Channel number="1" type="dssd" subtype="HG" group="1" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="2" type="DSSD" subtype="HG" group="2" tags="0">
+				<Channel number="2" type="dssd" subtype="HG" group="2" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="3" type="DSSD" subtype="HG" group="3" tags="0">
+				<Channel number="3" type="dssd" subtype="HG" group="3" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="4" type="DSSD" subtype="HG" group="4" tags="0">
+				<Channel number="4" type="dssd" subtype="HG" group="4" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="5" type="DSSD" subtype="HG" group="5" tags="0">
+				<Channel number="5" type="dssd" subtype="HG" group="5" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="6" type="DSSD" subtype="HG" group="6" tags="0">
+				<Channel number="6" type="dssd" subtype="HG" group="6" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="7" type="DSSD" subtype="HG" group="7" tags="0">
+				<Channel number="7" type="dssd" subtype="HG" group="7" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="8" type="DSSD" subtype="HG" group="8" tags="0">
+				<Channel number="8" type="dssd" subtype="HG" group="8" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="9" type="DSSD" subtype="HG" group="9" tags="0">
+				<Channel number="9" type="dssd" subtype="HG" group="9" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="10" type="DSSD" subtype="HG" group="10" tags="0">
+				<Channel number="10" type="dssd" subtype="HG" group="10" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="11" type="DSSD" subtype="HG" group="11" tags="0">
+				<Channel number="11" type="dssd" subtype="HG" group="11" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="12" type="DSSD" subtype="HG" group="12" tags="0">
+				<Channel number="12" type="dssd" subtype="HG" group="12" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="13" type="DSSD" subtype="HG" group="13" tags="0">
+				<Channel number="13" type="dssd" subtype="HG" group="13" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="14" type="DSSD" subtype="HG" group="14" tags="0">
+				<Channel number="14" type="dssd" subtype="HG" group="14" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="15" type="DSSD" subtype="HG" group="15" tags="0">
+				<Channel number="15" type="dssd" subtype="HG" group="15" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 			</Module>
 			<Module number="1" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
-				<Channel number="0" type="DSSD" subtype="HG" group="16" tags="0">
+				<Channel number="0" type="dssd" subtype="HG" group="16" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="1" type="DSSD" subtype="HG" group="17" tags="0">
+				<Channel number="1" type="dssd" subtype="HG" group="17" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="2" type="DSSD" subtype="HG" group="18" tags="0">
+				<Channel number="2" type="dssd" subtype="HG" group="18" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="3" type="DSSD" subtype="HG" group="19" tags="0">
+				<Channel number="3" type="dssd" subtype="HG" group="19" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="4" type="DSSD" subtype="HG" group="20" tags="0">
+				<Channel number="4" type="dssd" subtype="HG" group="20" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="5" type="DSSD" subtype="HG" group="21" tags="0">
+				<Channel number="5" type="dssd" subtype="HG" group="21" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="6" type="DSSD" subtype="HG" group="22" tags="0">
+				<Channel number="6" type="dssd" subtype="HG" group="22" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="7" type="DSSD" subtype="HG" group="23" tags="0">
+				<Channel number="7" type="dssd" subtype="HG" group="23" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="8" type="DSSD" subtype="HG" group="24" tags="0">
+				<Channel number="8" type="dssd" subtype="HG" group="24" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="9" type="DSSD" subtype="HG" group="25" tags="0">
+				<Channel number="9" type="dssd" subtype="HG" group="25" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="10" type="DSSD" subtype="HG" group="26" tags="0">
+				<Channel number="10" type="dssd" subtype="HG" group="26" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="11" type="DSSD" subtype="HG" group="27" tags="0">
+				<Channel number="11" type="dssd" subtype="HG" group="27" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="12" type="DSSD" subtype="HG" group="28" tags="0">
+				<Channel number="12" type="dssd" subtype="HG" group="28" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="13" type="DSSD" subtype="HG" group="29" tags="0">
+				<Channel number="13" type="dssd" subtype="HG" group="29" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="14" type="DSSD" subtype="HG" group="30" tags="0">
+				<Channel number="14" type="dssd" subtype="HG" group="30" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="15" type="DSSD" subtype="HG" group="31" tags="0">
+				<Channel number="15" type="dssd" subtype="HG" group="31" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 			</Module>
 			<Module number="2" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
-				<Channel number="0" type="DSSD" subtype="HG" group="32" tags="0">
+				<Channel number="0" type="dssd" subtype="HG" group="32" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="1" type="DSSD" subtype="HG" group="33" tags="0">
+				<Channel number="1" type="dssd" subtype="HG" group="33" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="2" type="DSSD" subtype="HG" group="34" tags="0">
+				<Channel number="2" type="dssd" subtype="HG" group="34" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="3" type="DSSD" subtype="HG" group="35" tags="0">
+				<Channel number="3" type="dssd" subtype="HG" group="35" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="4" type="DSSD" subtype="HG" group="36" tags="0">
+				<Channel number="4" type="dssd" subtype="HG" group="36" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="5" type="DSSD" subtype="HG" group="37" tags="0">
+				<Channel number="5" type="dssd" subtype="HG" group="37" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="6" type="DSSD" subtype="HG" group="38" tags="0">
+				<Channel number="6" type="dssd" subtype="HG" group="38" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="7" type="DSSD" subtype="HG" group="39" tags="0">
+				<Channel number="7" type="dssd" subtype="HG" group="39" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="8" type="DSSD" subtype="HG" group="40" tags="0">
+				<Channel number="8" type="dssd" subtype="HG" group="40" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="9" type="DSSD" subtype="HG" group="41" tags="0">
+				<Channel number="9" type="dssd" subtype="HG" group="41" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="10" type="DSSD" subtype="HG" group="42" tags="0">
+				<Channel number="10" type="dssd" subtype="HG" group="42" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="11" type="DSSD" subtype="HG" group="43" tags="0">
+				<Channel number="11" type="dssd" subtype="HG" group="43" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="12" type="DSSD" subtype="HG" group="44" tags="0">
+				<Channel number="12" type="dssd" subtype="HG" group="44" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="13" type="DSSD" subtype="HG" group="45" tags="0">
+				<Channel number="13" type="dssd" subtype="HG" group="45" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="14" type="DSSD" subtype="HG" group="46" tags="0">
+				<Channel number="14" type="dssd" subtype="HG" group="46" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="15" type="DSSD" subtype="HG" group="47" tags="0">
+				<Channel number="15" type="dssd" subtype="HG" group="47" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 			</Module>
 			<Module number="3" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
-				<Channel number="0" type="DSSD" subtype="HG" group="48" tags="0">
+				<Channel number="0" type="dssd" subtype="HG" group="48" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="1" type="DSSD" subtype="HG" group="49" tags="0">
+				<Channel number="1" type="dssd" subtype="HG" group="49" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="2" type="DSSD" subtype="HG" group="50" tags="0">
+				<Channel number="2" type="dssd" subtype="HG" group="50" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="3" type="DSSD" subtype="HG" group="51" tags="0">
+				<Channel number="3" type="dssd" subtype="HG" group="51" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="4" type="DSSD" subtype="HG" group="52" tags="0">
+				<Channel number="4" type="dssd" subtype="HG" group="52" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="5" type="DSSD" subtype="HG" group="53" tags="0">
+				<Channel number="5" type="dssd" subtype="HG" group="53" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="6" type="DSSD" subtype="HG" group="54" tags="0">
+				<Channel number="6" type="dssd" subtype="HG" group="54" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="7" type="DSSD" subtype="HG" group="55" tags="0">
+				<Channel number="7" type="dssd" subtype="HG" group="55" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="8" type="DSSD" subtype="HG" group="56" tags="0">
+				<Channel number="8" type="dssd" subtype="HG" group="56" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="9" type="DSSD" subtype="HG" group="57" tags="0">
+				<Channel number="9" type="dssd" subtype="HG" group="57" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="10" type="DSSD" subtype="HG" group="58" tags="0">
+				<Channel number="10" type="dssd" subtype="HG" group="58" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="11" type="DSSD" subtype="HG" group="59" tags="0">
+				<Channel number="11" type="dssd" subtype="HG" group="59" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="12" type="DSSD" subtype="HG" group="60" tags="0">
+				<Channel number="12" type="dssd" subtype="HG" group="60" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="13" type="DSSD" subtype="HG" group="61" tags="0">
+				<Channel number="13" type="dssd" subtype="HG" group="61" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="14" type="DSSD" subtype="HG" group="62" tags="0">
+				<Channel number="14" type="dssd" subtype="HG" group="62" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="15" type="DSSD" subtype="HG" group="63" tags="0">
+				<Channel number="15" type="dssd" subtype="HG" group="63" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 			</Module>
 			<Module number="4" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
-				<Channel number="0" type="DSSD" subtype="HG" group="0" tags="1">
+				<Channel number="0" type="dssd" subtype="HG" group="0" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="1" type="DSSD" subtype="HG" group="1" tags="1">
+				<Channel number="1" type="dssd" subtype="HG" group="1" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="2" type="DSSD" subtype="HG" group="2" tags="1">
+				<Channel number="2" type="dssd" subtype="HG" group="2" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="3" type="DSSD" subtype="HG" group="3" tags="1">
+				<Channel number="3" type="dssd" subtype="HG" group="3" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="4" type="DSSD" subtype="HG" group="4" tags="1">
+				<Channel number="4" type="dssd" subtype="HG" group="4" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="5" type="DSSD" subtype="HG" group="5" tags="1">
+				<Channel number="5" type="dssd" subtype="HG" group="5" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="6" type="DSSD" subtype="HG" group="6" tags="1">
+				<Channel number="6" type="dssd" subtype="HG" group="6" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="7" type="DSSD" subtype="HG" group="7" tags="1">
+				<Channel number="7" type="dssd" subtype="HG" group="7" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="8" type="DSSD" subtype="HG" group="8" tags="1">
+				<Channel number="8" type="dssd" subtype="HG" group="8" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="9" type="DSSD" subtype="HG" group="9" tags="1">
+				<Channel number="9" type="dssd" subtype="HG" group="9" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="10" type="DSSD" subtype="HG" group="10" tags="1">
+				<Channel number="10" type="dssd" subtype="HG" group="10" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="11" type="DSSD" subtype="HG" group="11" tags="1">
+				<Channel number="11" type="dssd" subtype="HG" group="11" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="12" type="DSSD" subtype="HG" group="12" tags="1">
+				<Channel number="12" type="dssd" subtype="HG" group="12" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="13" type="DSSD" subtype="HG" group="13" tags="1">
+				<Channel number="13" type="dssd" subtype="HG" group="13" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="14" type="DSSD" subtype="HG" group="14" tags="1">
+				<Channel number="14" type="dssd" subtype="HG" group="14" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="15" type="DSSD" subtype="HG" group="15" tags="1">
+				<Channel number="15" type="dssd" subtype="HG" group="15" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 			</Module>
 			<Module number="5" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
-				<Channel number="0" type="DSSD" subtype="HG" group="16" tags="1">
+				<Channel number="0" type="dssd" subtype="HG" group="16" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="1" type="DSSD" subtype="HG" group="17" tags="1">
+				<Channel number="1" type="dssd" subtype="HG" group="17" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="2" type="DSSD" subtype="HG" group="18" tags="1">
+				<Channel number="2" type="dssd" subtype="HG" group="18" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="3" type="DSSD" subtype="HG" group="19" tags="1">
+				<Channel number="3" type="dssd" subtype="HG" group="19" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="4" type="DSSD" subtype="HG" group="20" tags="1">
+				<Channel number="4" type="dssd" subtype="HG" group="20" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="5" type="DSSD" subtype="HG" group="21" tags="1">
+				<Channel number="5" type="dssd" subtype="HG" group="21" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="6" type="DSSD" subtype="HG" group="22" tags="1">
+				<Channel number="6" type="dssd" subtype="HG" group="22" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="7" type="DSSD" subtype="HG" group="23" tags="1">
+				<Channel number="7" type="dssd" subtype="HG" group="23" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="8" type="DSSD" subtype="HG" group="24" tags="1">
+				<Channel number="8" type="dssd" subtype="HG" group="24" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="9" type="DSSD" subtype="HG" group="25" tags="1">
+				<Channel number="9" type="dssd" subtype="HG" group="25" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="10" type="DSSD" subtype="HG" group="26" tags="1">
+				<Channel number="10" type="dssd" subtype="HG" group="26" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="11" type="DSSD" subtype="HG" group="27" tags="1">
+				<Channel number="11" type="dssd" subtype="HG" group="27" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="12" type="DSSD" subtype="HG" group="28" tags="1">
+				<Channel number="12" type="dssd" subtype="HG" group="28" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="13" type="DSSD" subtype="HG" group="29" tags="1">
+				<Channel number="13" type="dssd" subtype="HG" group="29" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="14" type="DSSD" subtype="HG" group="30" tags="1">
+				<Channel number="14" type="dssd" subtype="HG" group="30" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="15" type="DSSD" subtype="HG" group="31" tags="1">
+				<Channel number="15" type="dssd" subtype="HG" group="31" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 			</Module>
 			<Module number="6" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
-				<Channel number="0" type="DSSD" subtype="HG" group="32" tags="1">
+				<Channel number="0" type="dssd" subtype="HG" group="32" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="1" type="DSSD" subtype="HG" group="33" tags="1">
+				<Channel number="1" type="dssd" subtype="HG" group="33" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="2" type="DSSD" subtype="HG" group="34" tags="1">
+				<Channel number="2" type="dssd" subtype="HG" group="34" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="3" type="DSSD" subtype="HG" group="35" tags="1">
+				<Channel number="3" type="dssd" subtype="HG" group="35" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="4" type="DSSD" subtype="HG" group="36" tags="1">
+				<Channel number="4" type="dssd" subtype="HG" group="36" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="5" type="DSSD" subtype="HG" group="37" tags="1">
+				<Channel number="5" type="dssd" subtype="HG" group="37" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="6" type="DSSD" subtype="HG" group="38" tags="1">
+				<Channel number="6" type="dssd" subtype="HG" group="38" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="7" type="DSSD" subtype="HG" group="39" tags="1">
+				<Channel number="7" type="dssd" subtype="HG" group="39" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="8" type="DSSD" subtype="HG" group="40" tags="1">
+				<Channel number="8" type="dssd" subtype="HG" group="40" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="9" type="DSSD" subtype="HG" group="41" tags="1">
+				<Channel number="9" type="dssd" subtype="HG" group="41" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="10" type="DSSD" subtype="HG" group="42" tags="1">
+				<Channel number="10" type="dssd" subtype="HG" group="42" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="11" type="DSSD" subtype="HG" group="43" tags="1">
+				<Channel number="11" type="dssd" subtype="HG" group="43" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="12" type="DSSD" subtype="HG" group="44" tags="1">
+				<Channel number="12" type="dssd" subtype="HG" group="44" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="13" type="DSSD" subtype="HG" group="45" tags="1">
+				<Channel number="13" type="dssd" subtype="HG" group="45" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="14" type="DSSD" subtype="HG" group="46" tags="1">
+				<Channel number="14" type="dssd" subtype="HG" group="46" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="15" type="DSSD" subtype="HG" group="47" tags="1">
+				<Channel number="15" type="dssd" subtype="HG" group="47" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 			</Module>
 			<Module number="7" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
-				<Channel number="0" type="DSSD" subtype="HG" group="48" tags="1">
+				<Channel number="0" type="dssd" subtype="HG" group="48" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="1" type="DSSD" subtype="HG" group="49" tags="1">
+				<Channel number="1" type="dssd" subtype="HG" group="49" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="2" type="DSSD" subtype="HG" group="50" tags="1">
+				<Channel number="2" type="dssd" subtype="HG" group="50" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="3" type="DSSD" subtype="HG" group="51" tags="1">
+				<Channel number="3" type="dssd" subtype="HG" group="51" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="4" type="DSSD" subtype="HG" group="52" tags="1">
+				<Channel number="4" type="dssd" subtype="HG" group="52" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="5" type="DSSD" subtype="HG" group="53" tags="1">
+				<Channel number="5" type="dssd" subtype="HG" group="53" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="6" type="DSSD" subtype="HG" group="54" tags="1">
+				<Channel number="6" type="dssd" subtype="HG" group="54" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="7" type="DSSD" subtype="HG" group="55" tags="1">
+				<Channel number="7" type="dssd" subtype="HG" group="55" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="8" type="DSSD" subtype="HG" group="56" tags="1">
+				<Channel number="8" type="dssd" subtype="HG" group="56" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="9" type="DSSD" subtype="HG" group="57" tags="1">
+				<Channel number="9" type="dssd" subtype="HG" group="57" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="10" type="DSSD" subtype="HG" group="58" tags="1">
+				<Channel number="10" type="dssd" subtype="HG" group="58" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="11" type="DSSD" subtype="HG" group="59" tags="1">
+				<Channel number="11" type="dssd" subtype="HG" group="59" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="12" type="DSSD" subtype="HG" group="60" tags="1">
+				<Channel number="12" type="dssd" subtype="HG" group="60" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="13" type="DSSD" subtype="HG" group="61" tags="1">
+				<Channel number="13" type="dssd" subtype="HG" group="61" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="14" type="DSSD" subtype="HG" group="62" tags="1">
+				<Channel number="14" type="dssd" subtype="HG" group="62" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="15" type="DSSD" subtype="HG" group="63" tags="1">
+				<Channel number="15" type="dssd" subtype="HG" group="63" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 			</Module>
 		</Crate>
 		<Crate number="3">			<!-- spdaq76 Low Gain side of the Dual Gains-->
 			<Module number="0" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
-				<Channel number="0" type="DSSD" subtype="LG" group="0" tags="0">
+				<Channel number="0" type="dssd" subtype="LG" group="0" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="1" type="DSSD" subtype="LG" group="1" tags="0">
+				<Channel number="1" type="dssd" subtype="LG" group="1" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="2" type="DSSD" subtype="LG" group="2" tags="0">
+				<Channel number="2" type="dssd" subtype="LG" group="2" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="3" type="DSSD" subtype="LG" group="3" tags="0">
+				<Channel number="3" type="dssd" subtype="LG" group="3" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="4" type="DSSD" subtype="LG" group="4" tags="0">
+				<Channel number="4" type="dssd" subtype="LG" group="4" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="5" type="DSSD" subtype="LG" group="5" tags="0">
+				<Channel number="5" type="dssd" subtype="LG" group="5" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="6" type="DSSD" subtype="LG" group="6" tags="0">
+				<Channel number="6" type="dssd" subtype="LG" group="6" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="7" type="DSSD" subtype="LG" group="7" tags="0">
+				<Channel number="7" type="dssd" subtype="LG" group="7" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="8" type="DSSD" subtype="LG" group="8" tags="0">
+				<Channel number="8" type="dssd" subtype="LG" group="8" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="9" type="DSSD" subtype="LG" group="9" tags="0">
+				<Channel number="9" type="dssd" subtype="LG" group="9" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="10" type="DSSD" subtype="LG" group="10" tags="0">
+				<Channel number="10" type="dssd" subtype="LG" group="10" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="11" type="DSSD" subtype="LG" group="11" tags="0">
+				<Channel number="11" type="dssd" subtype="LG" group="11" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="12" type="DSSD" subtype="LG" group="12" tags="0">
+				<Channel number="12" type="dssd" subtype="LG" group="12" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="13" type="DSSD" subtype="LG" group="13" tags="0">
+				<Channel number="13" type="dssd" subtype="LG" group="13" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="14" type="DSSD" subtype="LG" group="14" tags="0">
+				<Channel number="14" type="dssd" subtype="LG" group="14" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="15" type="DSSD" subtype="LG" group="15" tags="0">
+				<Channel number="15" type="dssd" subtype="LG" group="15" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 			</Module>
 			<Module number="1" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
-				<Channel number="0" type="DSSD" subtype="LG" group="16" tags="0">
+				<Channel number="0" type="dssd" subtype="LG" group="16" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="1" type="DSSD" subtype="LG" group="17" tags="0">
+				<Channel number="1" type="dssd" subtype="LG" group="17" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="2" type="DSSD" subtype="LG" group="18" tags="0">
+				<Channel number="2" type="dssd" subtype="LG" group="18" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="3" type="DSSD" subtype="LG" group="19" tags="0">
+				<Channel number="3" type="dssd" subtype="LG" group="19" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="4" type="DSSD" subtype="LG" group="20" tags="0">
+				<Channel number="4" type="dssd" subtype="LG" group="20" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="5" type="DSSD" subtype="LG" group="21" tags="0">
+				<Channel number="5" type="dssd" subtype="LG" group="21" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="6" type="DSSD" subtype="LG" group="22" tags="0">
+				<Channel number="6" type="dssd" subtype="LG" group="22" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="7" type="DSSD" subtype="LG" group="23" tags="0">
+				<Channel number="7" type="dssd" subtype="LG" group="23" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="8" type="DSSD" subtype="LG" group="24" tags="0">
+				<Channel number="8" type="dssd" subtype="LG" group="24" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="9" type="DSSD" subtype="LG" group="25" tags="0">
+				<Channel number="9" type="dssd" subtype="LG" group="25" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="10" type="DSSD" subtype="LG" group="26" tags="0">
+				<Channel number="10" type="dssd" subtype="LG" group="26" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="11" type="DSSD" subtype="LG" group="27" tags="0">
+				<Channel number="11" type="dssd" subtype="LG" group="27" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="12" type="DSSD" subtype="LG" group="28" tags="0">
+				<Channel number="12" type="dssd" subtype="LG" group="28" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="13" type="DSSD" subtype="LG" group="29" tags="0">
+				<Channel number="13" type="dssd" subtype="LG" group="29" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="14" type="DSSD" subtype="LG" group="30" tags="0">
+				<Channel number="14" type="dssd" subtype="LG" group="30" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="15" type="DSSD" subtype="LG" group="31" tags="0">
+				<Channel number="15" type="dssd" subtype="LG" group="31" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 			</Module>
 			<Module number="2" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
-				<Channel number="0" type="DSSD" subtype="LG" group="32" tags="0">
+				<Channel number="0" type="dssd" subtype="LG" group="32" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="1" type="DSSD" subtype="LG" group="33" tags="0">
+				<Channel number="1" type="dssd" subtype="LG" group="33" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="2" type="DSSD" subtype="LG" group="34" tags="0">
+				<Channel number="2" type="dssd" subtype="LG" group="34" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="3" type="DSSD" subtype="LG" group="35" tags="0">
+				<Channel number="3" type="dssd" subtype="LG" group="35" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="4" type="DSSD" subtype="LG" group="36" tags="0">
+				<Channel number="4" type="dssd" subtype="LG" group="36" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="5" type="DSSD" subtype="LG" group="37" tags="0">
+				<Channel number="5" type="dssd" subtype="LG" group="37" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="6" type="DSSD" subtype="LG" group="38" tags="0">
+				<Channel number="6" type="dssd" subtype="LG" group="38" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="7" type="DSSD" subtype="LG" group="39" tags="0">
+				<Channel number="7" type="dssd" subtype="LG" group="39" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="8" type="DSSD" subtype="LG" group="40" tags="0">
+				<Channel number="8" type="dssd" subtype="LG" group="40" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="9" type="DSSD" subtype="LG" group="41" tags="0">
+				<Channel number="9" type="dssd" subtype="LG" group="41" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="10" type="DSSD" subtype="LG" group="42" tags="0">
+				<Channel number="10" type="dssd" subtype="LG" group="42" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="11" type="DSSD" subtype="LG" group="43" tags="0">
+				<Channel number="11" type="dssd" subtype="LG" group="43" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="12" type="DSSD" subtype="LG" group="44" tags="0">
+				<Channel number="12" type="dssd" subtype="LG" group="44" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="13" type="DSSD" subtype="LG" group="45" tags="0">
+				<Channel number="13" type="dssd" subtype="LG" group="45" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="14" type="DSSD" subtype="LG" group="46" tags="0">
+				<Channel number="14" type="dssd" subtype="LG" group="46" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="15" type="DSSD" subtype="LG" group="47" tags="0">
+				<Channel number="15" type="dssd" subtype="LG" group="47" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 			</Module>
 			<Module number="3" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
-				<Channel number="0" type="DSSD" subtype="LG" group="48" tags="0">
+				<Channel number="0" type="dssd" subtype="LG" group="48" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="1" type="DSSD" subtype="LG" group="49" tags="0">
+				<Channel number="1" type="dssd" subtype="LG" group="49" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="2" type="DSSD" subtype="LG" group="50" tags="0">
+				<Channel number="2" type="dssd" subtype="LG" group="50" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="3" type="DSSD" subtype="LG" group="51" tags="0">
+				<Channel number="3" type="dssd" subtype="LG" group="51" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="4" type="DSSD" subtype="LG" group="52" tags="0">
+				<Channel number="4" type="dssd" subtype="LG" group="52" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="5" type="DSSD" subtype="LG" group="53" tags="0">
+				<Channel number="5" type="dssd" subtype="LG" group="53" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="6" type="DSSD" subtype="LG" group="54" tags="0">
+				<Channel number="6" type="dssd" subtype="LG" group="54" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="7" type="DSSD" subtype="LG" group="55" tags="0">
+				<Channel number="7" type="dssd" subtype="LG" group="55" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="8" type="DSSD" subtype="LG" group="56" tags="0">
+				<Channel number="8" type="dssd" subtype="LG" group="56" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="9" type="DSSD" subtype="LG" group="57" tags="0">
+				<Channel number="9" type="dssd" subtype="LG" group="57" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="10" type="DSSD" subtype="LG" group="58" tags="0">
+				<Channel number="10" type="dssd" subtype="LG" group="58" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="11" type="DSSD" subtype="LG" group="59" tags="0">
+				<Channel number="11" type="dssd" subtype="LG" group="59" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="12" type="DSSD" subtype="LG" group="60" tags="0">
+				<Channel number="12" type="dssd" subtype="LG" group="60" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="13" type="DSSD" subtype="LG" group="61" tags="0">
+				<Channel number="13" type="dssd" subtype="LG" group="61" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="14" type="DSSD" subtype="LG" group="62" tags="0">
+				<Channel number="14" type="dssd" subtype="LG" group="62" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="15" type="DSSD" subtype="LG" group="63" tags="0">
+				<Channel number="15" type="dssd" subtype="LG" group="63" tags="dssd0">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 			</Module>
 			<Module number="4" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
-				<Channel number="0" type="DSSD" subtype="LG" group="0" tags="1">
+				<Channel number="0" type="dssd" subtype="LG" group="0" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="1" type="DSSD" subtype="LG" group="1" tags="1">
+				<Channel number="1" type="dssd" subtype="LG" group="1" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="2" type="DSSD" subtype="LG" group="2" tags="1">
+				<Channel number="2" type="dssd" subtype="LG" group="2" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="3" type="DSSD" subtype="LG" group="3" tags="1">
+				<Channel number="3" type="dssd" subtype="LG" group="3" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="4" type="DSSD" subtype="LG" group="4" tags="1">
+				<Channel number="4" type="dssd" subtype="LG" group="4" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="5" type="DSSD" subtype="LG" group="5" tags="1">
+				<Channel number="5" type="dssd" subtype="LG" group="5" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="6" type="DSSD" subtype="LG" group="6" tags="1">
+				<Channel number="6" type="dssd" subtype="LG" group="6" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="7" type="DSSD" subtype="LG" group="7" tags="1">
+				<Channel number="7" type="dssd" subtype="LG" group="7" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="8" type="DSSD" subtype="LG" group="8" tags="1">
+				<Channel number="8" type="dssd" subtype="LG" group="8" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="9" type="DSSD" subtype="LG" group="9" tags="1">
+				<Channel number="9" type="dssd" subtype="LG" group="9" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="10" type="DSSD" subtype="LG" group="10" tags="1">
+				<Channel number="10" type="dssd" subtype="LG" group="10" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="11" type="DSSD" subtype="LG" group="11" tags="1">
+				<Channel number="11" type="dssd" subtype="LG" group="11" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="12" type="DSSD" subtype="LG" group="12" tags="1">
+				<Channel number="12" type="dssd" subtype="LG" group="12" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="13" type="DSSD" subtype="LG" group="13" tags="1">
+				<Channel number="13" type="dssd" subtype="LG" group="13" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="14" type="DSSD" subtype="LG" group="14" tags="1">
+				<Channel number="14" type="dssd" subtype="LG" group="14" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="15" type="DSSD" subtype="LG" group="15" tags="1">
+				<Channel number="15" type="dssd" subtype="LG" group="15" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 			</Module>
 			<Module number="5" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
-				<Channel number="0" type="DSSD" subtype="LG" group="16" tags="1">
+				<Channel number="0" type="dssd" subtype="LG" group="16" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="1" type="DSSD" subtype="LG" group="17" tags="1">
+				<Channel number="1" type="dssd" subtype="LG" group="17" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="2" type="DSSD" subtype="LG" group="18" tags="1">
+				<Channel number="2" type="dssd" subtype="LG" group="18" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="3" type="DSSD" subtype="LG" group="19" tags="1">
+				<Channel number="3" type="dssd" subtype="LG" group="19" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="4" type="DSSD" subtype="LG" group="20" tags="1">
+				<Channel number="4" type="dssd" subtype="LG" group="20" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="5" type="DSSD" subtype="LG" group="21" tags="1">
+				<Channel number="5" type="dssd" subtype="LG" group="21" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="6" type="DSSD" subtype="LG" group="22" tags="1">
+				<Channel number="6" type="dssd" subtype="LG" group="22" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="7" type="DSSD" subtype="LG" group="23" tags="1">
+				<Channel number="7" type="dssd" subtype="LG" group="23" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="8" type="DSSD" subtype="LG" group="24" tags="1">
+				<Channel number="8" type="dssd" subtype="LG" group="24" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="9" type="DSSD" subtype="LG" group="25" tags="1">
+				<Channel number="9" type="dssd" subtype="LG" group="25" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="10" type="DSSD" subtype="LG" group="26" tags="1">
+				<Channel number="10" type="dssd" subtype="LG" group="26" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="11" type="DSSD" subtype="LG" group="27" tags="1">
+				<Channel number="11" type="dssd" subtype="LG" group="27" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="12" type="DSSD" subtype="LG" group="28" tags="1">
+				<Channel number="12" type="dssd" subtype="LG" group="28" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="13" type="DSSD" subtype="LG" group="29" tags="1">
+				<Channel number="13" type="dssd" subtype="LG" group="29" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="14" type="DSSD" subtype="LG" group="30" tags="1">
+				<Channel number="14" type="dssd" subtype="LG" group="30" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="15" type="DSSD" subtype="LG" group="31" tags="1">
+				<Channel number="15" type="dssd" subtype="LG" group="31" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 			</Module>
 			<Module number="6" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
-				<Channel number="0" type="DSSD" subtype="LG" group="32" tags="1">
+				<Channel number="0" type="dssd" subtype="LG" group="32" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="1" type="DSSD" subtype="LG" group="33" tags="1">
+				<Channel number="1" type="dssd" subtype="LG" group="33" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="2" type="DSSD" subtype="LG" group="34" tags="1">
+				<Channel number="2" type="dssd" subtype="LG" group="34" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="3" type="DSSD" subtype="LG" group="35" tags="1">
+				<Channel number="3" type="dssd" subtype="LG" group="35" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="4" type="DSSD" subtype="LG" group="36" tags="1">
+				<Channel number="4" type="dssd" subtype="LG" group="36" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="5" type="DSSD" subtype="LG" group="37" tags="1">
+				<Channel number="5" type="dssd" subtype="LG" group="37" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="6" type="DSSD" subtype="LG" group="38" tags="1">
+				<Channel number="6" type="dssd" subtype="LG" group="38" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="7" type="DSSD" subtype="LG" group="39" tags="1">
+				<Channel number="7" type="dssd" subtype="LG" group="39" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="8" type="DSSD" subtype="LG" group="40" tags="1">
+				<Channel number="8" type="dssd" subtype="LG" group="40" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="9" type="DSSD" subtype="LG" group="41" tags="1">
+				<Channel number="9" type="dssd" subtype="LG" group="41" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="10" type="DSSD" subtype="LG" group="42" tags="1">
+				<Channel number="10" type="dssd" subtype="LG" group="42" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="11" type="DSSD" subtype="LG" group="43" tags="1">
+				<Channel number="11" type="dssd" subtype="LG" group="43" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="12" type="DSSD" subtype="LG" group="44" tags="1">
+				<Channel number="12" type="dssd" subtype="LG" group="44" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="13" type="DSSD" subtype="LG" group="45" tags="1">
+				<Channel number="13" type="dssd" subtype="LG" group="45" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="14" type="DSSD" subtype="LG" group="46" tags="1">
+				<Channel number="14" type="dssd" subtype="LG" group="46" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="15" type="DSSD" subtype="LG" group="47" tags="1">
+				<Channel number="15" type="dssd" subtype="LG" group="47" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 			</Module>
 			<Module number="7" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
-				<Channel number="0" type="DSSD" subtype="LG" group="48" tags="1">
+				<Channel number="0" type="dssd" subtype="LG" group="48" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="1" type="DSSD" subtype="LG" group="49" tags="1">
+				<Channel number="1" type="dssd" subtype="LG" group="49" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="2" type="DSSD" subtype="LG" group="50" tags="1">
+				<Channel number="2" type="dssd" subtype="LG" group="50" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="3" type="DSSD" subtype="LG" group="51" tags="1">
+				<Channel number="3" type="dssd" subtype="LG" group="51" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="4" type="DSSD" subtype="LG" group="52" tags="1">
+				<Channel number="4" type="dssd" subtype="LG" group="52" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="5" type="DSSD" subtype="LG" group="53" tags="1">
+				<Channel number="5" type="dssd" subtype="LG" group="53" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="6" type="DSSD" subtype="LG" group="54" tags="1">
+				<Channel number="6" type="dssd" subtype="LG" group="54" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="7" type="DSSD" subtype="LG" group="55" tags="1">
+				<Channel number="7" type="dssd" subtype="LG" group="55" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="8" type="DSSD" subtype="LG" group="56" tags="1">
+				<Channel number="8" type="dssd" subtype="LG" group="56" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="9" type="DSSD" subtype="LG" group="57" tags="1">
+				<Channel number="9" type="dssd" subtype="LG" group="57" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="10" type="DSSD" subtype="LG" group="58" tags="1">
+				<Channel number="10" type="dssd" subtype="LG" group="58" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="11" type="DSSD" subtype="LG" group="59" tags="1">
+				<Channel number="11" type="dssd" subtype="LG" group="59" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="12" type="DSSD" subtype="LG" group="60" tags="1">
+				<Channel number="12" type="dssd" subtype="LG" group="60" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="13" type="DSSD" subtype="LG" group="61" tags="1">
+				<Channel number="13" type="dssd" subtype="LG" group="61" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="14" type="DSSD" subtype="LG" group="62" tags="1">
+				<Channel number="14" type="dssd" subtype="LG" group="62" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="15" type="DSSD" subtype="LG" group="63" tags="1">
+				<Channel number="15" type="dssd" subtype="LG" group="63" tags="dssd1">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 			</Module>

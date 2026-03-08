@@ -130,6 +130,16 @@ list(APPEND PROCESSOR_STRUCT_LIBS CloverStruct)
 list(APPEND PROCESSOR_STRUCT_PCM ${CMAKE_CURRENT_BINARY_DIR}/libCloverStruct_root_rdict.pcm)
 list(APPEND PROCESSOR_STRUCT_RMAP ${CMAKE_CURRENT_BINARY_DIR}/libCloverStruct_root.rootmap)
 
+ROOT_GENERATE_DICTIONARY(DSSDStruct_root
+	DSSDStruct.hpp ${ROOT_CONTAINER_PATHS}
+	LINKDEF include/DSSDStructLinkDef.hpp )
+add_library(DSSDStruct SHARED DSSDStruct_root.cxx DSSDStruct_root)
+target_link_libraries(DSSDStruct ${ROOT_LIBRARIES})
+add_dependencies(DSSDStruct ${EXTERNAL_PROCESSOR_DEPS} ${EXTERNAL_LOG_DEPS})
+list(APPEND PROCESSOR_STRUCT_LIBS DSSDStruct)
+list(APPEND PROCESSOR_STRUCT_PCM ${CMAKE_CURRENT_BINARY_DIR}/libDSSDStruct_root_rdict.pcm)
+list(APPEND PROCESSOR_STRUCT_RMAP ${CMAKE_CURRENT_BINARY_DIR}/libDSSDStruct_root.rootmap)
+
 add_library(GenScanProcessors ${src_files})
 target_link_libraries(GenScanProcessors PUBLIC ${ROOT_LIBRARIES} GenScanFitters GenScanUtility pugixml)
 target_include_directories(GenScanProcessors PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
