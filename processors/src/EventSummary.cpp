@@ -4,7 +4,7 @@
 EventSummary::EventSummary(EventHistoryManager* hismanager, const boost::container::flat_map<std::string, std::vector<bool>>& table) {
 	this->ColonParse = boost::regex(":");
 	this->parent = hismanager;
-	this->MappedUIDs = table;
+	// this->MappedUIDs = table;
 }
 
 void EventSummary::BuildDetectorSummary() {
