@@ -32,7 +32,15 @@ DSSDProcessor::DSSDProcessor(const std::string& log)
 
 	auto summary = eventhistory->GetCurrentEventSummary();
 	summary->GetDetectorSummary(this->AllDefaultRegex["dssd"], this->SummaryData);
-	
+
+	std::vector<std::vector<TH2*>> DSSD_StripEnergyPlots(this->numDSSDs, std::vector<TH2*>(4, nullptr)); // 4 subtypes (LL beta, LL ion, HG, LG)
+	for (int i = 0; i < this->numDSSDs; ++i) {
+		DSSD_StripEnergyPlots[i][0] = hismanager->GetPlot<TH2*>("DSSD_" + std::to_string(i) + "11");
+		DSSD_StripEnergyPlots[i][1] = hismanager->GetPlot<TH2*>("DSSD_" + std::to_string(i) + "12");
+		DSSD_StripEnergyPlots[i][2] = hismanager->GetPlot<TH2*>("DSSD_" + std::to_string(i) + "13");
+		DSSD_StripEnergyPlots[i][3] = hismanager->GetPlot<TH2*>("DSSD_" + std::to_string(i) + "14");
+
+	}
 
 	for (const auto& evt : this->SummaryData) {
 		
@@ -59,60 +67,88 @@ DSSDProcessor::DSSDProcessor(const std::string& log)
 
 		if (evt->GetSubType().compare("LL") == 0) {
 			this->LL_Mult[this->currDSSD]++;
-			// Beta branch of the LinLogs is expected to be below the LL_Branch_Energy_Split, Ion branch above. 
+			// Beta branch of the LinLogs is expected to be below the LL_Branch_Energy_Split, Ion branch above.
 			if (currEnergy < this->LL_Branch_Energy_Split) {
-				if (this->LL_maxEnEvt[this->currDSSD].first == nullptr || currEnergy > this->LL_maxEnEvt[this->currDSSD].first->GetEnergy()) {
+				if (DSSD_StripEnergyPlots[this->currDSSD][0] != nullptr) {
+					DSSD_StripEnergyPlots[this->currDSSD][0]->Fill(currEnergy, this->currStrip);
+				}
+				if (this->LL_maxEnEvt[this->currDSSD].first == nullptr) {
 					this->LL_maxEnEvt[this->currDSSD].first = evt;
+				} else {
+					if (currEnergy > this->LL_maxEnEvt[this->currDSSD].first->GetEnergy()) {
+						this->LL_maxEnEvt[this->currDSSD].first = evt;
+					};
 				};
 			} else {
-				if (this->LL_maxEnEvt[this->currDSSD].second == nullptr || currEnergy > this->LL_maxEnEvt[this->currDSSD].second->GetEnergy()) {
+				if (DSSD_StripEnergyPlots[this->currDSSD][1] != nullptr) {
+					DSSD_StripEnergyPlots[this->currDSSD][1]->Fill(currEnergy, this->currStrip);
+				}
+				if (this->LL_maxEnEvt[this->currDSSD].second == nullptr) {
 					this->LL_maxEnEvt[this->currDSSD].second = evt;
+				} else {
+					if (currEnergy > this->LL_maxEnEvt[this->currDSSD].second->GetEnergy()) {
+						this->LL_maxEnEvt[this->currDSSD].second = evt;
+					};
 				};
 			}
 		} else if (evt->GetSubType().compare("HG") == 0) {
 			this->HG_Mult[this->currDSSD]++;
-			if (this->HG_maxEnEvt[this->currDSSD] == nullptr || currEnergy > this->HG_maxEnEvt[this->currDSSD]->GetEnergy()) {
+			if (DSSD_StripEnergyPlots[this->currDSSD][2] != nullptr) {
+				DSSD_StripEnergyPlots[this->currDSSD][2]->Fill(currEnergy, this->currStrip);
+			}
+			if (this->HG_maxEnEvt[this->currDSSD] == nullptr) {
 				this->HG_maxEnEvt[this->currDSSD] = evt;
+			} else {
+				if (currEnergy > this->HG_maxEnEvt[this->currDSSD]->GetEnergy()) {
+					this->HG_maxEnEvt[this->currDSSD] = evt;
+				};
 			};
 		} else if (evt->GetSubType().compare("LG") == 0) {
 			this->LG_Mult[this->currDSSD]++;
-			if (this->LG_maxEnEvt[this->currDSSD] == nullptr || currEnergy > this->LG_maxEnEvt[this->currDSSD]->GetEnergy()) {
-				this->LG_maxEnEvt[this->currDSSD] = evt;
-			};
+			if (DSSD_StripEnergyPlots[this->currDSSD][3] != nullptr) {
+				DSSD_StripEnergyPlots[this->currDSSD][3]->Fill(currEnergy, this->currStrip);
+			}
+			if (this->LG_maxEnEvt[this->currDSSD] == nullptr) {
+					this->LG_maxEnEvt[this->currDSSD] = evt;
+				} else {
+					if (currEnergy > this->LG_maxEnEvt[this->currDSSD]->GetEnergy()) {
+						this->LG_maxEnEvt[this->currDSSD] = evt;
+					};
+				};
 		} else {
 			this->console->warn("Unknown DSSD gain tag '{}' for Crate {}::Module {}::Channel {}, skipping", evt->GetSubType(), evt->GetCrate(), evt->GetModule(), evt->GetChannel());
 			continue;
-		}		
+		}
 	}
 
 	for (int i = 0; i < this->numDSSDs; ++i) {
 		hismanager->Fill("DSSD_" + std::to_string(i) + "10", LL_Mult[i], 0);
 		hismanager->Fill("DSSD_" + std::to_string(i) + "10", HG_Mult[i], 1);
 		hismanager->Fill("DSSD_" + std::to_string(i) + "10", LG_Mult[i], 2);
-
+		auto DSSD_MAXEN = hismanager->GetPlot<TH2*>("DSSD_" + std::to_string(i) + "00");
 		if (LL_maxEnEvt[i].first != nullptr) {
 			BETA_DSSDData_vec[i].front.energy = LL_maxEnEvt[i].first->GetEnergy();
 			BETA_DSSDData_vec[i].front.time = LL_maxEnEvt[i].first->GetTimeStamp();
 			BETA_DSSDData_vec[i].front.stripnum = stoi(LL_maxEnEvt[i].first->GetGroup());
-			hismanager->Fill("DSSD_" + std::to_string(i) + "00", LL_maxEnEvt[i].first->GetEnergy(), 0); // LL-B
+			DSSD_MAXEN->Fill(LL_maxEnEvt[i].first->GetEnergy(), 0); // LL-B
 		}
 		if (LL_maxEnEvt[i].second != nullptr) {
 			ION_DSSDData_vec[i].front.energy = LL_maxEnEvt[i].second->GetEnergy();
 			ION_DSSDData_vec[i].front.time = LL_maxEnEvt[i].second->GetTimeStamp();
 			ION_DSSDData_vec[i].front.stripnum = stoi(LL_maxEnEvt[i].second->GetGroup());
-			hismanager->Fill("DSSD_" + std::to_string(i) + "00", LL_maxEnEvt[i].second->GetEnergy(), 1); // LL-I
+			DSSD_MAXEN->Fill(LL_maxEnEvt[i].second->GetEnergy(), 1); // LL-I
 		}
 		if (HG_maxEnEvt[i] != nullptr) {
 			BETA_DSSDData_vec[i].back.energy = HG_maxEnEvt[i]->GetEnergy();
 			BETA_DSSDData_vec[i].back.time = HG_maxEnEvt[i]->GetTimeStamp();
 			BETA_DSSDData_vec[i].back.stripnum = stoi(HG_maxEnEvt[i]->GetGroup());
-			hismanager->Fill("DSSD_" + std::to_string(i) + "00", HG_maxEnEvt[i]->GetEnergy(), 2); // HG
+			DSSD_MAXEN->Fill(HG_maxEnEvt[i]->GetEnergy(), 2); // HG
 		}
 		if (LG_maxEnEvt[i] != nullptr) {
 			ION_DSSDData_vec[i].back.energy = LG_maxEnEvt[i]->GetEnergy();
 			ION_DSSDData_vec[i].back.time = LG_maxEnEvt[i]->GetTimeStamp();
 			ION_DSSDData_vec[i].back.stripnum = stoi(LG_maxEnEvt[i]->GetGroup());
-			hismanager->Fill("DSSD_" + std::to_string(i) + "00", LG_maxEnEvt[i]->GetEnergy(), 3); // LG
+			DSSD_MAXEN->Fill(LG_maxEnEvt[i]->GetEnergy(), 3); // LG
 		}
 
 		if (BETA_DSSDData_vec[i].front.stripnum >= 0 && BETA_DSSDData_vec[i].back.stripnum >= 0) {
@@ -178,10 +214,10 @@ void DSSDProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) {
 		hismanager->RegisterPlot<TH2F>(prefix + std::to_string(i) + "01", "DSSD Beta Image (Highest Energy); X (Strip); Y (Strip)", this->h2dsettings.at(1));
 		hismanager->RegisterPlot<TH2F>(prefix + std::to_string(i) + "02", "DSSD Ion Image (Highest Energy); X (Strip); Y (Strip)", this->h2dsettings.at(2));
 		hismanager->RegisterPlot<TH2F>(prefix + std::to_string(i) + "10", "DSSD multiplicity; Multiplicity; Gain (LL,HG,LG)", this->h2dsettings.at(10));
-		hismanager->RegisterPlot<TH2F>(prefix + std::to_string(i) + "11", "DSSD energy vs strip; Energy (keV); Strip (LL-B)", this->h2dsettings.at(11));
-		hismanager->RegisterPlot<TH2F>(prefix + std::to_string(i) + "12", "DSSD energy vs strip; Energy (keV); Strip (LL-I)", this->h2dsettings.at(12));
-		hismanager->RegisterPlot<TH2F>(prefix + std::to_string(i) + "13", "DSSD energy vs strip; Energy (keV); Strip (HG)", this->h2dsettings.at(13));
-		hismanager->RegisterPlot<TH2F>(prefix + std::to_string(i) + "14", "DSSD energy vs strip; Energy (keV); Strip (LG)", this->h2dsettings.at(14));
+		hismanager->RegisterPlot<TH2F>(prefix + std::to_string(i) + "11", "DSSD energy vs strip (LL-B); Energy (keV); Strip (LL-B)", this->h2dsettings.at(11));
+		hismanager->RegisterPlot<TH2F>(prefix + std::to_string(i) + "12", "DSSD energy vs strip (LL-I); Energy (keV); Strip (LL-I)", this->h2dsettings.at(12));
+		hismanager->RegisterPlot<TH2F>(prefix + std::to_string(i) + "13", "DSSD energy vs strip (HG); Energy (keV); Strip (HG)", this->h2dsettings.at(13));
+		hismanager->RegisterPlot<TH2F>(prefix + std::to_string(i) + "14", "DSSD energy vs strip (LG); Energy (keV); Strip (LG)", this->h2dsettings.at(14));
 	}
 
 	this->console->info("Finished Declaring Plots");
@@ -206,15 +242,14 @@ void DSSDProcessor::CleanupTree() {
 }
 
 void DSSDProcessor::Reset() {
-
 	for (int i = 0; i < this->numDSSDs; ++i) {
-	LL_maxEnEvt[i] = std::make_pair(nullptr, nullptr);
-	LG_maxEnEvt[i] = nullptr;
-	HG_maxEnEvt[i] = nullptr;
+		LL_maxEnEvt[i].first = nullptr;
+		LL_maxEnEvt[i].second = nullptr;
+		LG_maxEnEvt[i] = nullptr;
+		HG_maxEnEvt[i] = nullptr;
 
-	LL_Mult[i] = 0;
-	LG_Mult[i] = 0;
-	HG_Mult[i] = 0;
+		LL_Mult[i] = 0;
+		LG_Mult[i] = 0;
+		HG_Mult[i] = 0;
 	}
-	
 }

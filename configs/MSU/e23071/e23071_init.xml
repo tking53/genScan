@@ -6,7 +6,7 @@
 		<Email>default AT gmail</Email>
 	</Author>
 	<Description> Initial XML for E23071</Description>
-	<Global EventWidth="500" EventWidthUnit="ns" CorrelationType="rolling-trigger" />
+	<Global EventWidth="2" EventWidthUnit="us" CorrelationType="rolling-trigger" />
 	<DetectorDriver>
 		<Processor name="RootDevProcessor" included_types="dssd" />
 		<!-- <Analyzer name="WaveformAnalyzer" included_types="dssd"> -->
