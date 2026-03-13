@@ -8,10 +8,9 @@
 	<Description> Initial XML for E23071</Description>
 	<Global EventWidth="2" EventWidthUnit="us" CorrelationType="rolling-trigger" />
 	<DetectorDriver>
-		<Processor name="RootDevProcessor" included_types="dssd" />
+		<!--<Processor name="RootDevProcessor" included_types="dssd" /> -->
 		<!-- <Analyzer name="WaveformAnalyzer" included_types="dssd"> -->
-			<!-- <settings Crate="[0]" Module="([0,5-8])" Channel="(0|[0-9]|1[0-5])"
-			CalcDerivative="true"> -->
+			<!-- <settings Crate="[0]" Module="([0,5-8])" Channel="(0|[0-9]|1[0-5])" CalcDerivative="true"> -->
 			<!-- <settings Crate="([1-3])" Module="0" Channel="(0|[0-9]|1[0-5])" CalcDerivative="true"> -->
 				<!-- <PreTrigger min="5" max="43" /> -->
 				<!-- <PostTrigger min="200" max="249" /> -->
@@ -19,7 +18,42 @@
 				<!-- <PSD begin="45" middle="85" end="240" pre="5" post="10" fraction="0.75" /> -->
 			<!-- </settings> -->
 		<!-- </Analyzer> -->
-		<Processor name="DSSDProcessor" NumDSSDs="2" NumStrips="64"/>
+		<Processor name="DSSDProcessor" NumDSSDs="2" NumStrips="64">
+			<Histogram id="11" nbinsx="6553" xlow="0" xhigh="65536" />
+			<Histogram id="12" nbinsx="6553" xlow="0" xhigh="65536" />
+			<Histogram id="13" nbinsx="6553" xlow="0" xhigh="65536" />
+			<Histogram id="14" nbinsx="6553" xlow="0" xhigh="65536" />
+		</Processor>
+		<Processor name="PidProcessor" TofFlip="true">
+			<!-- <TofShift label="fp1">
+				<Shift id="0" delta="0" />
+				<Shift id="1" delta="0" />
+			</TofShift> -->
+
+			<Histogram id="01" nbinx="2000" xlow="-200" xhigh="0" />
+			<Histogram id="02" nbinx="2000" xlow="-200" xhigh="0" />
+			<Histogram id="03" nbinx="2000" xlow="-200" xhigh="0" />
+			<Histogram id="04" nbinx="2000" xlow="-200" xhigh="0" />
+			<Histogram id="05" nbinx="2000" xlow="-200" xhigh="0" />
+			<Histogram id="06" nbinx="2000" xlow="-200" xhigh="0" />
+			<Histogram id="07" nbinx="2000" xlow="-200" xhigh="0" />
+			<Histogram id="08" nbinx="2000" xlow="-200" xhigh="0" />
+
+			<Histogram id="09" xlow="-150" xhigh="-130" ylow="2000" yhigh="6000" />
+			<Histogram id="10" xlow="-150" xhigh="-130" ylow="2000" yhigh="6000" />
+
+			<Histogram id="13" xlow="-150" xhigh="-130" ylow="2000" yhigh="6000" />
+			<Histogram id="14" xlow="-150" xhigh="-130" ylow="2000" yhigh="6000" />
+
+			<Histogram id="17" xlow="-150" xhigh="-130" ylow="2000" yhigh="6000" />
+			<Histogram id="18" xlow="-150" xhigh="-130" ylow="2000" yhigh="6000" />
+
+			<Histogram id="21" xlow="-150" xhigh="-130" ylow="2000" yhigh="6000" />
+			<Histogram id="22" xlow="-150" xhigh="-130" ylow="2000" yhigh="6000" />
+
+			<Histogram id="25" xlow="-150" xhigh="-130" ylow="2000" yhigh="6000" />
+			<Histogram id="26" xlow="-150" xhigh="-130" ylow="2000" yhigh="6000" />
+		</Processor>
 		<Processor name="CloverProcessor" />
 
 	</DetectorDriver>
@@ -65,10 +99,10 @@
 				<Channel number="12" type="generic" subtype="vetoscint" group="" tags="">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="13" type="pid" subtype="scint" group="" tags="fp1,left">
+				<Channel number="13" type="pid" subtype="scint" group="" tags="fp1,left,tas">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="14" type="pid" subtype="scint" group="" tags="fp1,right">
+				<Channel number="14" type="pid" subtype="scint" group="" tags="fp1,right,tas">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 				<Channel number="15" type="generic" subtype="pulser" group="" tags="">
@@ -76,79 +110,79 @@
 				</Channel>
 			</Module>
 			<Module number="1" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
-				<Channel number="0" type="pid" subtype="scint" group="0" tags="db3,left">
+				<Channel number="0" type="pid" subtype="scint" group="0" tags="db3,left,tas">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="1" type="pid" subtype="scint" group="0" tags="db3,right">
+				<Channel number="1" type="pid" subtype="scint" group="0" tags="db3,right,tas">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="12" type="pid" subtype="ppac" group="0" tags="db3,anode">
+				<Channel number="2" type="pid" subtype="ppac" group="0" tags="db3,anode,tas">
 					<Calibration model="linear">0.0 1.0 </Calibration>
 				</Channel>
-				<Channel number="13" type="pid" subtype="ppac" group="1" tags="db3,anode">
+				<Channel number="3" type="pid" subtype="ppac" group="1" tags="db3,anode,tas">
 					<Calibration model="linear">0.0 1.0 </Calibration>
 				</Channel>
 
-				<Channel number="4" type="pid" subtype="ppac" group="0" tags="db4,left">
+				<Channel number="12" type="pid" subtype="ppac" group="0" tags="db4,left,tas">
 					<Calibration model="linear">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="5" type="pid" subtype="ppac" group="0" tags="db4,right">
+				<Channel number="13" type="pid" subtype="ppac" group="0" tags="db4,right,tas">
 					<Calibration model="linear">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="6" type="pid" subtype="ppac" group="0" tags="db4,up">
+				<Channel number="14" type="pid" subtype="ppac" group="0" tags="db4,up,tas">
 					<Calibration model="linear">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="7" type="pid" subtype="ppac" group="0" tags="db4,down">
+				<Channel number="15" type="pid" subtype="ppac" group="0" tags="db4,down,tas">
 					<Calibration model="linear">0.0 1.0</Calibration>
 				</Channel>
 			</Module>
 			<Module number="2" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
-				<Channel number="0" type="pid" subtype="ppac" group="0" tags="db3,left">
+				<Channel number="0" type="pid" subtype="ppac" group="0" tags="db3,left,tas">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="1" type="pid" subtype="ppac" group="0" tags="db3,right">
+				<Channel number="1" type="pid" subtype="ppac" group="0" tags="db3,right,tas">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="2" type="pid" subtype="ppac" group="0" tags="db3,up">
+				<Channel number="2" type="pid" subtype="ppac" group="0" tags="db3,up,tas">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="3" type="pid" subtype="ppac" group="0" tags="db3,down">
+				<Channel number="3" type="pid" subtype="ppac" group="0" tags="db3,down,tas">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="4" type="pid" subtype="ppac" group="1" tags="db3,left">
+				<Channel number="4" type="pid" subtype="ppac" group="1" tags="db3,left,tas">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="5" type="pid" subtype="ppac" group="1" tags="db3,right">
+				<Channel number="5" type="pid" subtype="ppac" group="1" tags="db3,right,tas">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="6" type="pid" subtype="ppac" group="1" tags="db3,up">
+				<Channel number="6" type="pid" subtype="ppac" group="1" tags="db3,up,tas">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="7" type="pid" subtype="ppac" group="1" tags="db3,down">
+				<Channel number="7" type="pid" subtype="ppac" group="1" tags="db3,down,tas">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="8" type="pid" subtype="ppac" group="0" tags="db5,left">
+				<Channel number="8" type="pid" subtype="ppac" group="0" tags="db5,left,tas">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="9" type="pid" subtype="ppac" group="0" tags="db5,right">
+				<Channel number="9" type="pid" subtype="ppac" group="0" tags="db5,right,tas">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="10" type="pid" subtype="ppac" group="0" tags="db5,up">
+				<Channel number="10" type="pid" subtype="ppac" group="0" tags="db5,up,tas">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="11" type="pid" subtype="ppac" group="0" tags="db5,down">
+				<Channel number="11" type="pid" subtype="ppac" group="0" tags="db5,down,tas">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="12" type="pid" subtype="ppac" group="1" tags="db5,left">
+				<Channel number="12" type="pid" subtype="ppac" group="1" tags="db5,left,tas">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="13" type="pid" subtype="ppac" group="1" tags="db5,right">
+				<Channel number="13" type="pid" subtype="ppac" group="1" tags="db5,right,tas">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="14" type="pid" subtype="ppac" group="1" tags="db5,up">
+				<Channel number="14" type="pid" subtype="ppac" group="1" tags="db5,up,tas">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="15" type="pid" subtype="ppac" group="1" tags="db5,down">
+				<Channel number="15" type="pid" subtype="ppac" group="1" tags="db5,down,tas">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 			</Module>
@@ -366,13 +400,16 @@
 				</Channel>
 			</Module>
 			<Module number="9" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
-				<Channel number="0" type="pid" subtype="pin" group="1" tags="fp1">
+				<Channel number="0" type="pid" subtype="pin" group="1" tags="fp1,tas">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="1" type="pid" subtype="pin" group="2" tags="fp1">
+				<Channel number="1" type="pid" subtype="pin" group="2" tags="fp1,tas">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="2" type="pid" subtype="pin" group="3" tags="fp1">					<!-- veto pin -->
+				<Channel number="4" type="pid" subtype="pin" group="3" tags="fp1,tas">					<!-- flag pin -->
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="5" type="pid" subtype="pin" group="4" tags="fp1,tas">					<!-- veto pin -->
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 			</Module>
