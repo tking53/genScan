@@ -17,11 +17,8 @@
 #include "TFile.h"
 #endif
 
-
 #include "set2root.hpp"
 
-#define FILTER_CLOCK 8E-3 // Filter clock (in us)
-#define ADC_CLOCK 4E-3 // ADC clock (in us)
 #define READ_SIZE 1280 // Size of each module in the .set file.
 
 #ifdef USE_ROOT_OUTPUT
@@ -37,18 +34,18 @@ bool parameter::write(TFile *f_, const std::string &dir_/*=""*/){
     else{
         unsigned int count = 0;
         for(std::vector<unsigned int>::iterator iter = values.begin(); iter != values.end(); iter++){
-            std::stringstream stream;
-            stream << (*iter);
+		std::stringstream stream;
+		stream << (*iter);
 
-            std::stringstream chName;
-            chName << name << "[";
-            if(count < 10)
-                chName << "0";
-            chName << count << "]";
+		std::stringstream chName;
+		chName << name << "[";
+		if (count < 10)
+			chName << "0";
+		chName << count << "]";
 
-            TNamed named(chName.str().c_str(), stream.str().c_str());
-            named.Write();
-            count++;
+		TNamed named(chName.str().c_str(), stream.str().c_str());
+		named.Write();
+		count++;
         }
     }
 
