@@ -1,74 +1,50 @@
-file(GLOB src_files ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
-file(GLOB header_files ${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp)
+file(GLOB_RECURSE src_files ${CMAKE_CURRENT_SOURCE_DIR}/*/src/*.cpp)
+file(GLOB_RECURSE header_files ${CMAKE_CURRENT_SOURCE_DIR}/*/include/*.hpp)
 
 list(APPEND ALL_DOC_HEADERS ${header_files})
 list(APPEND ALL_DOC_SRC ${src_files})
 set(ALL_DOC_HEADERS ${ALL_DOC_HEADERS} PARENT_SCOPE)
 set(ALL_DOC_SRC ${ALL_DOC_SRC} PARENT_SCOPE)
 
-add_executable(GenConfig src/configmain.cpp)
-target_link_libraries(GenConfig PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES})
-list(APPEND EXE_LIST GenConfig)
-
-add_executable(GenDev src/devmain.cpp)
+add_executable(GenDev utilities/src/devmain.cpp)
 target_link_libraries(GenDev PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES})
 list(APPEND EXE_LIST GenDev)
 
-add_executable(GenTCutManipulator src/tcutmanipulator.cpp)
-target_link_libraries(GenTCutManipulator PRIVATE GenScanProcessors GenScanUtility ${ROOT_LIBRARIES})
-list(APPEND EXE_LIST GenTCutManipulator)
-
-add_executable(GenTraceFit src/fitmain.cpp)
-target_link_libraries(GenTraceFit PRIVATE Eigen3::Eigen pugixml GenScanFitters GenScanUtility ${ROOT_LIBRARIES})
-list(APPEND EXE_LIST GenTraceFit)
-
-add_executable(GenSplineFit src/makimamain.cpp)
-target_link_libraries(GenSplineFit PRIVATE GenScanFitters GenScanUtility ${ROOT_LIBRARIES})
-list(APPEND EXE_LIST GenSplineFit)
-
-add_executable(GenPeakFit src/peakfittermain.cpp)
-target_link_libraries(GenPeakFit PRIVATE Eigen3::Eigen GenScanFitters GenScanUtility ${ROOT_LIBRARIES} yaml-cpp::yaml-cpp)
-list(APPEND EXE_LIST GenPeakFit)
-
-add_executable(GenKeyPrint src/keyprint.cpp)
+add_executable(GenKeyPrint utilities/src/keyprint.cpp)
 target_link_libraries(GenKeyPrint PRIVATE ${ROOT_LIBRARIES})
 list(APPEND EXE_LIST GenKeyPrint)
 
-add_executable(GenCalRipper src/calibrationrippermain.cpp)
+add_executable(GenTCutManipulator utilities/src/tcutmanipulator.cpp)
+target_link_libraries(GenTCutManipulator PRIVATE GenScanProcessors GenScanUtility ${ROOT_LIBRARIES})
+list(APPEND EXE_LIST GenTCutManipulator)
+
+add_executable(GenConfig xml/src/configmain.cpp)
+target_link_libraries(GenConfig PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES})
+list(APPEND EXE_LIST GenConfig)
+
+add_executable(GenCalRipper xml/src/calibrationrippermain.cpp)
 target_link_libraries(GenCalRipper PRIVATE pugixml GenScanFitters GenScanUtility ${ROOT_LIBRARIES} yaml-cpp::yaml-cpp)
 list(APPEND EXE_LIST GenCalRipper)
 
-add_executable(GenTofShifter src/tofshiftermain.cpp)
+add_executable(GenTofShifter xml/src/tofshiftermain.cpp)
 target_link_libraries(GenTofShifter PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES} yaml-cpp::yaml-cpp)
 list(APPEND EXE_LIST GenTofShifter)
 
-add_executable(GenProcessorInserter src/processorinserter.cpp)
+add_executable(GenProcessorInserter xml/src/processorinserter.cpp)
 target_link_libraries(GenProcessorInserter PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES})
 list(APPEND EXE_LIST GenProcessorInserter)
 
-add_executable(GenKMeansCluster src/kmeansclustermain.cpp)
-target_link_libraries(GenKMeansCluster PRIVATE GenScanProcessors)
-list(APPEND EXE_LIST GenKMeansCluster)
-
-add_executable(GenProcessorDump src/dumpprocessormain.cpp)
+add_executable(GenProcessorDump xml/src/dumpprocessormain.cpp)
 target_link_libraries(GenProcessorDump PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES} )
 list(APPEND EXE_LIST GenProcessorDump)
 
-add_executable(GenTrapFilter src/trapfiltermain.cpp)
-target_link_libraries(GenTrapFilter PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES})
-list(APPEND EXE_LIST GenTrapFilter)
-
-add_executable(GenCMapRegexTest src/channelmapregexchecker.cpp)
+add_executable(GenCMapRegexTest xml/src/channelmapregexchecker.cpp)
 target_link_libraries(GenCMapRegexTest PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES})
 list(APPEND EXE_LIST GenCMapRegexTest)
 
-add_executable(GenUIDRegexTest src/uidregexchecker.cpp)
+add_executable(GenUIDRegexTest xml/src/uidregexchecker.cpp)
 target_link_libraries(GenUIDRegexTest PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES})
 list(APPEND EXE_LIST GenUIDRegexTest)
-
-add_executable(GenMCHalfLifeFitter src/mcmchalflifefitter.cpp)
-target_link_libraries(GenMCHalfLifeFitter PRIVATE GenScanUtility ${ROOT_LIBRARIES} yaml-cpp::yaml-cpp)
-list(APPEND EXE_LIST GenMCHalfLifeFitter)
 
 add_executable(GenCSRATest pixie/src/csra_test.cpp)
 list(APPEND EXE_LIST GenCSRATest)
@@ -88,6 +64,30 @@ target_compile_definitions(GenSet2Root PRIVATE USE_ROOT_OUTPUT)
 target_link_libraries(GenSet2Root PRIVATE ${ROOT_LIBRARIES})
 list(APPEND EXE_LIST GenSet2Root)
 
+add_executable(GenTraceFit fitters/src/fitmain.cpp)
+target_link_libraries(GenTraceFit PRIVATE Eigen3::Eigen pugixml GenScanFitters GenScanUtility ${ROOT_LIBRARIES})
+list(APPEND EXE_LIST GenTraceFit)
+
+add_executable(GenSplineFit fitters/src/makimamain.cpp)
+target_link_libraries(GenSplineFit PRIVATE GenScanFitters GenScanUtility ${ROOT_LIBRARIES})
+list(APPEND EXE_LIST GenSplineFit)
+
+add_executable(GenPeakFit fitters/src/peakfittermain.cpp)
+target_link_libraries(GenPeakFit PRIVATE Eigen3::Eigen GenScanFitters GenScanUtility ${ROOT_LIBRARIES} yaml-cpp::yaml-cpp)
+list(APPEND EXE_LIST GenPeakFit)
+
+add_executable(GenKMeansCluster fitters/src/kmeansclustermain.cpp)
+target_link_libraries(GenKMeansCluster PRIVATE GenScanProcessors)
+list(APPEND EXE_LIST GenKMeansCluster)
+
+add_executable(GenTrapFilter fitters/src/trapfiltermain.cpp)
+target_link_libraries(GenTrapFilter PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES})
+list(APPEND EXE_LIST GenTrapFilter)
+
+add_executable(GenMCHalfLifeFitter fitters/src/mcmchalflifefitter.cpp)
+target_link_libraries(GenMCHalfLifeFitter PRIVATE GenScanUtility ${ROOT_LIBRARIES} yaml-cpp::yaml-cpp)
+list(APPEND EXE_LIST GenMCHalfLifeFitter)
+
 #separate out things that are not necessary for running experiments
 #tools hidden behind this option will be purely analysis based such as 
 #bayesian deconvolution, and things to verify OpenCL
@@ -96,13 +96,13 @@ if(GS_ALL_TOOLS)
 	if( OpenCL_FOUND )
 		message(STATUS "Found OpenCL Include : ${OpenCL_INCLUDE_DIRS} Lib : ${OpenCL_LIBRARIES}")
 	endif()
-	add_executable(GenDeviceInfo src/deviceinfo.cpp)
+	add_executable(GenDeviceInfo utilities/src/deviceinfo.cpp)
 	target_link_libraries(GenDeviceInfo PRIVATE OpenCL::OpenCL yaml-cpp::yaml-cpp )
 	target_include_directories(GenDeviceInfo PUBLIC ${OpenCL_INCLUDE_DIRS})
 	list(APPEND EXE_LIST GenDeviceInfo)
 endif()
 
-add_executable(GenPeakLocator src/locatepeaksmain.cpp)
+add_executable(GenPeakLocator fitters/src/locatepeaksmain.cpp)
 target_link_libraries(GenPeakLocator PRIVATE GenScanUtility ${ROOT_LIBRARIES} yaml-cpp::yaml-cpp)
 list(APPEND EXE_LIST GenPeakLocator)
 
