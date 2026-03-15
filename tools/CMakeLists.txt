@@ -70,6 +70,24 @@ add_executable(GenMCHalfLifeFitter src/mcmchalflifefitter.cpp)
 target_link_libraries(GenMCHalfLifeFitter PRIVATE GenScanUtility ${ROOT_LIBRARIES} yaml-cpp::yaml-cpp)
 list(APPEND EXE_LIST GenMCHalfLifeFitter)
 
+add_executable(GenCSRATest pixie/src/csra_test.cpp)
+list(APPEND EXE_LIST GenCSRATest)
+
+add_executable(GenTrigConfigTest pixie/src/trigconfig_test.cpp)
+list(APPEND EXE_LIST GenTrigConfigTest)
+
+add_executable(GenModuleCSRBTest pixie/src/module_csrb_test.cpp)
+list(APPEND EXE_LIST GenModuleCSRBTest)
+
+add_executable(GenSet2Ascii pixie/src/set2root.cpp)
+target_include_directories(GenSet2Ascii PRIVATE ${CMAKE_SOURCE_DIR}/tools/pixie/include)
+list(APPEND EXE_LIST GenSet2Ascii)
+add_executable(GenSet2Root pixie/src/set2root.cpp)
+target_include_directories(GenSet2Root PRIVATE ${CMAKE_SOURCE_DIR}/tools/pixie/include)
+target_compile_definitions(GenSet2Root PRIVATE USE_ROOT_OUTPUT)
+target_link_libraries(GenSet2Root PRIVATE ${ROOT_LIBRARIES})
+list(APPEND EXE_LIST GenSet2Root)
+
 #separate out things that are not necessary for running experiments
 #tools hidden behind this option will be purely analysis based such as 
 #bayesian deconvolution, and things to verify OpenCL
