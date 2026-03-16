@@ -378,7 +378,7 @@ add_subdirectory(merger)
 add_subdirectory(generated)
 
 #MUST BE LAST
-option(GS_BUILD_DOCS "Enable debugging the correlator, output will be very slow" OFF)
+option(GS_BUILD_DOCS "Enable building documentation" OFF)
 set_property(CACHE GS_BUILD_DOCS PROPERTY ADVANCED ON)
 if(GS_BUILD_DOCS)
 	set(GS_BUILD_DOCS ON CACHE BOOL "Enabled building Doxygen documentation" FORCE)

@@ -6,6 +6,10 @@ list(APPEND ALL_DOC_SRC ${src_files})
 set(ALL_DOC_HEADERS ${ALL_DOC_HEADERS} PARENT_SCOPE)
 set(ALL_DOC_SRC ${ALL_DOC_SRC} PARENT_SCOPE)
 
+add_executable(GenCaenBinDump caen/src/caenbindump.cpp)
+target_link_libraries(GenCaenBinDump PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES})
+list(APPEND EXE_LIST GenCaenBinDump)
+
 add_executable(GenDev utilities/src/devmain.cpp)
 target_link_libraries(GenDev PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES})
 list(APPEND EXE_LIST GenDev)
