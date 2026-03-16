@@ -418,6 +418,8 @@ target_link_libraries(GenScanor PRIVATE BSMStruct
 					MtasStruct 
 					MusesStruct 
 					GroverStruct 
+					DSSDStruct 
+					CloverStruct
 					PidStruct 
 					PSPMTStruct 
 					RootDevStruct 
