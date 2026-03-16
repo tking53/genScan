@@ -365,6 +365,12 @@ find_package(Eigen3 REQUIRED)
 find_package(Python3)
 find_package(Doxygen)
 
+# we probably should do this 
+# set_property(GLOBAL PROPERTY ALL_DOC_SRC)
+# set_property(GLOBAL PROPERTY ALL_DOC_HEADERS)
+# then in each subdir 
+# set_property(GLOBAL APPEND PROPERTY ALL_DOC_SRC element)
+# set_property(GLOBAL APPEND PROPERTY ALL_DOC_HEADERS element)
 file(GLOB ALL_DOC_SRC ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 
 add_subdirectory(utility)

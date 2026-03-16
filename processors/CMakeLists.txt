@@ -38,6 +38,12 @@ foreach(file IN LISTS ROOT_CONTAINERS)
 	unset(${_var} CACHE)
 endforeach()
 
+# To add in a new struct, follow exactly what has been done for RootDev as seen below.
+# when you have finished here, remember to go to the main CMakeLists.txt (in the main directory)
+# and go down to the target_link_libraries for GenScanor, you need to then add your library 
+# to the growing list of structs for GenScanor.
+# the name you will add is the same as the first arg to add_library that you just wrote.
+
 ROOT_GENERATE_DICTIONARY(RootDevStruct_root 
 	RootDevStruct.hpp ${ROOT_CONTAINER_PATHS}
 	LINKDEF include/RootDevStructLinkDef.hpp )
