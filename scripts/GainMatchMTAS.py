@@ -219,12 +219,17 @@ if __name__ == "__main__":
     outer_indices = []
 
     if args.facility.upper() == 'FRIB': 
-        center_indices = list(range(33,33+12)) 
+        center_indices = list(range(33,33+12))
         inner_indices = list(range(center_indices[-1]+1,center_indices[-1]+1+12))
         middle_indices = list(range(inner_indices[-1]+1,inner_indices[-1]+1+12))
         outer_indices = list(range(middle_indices[-1]+1,middle_indices[-1]+1+12))
     elif args.facility.upper() == 'ANL':
-        center_indices = list(range(1,1+12)) 
+        center_indices = list(range(1,1+12))
+        inner_indices = list(range(center_indices[-1]+1,center_indices[-1]+1+12))
+        middle_indices = list(range(inner_indices[-1]+1,inner_indices[-1]+1+12))
+        outer_indices = list(range(middle_indices[-1]+1,middle_indices[-1]+1+12))
+    elif args.facility.upper() == 'ANL2026':
+        center_indices = list(range(17,17+12))
         inner_indices = list(range(center_indices[-1]+1,center_indices[-1]+1+12))
         middle_indices = list(range(inner_indices[-1]+1,inner_indices[-1]+1+12))
         outer_indices = list(range(middle_indices[-1]+1,middle_indices[-1]+1+12))
