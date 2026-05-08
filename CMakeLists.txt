@@ -241,7 +241,13 @@ set(_LOG_OPTIONS
 
 option(USE_SYSTEM_PUGIXML "Use the system installed pugixml, if not then we will download one and use that one" OFF)
 if( USE_SYSTEM_PUGIXML )
-	find_package(Pugixml REQUIRED)
+	find_package(Pugixml REQUIRED
+		HINTS
+		/opt/pugixml/
+		PATH_SUFFIXES
+			lib/cmake/pugixml
+			lib64/cmake/pugixml
+	)
 else()
 	set(PUGI_EXTERNAL_INSTALL_LOCATION ${CMAKE_INSTALL_PREFIX}/external)
 	set(PUGI_VERSION v1.13 CACHE STRING "Version of pugixml you want to get from git" )
@@ -263,7 +269,18 @@ endif()
 
 option(USE_SYSTEM_YAMLCPP "Use the system installed yaml-cpp, if not then we will download one and use that one" OFF)
 if( USE_SYSTEM_YAMLCPP )
-	find_package(yaml-cpp REQUIRED)
+	find_package(yaml-cpp REQUIRED
+		HINTS
+		/opt/yaml-cpp
+		PATH_SUFFIXES
+			lib/cmake/yaml-cpp
+			lib64/cmake/yaml-cpp
+		)
+	if (yaml-cpp_FOUND)
+		message(STATUS "Found yaml-cpp: ${yaml-cpp_VERSION} at ${yaml-cpp_DIR}")
+	else()
+		message(FATAL_ERROR "System yaml-cpp not found.")
+	endif()
 else()
 	set(YAML_EXTERNAL_INSTALL_LOCATION ${CMAKE_INSTALL_PREFIX}/external)
 	set(YAML_VERSION 0.8.0 CACHE STRING "Version of yaml-cpp you want to get from git" )
@@ -285,7 +302,13 @@ endif()
 
 option(USE_SYSTEM_FMT "Use the system fmt library, if not then we will download and use that one" OFF)
 if( USE_SYSTEM_FMT )
-	find_package(fmt REQUIRED)
+	find_package(fmt REQUIRED
+		HINTS
+		/opt/fmt/
+		PATH_SUFFIXES
+			lib/cmake/fmt
+			lib64/cmake/fmt
+	)
 	set(_FMT_NAME fmt)
 else()
 	set(FMT_EXTERNAL_INSTALL_LOCATION ${CMAKE_INSTALL_PREFIX}/external)
@@ -308,7 +331,13 @@ endif()
 
 option(USE_SYSTEM_SPDLOG "Use either spdlog or grab it from github" OFF)
 if( USE_SYSTEM_SPDLOG )
-	find_package(spdlog REQUIRED)
+	find_package(spdlog REQUIRED
+		HINTS
+		/opt/spdlog/
+		PATH_SUFFIXES
+			lib/cmake/spdlog
+			lib64/cmake/spdlog
+	)
 else()
 	set(SPDLOG_EXTERNAL_INSTALL_LOCATION ${CMAKE_INSTALL_PREFIX}/external)
 	set(SPDLOG_VERSION v1.9.2 CACHE STRING "Version of spdlog you want to get from git" )
@@ -330,10 +359,15 @@ endif()
 
 option(USE_SYSTEM_BOOST "Use either system boost or grab one from github" OFF)
 if( USE_SYSTEM_BOOST )
-	find_package(Boost COMPONENTS container program_options REQUIRED)
+	find_package(Boost COMPONENTS container program_options REQUIRED
+		HINTS
+		/opt/boost/
+		PATH_SUFFIXES
+			lib/cmake
+		)
 	if(Boost_FOUND)
 		include_directories(${Boost_INCLUDE_DIRS})
-		message(STATUS "Boost found: ${Boost_VERSION}")
+		message(STATUS "Boost found: ${Boost_VERSION} at ${Boost_DIR}")
 	else()
 		message(FATAL_ERROR "System Boost not found.")
 	endif()
@@ -360,7 +394,12 @@ endif()
 
 #TODO: FINISH LATER
 option(USE_SYSTEM_EIGEN "Use either system eigen or grab from github" ON)
-find_package(Eigen3 REQUIRED)
+find_package(Eigen3 REQUIRED
+		HINTS
+		/opt/eigen/
+		PATH_SUFFIXES
+		share/eigen3/cmake
+)
 
 find_package(Python3)
 find_package(Doxygen)
