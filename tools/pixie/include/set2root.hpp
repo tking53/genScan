@@ -14,6 +14,7 @@
 
 #include <vector>
 #include <string.h>
+#include <cmath>
 
 #ifdef USE_ROOT_OUTPUT
 class TFile;
