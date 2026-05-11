@@ -7,7 +7,8 @@ set(ALL_DOC_HEADERS ${ALL_DOC_HEADERS} PARENT_SCOPE)
 set(ALL_DOC_SRC ${ALL_DOC_SRC} PARENT_SCOPE)
 
 add_executable(GenMerger mergermain.cpp)
-target_link_libraries(GenMerger PRIVATE GenScanUtility ${ROOT_LIBRARIES} GenScanProcessors yaml-cpp::yaml-cpp)
+target_link_libraries(GenMerger PRIVATE GenScanProcessors yaml-cpp::yaml-cpp)
+#target_link_libraries(GenMerger PRIVATE GenScanUtility ${ROOT_LIBRARIES} GenScanProcessors yaml-cpp::yaml-cpp)
 list(APPEND EXE_LIST GenMerger)
 
 if( EXTERNAL_DEPS )

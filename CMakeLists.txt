@@ -46,6 +46,7 @@ endif()
 
 #Use rpath on Mac OS, this may not be needed, if something breaks come here and comment out
 #set(CMAKE_MACOSX_RPATH TRUE)
+set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 
 if (CMAKE_COMPILER_IS_GNUCXX)
 	#Make compiler messages nice with colored tags.
