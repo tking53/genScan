@@ -30,7 +30,6 @@ private:
 
 	std::vector<ProcessorStruct::Clover> CloverDataVec;
 	int NumClover;
-	;
 	int LeavesPerClover = 4;
 };
 
