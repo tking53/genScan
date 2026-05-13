@@ -323,10 +323,20 @@ namespace PLOTS {
 		T GetPlot(const std::string& name) {
 			if constexpr (std::is_same_v<T, TH1*>) {
 				auto it = Plots_1D.find(name);
-				return it != Plots_1D.end() ? it->second : nullptr;
+				if (it == Plots_1D.end()) {
+					std::string mess = "1D Plot : " + name + " does not exist";
+					this->console->error("{}", mess);
+					throw mess;
+				}
+				return it->second;
 			} else if constexpr (std::is_same_v<T, TH2*>) {
 				auto it = Plots_2D.find(name);
-				return it != Plots_2D.end() ? it->second : nullptr;
+				if (it == Plots_2D.end()) {
+					std::string mess = "2D Plot : " + name + " does not exist";
+					this->console->error("{}", mess);
+					throw mess;
+				}
+				return it->second;
 			} else {
 				static_assert(sizeof(T) == 0, "Unsupported type");
 			}
