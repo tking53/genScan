@@ -462,6 +462,81 @@ int main(int argc, char* argv[]) {
 
 		HistogramManager->WriteInfo();
 
+		// take advantage of this optimization for speeding things ups when scanning
+		auto Ion_Spatial_Distribution = HistogramManager->GetPlot<TH2*>("Ion_Spatial_Distribution");
+		auto Ion_R2_v_X = HistogramManager->GetPlot<TH2*>("Ion_R2_v_X");
+		auto Ion_R2_v_Y = HistogramManager->GetPlot<TH2*>("Ion_R2_v_Y");
+		auto Corrected_Ion_Spatial_Distribution = HistogramManager->GetPlot<TH2*>("Corrected_Ion_Spatial_Distribution");
+		auto Ion_AnodeSum_v_X = HistogramManager->GetPlot<TH2*>("Ion_AnodeSum_v_X");
+		auto Ion_AnodeSum_v_Y = HistogramManager->GetPlot<TH2*>("Ion_AnodeSum_v_Y");
+
+		auto Negative_Gamma_Gamma = HistogramManager->GetPlot<TH2*>("Negative_Gamma_Gamma");
+		auto Negative_Beta_Spatial_Distribution = HistogramManager->GetPlot<TH2*>("Negative_Beta_Spatial_Distribution");
+		auto Negative_Mtas_C_v_T = HistogramManager->GetPlot<TH2*>("Negative_Mtas_C_v_T");
+		auto Negative_Mtas_T = HistogramManager->GetPlot<TH1*>("Negative_Mtas_T");
+		auto Negative_Mtas_C = HistogramManager->GetPlot<TH1*>("Negative_Mtas_C");
+		auto Negative_Mtas_I = HistogramManager->GetPlot<TH1*>("Negative_Mtas_I");
+		auto Negative_Mtas_M = HistogramManager->GetPlot<TH1*>("Negative_Mtas_M");
+		auto Negative_Mtas_O = HistogramManager->GetPlot<TH1*>("Negative_Mtas_O");
+		auto Negative_Radius = HistogramManager->GetPlot<TH1*>("Negative_radius");
+		auto Negative_Beta_v_Mtas_T = HistogramManager->GetPlot<TH2*>("Negative_Beta_v_Mtas_T");
+		auto Negative_Beta_v_Mtas_C = HistogramManager->GetPlot<TH2*>("Negative_Beta_v_Mtas_C");
+		auto Negative_Beta_v_Radius = HistogramManager->GetPlot<TH2*>("Negative_Beta_v_radius");
+		auto Negative_Beta_AnodeSum_v_X = HistogramManager->GetPlot<TH2*>("Negative_Beta_AnodeSum_v_X");
+		auto Negative_Beta_AnodeSum_v_Y = HistogramManager->GetPlot<TH2*>("Negative_Beta_AnodeSum_v_X");
+		auto Negative_Mtas_Ci_v_T = HistogramManager->GetPlot<TH2*>("Negative_Mtas_Ci_v_T");
+		auto Negative_Mtas_Ci_v_C = HistogramManager->GetPlot<TH2*>("Negative_Mtas_Ci_v_C");
+		auto Negative_Mtas_IMO_v_T = HistogramManager->GetPlot<TH2*>("Negative_Mtas_IMO_v_T");
+		auto Negative_Mtas_C_Stack = HistogramManager->GetPlot<TH1*>("Negative_Mtas_C_Stack");
+		auto Negative_Mtas_I_Stack = HistogramManager->GetPlot<TH1*>("Negative_Mtas_I_Stack");
+		auto Negative_Mtas_M_Stack = HistogramManager->GetPlot<TH1*>("Negative_Mtas_M_Stack");
+		auto Negative_Mtas_O_Stack = HistogramManager->GetPlot<TH1*>("Negative_Mtas_O_Stack");
+		auto Negative_Beta_v_Mtas_Ci = HistogramManager->GetPlot<TH2*>("Negative_Beta_v_Mtas_Ci");
+		auto Negative_Beta_v_Mtas_IMO = HistogramManager->GetPlot<TH2*>("Negative_Beta_v_Mtas_IMO");
+
+		auto Positive_Gamma_Gamma = HistogramManager->GetPlot<TH2*>("Positive_Gamma_Gamma");
+		auto Positive_Beta_Spatial_Distribution = HistogramManager->GetPlot<TH2*>("Positive_Beta_Spatial_Distribution");
+		auto Positive_Mtas_C_v_T = HistogramManager->GetPlot<TH2*>("Positive_Mtas_C_v_T");
+		auto Positive_Mtas_T = HistogramManager->GetPlot<TH1*>("Positive_Mtas_T");
+		auto Positive_Mtas_C = HistogramManager->GetPlot<TH1*>("Positive_Mtas_C");
+		auto Positive_Mtas_I = HistogramManager->GetPlot<TH1*>("Positive_Mtas_I");
+		auto Positive_Mtas_M = HistogramManager->GetPlot<TH1*>("Positive_Mtas_M");
+		auto Positive_Mtas_O = HistogramManager->GetPlot<TH1*>("Positive_Mtas_O");
+		auto Positive_Radius = HistogramManager->GetPlot<TH1*>("Positive_radius");
+		auto Positive_Beta_v_Mtas_T = HistogramManager->GetPlot<TH2*>("Positive_Beta_v_Mtas_T");
+		auto Positive_Beta_v_Mtas_C = HistogramManager->GetPlot<TH2*>("Positive_Beta_v_Mtas_C");
+		auto Positive_Beta_v_Radius = HistogramManager->GetPlot<TH2*>("Positive_Beta_v_radius");
+		auto Positive_Beta_AnodeSum_v_X = HistogramManager->GetPlot<TH2*>("Positive_Beta_AnodeSum_v_X");
+		auto Positive_Beta_AnodeSum_v_Y = HistogramManager->GetPlot<TH2*>("Positive_Beta_AnodeSum_v_X");
+		auto Positive_Mtas_Ci_v_T = HistogramManager->GetPlot<TH2*>("Positive_Mtas_Ci_v_T");
+		auto Positive_Mtas_Ci_v_C = HistogramManager->GetPlot<TH2*>("Positive_Mtas_Ci_v_C");
+		auto Positive_Mtas_IMO_v_T = HistogramManager->GetPlot<TH2*>("Positive_Mtas_IMO_v_T");
+		auto Positive_Mtas_C_Stack = HistogramManager->GetPlot<TH1*>("Positive_Mtas_C_Stack");
+		auto Positive_Mtas_I_Stack = HistogramManager->GetPlot<TH1*>("Positive_Mtas_I_Stack");
+		auto Positive_Mtas_M_Stack = HistogramManager->GetPlot<TH1*>("Positive_Mtas_M_Stack");
+		auto Positive_Mtas_O_Stack = HistogramManager->GetPlot<TH1*>("Positive_Mtas_O_Stack");
+		auto Positive_Beta_v_Mtas_Ci = HistogramManager->GetPlot<TH2*>("Positive_Beta_v_Mtas_Ci");
+		auto Positive_Beta_v_Mtas_IMO = HistogramManager->GetPlot<TH2*>("Positive_Beta_v_Mtas_IMO");
+
+		auto TDiff_Beta_Ion_s = HistogramManager->GetPlot<TH1*>("TDiff_Beta_Ion_s");
+		auto TDiff_Beta_Ion_ms = HistogramManager->GetPlot<TH1*>("TDiff_Beta_Ion_ms");
+		auto TDiff_Beta_Ion_us = HistogramManager->GetPlot<TH1*>("TDiff_Beta_Ion_us");
+
+		auto Mtas_T_TDiff_Beta_Ion_Gamma_s = HistogramManager->GetPlot<TH2*>("Mtas_T_TDiff_Beta_Ion_Gamma_s");
+		auto Sparse_Mtas_T_TDiff_Beta_Ion_Gamma_s = HistogramManager->GetPlot<TH2*>("Sparse_Mtas_T_TDiff_Beta_Ion_Gamma_s");
+
+		auto Mtas_C_TDiff_Beta_Ion_Gamma_s = HistogramManager->GetPlot<TH2*>("Mtas_C_TDiff_Beta_Ion_Gamma_s");
+		auto Sparse_Mtas_C_TDiff_Beta_Ion_Gamma_s = HistogramManager->GetPlot<TH2*>("Sparse_Mtas_C_TDiff_Beta_Ion_Gamma_s");
+
+		auto Mtas_I_TDiff_Beta_Ion_Gamma_s = HistogramManager->GetPlot<TH2*>("Mtas_I_TDiff_Beta_Ion_Gamma_s");
+		auto Sparse_Mtas_I_TDiff_Beta_Ion_Gamma_s = HistogramManager->GetPlot<TH2*>("Sparse_Mtas_I_TDiff_Beta_Ion_Gamma_s");
+
+		auto Mtas_M_TDiff_Beta_Ion_Gamma_s = HistogramManager->GetPlot<TH2*>("Mtas_M_TDiff_Beta_Ion_Gamma_s");
+		auto Sparse_Mtas_M_TDiff_Beta_Ion_Gamma_s = HistogramManager->GetPlot<TH2*>("Sparse_Mtas_M_TDiff_Beta_Ion_Gamma_s");
+
+		auto Mtas_O_TDiff_Beta_Ion_Gamma_s = HistogramManager->GetPlot<TH2*>("Mtas_O_TDiff_Beta_Ion_Gamma_s");
+		auto Sparse_Mtas_O_TDiff_Beta_Ion_Gamma_s = HistogramManager->GetPlot<TH2*>("Sparse_Mtas_O_TDiff_Beta_Ion_Gamma_s");
+
 		console->info("Begin sorting");
 
 		volatile const auto period = ValidImplants.size() / 10 + 1;
@@ -511,12 +586,12 @@ int main(int argc, char* argv[]) {
 			const auto ion_r2 = ion_xdiff * ion_xdiff + ion_ydiff * ion_ydiff;
 			const auto c_ion_x = ion_xdiff / (1.0 + k1 * ion_r2 + k2 * ion_r2 * ion_r2);
 			const auto c_ion_y = ion_ydiff / (1.0 + k1 * ion_r2 + k2 * ion_r2 * ion_r2);
-			HistogramManager->Fill("Ion_Spatial_Distribution", ion_x, ion_y);
-			HistogramManager->Fill("Ion_R2_v_X", ion_xdiff, ion_r2);
-			HistogramManager->Fill("Ion_R2_v_Y", ion_ydiff, ion_r2);
-			HistogramManager->Fill("Corrected_Ion_Spatial_Distribution", c_ion_x, c_ion_y);
-			HistogramManager->Fill("Ion_AnodeSum_v_X", c_ion_x, ion_anodesum);
-			HistogramManager->Fill("Ion_AnodeSum_v_Y", c_ion_y, ion_anodesum);
+			Ion_Spatial_Distribution->Fill(ion_x, ion_y);
+			Ion_R2_v_X->Fill(ion_xdiff, ion_r2);
+			Ion_R2_v_Y->Fill(ion_ydiff, ion_r2);
+			Corrected_Ion_Spatial_Distribution->Fill(c_ion_x, c_ion_y);
+			Ion_AnodeSum_v_X->Fill(c_ion_x, ion_anodesum);
+			Ion_AnodeSum_v_Y->Fill(c_ion_y, ion_anodesum);
 			auto start = std::distance(ValidBetas.begin(), beta_begin);
 			auto stop = std::distance(ValidBetas.begin(), beta_end);
 			for (auto iter = start; iter < stop; ++iter) {
@@ -538,103 +613,103 @@ int main(int argc, char* argv[]) {
 					const auto O = ValidTotals[iter][4].sumenergy;
 
 					if (tdiff < 0) {
-						HistogramManager->Fill("Negative_Beta_Spatial_Distribution", c_beta_x, c_beta_y);
-						HistogramManager->Fill("Negative_Mtas_C_v_T", T, C);
-						HistogramManager->Fill("Negative_Mtas_T", T);
-						HistogramManager->Fill("Negative_Mtas_C", C);
-						HistogramManager->Fill("Negative_Mtas_I", I);
-						HistogramManager->Fill("Negative_Mtas_M", M);
-						HistogramManager->Fill("Negative_Mtas_O", O);
-						HistogramManager->Fill("Negative_Radius", radius);
-						HistogramManager->Fill("Negative_Beta_v_Mtas_T", T, beta_erg);
-						HistogramManager->Fill("Negative_Beta_v_Mtas_C", C, beta_erg);
-						HistogramManager->Fill("Negative_Beta_v_Radius", radius, beta_erg);
-						HistogramManager->Fill("Negative_Beta_AnodeSum_v_X", c_beta_x, beta_anode_sum);
-						HistogramManager->Fill("Negative_Beta_AnodeSum_v_Y", c_beta_y, beta_anode_sum);
+						Negative_Beta_Spatial_Distribution->Fill(c_beta_x, c_beta_y);
+						Negative_Mtas_C_v_T->Fill(T, C);
+						Negative_Mtas_T->Fill(T);
+						Negative_Mtas_C->Fill(C);
+						Negative_Mtas_I->Fill(I);
+						Negative_Mtas_M->Fill(M);
+						Negative_Mtas_O->Fill(O);
+						Negative_Radius->Fill(radius);
+						Negative_Beta_v_Mtas_T->Fill(T, beta_erg);
+						Negative_Beta_v_Mtas_C->Fill(C, beta_erg);
+						Negative_Beta_v_Radius->Fill(radius, beta_erg);
+						Negative_Beta_AnodeSum_v_X->Fill(c_beta_x, beta_anode_sum);
+						Negative_Beta_AnodeSum_v_Y->Fill(c_beta_y, beta_anode_sum);
 						for (size_t ii = 0; ii < 6; ++ii) {
-							HistogramManager->Fill("Negative_Mtas_Ci_v_T", T, ValidSegments[iter][ii].sumenergy);
-							HistogramManager->Fill("Negative_Mtas_Ci_v_C", C, ValidSegments[iter][ii].sumenergy);
-							HistogramManager->Fill("Negative_Mtas_IMO_v_T", T, ValidSegments[iter][ii + 6].sumenergy);
-							HistogramManager->Fill("Negative_Mtas_IMO_v_T", T, ValidSegments[iter][ii + 12].sumenergy);
-							HistogramManager->Fill("Negative_Mtas_IMO_v_T", T, ValidSegments[iter][ii + 18].sumenergy);
+							Negative_Mtas_Ci_v_T->Fill(T, ValidSegments[iter][ii].sumenergy);
+							Negative_Mtas_Ci_v_C->Fill(C, ValidSegments[iter][ii].sumenergy);
+							Negative_Mtas_IMO_v_T->Fill(T, ValidSegments[iter][ii + 6].sumenergy);
+							Negative_Mtas_IMO_v_T->Fill(T, ValidSegments[iter][ii + 12].sumenergy);
+							Negative_Mtas_IMO_v_T->Fill(T, ValidSegments[iter][ii + 18].sumenergy);
 
-							HistogramManager->Fill("Negative_Mtas_C_Stack", ValidSegments[iter][ii].sumenergy);
-							HistogramManager->Fill("Negative_Mtas_I_Stack", ValidSegments[iter][ii + 6].sumenergy);
-							HistogramManager->Fill("Negative_Mtas_M_Stack", ValidSegments[iter][ii + 12].sumenergy);
-							HistogramManager->Fill("Negative_Mtas_O_Stack", ValidSegments[iter][ii + 18].sumenergy);
+							Negative_Mtas_C_Stack->Fill(ValidSegments[iter][ii].sumenergy);
+							Negative_Mtas_I_Stack->Fill(ValidSegments[iter][ii + 6].sumenergy);
+							Negative_Mtas_M_Stack->Fill(ValidSegments[iter][ii + 12].sumenergy);
+							Negative_Mtas_O_Stack->Fill(ValidSegments[iter][ii + 18].sumenergy);
 
-							HistogramManager->Fill("Negative_Beta_v_Mtas_Ci", ValidSegments[iter][ii].sumenergy, beta_erg);
-							HistogramManager->Fill("Negative_Beta_v_Mtas_IMO", ValidSegments[iter][ii + 6].sumenergy, beta_erg);
-							HistogramManager->Fill("Negative_Beta_v_Mtas_IMO", ValidSegments[iter][ii + 12].sumenergy, beta_erg);
-							HistogramManager->Fill("Negative_Beta_v_Mtas_IMO", ValidSegments[iter][ii + 18].sumenergy, beta_erg);
+							Negative_Beta_v_Mtas_Ci->Fill(ValidSegments[iter][ii].sumenergy, beta_erg);
+							Negative_Beta_v_Mtas_IMO->Fill(ValidSegments[iter][ii + 6].sumenergy, beta_erg);
+							Negative_Beta_v_Mtas_IMO->Fill(ValidSegments[iter][ii + 12].sumenergy, beta_erg);
+							Negative_Beta_v_Mtas_IMO->Fill(ValidSegments[iter][ii + 18].sumenergy, beta_erg);
 						}
 						for (size_t ii = 0; ii < 24; ++ii) {
 							for (size_t jj = ii + 1; jj < 24; ++jj) {
-								HistogramManager->Fill("Negative_Gamma_Gamma",
-										       ValidSegments[iter][ii].sumenergy, ValidSegments[iter][jj].sumenergy);
-								HistogramManager->Fill("Negative_Gamma_Gamma",
-										       ValidSegments[iter][jj].sumenergy, ValidSegments[iter][ii].sumenergy);
+								Negative_Gamma_Gamma->Fill(
+									ValidSegments[iter][ii].sumenergy, ValidSegments[iter][jj].sumenergy);
+								Negative_Gamma_Gamma->Fill(
+									ValidSegments[iter][jj].sumenergy, ValidSegments[iter][ii].sumenergy);
 							}
 						}
 					} else {
-						HistogramManager->Fill("Positive_Beta_Spatial_Distribution", c_beta_x, c_beta_y);
-						HistogramManager->Fill("Positive_Mtas_C_v_T", T, C);
-						HistogramManager->Fill("Positive_Mtas_T", T);
-						HistogramManager->Fill("Positive_Mtas_C", C);
-						HistogramManager->Fill("Positive_Mtas_I", I);
-						HistogramManager->Fill("Positive_Mtas_M", M);
-						HistogramManager->Fill("Positive_Mtas_O", O);
-						HistogramManager->Fill("Positive_Radius", radius);
-						HistogramManager->Fill("Positive_Beta_v_Mtas_T", T, beta_erg);
-						HistogramManager->Fill("Positive_Beta_v_Mtas_C", C, beta_erg);
-						HistogramManager->Fill("Positive_Beta_v_Radius", radius, beta_erg);
-						HistogramManager->Fill("Positive_Beta_AnodeSum_v_X", c_beta_x, beta_anode_sum);
-						HistogramManager->Fill("Positive_Beta_AnodeSum_v_Y", c_beta_y, beta_anode_sum);
+						Positive_Beta_Spatial_Distribution->Fill(c_beta_x, c_beta_y);
+						Positive_Mtas_C_v_T->Fill(T, C);
+						Positive_Mtas_T->Fill(T);
+						Positive_Mtas_C->Fill(C);
+						Positive_Mtas_I->Fill(I);
+						Positive_Mtas_M->Fill(M);
+						Positive_Mtas_O->Fill(O);
+						Positive_Radius->Fill(radius);
+						Positive_Beta_v_Mtas_T->Fill(T, beta_erg);
+						Positive_Beta_v_Mtas_C->Fill(C, beta_erg);
+						Positive_Beta_v_Radius->Fill(radius, beta_erg);
+						Positive_Beta_AnodeSum_v_X->Fill(c_beta_x, beta_anode_sum);
+						Positive_Beta_AnodeSum_v_Y->Fill(c_beta_y, beta_anode_sum);
 						for (size_t ii = 0; ii < 6; ++ii) {
-							HistogramManager->Fill("Positive_Mtas_Ci_v_T", T, ValidSegments[iter][ii].sumenergy);
-							HistogramManager->Fill("Positive_Mtas_Ci_v_C", C, ValidSegments[iter][ii].sumenergy);
-							HistogramManager->Fill("Positive_Mtas_IMO_v_T", T, ValidSegments[iter][ii + 6].sumenergy);
-							HistogramManager->Fill("Positive_Mtas_IMO_v_T", T, ValidSegments[iter][ii + 12].sumenergy);
-							HistogramManager->Fill("Positive_Mtas_IMO_v_T", T, ValidSegments[iter][ii + 18].sumenergy);
+							Positive_Mtas_Ci_v_T->Fill(T, ValidSegments[iter][ii].sumenergy);
+							Positive_Mtas_Ci_v_C->Fill(C, ValidSegments[iter][ii].sumenergy);
+							Positive_Mtas_IMO_v_T->Fill(T, ValidSegments[iter][ii + 6].sumenergy);
+							Positive_Mtas_IMO_v_T->Fill(T, ValidSegments[iter][ii + 12].sumenergy);
+							Positive_Mtas_IMO_v_T->Fill(T, ValidSegments[iter][ii + 18].sumenergy);
 
-							HistogramManager->Fill("Positive_Mtas_C_Stack", ValidSegments[iter][ii].sumenergy);
-							HistogramManager->Fill("Positive_Mtas_I_Stack", ValidSegments[iter][ii + 6].sumenergy);
-							HistogramManager->Fill("Positive_Mtas_M_Stack", ValidSegments[iter][ii + 12].sumenergy);
-							HistogramManager->Fill("Positive_Mtas_O_Stack", ValidSegments[iter][ii + 18].sumenergy);
+							Positive_Mtas_C_Stack->Fill(ValidSegments[iter][ii].sumenergy);
+							Positive_Mtas_I_Stack->Fill(ValidSegments[iter][ii + 6].sumenergy);
+							Positive_Mtas_M_Stack->Fill(ValidSegments[iter][ii + 12].sumenergy);
+							Positive_Mtas_O_Stack->Fill(ValidSegments[iter][ii + 18].sumenergy);
 
-							HistogramManager->Fill("Positive_Beta_v_Mtas_Ci", ValidSegments[iter][ii].sumenergy, beta_erg);
-							HistogramManager->Fill("Positive_Beta_v_Mtas_IMO", ValidSegments[iter][ii + 6].sumenergy, beta_erg);
-							HistogramManager->Fill("Positive_Beta_v_Mtas_IMO", ValidSegments[iter][ii + 12].sumenergy, beta_erg);
-							HistogramManager->Fill("Positive_Beta_v_Mtas_IMO", ValidSegments[iter][ii + 18].sumenergy, beta_erg);
+							Positive_Beta_v_Mtas_Ci->Fill(ValidSegments[iter][ii].sumenergy, beta_erg);
+							Positive_Beta_v_Mtas_IMO->Fill(ValidSegments[iter][ii + 6].sumenergy, beta_erg);
+							Positive_Beta_v_Mtas_IMO->Fill(ValidSegments[iter][ii + 12].sumenergy, beta_erg);
+							Positive_Beta_v_Mtas_IMO->Fill(ValidSegments[iter][ii + 18].sumenergy, beta_erg);
 						}
 						for (size_t ii = 0; ii < 24; ++ii) {
 							for (size_t jj = ii + 1; jj < 24; ++jj) {
-								HistogramManager->Fill("Positive_Gamma_Gamma",
-										       ValidSegments[iter][ii].sumenergy, ValidSegments[iter][jj].sumenergy);
-								HistogramManager->Fill("Positive_Gamma_Gamma",
-										       ValidSegments[iter][jj].sumenergy, ValidSegments[iter][ii].sumenergy);
+								Positive_Gamma_Gamma->Fill(
+									ValidSegments[iter][ii].sumenergy, ValidSegments[iter][jj].sumenergy);
+								Positive_Gamma_Gamma->Fill(
+									ValidSegments[iter][jj].sumenergy, ValidSegments[iter][ii].sumenergy);
 							}
 						}
 					}
 
-					HistogramManager->Fill("TDiff_Beta_Ion_s", tdiff);
-					HistogramManager->Fill("TDiff_Beta_Ion_ms", 1.0e3 * tdiff);
-					HistogramManager->Fill("TDiff_Beta_Ion_us", 1.0e6 * tdiff);
+					TDiff_Beta_Ion_s->Fill(tdiff);
+					TDiff_Beta_Ion_ms->Fill(1.0e3 * tdiff);
+					TDiff_Beta_Ion_us->Fill(1.0e6 * tdiff);
 
-					HistogramManager->Fill("Mtas_T_TDiff_Beta_Ion_Gamma_s", T, tdiff);
-					HistogramManager->Fill("Sparse_Mtas_T_TDiff_Beta_Ion_Gamma_s", T, tdiff);
+					Mtas_T_TDiff_Beta_Ion_Gamma_s->Fill(T, tdiff);
+					Sparse_Mtas_T_TDiff_Beta_Ion_Gamma_s->Fill(T, tdiff);
 
-					HistogramManager->Fill("Mtas_C_TDiff_Beta_Ion_Gamma_s", C, tdiff);
-					HistogramManager->Fill("Sparse_Mtas_C_TDiff_Beta_Ion_Gamma_s", C, tdiff);
+					Mtas_C_TDiff_Beta_Ion_Gamma_s->Fill(C, tdiff);
+					Sparse_Mtas_C_TDiff_Beta_Ion_Gamma_s->Fill(C, tdiff);
 
-					HistogramManager->Fill("Mtas_I_TDiff_Beta_Ion_Gamma_s", I, tdiff);
-					HistogramManager->Fill("Sparse_Mtas_I_TDiff_Beta_Ion_Gamma_s", I, tdiff);
+					Mtas_I_TDiff_Beta_Ion_Gamma_s->Fill(I, tdiff);
+					Sparse_Mtas_I_TDiff_Beta_Ion_Gamma_s->Fill(I, tdiff);
 
-					HistogramManager->Fill("Mtas_M_TDiff_Beta_Ion_Gamma_s", M, tdiff);
-					HistogramManager->Fill("Sparse_Mtas_M_TDiff_Beta_Ion_Gamma_s", M, tdiff);
+					Mtas_M_TDiff_Beta_Ion_Gamma_s->Fill(M, tdiff);
+					Sparse_Mtas_M_TDiff_Beta_Ion_Gamma_s->Fill(M, tdiff);
 
-					HistogramManager->Fill("Mtas_O_TDiff_Beta_Ion_Gamma_s", O, tdiff);
-					HistogramManager->Fill("Sparse_Mtas_O_TDiff_Beta_Ion_Gamma_s", O, tdiff);
+					Mtas_O_TDiff_Beta_Ion_Gamma_s->Fill(O, tdiff);
+					Sparse_Mtas_O_TDiff_Beta_Ion_Gamma_s->Fill(O, tdiff);
 				}
 			}
 			++iiter;
