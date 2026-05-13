@@ -478,10 +478,10 @@ int main(int argc, char* argv[]) {
 		auto Negative_Mtas_I = HistogramManager->GetPlot<TH1*>("Negative_Mtas_I");
 		auto Negative_Mtas_M = HistogramManager->GetPlot<TH1*>("Negative_Mtas_M");
 		auto Negative_Mtas_O = HistogramManager->GetPlot<TH1*>("Negative_Mtas_O");
-		auto Negative_Radius = HistogramManager->GetPlot<TH1*>("Negative_radius");
+		auto Negative_Radius = HistogramManager->GetPlot<TH1*>("Negative_Radius");
 		auto Negative_Beta_v_Mtas_T = HistogramManager->GetPlot<TH2*>("Negative_Beta_v_Mtas_T");
 		auto Negative_Beta_v_Mtas_C = HistogramManager->GetPlot<TH2*>("Negative_Beta_v_Mtas_C");
-		auto Negative_Beta_v_Radius = HistogramManager->GetPlot<TH2*>("Negative_Beta_v_radius");
+		auto Negative_Beta_v_Radius = HistogramManager->GetPlot<TH2*>("Negative_Beta_v_Radius");
 		auto Negative_Beta_AnodeSum_v_X = HistogramManager->GetPlot<TH2*>("Negative_Beta_AnodeSum_v_X");
 		auto Negative_Beta_AnodeSum_v_Y = HistogramManager->GetPlot<TH2*>("Negative_Beta_AnodeSum_v_X");
 		auto Negative_Mtas_Ci_v_T = HistogramManager->GetPlot<TH2*>("Negative_Mtas_Ci_v_T");
@@ -502,10 +502,10 @@ int main(int argc, char* argv[]) {
 		auto Positive_Mtas_I = HistogramManager->GetPlot<TH1*>("Positive_Mtas_I");
 		auto Positive_Mtas_M = HistogramManager->GetPlot<TH1*>("Positive_Mtas_M");
 		auto Positive_Mtas_O = HistogramManager->GetPlot<TH1*>("Positive_Mtas_O");
-		auto Positive_Radius = HistogramManager->GetPlot<TH1*>("Positive_radius");
+		auto Positive_Radius = HistogramManager->GetPlot<TH1*>("Positive_Radius");
 		auto Positive_Beta_v_Mtas_T = HistogramManager->GetPlot<TH2*>("Positive_Beta_v_Mtas_T");
 		auto Positive_Beta_v_Mtas_C = HistogramManager->GetPlot<TH2*>("Positive_Beta_v_Mtas_C");
-		auto Positive_Beta_v_Radius = HistogramManager->GetPlot<TH2*>("Positive_Beta_v_radius");
+		auto Positive_Beta_v_Radius = HistogramManager->GetPlot<TH2*>("Positive_Beta_v_Radius");
 		auto Positive_Beta_AnodeSum_v_X = HistogramManager->GetPlot<TH2*>("Positive_Beta_AnodeSum_v_X");
 		auto Positive_Beta_AnodeSum_v_Y = HistogramManager->GetPlot<TH2*>("Positive_Beta_AnodeSum_v_X");
 		auto Positive_Mtas_Ci_v_T = HistogramManager->GetPlot<TH2*>("Positive_Mtas_Ci_v_T");
