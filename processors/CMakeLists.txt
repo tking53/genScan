@@ -146,6 +146,15 @@ list(APPEND PROCESSOR_STRUCT_LIBS DSSDStruct)
 list(APPEND PROCESSOR_STRUCT_PCM ${CMAKE_CURRENT_BINARY_DIR}/libDSSDStruct_root_rdict.pcm)
 list(APPEND PROCESSOR_STRUCT_RMAP ${CMAKE_CURRENT_BINARY_DIR}/libDSSDStruct_root.rootmap)
 
+ROOT_GENERATE_DICTIONARY(EBSSStruct_root
+	EBSSStruct.hpp ${ROOT_CONTAINER_PATHS}
+	LINKDEF include/EBSSStructLinkDef.hpp )
+add_library(EBSSStruct SHARED EBSSStruct_root.cxx EBSSStruct_root)
+target_link_libraries(EBSSStruct ${ROOT_LIBRARIES})
+list(APPEND PROCESSOR_STRUCT_LIBS EBSSStruct)
+list(APPEND PROCESSOR_STRUCT_PCM ${CMAKE_CURRENT_BINARY_DIR}/libEBSSStruct_root_rdict.pcm)
+list(APPEND PROCESSOR_STRUCT_RMAP ${CMAKE_CURRENT_BINARY_DIR}/libEBSSStruct_root.rootmap)
+
 add_library(GenScanProcessors ${src_files})
 target_link_libraries(GenScanProcessors PUBLIC ${ROOT_LIBRARIES} GenScanFitters GenScanUtility pugixml)
 target_include_directories(GenScanProcessors PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

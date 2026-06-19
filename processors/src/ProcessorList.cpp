@@ -19,6 +19,7 @@
 #include "YAPProcessor.hpp"
 
 #include "BSMProcessor.hpp"
+#include "EBSSProcessor.hpp"
 #include "HagridProcessor.hpp"
 #include "IonizationChamberProcessor.hpp"
 #include "DSSDProcessor.hpp"
@@ -118,6 +119,8 @@ void ProcessorList::CreateProc(const std::string& name) {
 		known_processors.push_back(std::make_shared<e21027Processor>(this->LogName));
 	} else if (name.compare("e21069b_fp2Processor") == 0) {
 		known_processors.push_back(std::make_shared<e21069b_fp2Processor>(this->LogName));
+	} else if (name.compare("EBSSProcessor") == 0) {
+		known_processors.push_back(std::make_shared<EBSSProcessor>(this->LogName));
 	} else if (name.compare("KClComptonProcessor") == 0) {
 		known_processors.push_back(std::make_shared<KClComptonProcessor>(this->LogName));
 	} else if (name.compare("ribf168Processor") == 0) {
