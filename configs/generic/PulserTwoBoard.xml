@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Configuration>
+	<Author>
+		<Name>T. Ruland and T. T. King</Name>
+		<Date>March 28, 2022</Date>
+		<Email>rtho139 AT lsu DOT edu</Email>
+	</Author>
+
+	<Description>
+		The HoneyCombDuo xml
+	</Description>
+
+	<Global EventWidth="5.0e-7" EventWidthUnit="s" CorrelationType="rolling-trigger" />
+
+	<DetectorDriver >
+		<Processor name="RootDevProcessor" included_types="pulser" />
+	</DetectorDriver>
+
+	<Map>
+		<Crate number="0">
+			<Module number="0" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="264">
+				<Channel number="0" type="pulser" subtype="psd" group="0" tags="pulser">
+					<Calibration model="linear" min="0">	
+						0	1.0
+					</Calibration>
+				</Channel>
+				<Channel number="1" type="pulser" subtype="psd" group="1" tags="pulser">
+					<Calibration model="linear" min="0"> 
+						0	1.0
+					</Calibration>
+				</Channel>
+			</Module>
+			<Module number="1" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="264">
+				<Channel number="0" type="pulser" subtype="pha" group="0" tags="pulser">
+					<Calibration model="linear" min="0"> 
+						0	1.0
+					</Calibration>
+				</Channel>
+				<Channel number="1" type="pulser" subtype="pha" group="1" tags="pulser">
+					<Calibration model="linear" min="0"> 
+						0	1.0
+					</Calibration>
+				</Channel>
+			</Module>
+		</Crate>
+	</Map>
+</Configuration>
