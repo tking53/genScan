@@ -46,7 +46,10 @@ endif()
 
 #Use rpath on Mac OS, this may not be needed, if something breaks come here and comment out
 #set(CMAKE_MACOSX_RPATH TRUE)
-set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+#set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+set(CMAKE_INSTALL_RPATH "@loader_path/../lib")
+set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 if (CMAKE_COMPILER_IS_GNUCXX)
 	#Make compiler messages nice with colored tags.
@@ -459,6 +462,7 @@ if( EXTERNAL_DEPS )
 	add_dependencies(GenScanor ${EXTERNAL_DEPS})
 endif()
 target_link_libraries(GenScanor PRIVATE BSMStruct 
+					EBSSStruct
 					VetoStruct 
 					MtasImplantStruct 
 					MtasStruct 
