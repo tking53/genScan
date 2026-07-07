@@ -6,6 +6,70 @@
 #include <string>
 #include <iostream>
 
+CaenDecoder::CaenDecoder()
+	: bit0(false)
+	, bit1(false)
+	, bit2(false)
+	, bit3(false) {
+}
+
+CaenDecoder::CaenDecoder(const CaenDecoder& rhs)
+	: bit0(rhs.bit0)
+	, bit1(rhs.bit1)
+	, bit2(rhs.bit2)
+	, bit3(rhs.bit3) {
+}
+
+CaenDecoder::CaenDecoder(CaenDecoder&& other) noexcept 
+	: bit0(std::move(other.bit0))
+	, bit1(std::move(other.bit1))
+	, bit2(std::move(other.bit2))
+	, bit3(std::move(other.bit3)) {
+}
+
+CaenDecoder& CaenDecoder::operator=(const CaenDecoder& rhs) {
+	if (this != &rhs) {
+		this->bit0 = rhs.bit0;
+		this->bit1 = rhs.bit1;
+		this->bit2 = rhs.bit2;
+		this->bit3 = rhs.bit3;
+	}
+	return *this;
+}
+
+CaenDecoder& CaenDecoder::operator=(CaenDecoder&& other) noexcept { 
+	if (this != &other) {
+		this->bit0 = other.bit0;
+		this->bit1 = other.bit1;
+		this->bit2 = other.bit2;
+		this->bit3 = other.bit3;
+	}
+	return *this;
+}
+
+void CaenDecoder::SetBits(const uint16_t& header) {
+	this->bit0 = (header >> 0) & 1; 
+	this->bit1 = (header >> 1) & 1; 
+	this->bit2 = (header >> 2) & 1; 
+	this->bit3 = (header >> 3) & 1; 
+}
+
+bool CaenDecoder::HasBit0() const {
+	return this->bit0;
+}
+
+bool CaenDecoder::HasBit1() const {
+	return this->bit1;
+}
+
+bool CaenDecoder::HasBit2() const {
+	return this->bit2;
+}
+
+bool CaenDecoder::HasBit3() const {
+	return this->bit3;
+}
+
 XiaDecoder::XiaDecoder(ChannelMap::FirmwareVersion firmware, int Frequency)
 	: Ver(firmware)
 	, Freq(Frequency)

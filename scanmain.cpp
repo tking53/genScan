@@ -103,7 +103,7 @@ int main(int argc, char* argv[]) {
 		("enabletree,t", boost::program_options::value<bool>(&enabletree)->default_value(true),
 				"enable root tree output or disable it and only generate histograms")
 		("format,x", boost::program_options::value<std::string>(&dataformat)->default_value("null"),
-				"[file_format] format of the data file (evt,evt_to,evt-presort,ldf,pacman_ldf,pld,caen_root,caen_bin)")
+				"[file_format] format of the data file (evt,evt_to,evt-presort,ldf,pacman_ldf,pld,caen_root,caen_bin_single_file,caen_bin_time_sorted,caen_bin_single_channel)")
 		("version", "print version number and exit")
 		("cmake-info", "print info about the cmake used")
 		("compiler-info", "print info about the compiler used")
@@ -217,8 +217,12 @@ int main(int argc, char* argv[]) {
 			dataparser.reset(new DataParser(DataParser::DataFileType::PLD, logname));
 		} else if (dataformat.compare("caen_root") == 0) {
 			dataparser.reset(new DataParser(DataParser::DataFileType::CAEN_ROOT, logname));
-		} else if (dataformat.compare("caen_bin") == 0) {
-			dataparser.reset(new DataParser(DataParser::DataFileType::CAEN_BIN, logname));
+		} else if (dataformat.compare("caen_bin_single_file") == 0) {
+			dataparser.reset(new DataParser(DataParser::DataFileType::CAEN_BIN_SINGLE_FILE, logname));
+		} else if (dataformat.compare("caen_bin_time_sorted") == 0) {
+			dataparser.reset(new DataParser(DataParser::DataFileType::CAEN_BIN_TIME_SORTED, logname));
+		} else if (dataformat.compare("caen_bin_single_channel") == 0) {
+			dataparser.reset(new DataParser(DataParser::DataFileType::CAEN_BIN_SINGLE_CHANNEL, logname));
 		} else {
 			throw std::runtime_error("Unknown file format : " + dataformat + ", supported types are evt,evt_to,evt-presort,ldf,pld,caen_root,caen_bin");
 		}

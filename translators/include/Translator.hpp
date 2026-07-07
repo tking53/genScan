@@ -46,6 +46,7 @@ protected:
 	std::string TranslatorName;
 
 	std::vector<std::string> InputFiles;
+	std::vector<std::string> InputStems;
 	std::vector<int> FileSizes;
 	std::ifstream CurrentFile;
 	size_t NumTotalFiles;

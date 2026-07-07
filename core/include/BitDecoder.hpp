@@ -18,6 +18,28 @@ struct Mask {
 	};
 };
 
+class CaenDecoder {
+public:
+	CaenDecoder();
+	CaenDecoder(const CaenDecoder&);
+	CaenDecoder(CaenDecoder&&) noexcept;
+
+	CaenDecoder& operator=(const CaenDecoder&);
+	CaenDecoder& operator=(CaenDecoder&&) noexcept;
+
+	void SetBits(const uint16_t&);
+	bool HasBit0() const;
+	bool HasBit1() const;
+	bool HasBit2() const;
+	bool HasBit3() const;
+
+private:
+	bool bit0;
+	bool bit1;
+	bool bit2;
+	bool bit3;
+};
+
 class XiaDecoder {
 public:
 	XiaDecoder(ChannelMap::FirmwareVersion, int);

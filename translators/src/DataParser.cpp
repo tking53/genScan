@@ -12,6 +12,9 @@
 #include "EVTPresortTranslator.hpp"
 #include "LDFPixieTranslator.hpp"
 #include "PacmanLDFPixieTranslator.hpp"
+#include "CompassBinSingleFileTranslator.hpp"
+#include "CompassBinTimeSortedTranslator.hpp"
+#include "CompassBinSingleChannelTranslator.hpp"
 
 DataParser::DataParser(DataParser::DataFileType dft, const std::string& log) {
 	this->DataType = dft;
@@ -23,8 +26,14 @@ DataParser::DataParser(DataParser::DataFileType dft, const std::string& log) {
 	case CAEN_ROOT:
 		this->ParserName = "CAEN_ROOT";
 		break;
-	case CAEN_BIN:
-		this->ParserName = "CAEN_BIN";
+	case CAEN_BIN_SINGLE_FILE:
+		this->ParserName = "CAEN_BIN_SINGLE_FILE";
+		break;
+	case CAEN_BIN_SINGLE_CHANNEL:
+		this->ParserName = "CAEN_BIN_SINGLE_CHANNEL";
+		break;
+	case CAEN_BIN_TIME_SORTED:
+		this->ParserName = "CAEN_BIN_TIME_SORTED";
 		break;
 	case LDF_PIXIE:
 		this->ParserName = "LDF_PIXIE";
@@ -68,8 +77,19 @@ DataParser::DataParser(DataParser::DataFileType dft, const std::string& log) {
 		this->console = spdlog::get(this->LogName)->clone("EVT_TO_Parser");
 		this->DataTranslator.reset(new EVTTOTranslator(this->LogName, this->ParserName));
 		break;
+	case CAEN_BIN_SINGLE_FILE:
+		this->console = spdlog::get(this->LogName)->clone("CAEN_BIN_SINGLE_FILE_Parser");
+		this->DataTranslator.reset(new CompassBinSingleFileTranslator(this->LogName, this->ParserName));
+		break;
+	case CAEN_BIN_TIME_SORTED:
+		this->console = spdlog::get(this->LogName)->clone("CAEN_BIN_TIME_SORTED_Parser");
+		this->DataTranslator.reset(new CompassBinTimeSortedTranslator(this->LogName, this->ParserName));
+		break;
+	case CAEN_BIN_SINGLE_CHANNEL:
+		this->console = spdlog::get(this->LogName)->clone("CAEN_BIN_SINGLE_CHANNEL_Parser");
+		this->DataTranslator.reset(new CompassBinSingleChannelTranslator(this->LogName, this->ParserName));
+		break;
 	case CAEN_ROOT:
-	case CAEN_BIN:
 	case PLD:
 	case Unknown:
 	default:

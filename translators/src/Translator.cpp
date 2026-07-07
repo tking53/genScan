@@ -46,21 +46,24 @@ void Translator::FinalizeFiles() {
 	this->NumFilesRemaining = this->NumTotalFiles;
 	this->CurrentFileIndex = 0;
 	this->FinishedCurrentFile = true;
+	for (const auto& f : this->InputFiles) {
+		this->InputStems.push_back(std::filesystem::path(f).stem().string());
+	}
 }
 
 bool Translator::OpenNextFile() {
 	this->FinishedCurrentFile = false;
 	if (this->CurrentFileIndex == 0) {
-		this->console->info("Opening First File : {}", this->InputFiles.at(this->CurrentFileIndex));
+		this->console->info("Opening First File : {}", this->InputStems.at(this->CurrentFileIndex));
 		this->CurrentFile.open(this->InputFiles.at(this->CurrentFileIndex), std::ifstream::binary);
 		++(this->CurrentFileIndex);
 		return true;
 	} else if (this->CurrentFileIndex == this->NumTotalFiles) {
-		this->console->info("Completed Final File : {}", this->InputFiles.at(this->CurrentFileIndex - 1));
+		this->console->info("Completed Final File : {}", this->InputStems.at(this->CurrentFileIndex - 1));
 		this->CurrentFile.close();
 		return false;
 	} else {
-		this->console->info("Swapping input File from : {} to : {}", this->InputFiles.at(this->CurrentFileIndex - 1), this->InputFiles.at(this->CurrentFileIndex));
+		this->console->info("Swapping input File from : {} to : {}", this->InputStems.at(this->CurrentFileIndex - 1), this->InputStems.at(this->CurrentFileIndex));
 		this->console->info("{}/{} Files Processed", this->CurrentFileIndex, this->InputFiles.size());
 		this->CurrentFile.close();
 		this->CurrentFile.open(this->InputFiles.at(this->CurrentFileIndex), std::ifstream::binary);

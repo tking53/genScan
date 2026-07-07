@@ -26,7 +26,9 @@ public:
 	enum DataFileType {
 		Unknown,
 		CAEN_ROOT,
-		CAEN_BIN,
+		CAEN_BIN_SINGLE_FILE,
+		CAEN_BIN_TIME_SORTED,
+		CAEN_BIN_SINGLE_CHANNEL,
 		LDF_PIXIE,
 		PACMAN_LDF_PIXIE,
 		PLD,

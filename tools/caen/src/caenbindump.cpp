@@ -120,7 +120,7 @@ struct CaenHelper {
 			// spdlog::info("{} : {}",waveform_code,num_samples);
 			waveform = std::vector<uint16_t>(num_samples, 0);
 			input.read(reinterpret_cast<char*>(&(waveform.data()[0])), num_samples * sizeof(uint16_t));
-			input.read(reinterpret_cast<char*>(&waveform_code), sizeof(uint8_t));
+			// input.read(reinterpret_cast<char*>(&waveform_code), sizeof(uint8_t));
 		}
 
 		// flag decoding for caen
