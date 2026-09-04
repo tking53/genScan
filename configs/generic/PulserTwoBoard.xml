@@ -10,7 +10,7 @@
 		The HoneyCombDuo xml
 	</Description>
 
-	<Global EventWidth="5.0e-7" EventWidthUnit="s" CorrelationType="rolling-trigger" />
+	<Global EventWidth="1.0e-5" EventWidthUnit="s" CorrelationType="rolling-trigger" />
 
 	<DetectorDriver >
 		<Processor name="RootDevProcessor" included_types="pulser" />

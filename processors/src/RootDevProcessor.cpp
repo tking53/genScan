@@ -39,6 +39,7 @@ RootDevProcessor::RootDevProcessor(const std::string& log)
 			this->CurrData.tracelength = this->CurrData.trace.size();
 			this->CurrData.qdcSums = evt->GetQDCSums();
 			this->CurrData.qdclength = this->CurrData.qdcSums.size();
+			this->CurrData.tmax = std::abs(evt->GetPSDBoundedTraceMaxInfo().second - evt->GetTracePreTriggerBaseline().first);
 
 			this->DataVec.push_back(this->CurrData);
 		}

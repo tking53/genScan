@@ -10,6 +10,7 @@ namespace PeakFit {
 	double GaussErf(double*, double*);
 	double GaussNErf(double*, double*);
 	double GaussNErfBkg(double*, double*);
+	double GaussNErfQuadComptonBkg(double*, double*);
 	double Erf(double*, double*);
 	double TailingGaussN(double*, double*);
 	double SingleTailingGaussN(double*, double*);

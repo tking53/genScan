@@ -122,7 +122,7 @@ public:
 		return data.size();
 	}
 
-	void AnalyzeWaveform(const std::pair<size_t, size_t>& PreTrigRegion, const std::pair<size_t, size_t>& PostTrigRegion, const std::vector<size_t>& QDCBounds) {
+	void AnalyzeWaveform(const std::pair<size_t, size_t>& PreTrigRegion, const std::pair<size_t, size_t>& PostTrigRegion, const std::vector<size_t>& QDCBounds, const bool& inverttrace) {
 		if (PreTrigRegion.first >= PreTrigRegion.second) {
 			throw std::runtime_error("TraceHelper::AnalyzeWaveform(const std::pair<size_t,size_t>& PreTrigRegion,const std::pair<size_t,size_t>& PostTrigRegion,const std::vector<size_t>& QDCBounds) PreTrigRegion.first > PreTrigRegion.second");
 		}
@@ -172,13 +172,14 @@ public:
 			this->TQDCSums.push_back(sum);
 		}
 
-		auto maxval = std::max_element(this->data.begin(), this->data.end());
+		auto maxval = (inverttrace) ? std::min_element(this->data.begin(),this->data.end()) : std::max_element(this->data.begin(), this->data.end());
 		this->MaxInfo = std::make_pair(std::distance(this->data.begin(), maxval), *maxval);
 
 		this->data_baselinesub = std::vector<U>(data.size(), 0.0);
 		size_t idx = 0;
 		for (const auto& val : data) {
-			this->data_baselinesub[idx] = static_cast<U>(val) - this->PreTriggerBaselineInfo.first;
+			this->data_baselinesub[idx] = (inverttrace) ? this->PreTriggerBaselineInfo.first - static_cast<U>(val)
+								    : static_cast<U>(val) - this->PreTriggerBaselineInfo.first;
 			++idx;
 		}
 
@@ -310,13 +311,14 @@ public:
 		return this->BaselineSubPSDBoundedMax;
 	}
 
-	void CalcFixedPSD(const size_t& start, const size_t& mid, const size_t& end) {
+	void CalcFixedPSD(const size_t& start, const size_t& mid, const size_t& end, const bool& inverttrace) {
 		// U pre = this->IntegrateRawTrace(start,mid);
 		// U post = this->IntegrateRawTrace(mid,end);
 		U pre = this->IntegrateBaselineSubtractedTrace(start, mid);
 		U post = this->IntegrateBaselineSubtractedTrace(mid, end);
 
-		auto maxval = std::max_element(this->data.begin() + start, this->data.begin() + end);
+		auto maxval = (inverttrace) ? std::min_element(this->data.begin() + start, this->data.begin() + end) : 
+					      std::max_element(this->data.begin() + start, this->data.begin() + end);
 		this->PSDBoundedMaxInfo = std::make_pair(std::distance(this->data.begin(), maxval), *maxval);
 		this->BaselineSubPSDBoundedMax = this->data_baselinesub[this->PSDBoundedMaxInfo.first];
 

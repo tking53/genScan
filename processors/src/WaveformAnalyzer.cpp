@@ -64,7 +64,7 @@ WaveformAnalyzer::~WaveformAnalyzer() {
 				if (boost::regex_match(evt->GetCMapID(), cmapmatch, s.first, boost::regex_constants::match_continuous)) {
 					try {
 						if (this->BannedGCID.find(evt->GetGlobalChannelID()) == this->BannedGCID.end()) {
-							evt->AnalyzeWaveform(s.second.PreTriggerBounds, s.second.PostTriggerBounds, s.second.QDCBounds);
+							evt->AnalyzeWaveform(s.second.PreTriggerBounds, s.second.PostTriggerBounds, s.second.QDCBounds, s.second.InvertTrace);
 						} else {
 							continue;
 						}
@@ -98,7 +98,7 @@ WaveformAnalyzer::~WaveformAnalyzer() {
 						if (mid > 0) {
 							auto begin = std::get<0>(s.second.FixedPSDBounds);
 							auto end = std::get<2>(s.second.FixedPSDBounds);
-							evt->CalcTraceFixedPSD(begin, mid, end);
+							evt->CalcTraceFixedPSD(begin, mid, end, s.second.InvertTrace);
 							auto psd = evt->GetTraceFixedPSD();
 							auto gcid = evt->GetGlobalChannelID();
 							auto head = std::get<0>(psd);

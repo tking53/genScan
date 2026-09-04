@@ -19,9 +19,11 @@ struct PSDCalculator {
 	std::tuple<size_t, size_t, float> FractionalPSDBounds;
 
 	bool CalcDerivative;
+	bool InvertTrace;
 
 	PSDCalculator(const pugi::xml_node& settings) {
 		this->CalcDerivative = settings.attribute("CalcDerivative").as_bool(false);
+		this->InvertTrace = settings.attribute("InvertTrace").as_bool(false);
 
 		if (pugi::xml_node curr = settings.child("PreTrigger")) {
 			this->PreTriggerBounds = std::make_pair<size_t, size_t>(curr.attribute("min").as_int(0), curr.attribute("max").as_int(0));

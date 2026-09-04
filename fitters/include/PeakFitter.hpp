@@ -36,6 +36,7 @@ namespace FitTypes {
 	enum OneDim : int {
 		GaussNLinBkgFit = 1,
 		GaussNErfBkgFit = 2,
+		GaussNErfQuadComptonBkg = 3,
 		SingleTailingGaussNFit = 10,
 		SingleTailingGaussNLinBkgFit = 11,
 		DoubleTailingGaussNFit = 20,
@@ -49,7 +50,7 @@ namespace FitTypes {
 		SingleDaughterImplantationCurveFit = 510
 	};
 	BOOST_DESCRIBE_ENUM(OneDim,
-			    GaussNLinBkgFit, GaussNErfBkgFit,
+			    GaussNLinBkgFit, GaussNErfBkgFit, GaussNErfQuadComptonBkg,
 			    SingleTailingGaussNFit, SingleTailingGaussNLinBkgFit,
 			    DoubleTailingGaussNFit,
 			    ErfFit,
@@ -515,6 +516,11 @@ struct PeakFitter1D : public PeakFitter {
 						&PeakFit::GaussNErfBkg,
 						XFitRange.first, XFitRange.second, 6);
 			this->InitGaussNErfBkgFit();
+		} else if (mode == FitTypes::OneDim::GaussNErfQuadComptonBkg) {
+			this->fitfunc = new TF1("GaussNErfQuadComptonBkg",
+						&PeakFit::GaussNErfQuadComptonBkg,
+						XFitRange.first, XFitRange.second, 6);
+			this->InitGaussNErfQuadComptonBkgFit();
 		} else if (mode == FitTypes::OneDim::SingleTailingGaussNFit) {
 			this->fitfunc = new TF1("SingleTailingGaussN",
 						&PeakFit::SingleTailingGaussN,
@@ -1035,6 +1041,64 @@ struct PeakFitter1D : public PeakFitter {
 				this->fithist->GetListOfFunctions()->Add(this->components.at(1));
 				this->components.at(2)->SetParameters(this->Results["BkgOffset"], this->Results["BkgSlope"]);
 				this->fithist->GetListOfFunctions()->Add(this->components.at(2));
+
+				TLine* gauss_centroid = new TLine(this->Results["Mean"], 0,
+								  this->Results["Mean"], 0.75 * (this->fithist->GetBinContent(this->fithist->FindBin(this->Results["Mean"]))));
+				gauss_centroid->SetLineColor(kAzure);
+				this->fithist->GetListOfFunctions()->Add(gauss_centroid);
+			}
+		}
+	}
+
+	void InitGaussNErfQuadComptonBkgFit() {
+		this->fitfunc->SetLineColor(kRed);
+		// this->components = {
+		// 	new TF1("GaussN", &PeakFit::GaussN, XFitRange.first, XFitRange.second, 3),
+		// 	new TF1("ErfBkg", &PeakFit::GaussErf, XFitRange.first, XFitRange.second, 3),
+		// 	new TF1("LinBkg", &CommonFit::Quad, XFitRange.first, XFitRange.second, 3)};
+		// this->components.at(0)->SetLineColor(kMagenta);
+		// this->components.at(1)->SetLineColor(kGreen);
+		// this->components.at(2)->SetLineColor(kViolet);
+
+		double cbkg = 0;
+		double sbkg = 0;
+		double width = this->XFitRange.second - this->XFitRange.first;
+		double offset = (this->XFitRange.second + this->XFitRange.first) / 2.0;
+		double area = this->fithist->GetBinContent(this->fithist->FindBin(offset));
+		double ca = area;
+
+		this->keys = {{"Area", {0, area}}, {"Mean", {1, offset}}, {"Sigma", {2, width}}, {"A", {3, ca}}, {"B", {4, cbkg}}, {"C", {5, sbkg}}};
+		AssignFitParNames();
+		VerifyFixedValues();
+		VerifyBoundedValues();
+		if (this->fvalues.find("Mean") == this->fvalues.end() and this->bvalues.find("Mean") == this->bvalues.end()) {
+			this->bvalues["Mean"] = this->XFitRange;
+		}
+
+		auto minbin = this->fithist->FindBin(this->XFitRange.first);
+		auto maxbin = this->fithist->FindBin(this->XFitRange.second);
+		auto integral = this->fithist->Integral(minbin, maxbin);
+
+		FixAndBoundParameters();
+
+		if (integral > 0.0) {
+			std::string option = "0SQ";
+			if (this->loglikelihood) {
+				option += "L";
+			}
+			TFitResultPtr fitresult = this->fithist->Fit(this->fitfunc, option.c_str(), "", XFitRange.first, XFitRange.second);
+
+			if (not fitresult->IsEmpty()) {
+				AssignFitValuesErrors(fitresult);
+				AssignFitFuncParams();
+				this->fithist->GetListOfFunctions()->Add(this->fitfunc);
+
+				// this->components.at(0)->SetParameters(this->Results["Area"], this->Results["Mean"], this->Results["Sigma"]);
+				// this->fithist->GetListOfFunctions()->Add(this->components.at(0));
+				// this->components.at(1)->SetParameters(this->Results["ComptonArea"], this->Results["Mean"], this->Results["Sigma"]);
+				// this->fithist->GetListOfFunctions()->Add(this->components.at(1));
+				// this->components.at(2)->SetParameters(this->Results["BkgOffset"], this->Results["BkgSlope"]);
+				// this->fithist->GetListOfFunctions()->Add(this->components.at(2));
 
 				TLine* gauss_centroid = new TLine(this->Results["Mean"], 0,
 								  this->Results["Mean"], 0.75 * (this->fithist->GetBinContent(this->fithist->FindBin(this->Results["Mean"]))));

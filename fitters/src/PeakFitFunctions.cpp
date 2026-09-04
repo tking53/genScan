@@ -52,6 +52,22 @@ namespace PeakFit {
 		return GaussNErf(x, par) + bkg;
 	}
 
+	double GaussNErfQuadComptonBkg(double* x, double* par){
+		// paper defining this is equation 6+7 in https://arxiv.org/abs/1610.09185
+		double E = x[0];
+		double E_c = par[1];
+		double sigma = par[2];
+		double a = par[3];
+		double b = par[4];
+		double c = par[5];
+		double alpha = 0.5*(a*(E*E + sigma*sigma) + b*E + c);
+		double beta = (-sigma/TMath::Sqrt(2.0*TMath::Pi()))*(E+E_c)+b;
+		double arg = (E-E_c)/(TMath::Sqrt(2.0)*sigma);
+		double term1 = alpha*TMath::Erfc(arg);
+		double term2 = beta*TMath::Exp(-arg*arg);
+		return par[0]*(term1+term2);
+	}
+
 	double Erf(double* x, double* par) {
 		// have to calc by hand because we can't transform the params to work without causing memory issues
 		double arg = 0.0;

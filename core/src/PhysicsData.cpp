@@ -562,8 +562,8 @@ uint64_t PhysicsData::GetExternalTimeStamp() const {
 	return this->ExternalTimestamp;
 }
 
-void PhysicsData::AnalyzeWaveform(const std::pair<size_t, size_t>& pretriggerbounds, const std::pair<size_t, size_t>& posttriggerbounds, const std::vector<size_t>& tqdcbounds) {
-	this->Trace.AnalyzeWaveform(pretriggerbounds, posttriggerbounds, tqdcbounds);
+void PhysicsData::AnalyzeWaveform(const std::pair<size_t, size_t>& pretriggerbounds, const std::pair<size_t, size_t>& posttriggerbounds, const std::vector<size_t>& tqdcbounds, const bool& inverttrace) {
+	this->Trace.AnalyzeWaveform(pretriggerbounds, posttriggerbounds, tqdcbounds, inverttrace);
 }
 
 const std::pair<float, float>& PhysicsData::GetTracePreTriggerBaseline() const {
@@ -598,8 +598,8 @@ float PhysicsData::AverageBaselineSubtractedTrace(const std::pair<size_t, size_t
 	return this->Trace.AverageBaselineSubtractedTrace(bounds);
 }
 
-void PhysicsData::CalcTraceFixedPSD(const size_t& start, const size_t& mid, const size_t& end) {
-	this->Trace.CalcFixedPSD(start, mid, end);
+void PhysicsData::CalcTraceFixedPSD(const size_t& start, const size_t& mid, const size_t& end, const bool& inverttrace) {
+	this->Trace.CalcFixedPSD(start, mid, end, inverttrace);
 }
 
 const std::tuple<float, float, float>& PhysicsData::GetTraceFixedPSD() const {

@@ -92,7 +92,7 @@ int CompassBinSingleFileTranslator::ReadNext() {
 			return -1;
 		}
 		raw_energy = secondWords[0];
-		energy_short = secondWords[5];
+		energy_short = secondWords[1];
 	} else if (this->single_file_decoder->HasBit1() and this->single_file_decoder->HasBit2()) {
 		if (!this->CurrentFile.read(reinterpret_cast<char*>(&secondWords), sizeof(uint16_t) * 5)) {
 			return -1;
@@ -158,9 +158,9 @@ int CompassBinSingleFileTranslator::ReadNext() {
 			return -1;
 		}
 		waveform_code = thirdWords[0];
-		if (waveform_code != 1) {
-			this->console->info("waveform_code({}) != 1", waveform_code);
-		}
+		// if (waveform_code != 1) {
+		// 	this->console->info("waveform_code({}) != 1", waveform_code);
+		// }
 		num_samples = static_cast<uint32_t>(thirdWords[4]) << 24 |
 			      static_cast<uint32_t>(thirdWords[3]) << 16 |
 			      static_cast<uint32_t>(thirdWords[2]) << 8 |

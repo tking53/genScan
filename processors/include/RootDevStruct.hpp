@@ -28,6 +28,7 @@ namespace ProcessorStruct {
 		int tracelength = 0;
 		std::vector<unsigned int> qdcSums = {}; // output the onboard qdc sums if present
 		int qdclength = 0;
+		double tmax = 0.0;
 	};
 	static const RootDev DEFAULT_RD_STRUCT;
 } // namespace ProcessorStruct

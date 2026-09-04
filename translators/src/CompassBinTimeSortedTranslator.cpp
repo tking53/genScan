@@ -87,7 +87,7 @@ int CompassBinTimeSortedTranslator::ReadNext(boost::container::devector<PhysicsD
 			return -1;
 		}
 		raw_energy = secondWords[0];
-		energy_short = secondWords[5];
+		energy_short = secondWords[1];
 	} else if (this->single_file_decoder->HasBit1() and this->single_file_decoder->HasBit2()) {
 		if (!this->CurrentFile.read(reinterpret_cast<char*>(&secondWords), sizeof(uint16_t) * 5)) {
 			return -1;
@@ -134,6 +134,7 @@ int CompassBinTimeSortedTranslator::ReadNext(boost::container::devector<PhysicsD
 		// store energy_short within the QDC sum
 		RawEvents.back().SetRawQDCSumLength(1);
 		RawEvents.back().SetQDCValue(0,energy_short);
+		// this->console->info("{}",energy_short);
 	}
 
 	uint32_t event_flags = 0;
@@ -153,9 +154,9 @@ int CompassBinTimeSortedTranslator::ReadNext(boost::container::devector<PhysicsD
 			return -1;
 		}
 		waveform_code = thirdWords[0];
-		if (waveform_code != 1) {
-			this->console->info("waveform_code({}) != 1",waveform_code);
-		}
+		// if (waveform_code != 1) {
+		// 	this->console->info("waveform_code({}) != 1 for module({}) channel({})",waveform_code,board,channel);
+		// }
 		num_samples = static_cast<uint32_t>(thirdWords[4]) << 24 |
 			      static_cast<uint32_t>(thirdWords[3]) << 16 |
 			      static_cast<uint32_t>(thirdWords[2]) <<  8 |

@@ -372,7 +372,7 @@ public:
 	bool operator==(const PhysicsData&) const;
 	bool operator!=(const PhysicsData&) const;
 
-	void AnalyzeWaveform(const std::pair<size_t, size_t>&, const std::pair<size_t, size_t>&, const std::vector<size_t>&);
+	void AnalyzeWaveform(const std::pair<size_t, size_t>&, const std::pair<size_t, size_t>&, const std::vector<size_t>&, const bool&);
 	const std::pair<float, float>& GetTracePreTriggerBaseline() const;
 	const std::pair<float, float>& GetTracePostTriggerBaseline() const;
 	const std::pair<size_t, uint16_t>& GetTraceMaxInfo() const;
@@ -383,7 +383,7 @@ public:
 	float AverageRawTrace(const std::pair<size_t, size_t>&) const;
 	float IntegrateBaselineSubtractedTrace(const std::pair<size_t, size_t>&) const;
 	float AverageBaselineSubtractedTrace(const std::pair<size_t, size_t>&) const;
-	void CalcTraceFixedPSD(const size_t&, const size_t&, const size_t&);
+	void CalcTraceFixedPSD(const size_t&, const size_t&, const size_t&, const bool&);
 	const std::tuple<float, float, float>& GetTraceFixedPSD() const;
 	void CalcTraceFractionalPSD(const size_t&, const size_t&, const float&);
 	const std::tuple<float, float, float>& GetTraceFractionalPSD() const;
