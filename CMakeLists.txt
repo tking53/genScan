@@ -1,26 +1,63 @@
-# @authors S.V. Paulauskas, K. Smith, and C. Thronsberry
-
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.10)
 
 project(GENSCAN C CXX )
+include(CheckCXXCompilerFlag)
+
+#wanted to see if we can do an LTO build
+#include(CheckIPOSupported)
+#check_ipo_supported(RESULT ipo_supported OUTPUT ipo_error)
+#
+#if(ipo_supported)
+#    message(STATUS "IPO / LTO enabled")
+#	# Enable LTO for all targets below this line
+#	set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+#else()
+#    message(WARNING "IPO/LTO not supported: ${ipo_error}")
+#endif()
+
+#make cmake depend on git things
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
+    "${CMAKE_SOURCE_DIR}/.git/HEAD"
+    "${CMAKE_SOURCE_DIR}/.git/index"
+)
 
 #Set the C++ standard to c++20.
 if(NOT CMAKE_CXX_STANDARD)
-	set(CMAKE_CXX_STANDARD 17)
+	set(CMAKE_CXX_STANDARD 20)
 	set(CMAKE_CXX_STANDARD_REQUIRED ON)
 endif()
 
+check_cxx_compiler_flag("-Wc++20-extensions" COMPILER_SUPPORTS_WCXX20_EXTENSIONS)
+check_cxx_compiler_flag("-Wc++20-attribute-extensions" COMPILER_SUPPORTS_WCXX20_ATTRIBUTE_EXTENSIONS)
+if(COMPILER_SUPPORTS_WCXX20_EXTENSIONS)
+	if(NOT CMAKE_CXX_STANDARD STREQUAL "20")
+		add_compile_options(-Wc++20-extensions)
+	else()
+		add_compile_options(-Wno-c++20-extensions)
+	endif()
+endif()
+if(COMPILER_SUPPORTS_WCXX20_ATTRIBUTE_EXTENSIONS)
+	if(NOT CMAKE_CXX_STANDARD STREQUAL "20")
+		add_compile_options(-Wc++20-attribute-extensions)
+	else()
+		add_compile_options(-Wno-c++20-attribute-extensions)
+	endif()
+endif()
 
-#Use rpath on Mac OS
-set(CMAKE_MACOSX_RPATH TRUE)
+#Use rpath on Mac OS, this may not be needed, if something breaks come here and comment out
+#set(CMAKE_MACOSX_RPATH TRUE)
+#set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+set(CMAKE_INSTALL_RPATH "@loader_path/../lib")
+set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 if (CMAKE_COMPILER_IS_GNUCXX)
-    #Make compiler messages nice with colored tags.
-    if (${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER "4.9")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fdiagnostics-color=auto")
-    endif ()
+	#Make compiler messages nice with colored tags.
+	if (${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER "4.9")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fdiagnostics-color=auto")
+	endif ()
 
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -fPIC")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -fPIC")
 endif ()
 
 #if user does not specify prefix we assign it to the install directory
@@ -29,47 +66,64 @@ endif ()
 #build. This configuration adds additional junk to my directory that I may
 #not actually want or need.
 if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-    message(STATUS "Install Prefix not specified.")
-    file(MAKE_DIRECTORY install)
-    get_filename_component(INSTALL_DIR ${CMAKE_SOURCE_DIR}/install REALPATH)
-    set(CMAKE_INSTALL_PREFIX ${INSTALL_DIR} CACHE PATH "Install Prefix")
+	message(STATUS "Install Prefix not specified.")
+	file(MAKE_DIRECTORY install)
+	get_filename_component(INSTALL_DIR ${CMAKE_SOURCE_DIR}/install REALPATH)
+	set(CMAKE_INSTALL_PREFIX ${INSTALL_DIR} CACHE PATH "Install Prefix" FORCE)
 endif ()
 message(STATUS "Installing to ${CMAKE_INSTALL_PREFIX}")
+
+#this is for making RHEL/CENTOS (lib64 default) behave with DEBIAN/UBUNTU/OSX (lib what we want)
+if(DEFINED CMAKE_INSTALL_LIBDIR)
+	message(STATUS "CMAKE_INSTALL_LIBDIR is set to: ${CMAKE_INSTALL_LIBDIR}")
+else()
+	set(CMAKE_INSTALL_LIBDIR "lib" CACHE PATH "libdir install subdir" FORCE)
+	message(STATUS "CMAKE_INSTALL_LIBDIR is NOT set, setting to ${CMAKE_INSTALL_LIBDIR}")
+endif()
 
 option(GS_CORRELATOR_DEBUG "Enable debugging the correlator, output will be very slow" OFF)
 set_property(CACHE GS_CORRELATOR_DEBUG PROPERTY ADVANCED ON)
 if(GS_CORRELATOR_DEBUG)
-    set(GS_CORRELATOR_DEBUG ON CACHE BOOL "Enable debugging the ProcessorList, output will be very slow" FORCE)
-    message(STATUS "ENABLED CORRELATOR DEBUGGING, OUTPUT IS SLOW")
+	set(GS_CORRELATOR_DEBUG ON CACHE BOOL "Enable debugging the ProcessorList, output will be very slow" FORCE)
+	message(STATUS "ENABLED CORRELATOR DEBUGGING, OUTPUT IS SLOW")
 else()
-    set(GS_CORRELATOR_DEBUG OFF CACHE BOOL "Enable debugging the ProcessorList, output will be very slow" FORCE)
+	set(GS_CORRELATOR_DEBUG OFF CACHE BOOL "Enable debugging the ProcessorList, output will be very slow" FORCE)
 endif()
 
 option(GS_PROCESSOR_DEBUG "Enable debugging the ProcessorList, output will be very slow" OFF)
 set_property(CACHE GS_PROCESSOR_DEBUG PROPERTY ADVANCED ON)
 if(GS_PROCESSOR_DEBUG)
-    set(GS_PROCESSOR_DEBUG ON CACHE BOOL "Enable debugging the ProcessorList, output will be very slow" FORCE)
-    message(STATUS "ENABLED PROCESSOR DEBUGGING, OUTPUT IS SLOW")
+	set(GS_PROCESSOR_DEBUG ON CACHE BOOL "Enable debugging the ProcessorList, output will be very slow" FORCE)
+	message(STATUS "ENABLED PROCESSOR DEBUGGING, OUTPUT IS SLOW")
 else()
-    set(GS_PROCESSOR_DEBUG OFF CACHE BOOL "Enable debugging the ProcessorList, output will be very slow" FORCE)
+	set(GS_PROCESSOR_DEBUG OFF CACHE BOOL "Enable debugging the ProcessorList, output will be very slow" FORCE)
 endif()
 
 option(GS_EVENTSUMMARY_DEBUG "Enable debugging the EventSummary, output will be very slow" OFF)
 set_property(CACHE GS_EVENTSUMMARY_DEBUG PROPERTY ADVANCED ON)
 if(GS_EVENTSUMMARY_DEBUG)
-    set(GS_EVENTSUMMARY_DEBUG ON CACHE BOOL "Enable debugging the EventSummary, output will be very slow" FORCE)
-    message(STATUS "ENABLED EVENTSUMMARY DEBUGGING, OUTPUT IS SLOW")
+	set(GS_EVENTSUMMARY_DEBUG ON CACHE BOOL "Enable debugging the EventSummary, output will be very slow" FORCE)
+	message(STATUS "ENABLED EVENTSUMMARY DEBUGGING, OUTPUT IS SLOW")
 else()
-    set(GS_EVENTSUMMARY_DEBUG OFF CACHE BOOL "Enable debugging the EventSummary, output will be very slow" FORCE)
+	set(GS_EVENTSUMMARY_DEBUG OFF CACHE BOOL "Enable debugging the EventSummary, output will be very slow" FORCE)
 endif()
 
 option(GS_TRANSLATOR_DEBUG "Enable debugging the Translators, output will be very slow" OFF)
 set_property(CACHE GS_TRANSLATOR_DEBUG PROPERTY ADVANCED ON)
 if(GS_TRANSLATOR_DEBUG)
-    set(GS_TRANSLATOR_DEBUG ON CACHE BOOL "Enable debugging the ProcessorList, output will be very slow" FORCE)
-    message(STATUS "ENABLED TRANSLATOR DEBUGGING, OUTPUT IS SLOW")
+	set(GS_TRANSLATOR_DEBUG ON CACHE BOOL "Enable debugging the ProcessorList, output will be very slow" FORCE)
+	message(STATUS "ENABLED TRANSLATOR DEBUGGING, OUTPUT IS SLOW")
 else()
-    set(GS_TRANSLATOR_DEBUG OFF CACHE BOOL "Enable debugging the ProcessorList, output will be very slow" FORCE)
+	set(GS_TRANSLATOR_DEBUG OFF CACHE BOOL "Enable debugging the ProcessorList, output will be very slow" FORCE)
+endif()
+
+option(GS_ALL_TOOLS "Enable building all tools, requires OpenCL" OFF)
+set_property(CACHE GS_ALL_TOOLS PROPERTY ADVANCED ON)
+if(GS_ALL_TOOLS)
+	set(GS_ALL_TOOLS ON CACHE BOOL "Enable building all tools, requires OpenCL" FORCE)
+	message(STATUS "ENABLED BUILDING ALL TOOLS. REQUIRES OPENCL")
+else()
+	set(GS_ALL_TOOLS OFF CACHE BOOL "Enable building all tools, requires OpenCL" FORCE)
 endif()
 
 #Add additional CXX flags if we use the Debug option
@@ -98,65 +152,75 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE BOOL "Generates compile_commands.json
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/Cmake_modules")
 
 #Find ROOT if USE_ROOT was set.
-find_package(ROOT REQUIRED COMPONENTS TreePlayer)
+find_package(ROOT REQUIRED)
+include(${ROOT_USE_FILE})
 set(ROOTSYS $ENV{ROOTSYS} CACHE STRING "ROOT directory.")
 message(STATUS "FOUND ROOT LOCATED HERE: ${ROOTSYS}")
 find_program(ROOT_CONFIG_EXECUTABLE root-config PATHS ${ROOTSYS}/bin)
 find_program(ROOTCINT_EXECUTABLE rootcint PATHS $ENV{ROOTSYS}/bin)
 find_program(GENREFLEX_EXECUTABLE genreflex PATHS $ENV{ROOTSYS}/bin)
 if (ROOT_CONFIG_EXECUTABLE)
-    execute_process(
-        COMMAND ${ROOT_CONFIG_EXECUTABLE} --prefix
-        OUTPUT_VARIABLE ROOTSYS
-        OUTPUT_STRIP_TRAILING_WHITESPACE)
+	execute_process(
+	COMMAND ${ROOT_CONFIG_EXECUTABLE} --prefix
+	OUTPUT_VARIABLE ROOTSYS
+	OUTPUT_STRIP_TRAILING_WHITESPACE)
+	message(STATUS "ROOTSYS: ${ROOTSYS}")
 
-    execute_process(
-        COMMAND ${ROOT_CONFIG_EXECUTABLE} --version
-        OUTPUT_VARIABLE ROOT_VERSION
-        OUTPUT_STRIP_TRAILING_WHITESPACE)
+	execute_process(
+	COMMAND ${ROOT_CONFIG_EXECUTABLE} --version
+	OUTPUT_VARIABLE ROOT_VERSION
+	OUTPUT_STRIP_TRAILING_WHITESPACE)
+	message(STATUS "ROOT Version: ${ROOT_VERSION}")
 
-    execute_process(
-        COMMAND ${ROOT_CONFIG_EXECUTABLE} --incdir
-        OUTPUT_VARIABLE ROOT_INCLUDE_DIR
-        OUTPUT_STRIP_TRAILING_WHITESPACE)
+	execute_process(
+	COMMAND ${ROOT_CONFIG_EXECUTABLE} --incdir
+	OUTPUT_VARIABLE ROOT_INCLUDE_DIR
+	OUTPUT_STRIP_TRAILING_WHITESPACE)
+	message(STATUS "ROOT Include Dir: ${ROOT_INCLUDE_DIR}")
 
-    execute_process(
-        COMMAND ${ROOT_CONFIG_EXECUTABLE} --libs
-        OUTPUT_VARIABLE ROOT_LIBRARIES
-        OUTPUT_STRIP_TRAILING_WHITESPACE)
+	execute_process(
+	COMMAND ${ROOT_CONFIG_EXECUTABLE} --libs
+	OUTPUT_VARIABLE ROOT_LIBRARIES
+	OUTPUT_STRIP_TRAILING_WHITESPACE)
+	message(STATUS "ROOT Libraries: ${ROOT_LIBRARIES}")
 
-    execute_process(
-        COMMAND ${ROOT_CONFIG_EXECUTABLE} --glibs
-        OUTPUT_VARIABLE ROOT_GUI_LIBRARIES
-        OUTPUT_STRIP_TRAILING_WHITESPACE)
+	execute_process(
+	COMMAND ${root_config_executable} --glibs
+	OUTPUT_VARIABLE ROOT_GUI_LIBRARIES
+	OUTPUT_STRIP_TRAILING_WHITESPACE)
+	message(STATUS "ROOT Gui Libraries: ${ROOT_GUI_LIBRARIES}")
 
-    set(ROOT_LIBRARY_DIR ${ROOTSYS}/lib)
+	execute_process(
+	COMMAND ${root_config_executable} --evelibs
+	OUTPUT_VARIABLE ROOT_EVE_GUI_LIBRARIES
+	OUTPUT_STRIP_TRAILING_WHITESPACE)
+	message(STATUS "ROOT Eve Gui Libraries: ${ROOT_EVE_GUI_LIBRARIES}")
 
-    execute_process(
-        COMMAND ${ROOT_CONFIG_EXECUTABLE} --has-minuit2
-        OUTPUT_VARIABLE ROOT_HAS_MINUIT2
-        OUTPUT_STRIP_TRAILING_WHITESPACE)
+	set(ROOT_LIBRARY_DIR ${ROOTSYS}/lib)
 
-    execute_process(
-        COMMAND ${ROOT_CONFIG_EXECUTABLE} --has-cxx17
-        OUTPUT_VARIABLE ROOT_HAS_CXX17)
+	execute_process(
+	COMMAND ${ROOT_CONFIG_EXECUTABLE} --has-minuit2
+	OUTPUT_VARIABLE ROOT_HAS_MINUIT2
+	OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-    execute_process(
-        COMMAND ${ROOT_CONFIG_EXECUTABLE} --has-cxx14
-        OUTPUT_VARIABLE ROOT_HAS_CXX14)
+	execute_process(
+	COMMAND ${ROOT_CONFIG_EXECUTABLE} --has-cxx17
+	OUTPUT_VARIABLE ROOT_HAS_CXX17)
 
-    execute_process(
-        COMMAND ${ROOT_CONFIG_EXECUTABLE} --has-cxx11
-        OUTPUT_VARIABLE ROOT_HAS_CXX11)
+	execute_process(
+	COMMAND ${ROOT_CONFIG_EXECUTABLE} --has-cxx14
+	OUTPUT_VARIABLE ROOT_HAS_CXX14)
+
+	execute_process(
+	COMMAND ${ROOT_CONFIG_EXECUTABLE} --has-cxx11
+	OUTPUT_VARIABLE ROOT_HAS_CXX11)
 
 endif ()
 
 if (${ROOT_VERSION} VERSION_LESS "6.10")
-    message(FATAL_ERROR "Minimum ROOT version is 6.10.00.")
+	message(FATAL_ERROR "Minimum ROOT version is 6.10.00.")
 endif (${ROOT_VERSION} VERSION_LESS "6.10")
 mark_as_advanced( GENREFLEX_EXECUTABLE ROOTCINT_EXECUTABLE ROOT_CONFIG_EXECUTABLE)
-include_directories(${ROOT_INCLUDE_DIR})
-link_directories(${ROOT_LIBRARY_DIR})
 #------------------------------------------------------------------------------
 
 include(ExternalProject)
@@ -177,190 +241,271 @@ set(_LOG_OPTIONS
 	LOG_INSTALL TRUE
 	LOG_PATCH TRUE
 	LOG_OUTPUT_ON_FAILURE TRUE
-	)
+)
 
 option(USE_SYSTEM_PUGIXML "Use the system installed pugixml, if not then we will download one and use that one" OFF)
 if( USE_SYSTEM_PUGIXML )
-	find_package(Pugixml REQUIRED)
+	find_package(Pugixml REQUIRED
+		HINTS
+		/opt/pugixml/
+		PATH_SUFFIXES
+			lib/cmake/pugixml
+			lib64/cmake/pugixml
+	)
 else()
-	set(PUGI_EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external/pugi)
+	set(PUGI_EXTERNAL_INSTALL_LOCATION ${CMAKE_INSTALL_PREFIX}/external)
 	set(PUGI_VERSION v1.13 CACHE STRING "Version of pugixml you want to get from git" )
 	mark_as_advanced(PUGI_VERSION)
 	ExternalProject_Add(PugixmlProject
 		GIT_REPOSITORY https://github.com/zeux/pugixml
 		GIT_TAG ${PUGI_VERSION}
-		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${PUGI_EXTERNAL_INSTALL_LOCATION} -DCMAKE_VERBOSE_MAKEFILE=OFF -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
+		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${PUGI_EXTERNAL_INSTALL_LOCATION} -DCMAKE_INSTALL_LIBDIR=${CMAKE_INSTALL_LIBDIR}  -DCMAKE_VERBOSE_MAKEFILE=OFF -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
 		BUILD_COMMAND make -s
 		INSTALL_COMMAND make -s install
 		${_LOG_OPTIONS}
-		)
+	)
 	include_directories(${PUGI_EXTERNAL_INSTALL_LOCATION}/include)
-	link_directories(${PUGI_EXTERNAL_INSTALL_LOCATION}/lib)
+	link_directories(${PUGI_EXTERNAL_INSTALL_LOCATION}/${CMAKE_INSTALL_LIBDIR})
 	list(APPEND EXTERNAL_DEPS PugixmlProject)
 	list(APPEND EXTERNAL_CORE_DEPS PugixmlProject)
 	list(APPEND EXTERNAL_PROCESSOR_DEPS PugixmlProject)
 endif()
-	
+
 option(USE_SYSTEM_YAMLCPP "Use the system installed yaml-cpp, if not then we will download one and use that one" OFF)
 if( USE_SYSTEM_YAMLCPP )
-	find_package(yaml-cpp REQUIRED)
+	find_package(yaml-cpp REQUIRED
+		HINTS
+		/opt/yaml-cpp
+		PATH_SUFFIXES
+			lib/cmake/yaml-cpp
+			lib64/cmake/yaml-cpp
+		)
+	if (yaml-cpp_FOUND)
+		message(STATUS "Found yaml-cpp: ${yaml-cpp_VERSION} at ${yaml-cpp_DIR}")
+	else()
+		message(FATAL_ERROR "System yaml-cpp not found.")
+	endif()
 else()
-	set(YAML_EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external/yaml-cpp)
+	set(YAML_EXTERNAL_INSTALL_LOCATION ${CMAKE_INSTALL_PREFIX}/external)
 	set(YAML_VERSION 0.8.0 CACHE STRING "Version of yaml-cpp you want to get from git" )
 	mark_as_advanced(YAML_VERSION)
 	ExternalProject_Add(yaml-cppProject
 		GIT_REPOSITORY https://github.com/jbeder/yaml-cpp
 		GIT_TAG ${YAML_VERSION}
-		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${YAML_EXTERNAL_INSTALL_LOCATION} -DCMAKE_VERBOSE_MAKEFILE=OFF -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DYAML_CPP_BUILD_CONTRIB=OFF -DYAML_CPP_BUILD_TESTS=OFF -DYAML_CPP_BUILD_TOOLS=OFF -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
+		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${YAML_EXTERNAL_INSTALL_LOCATION} -DCMAKE_INSTALL_LIBDIR=${CMAKE_INSTALL_LIBDIR} -DCMAKE_VERBOSE_MAKEFILE=OFF -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DYAML_CPP_BUILD_CONTRIB=OFF -DYAML_CPP_BUILD_TESTS=OFF -DYAML_CPP_BUILD_TOOLS=OFF -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
 		BUILD_COMMAND make -s
 		INSTALL_COMMAND make -s install
 		${_LOG_OPTIONS}
-		)
+	)
 	include_directories(${YAML_EXTERNAL_INSTALL_LOCATION}/include)
-	link_directories(${YAML_EXTERNAL_INSTALL_LOCATION}/lib)
+	link_directories(${YAML_EXTERNAL_INSTALL_LOCATION}/${CMAKE_INSTALL_LIBDIR})
+	set(CMAKE_PREFIX_PATH "${YAML_EXTERNAL_INSTALL_LOCATION}" ${CMAKE_PREFIX_PATH})
+	find_package(yaml-cpp REQUIRED)
 	list(APPEND EXTERNAL_DEPS yaml-cppProject)
-	list(APPEND EXTERNAL_CORE_DEPS yaml-cppProject)
-	list(APPEND EXTERNAL_PROCESSOR_DEPS yaml-cppProject)
 endif()
-	
-option(USE_SYSTEM_JSONCPP "Use the system installed jsoncpp, if not then we will download one and use that one" OFF)
-if( USE_SYSTEM_JSONCPP )
-	find_package(jsoncpp REQUIRED)
-else()
-	set(JSON_EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external/jsoncpp)
-	set(JSON_VERSION 1.9.5 CACHE STRING "Version of jsoncpp you want to get from git" )
-	mark_as_advanced(JSON_VERSION)
-	ExternalProject_Add(jsoncppProject
-		GIT_REPOSITORY https://github.com/open-source-parsers/jsoncpp
-		GIT_TAG ${JSON_VERSION}
-		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${JSON_EXTERNAL_INSTALL_LOCATION} -DCMAKE_VERBOSE_MAKEFILE=OFF -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DJSONCPP_WITH_TESTS=OFF -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
-		BUILD_COMMAND make -s
-		INSTALL_COMMAND make -s install
-		${_LOG_OPTIONS}
-		)
-	include_directories(${JSON_EXTERNAL_INSTALL_LOCATION}/include)
-	link_directories(${JSON_EXTERNAL_INSTALL_LOCATION}/lib)
-	list(APPEND EXTERNAL_DEPS jsoncppProject)
-	list(APPEND EXTERNAL_CORE_DEPS jsoncppProject)
-	list(APPEND EXTERNAL_PROCESSOR_DEPS jsoncppProject)
-endif()
-	
+
 option(USE_SYSTEM_FMT "Use the system fmt library, if not then we will download and use that one" OFF)
 if( USE_SYSTEM_FMT )
-	find_package(fmt REQUIRED)
+	find_package(fmt REQUIRED
+		HINTS
+		/opt/fmt/
+		PATH_SUFFIXES
+			lib/cmake/fmt
+			lib64/cmake/fmt
+	)
 	set(_FMT_NAME fmt)
 else()
-	set(FMT_EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external/fmt)
+	set(FMT_EXTERNAL_INSTALL_LOCATION ${CMAKE_INSTALL_PREFIX}/external)
 	set(FMT_VERSION 8.1.1 CACHE STRING "Version of fmt you want to get from git" )
 	mark_as_advanced(FMT_VERSION)
 	set(_FMT_NAME fmtProject)
 	ExternalProject_Add(fmtProject
 		GIT_REPOSITORY https://github.com/fmtlib/fmt
 		GIT_TAG ${FMT_VERSION}
-		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${FMT_EXTERNAL_INSTALL_LOCATION} -DCMAKE_VERBOSE_MAKEFILE=OFF -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
+		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${FMT_EXTERNAL_INSTALL_LOCATION} -DCMAKE_INSTALL_LIBDIR=${CMAKE_INSTALL_LIBDIR} -DCMAKE_VERBOSE_MAKEFILE=OFF -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
 		BUILD_COMMAND make -s
 		INSTALL_COMMAND make -s install
 		${_LOG_OPTIONS}
-		)
+	)
 	include_directories(${FMT_EXTERNAL_INSTALL_LOCATION}/include)
-	link_directories(${FMT_EXTERNAL_INSTALL_LOCATION}/lib)
+	link_directories(${FMT_EXTERNAL_INSTALL_LOCATION}/${CMAKE_INSTALL_LIBDIR})
 	list(APPEND EXTERNAL_DEPS fmtProject)
 	list(APPEND EXTERNAL_LOG_DEPS fmtProject)
 endif()
 
 option(USE_SYSTEM_SPDLOG "Use either spdlog or grab it from github" OFF)
 if( USE_SYSTEM_SPDLOG )
-	find_package(spdlog REQUIRED)
+	find_package(spdlog REQUIRED
+		HINTS
+		/opt/spdlog/
+		PATH_SUFFIXES
+			lib/cmake/spdlog
+			lib64/cmake/spdlog
+	)
 else()
-	set(SPDLOG_EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external/spdlog)
+	set(SPDLOG_EXTERNAL_INSTALL_LOCATION ${CMAKE_INSTALL_PREFIX}/external)
 	set(SPDLOG_VERSION v1.9.2 CACHE STRING "Version of spdlog you want to get from git" )
 	mark_as_advanced(SPDLOG_VERSION)
 	ExternalProject_Add(spdlogProject
 		GIT_REPOSITORY https://github.com/gabime/spdlog
 		GIT_TAG ${SPDLOG_VERSION}
-		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${SPDLOG_EXTERNAL_INSTALL_LOCATION} -DCMAKE_VERBOSE_MAKEFILE=OFF -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
+		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${SPDLOG_EXTERNAL_INSTALL_LOCATION} -DCMAKE_INSTALL_LIBDIR=${CMAKE_INSTALL_LIBDIR} -DCMAKE_VERBOSE_MAKEFILE=OFF -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
 		BUILD_COMMAND make -s
 		INSTALL_COMMAND make -s install
 		${_LOG_OPTIONS}
 		DEPENDS ${_FMT_NAME}
-		)
+	)
 	include_directories(${SPDLOG_EXTERNAL_INSTALL_LOCATION}/include)
-	link_directories(${SPDLOG_EXTERNAL_INSTALL_LOCATION}/lib)
+	link_directories(${SPDLOG_EXTERNAL_INSTALL_LOCATION}/${CMAKE_INSTALL_LIBDIR})
 	list(APPEND EXTERNAL_DEPS spdlogProject)
 	list(APPEND EXTERNAL_LOG_DEPS spdlogProject)
 endif()
 
 option(USE_SYSTEM_BOOST "Use either system boost or grab one from github" OFF)
 if( USE_SYSTEM_BOOST )
-	find_package(Boost COMPONENTS container program_options REQUIRED)
+	find_package(Boost COMPONENTS container program_options REQUIRED
+		HINTS
+		/opt/boost/
+		PATH_SUFFIXES
+			lib/cmake
+		)
 	if(Boost_FOUND)
 		include_directories(${Boost_INCLUDE_DIRS})
-		message(STATUS "Boost found: ${Boost_VERSION}")
+		message(STATUS "Boost found: ${Boost_VERSION} at ${Boost_DIR}")
 	else()
 		message(FATAL_ERROR "System Boost not found.")
 	endif()
 else()
-	set(BOOST_EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external/boost)
+	set(BOOST_EXTERNAL_INSTALL_LOCATION ${CMAKE_INSTALL_PREFIX}/external)
 	set(BOOST_VERSION boost-1.84.0 CACHE STRING "Version of boost you want to get from git" )
 	mark_as_advanced(BOOST_VERSION)
 	ExternalProject_Add(boostProject
 		GIT_REPOSITORY https://github.com/boostorg/boost
 		GIT_TAG ${BOOST_VERSION}
-		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${BOOST_EXTERNAL_INSTALL_LOCATION} -DCMAKE_VERBOSE_MAKEFILE=OFF -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
+		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${BOOST_EXTERNAL_INSTALL_LOCATION} -DCMAKE_INSTALL_LIBDIR=${CMAKE_INSTALL_LIBDIR} -DCMAKE_VERBOSE_MAKEFILE=OFF -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
 		BUILD_COMMAND make -s
 		INSTALL_COMMAND make -s install
 		${_LOG_OPTIONS}
 		DEPENDS ${_FMT_NAME}
-		)
+	)
 	include_directories(${BOOST_EXTERNAL_INSTALL_LOCATION}/include)
-	link_directories(${BOOST_EXTERNAL_INSTALL_LOCATION}/lib)
+	link_directories(${BOOST_EXTERNAL_INSTALL_LOCATION}/${CMAKE_INSTALL_LIBDIR})
 	list(APPEND EXTERNAL_DEPS boostProject)
 	list(APPEND EXTERNAL_PROCESSOR_DEPS boostProject)
 	list(APPEND EXTERNAL_TRANSLATOR_DEPS boostProject)
 	list(APPEND EXTERNAL_CORE_DEPS boostProject)
 endif()
 
+#TODO: FINISH LATER
+option(USE_SYSTEM_EIGEN "Use either system eigen or grab from github" ON)
+find_package(Eigen3 REQUIRED
+		HINTS
+		/opt/eigen/
+		PATH_SUFFIXES
+		share/eigen3/cmake
+)
+
+find_package(Python3)
+find_package(Doxygen)
+
+# we probably should do this 
+# set_property(GLOBAL PROPERTY ALL_DOC_SRC)
+# set_property(GLOBAL PROPERTY ALL_DOC_HEADERS)
+# then in each subdir 
+# set_property(GLOBAL APPEND PROPERTY ALL_DOC_SRC element)
+# set_property(GLOBAL APPEND PROPERTY ALL_DOC_HEADERS element)
+file(GLOB ALL_DOC_SRC ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
+
 add_subdirectory(utility)
 add_subdirectory(processors)
 add_subdirectory(core)
 add_subdirectory(translators)
+add_subdirectory(fitters)
+add_subdirectory(tools)
+add_subdirectory(scripts)
+add_subdirectory(merger)
+add_subdirectory(generated)
 
-target_include_directories(PROCESSOR_LIB PUBLIC core/include)
+#MUST BE LAST
+option(GS_BUILD_DOCS "Enable building documentation" OFF)
+set_property(CACHE GS_BUILD_DOCS PROPERTY ADVANCED ON)
+if(GS_BUILD_DOCS)
+	set(GS_BUILD_DOCS ON CACHE BOOL "Enabled building Doxygen documentation" FORCE)
+	message(STATUS "ENABLED Building Doxygen documentation")
+else()
+	set(GS_BUILD_DOCS OFF CACHE BOOL "Enable building Doxygen documentation" FORCE)
+endif()
+
+if(DOXYGEN_FOUND)
+	if(GS_BUILD_DOCS)
+		add_subdirectory(docs)
+		message(STATUS "Found Doxygen, building documentation")
+	else()
+		message(STATUS "Found Doxygen, not building documentation though")
+	endif()
+else()
+	message(STATUS "Doxygen not found, not creating documentation")
+endif()
+
+
+target_include_directories(GenScanProcessors PUBLIC core/include)
 
 add_executable(GenScanor scanmain.cpp)
-add_dependencies(GenScanor ${EXTERNAL_DEPS})
-target_link_libraries(GenScanor PRIVATE MtasStruct RootDevStruct TRANSLATOR_LIB PROCESSOR_LIB CORE_LIB UTILITY_LIB ${ROOT_LIBRARIES})
+add_dependencies(GenScanor force_version_info)
+set_property(TARGET GenScanor PROPERTY
+    ADDITIONAL_MAKE_CLEAN_FILES 
+    "${CMAKE_BINARY_DIR}/generated/include/git_version.hpp"
+    "${CMAKE_BINARY_DIR}/generated/include/cmake_info.hpp"
+    "${CMAKE_BINARY_DIR}/generated/include/compiler_version.hpp"
+)
+if( EXTERNAL_DEPS )
+	add_dependencies(GenScanor ${EXTERNAL_DEPS})
+endif()
+target_link_libraries(GenScanor PRIVATE BSMStruct 
+					EBSSStruct
+					VetoStruct 
+					MtasImplantStruct 
+					MtasStruct 
+					MusesStruct 
+					GroverStruct 
+					DSSDStruct 
+					CloverStruct
+					PidStruct 
+					PSPMTStruct 
+					RootDevStruct 
+					GenScanTranslators GenScanCore)
 
-add_executable(GenConfig configmain.cpp)
-add_dependencies(GenConfig ${EXTERNAL_DEPS})
-target_link_libraries(GenConfig PRIVATE UTILITY_LIB ${ROOT_LIBRARIES})
+target_include_directories(GenScanor PRIVATE ${CMAKE_BINARY_DIR}/generated/include)
 
 if( USE_SYSTEM_FMT )
 	target_link_libraries(GenScanor PRIVATE fmt::fmt)
-	target_link_libraries(GenConfig PRIVATE fmt::fmt)
 endif()
 if( USE_SYSTEM_SPDLOG )
 	target_link_libraries(GenScanor PRIVATE spdlog::spdlog_header_only)
-	target_link_libraries(GenConfig PRIVATE spdlog::spdlog_header_only)
 endif()
 if( USE_SYSTEM_BOOST )
-	target_link_libraries(GenScanor PRIVATE Boost::container Boost::program_options Boost::sort)
-	target_link_libraries(GenConfig PRIVATE Boost::container Boost::program_options Boost::sort)
+	target_link_libraries(GenScanor PRIVATE Boost::container Boost::program_options )
 else()
 	target_link_libraries(GenScanor PRIVATE 
-		${BOOST_EXTERNAL_INSTALL_LOCATION}/lib/libboost_container.a
-		${BOOST_EXTERNAL_INSTALL_LOCATION}/lib/libboost_program_options.a
-		)
-	target_link_libraries(GenConfig PRIVATE 
-		${BOOST_EXTERNAL_INSTALL_LOCATION}/lib/libboost_container.a
-		${BOOST_EXTERNAL_INSTALL_LOCATION}/lib/libboost_program_options.a
-		)
+		${BOOST_EXTERNAL_INSTALL_LOCATION}/${CMAKE_INSTALL_LIBDIR}/libboost_container.a
+		${BOOST_EXTERNAL_INSTALL_LOCATION}/${CMAKE_INSTALL_LIBDIR}/libboost_program_options.a
+	)
 endif()
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
 	target_compile_definitions(GenScanor PRIVATE DEBUG_MODE)
 endif()
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-	target_compile_definitions(GenConfig PRIVATE DEBUG_MODE)
-endif()
+add_custom_command(
+    TARGET GenScanor
+    POST_BUILD
+    COMMAND Python3::Interpreter
+    ${CMAKE_CURRENT_SOURCE_DIR}/scripts/ValidateHistogramSingletons.py
+    --dir ${CMAKE_SOURCE_DIR}
+    --exclude build
+    COMMENT "Simple Checking for Duplicate PLOT IDs using RegisterPlot"
+)
 
+install(TARGETS GenScanor DESTINATION bin)
+#Configure and install the module file
+configure_file("modulefiles/genScan" modulefiles/genScan @ONLY)
+install(DIRECTORY ${CMAKE_BINARY_DIR}/modulefiles  DESTINATION ${CMAKE_INSTALL_PREFIX})

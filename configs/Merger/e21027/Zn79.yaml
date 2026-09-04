@@ -1,0 +1,15 @@
+PID: /data42/frib/e21027/Analysis/cuts/Zn79.Cut.cxx
+RIT:
+  - Gate: 
+      lowerbound: 30000.0
+      upperbound: 65535.0
+ION:
+  lowerbound: 15000.0
+  upperbound: 45000.0
+BETA:
+  lowerbound: 400.0
+  upperbound: 10000.0
+CORRELATION:
+  Forward: 2.1
+  Backward: 2.1
+RADIUS: 0.5

@@ -1,69 +1,193 @@
 file(GLOB src_files ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
+file(GLOB header_files ${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp)
+
+list(APPEND ALL_DOC_HEADERS ${header_files})
+list(APPEND ALL_DOC_SRC ${src_files})
+set(ALL_DOC_HEADERS ${ALL_DOC_HEADERS} PARENT_SCOPE)
+set(ALL_DOC_SRC ${ALL_DOC_SRC} PARENT_SCOPE)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-ROOT_GENERATE_DICTIONARY(RootDevStruct_root RootDevStruct.hpp LINKDEF include/RootDevStructLinkDef.hpp )
+set(ROOT_CONTAINERS 
+	"RVec.hxx"
+	)
+
+#NEED to manually specify the root collections
+message(STATUS "Searching for ${ROOT_CONTAINERS} in ${ROOT_INCLUDE_DIR} and ${ROOT_INCLUDE_DIR}/ROOT to build the dictionaries for RDataFrames")
+
+set(ROOT_CONTAINER_PATHS)
+
+foreach(file IN LISTS ROOT_CONTAINERS)
+	string(MAKE_C_IDENTIFIER "FOUND_${file}" _var)
+	find_file(${_var}
+		NAMES ${file}
+		PATHS
+		${ROOT_INCLUDE_DIR}
+		${ROOT_INCLUDE_DIR}/ROOT
+		NO_DEFAULT_PATH
+	)
+
+	if(${_var})
+		message(STATUS "Found ${${_var}}")
+		list(APPEND ROOT_CONTAINER_PATHS "${${_var}}")
+	else()
+		message(FATAL_ERROR "Unable to find ${file} in ${ROOT_INCLUDE_DIR}") 
+	endif()
+
+	# Clean up to avoid cache pollution
+	unset(${_var} CACHE)
+endforeach()
+
+# To add in a new struct, follow exactly what has been done for RootDev as seen below.
+# when you have finished here, remember to go to the main CMakeLists.txt (in the main directory)
+# and go down to the target_link_libraries for GenScanor, you need to then add your library 
+# to the growing list of structs for GenScanor.
+# the name you will add is the same as the first arg to add_library that you just wrote.
+
+ROOT_GENERATE_DICTIONARY(RootDevStruct_root 
+	RootDevStruct.hpp ${ROOT_CONTAINER_PATHS}
+	LINKDEF include/RootDevStructLinkDef.hpp )
 add_library(RootDevStruct SHARED RootDevStruct_root.cxx RootDevStruct_root)
 target_link_libraries(RootDevStruct ${ROOT_LIBRARIES})
-add_dependencies(RootDevStruct ${EXTERNAL_PROCESSOR_DEPS} ${EXTERNAL_LOG_DEPS})
+list(APPEND PROCESSOR_STRUCT_LIBS RootDevStruct)
+list(APPEND PROCESSOR_STRUCT_PCM ${CMAKE_CURRENT_BINARY_DIR}/libRootDevStruct_root_rdict.pcm)
+list(APPEND PROCESSOR_STRUCT_RMAP ${CMAKE_CURRENT_BINARY_DIR}/libRootDevStruct_root.rootmap)
 
-if( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
-	add_custom_command(TARGET RootDevStruct
-		POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E create_symlink
-		$<TARGET_FILE_NAME:RootDevStruct>
-		libRootDevStruct_root.dylib
-		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/processors
-		COMMENT "Creating symlink for RootDevStruct"
-		)
-else()
-	add_custom_command(TARGET RootDevStruct
-		POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E create_symlink
-		$<TARGET_FILE_NAME:RootDevStruct>
-		libRootDevStruct_root.so
-		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/processors
-		COMMENT "Creating symlink for RootDevStruct"
-		)
-endif()
-
-ROOT_GENERATE_DICTIONARY(MtasStruct_root MtasStruct.hpp LINKDEF include/MtasStructLinkDef.hpp )
+ROOT_GENERATE_DICTIONARY(MtasStruct_root 
+	MtasStruct.hpp ${ROOT_CONTAINER_PATHS}
+	LINKDEF include/MtasStructLinkDef.hpp )
 add_library(MtasStruct SHARED MtasStruct_root.cxx MtasStruct_root)
 target_link_libraries(MtasStruct ${ROOT_LIBRARIES})
-add_dependencies(MtasStruct ${EXTERNAL_PROCESSOR_DEPS} ${EXTERNAL_LOG_DEPS})
-if( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
-	add_custom_command(TARGET MtasStruct
-		POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E create_symlink
-		$<TARGET_FILE_NAME:MtasStruct>
-		libMtasStruct_root.dylib
-		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/processors
-		COMMENT "Creating symlink for MtasStruct"
-		)
-else()
-	add_custom_command(TARGET MtasStruct
-		POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E create_symlink
-		$<TARGET_FILE_NAME:MtasStruct>
-		libMtasStruct_root.so
-		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/processors
-		COMMENT "Creating symlink for MtasStruct"
-		)
+list(APPEND PROCESSOR_STRUCT_LIBS MtasStruct)
+list(APPEND PROCESSOR_STRUCT_PCM ${CMAKE_CURRENT_BINARY_DIR}/libMtasStruct_root_rdict.pcm)
+list(APPEND PROCESSOR_STRUCT_RMAP ${CMAKE_CURRENT_BINARY_DIR}/libMtasStruct_root.rootmap)
+
+ROOT_GENERATE_DICTIONARY(MusesStruct_root 
+	MusesStruct.hpp ${ROOT_CONTAINER_PATHS}
+	LINKDEF include/MusesStructLinkDef.hpp )
+add_library(MusesStruct SHARED MusesStruct_root.cxx MusesStruct_root)
+target_link_libraries(MusesStruct ${ROOT_LIBRARIES})
+list(APPEND PROCESSOR_STRUCT_LIBS MusesStruct)
+list(APPEND PROCESSOR_STRUCT_PCM ${CMAKE_CURRENT_BINARY_DIR}/libMusesStruct_root_rdict.pcm)
+list(APPEND PROCESSOR_STRUCT_RMAP ${CMAKE_CURRENT_BINARY_DIR}/libMusesStruct_root.rootmap)
+
+ROOT_GENERATE_DICTIONARY(GroverStruct_root 
+	GroverStruct.hpp ${ROOT_CONTAINER_PATHS}
+	LINKDEF include/GroverStructLinkDef.hpp )
+add_library(GroverStruct SHARED GroverStruct_root.cxx GroverStruct_root)
+target_link_libraries(GroverStruct ${ROOT_LIBRARIES})
+list(APPEND PROCESSOR_STRUCT_LIBS GroverStruct)
+list(APPEND PROCESSOR_STRUCT_PCM ${CMAKE_CURRENT_BINARY_DIR}/libGroverStruct_root_rdict.pcm)
+list(APPEND PROCESSOR_STRUCT_RMAP ${CMAKE_CURRENT_BINARY_DIR}/libGroverStruct_root.rootmap)
+
+ROOT_GENERATE_DICTIONARY(VetoStruct_root 
+	VetoStruct.hpp ${ROOT_CONTAINER_PATHS}
+	LINKDEF include/VetoStructLinkDef.hpp )
+add_library(VetoStruct SHARED VetoStruct_root.cxx VetoStruct_root)
+target_link_libraries(VetoStruct ${ROOT_LIBRARIES})
+list(APPEND PROCESSOR_STRUCT_LIBS VetoStruct)
+list(APPEND PROCESSOR_STRUCT_PCM ${CMAKE_CURRENT_BINARY_DIR}/libVetoStruct_root_rdict.pcm)
+list(APPEND PROCESSOR_STRUCT_RMAP ${CMAKE_CURRENT_BINARY_DIR}/libVetoStruct_root.rootmap)
+
+ROOT_GENERATE_DICTIONARY(MtasImplantStruct_root 
+	MtasImplantStruct.hpp ${ROOT_CONTAINER_PATHS} 
+	LINKDEF include/MtasImplantStructLinkDef.hpp )
+add_library(MtasImplantStruct SHARED MtasImplantStruct_root.cxx MtasImplantStruct_root)
+target_link_libraries(MtasImplantStruct ${ROOT_LIBRARIES})
+list(APPEND PROCESSOR_STRUCT_LIBS MtasImplantStruct)
+list(APPEND PROCESSOR_STRUCT_PCM ${CMAKE_CURRENT_BINARY_DIR}/libMtasImplantStruct_root_rdict.pcm)
+list(APPEND PROCESSOR_STRUCT_RMAP ${CMAKE_CURRENT_BINARY_DIR}/libMtasImplantStruct_root.rootmap)
+
+ROOT_GENERATE_DICTIONARY(BSMStruct_root 
+	BSMStruct.hpp ${ROOT_CONTAINER_PATHS} 
+	LINKDEF include/BSMStructLinkDef.hpp )
+add_library(BSMStruct SHARED BSMStruct_root.cxx BSMStruct_root)
+target_link_libraries(BSMStruct ${ROOT_LIBRARIES})
+list(APPEND PROCESSOR_STRUCT_LIBS BSMStruct)
+list(APPEND PROCESSOR_STRUCT_PCM ${CMAKE_CURRENT_BINARY_DIR}/libBSMStruct_root_rdict.pcm)
+list(APPEND PROCESSOR_STRUCT_RMAP ${CMAKE_CURRENT_BINARY_DIR}/libBSMStruct_root.rootmap)
+
+ROOT_GENERATE_DICTIONARY(PidStruct_root 
+	PidStruct.hpp ${ROOT_CONTAINER_PATHS} 
+	LINKDEF include/PidStructLinkDef.hpp )
+add_library(PidStruct SHARED PidStruct_root.cxx PidStruct_root)
+target_link_libraries(PidStruct ${ROOT_LIBRARIES})
+list(APPEND PROCESSOR_STRUCT_LIBS PidStruct)
+list(APPEND PROCESSOR_STRUCT_PCM ${CMAKE_CURRENT_BINARY_DIR}/libPidStruct_root_rdict.pcm)
+list(APPEND PROCESSOR_STRUCT_RMAP ${CMAKE_CURRENT_BINARY_DIR}/libPidStruct_root.rootmap)
+
+ROOT_GENERATE_DICTIONARY(PSPMTStruct_root
+	PSPMTStruct.hpp ${ROOT_CONTAINER_PATHS}
+	LINKDEF include/PSPMTStructLinkDef.hpp )
+add_library(PSPMTStruct SHARED PSPMTStruct_root.cxx PSPMTStruct_root)
+target_link_libraries(PSPMTStruct ${ROOT_LIBRARIES})
+add_dependencies(PSPMTStruct ${EXTERNAL_PROCESSOR_DEPS} ${EXTERNAL_LOG_DEPS})
+list(APPEND PROCESSOR_STRUCT_LIBS PSPMTStruct)
+list(APPEND PROCESSOR_STRUCT_PCM ${CMAKE_CURRENT_BINARY_DIR}/libPSPMTStruct_root_rdict.pcm)
+list(APPEND PROCESSOR_STRUCT_RMAP ${CMAKE_CURRENT_BINARY_DIR}/libPSPMTStruct_root.rootmap)
+
+ROOT_GENERATE_DICTIONARY(CloverStruct_root
+	CloverStruct.hpp ${ROOT_CONTAINER_PATHS}
+	LINKDEF include/CloverStructLinkDef.hpp )
+add_library(CloverStruct SHARED CloverStruct_root.cxx CloverStruct_root)
+target_link_libraries(CloverStruct ${ROOT_LIBRARIES})
+add_dependencies(CloverStruct ${EXTERNAL_PROCESSOR_DEPS} ${EXTERNAL_LOG_DEPS})
+list(APPEND PROCESSOR_STRUCT_LIBS CloverStruct)
+list(APPEND PROCESSOR_STRUCT_PCM ${CMAKE_CURRENT_BINARY_DIR}/libCloverStruct_root_rdict.pcm)
+list(APPEND PROCESSOR_STRUCT_RMAP ${CMAKE_CURRENT_BINARY_DIR}/libCloverStruct_root.rootmap)
+
+ROOT_GENERATE_DICTIONARY(DSSDStruct_root
+	DSSDStruct.hpp ${ROOT_CONTAINER_PATHS}
+	LINKDEF include/DSSDStructLinkDef.hpp )
+add_library(DSSDStruct SHARED DSSDStruct_root.cxx DSSDStruct_root)
+target_link_libraries(DSSDStruct ${ROOT_LIBRARIES})
+add_dependencies(DSSDStruct ${EXTERNAL_PROCESSOR_DEPS} ${EXTERNAL_LOG_DEPS})
+list(APPEND PROCESSOR_STRUCT_LIBS DSSDStruct)
+list(APPEND PROCESSOR_STRUCT_PCM ${CMAKE_CURRENT_BINARY_DIR}/libDSSDStruct_root_rdict.pcm)
+list(APPEND PROCESSOR_STRUCT_RMAP ${CMAKE_CURRENT_BINARY_DIR}/libDSSDStruct_root.rootmap)
+
+ROOT_GENERATE_DICTIONARY(EBSSStruct_root
+	EBSSStruct.hpp ${ROOT_CONTAINER_PATHS}
+	LINKDEF include/EBSSStructLinkDef.hpp )
+add_library(EBSSStruct SHARED EBSSStruct_root.cxx EBSSStruct_root)
+target_link_libraries(EBSSStruct ${ROOT_LIBRARIES})
+list(APPEND PROCESSOR_STRUCT_LIBS EBSSStruct)
+list(APPEND PROCESSOR_STRUCT_PCM ${CMAKE_CURRENT_BINARY_DIR}/libEBSSStruct_root_rdict.pcm)
+list(APPEND PROCESSOR_STRUCT_RMAP ${CMAKE_CURRENT_BINARY_DIR}/libEBSSStruct_root.rootmap)
+
+add_library(GenScanProcessors ${src_files})
+target_link_libraries(GenScanProcessors PUBLIC ${ROOT_LIBRARIES} GenScanFitters GenScanUtility pugixml)
+target_include_directories(GenScanProcessors PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+if( EXTERNAL_PROCESSOR_DEPS OR EXTERNAL_LOG_DEPS )
+	foreach( CURRLIB ${PROCESSOR_STRUCT_LIBS} )
+		add_dependencies(${CURRLIB} ${EXTERNAL_PROCESSOR_DEPS} ${EXTERNAL_LOG_DEPS})
+	endforeach()
+	add_dependencies(GenScanProcessors ${EXTERNAL_PROCESSOR_DEPS} ${EXTERNAL_LOG_DEPS})
 endif()
 
-add_library(PROCESSOR_LIB ${src_files})
-if( USE_SYSTEM_YAMLCPP )
-	target_link_libraries(PROCESSOR_LIB PUBLIC ${ROOT_LIBRARIES} UTILITY_LIB pugixml yaml-cppd jsoncpp)
-else()
-	target_link_libraries(PROCESSOR_LIB PUBLIC ${ROOT_LIBRARIES} UTILITY_LIB pugixml yaml-cpp jsoncpp)
-endif()
-target_include_directories(PROCESSOR_LIB PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-add_dependencies(PROCESSOR_LIB ${EXTERNAL_PROCESSOR_DEPS} ${EXTERNAL_LOG_DEPS})
 
 if(GS_PROCESSOR_DEBUG)
-	target_compile_definitions(PROCESSOR_LIB PUBLIC PROCESSOR_DEBUG)
+	target_compile_definitions(GenScanProcessors PUBLIC PROCESSOR_DEBUG)
 endif()
 
 if(GS_EVENTSUMMARY_DEBUG)
-	target_compile_definitions(PROCESSOR_LIB PUBLIC EVENTSUMMARY_DEBUG)
+	target_compile_definitions(GenScanProcessors PUBLIC EVENTSUMMARY_DEBUG)
 endif()
+
+install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_PREFIX})
+install(TARGETS GenScanProcessors DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})
+install(TARGETS ${PROCESSOR_STRUCT_LIBS} DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})
+install(FILES ${PROCESSOR_STRUCT_PCM} DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})
+install(FILES ${PROCESSOR_STRUCT_RMAP} DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})
+foreach( CURRLIB ${PROCESSOR_STRUCT_LIBS} )
+	if( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
+		install(CODE 
+			"execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink lib${CURRLIB}.dylib ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/lib${CURRLIB}_root.dylib)"
+			)
+	else()
+		install(CODE 
+			"execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink lib${CURRLIB}.so ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/lib${CURRLIB}_root.so)"
+			)
+	endif()
+endforeach()

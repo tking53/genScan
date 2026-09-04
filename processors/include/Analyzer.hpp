@@ -1,9 +1,9 @@
 #ifndef __ANALYZER_HPP__
 #define __ANALYZER_HPP__
 
-//will be the generic processor class that all other processors will derive from
-//this will act on every piece of data no matter what, will output to special root tree and make generic
-//histograms inside root
+// will be the generic processor class that all other processors will derive from
+// this will act on every piece of data no matter what, will output to special root tree and make generic
+// histograms inside root
 
 #include <initializer_list>
 #include <unordered_map>
@@ -21,86 +21,78 @@
 #include <pugixml.hpp>
 #include <pugiconfig.hpp>
 
-#include <yaml-cpp/yaml.h>
-
-#include <json/json.h>
-
 #include <boost/regex.hpp>
 
 #include "HistogramManager.hpp"
 #include "CutManager.hpp"
-#include "EventSummary.hpp"
+#include "EventHistoryManager.hpp"
 
-class Analyzer : public std::enable_shared_from_this<Analyzer>{
-	public:
-		Analyzer(const std::string&,const std::string&,const std::initializer_list<std::string>&);
-		virtual ~Analyzer();
-		[[maybe_unused]] virtual bool PreProcess() final;
-		[[maybe_unused]] virtual bool Process() final;
-		[[maybe_unused]] virtual bool PostProcess() final;
-		[[noreturn]] virtual bool PreProcess(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
-		[[noreturn]] virtual bool Process(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
-		[[noreturn]] virtual bool PostProcess(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
-		virtual void EndProcess() final;
+class Analyzer : public std::enable_shared_from_this<Analyzer> {
+public:
+	Analyzer(const std::string&, const std::string&, const std::initializer_list<std::string>&);
+	virtual ~Analyzer();
+	[[maybe_unused]] virtual bool PreProcess() final;
+	[[maybe_unused]] virtual bool Process() final;
+	[[maybe_unused]] virtual bool PostProcess() final;
+	[[noreturn]] virtual bool PreProcess(EventHistoryManager*, PLOTS::PlotRegistry*, CUTS::CutRegistry*);
+	[[noreturn]] virtual bool Process(EventHistoryManager*, PLOTS::PlotRegistry*, CUTS::CutRegistry*);
+	[[noreturn]] virtual bool PostProcess(EventHistoryManager*, PLOTS::PlotRegistry*, CUTS::CutRegistry*);
+	virtual void EndProcess() final;
 
-		std::shared_ptr<Analyzer> GetPtr();
-		virtual std::string GetAnalyzerName() const final;
+	std::shared_ptr<Analyzer> GetPtr();
+	virtual std::string GetAnalyzerName() const final;
 
-		[[nodiscard]] virtual bool ContainsType(const std::string&) const final;
-		[[nodiscard]] virtual bool ContainsAnyType(const std::set<std::string>&) const final;
+	[[nodiscard]] virtual bool ContainsType(const std::string&) const final;
+	[[nodiscard]] virtual bool ContainsAnyType(const std::set<std::string>&) const final;
 
-		[[noreturn]] virtual void Init([[maybe_unused]] const pugi::xml_node&);
-		[[noreturn]] virtual void Init([[maybe_unused]] const YAML::Node&);
-		[[noreturn]] virtual void Init([[maybe_unused]] const Json::Value&);
+	[[noreturn]] virtual void Init([[maybe_unused]] const pugi::xml_node&);
 
-		virtual void AssociateType(const std::string&) final;
-		[[noreturn]] virtual void Finalize();
+	virtual void AssociateType(const std::string&) final;
+	[[noreturn]] virtual void Finalize();
 
-		[[noreturn]] virtual void DeclarePlots([[maybe_unused]] PLOTS::PlotRegistry*) const;
+	[[noreturn]] virtual void DeclarePlots([[maybe_unused]] PLOTS::PlotRegistry*) const;
 
-	  	[[nodiscard]] virtual const boost::regex& GetDefaultRegex() const final;
-		[[nodiscard]] virtual const std::unordered_map<std::string,boost::regex>& GetAllDefaultRegex() const final;
-		
-		[[nodiscard]] virtual std::set<std::string> GetKnownTypes() const final;
+	[[nodiscard]] virtual const boost::regex& GetDefaultRegex() const final;
+	[[nodiscard]] virtual const std::unordered_map<std::string, boost::regex>& GetAllDefaultRegex() const final;
 
-	protected:
-		virtual void LoadHistogramSettings(const pugi::xml_node&) final;
-		virtual void LoadHistogramSettings(const YAML::Node&) final;
-		virtual void LoadHistogramSettings(const Json::Value&) final;
+	[[nodiscard]] virtual std::set<std::string> GetKnownTypes() const final;
 
-		enum STEP{
-			PREPROCESS,
-			PROCESS,
-			POSTPROCESS,
-			UNKNOWN
-		};
-		STEP currstep;
+protected:
+	virtual void LoadHistogramSettings(const pugi::xml_node&) final;
 
-		std::chrono::time_point<std::chrono::high_resolution_clock> start_time;
-		std::chrono::time_point<std::chrono::high_resolution_clock> stop_time;
-		double preprocesstime;
-		double processtime;
-		double postprocesstime;
+	enum STEP {
+		PREPROCESS,
+		PROCESS,
+		POSTPROCESS,
+		UNKNOWN
+	};
+	STEP currstep;
 
-		unsigned long long preprocesscalls;
-		unsigned long long processcalls;
-		unsigned long long postprocesscalls;
+	std::chrono::time_point<std::chrono::high_resolution_clock> start_time;
+	std::chrono::time_point<std::chrono::high_resolution_clock> stop_time;
+	double preprocesstime;
+	double processtime;
+	double postprocesstime;
 
-		std::set<std::string> Types;
-		
-		std::vector<PhysicsData*> SummaryData;
+	unsigned long long preprocesscalls;
+	unsigned long long processcalls;
+	unsigned long long postprocesscalls;
 
-		std::string AnalyzerName;
-		std::string LogName;
+	std::set<std::string> Types;
 
-		std::string DefaultRegexString;
-		boost::regex DefaultRegex;
-		std::unordered_map<std::string,boost::regex> AllDefaultRegex;
-		
-		std::shared_ptr<spdlog::logger> console;
+	std::vector<PhysicsData*> SummaryData;
 
-		std::map<int,PLOTS::HisHelper1D> h1dsettings;
-		std::map<int,PLOTS::HisHelper2D> h2dsettings;
+	std::string AnalyzerName;
+	std::string LogName;
+
+	std::string DefaultRegexString;
+	boost::regex DefaultRegex;
+	std::unordered_map<std::string, boost::regex> AllDefaultRegex;
+
+	std::shared_ptr<spdlog::logger> console;
+
+	std::map<int, PLOTS::HisHelper1D> h1dsettings;
+	std::map<int, PLOTS::HisHelper2D> h2dsettings;
 };
 
 #endif

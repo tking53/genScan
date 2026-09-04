@@ -16,26 +16,31 @@
 
 #include "TCutG.h"
 
-namespace CUTS{
-	class CutRegistry{
-		public:
-			CutRegistry(const std::string&);
-			~CutRegistry() = default;
-			void AddCut(const std::string&,const std::string&);
-			void AddCut(const std::string&,const std::vector<double>&,const std::vector<double>&);
-			bool IsWithin(const std::string&,double,double);
+namespace CUTS {
+	class CutRegistry {
+	public:
+		CutRegistry(const std::string&, const std::string&);
+		~CutRegistry() = default;
+		void AddCut(const std::string&, const std::string&);
+		void AddCut(const std::string&, const std::vector<double>&, const std::vector<double>&);
+		bool IsWithin(const std::string&, double, double);
+		TCutG* GetCut(const std::string&);
 
-		private:
-			bool CutIDExists(const std::string&) const;
-			std::vector<std::string> CutIDs;
-			std::unordered_map<std::string,TCutG*> Cuts;
-			std::string LogName;
-			std::string RegistryName;
-			std::shared_ptr<spdlog::logger> console;
-			std::regex SetPointRegex;
-			std::regex NumberPattern; 
+		std::vector<std::string> GetCutSearchPath() const;
+
+	private:
+		bool CutIDExists(const std::string&) const;
+		std::vector<std::string> CutIDs;
+		std::vector<std::string> Paths;
+		std::string PathList;
+		std::unordered_map<std::string, TCutG*> Cuts;
+		std::string LogName;
+		std::string RegistryName;
+		std::shared_ptr<spdlog::logger> console;
+		std::regex SetPointRegex;
+		std::regex NumberPattern;
 	};
 
-}
+} // namespace CUTS
 
 #endif

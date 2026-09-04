@@ -1,0 +1,27 @@
+#%Module1.0
+##
+## modulefiles/genScan
+##
+## @author T. T. King
+
+proc ModulesHelp {} {
+	global version modroot
+
+	puts stderr "genScan - GenScan provides utilities for a variety of file types and Acquisition systems"
+}
+module-whatis "GenScan provides utilities for a variety of file types and Acquisition systems"
+
+set topdir 	@CMAKE_INSTALL_PREFIX@
+
+setenv GENSCANSYS $topdir
+prepend-path PATH	$topdir/bin
+prepend-path PATH 	$topdir/scripts
+prepend-path LD_LIBRARY_PATH	$topdir/lib
+prepend-path LD_LIBRARY_PATH	$topdir/external/lib
+prepend-path DYLD_LIBRARY_PATH	$topdir/lib
+prepend-path DYLD_LIBRARY_PATH	$topdir/external/lib
+prepend-path CPLUS_INCLUDE_PATH	$topdir/include
+prepend-path CPLUS_INCLUDE_PATH	$topdir/external/include
+prepend-path LIBRARY_PATH	$topdir/lib
+prepend-path LIBRARY_PATH	$topdir/external/lib
+prepend-path GENSCANOR_DOC $topdir/share/doc/html/index.html
