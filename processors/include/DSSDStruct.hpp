@@ -16,5 +16,12 @@ namespace ProcessorStruct {
     };
     static const DSSD DEFAULT_DSSD_STRUCT;
 
+	struct DSSD_TOTALS {
+		float LL_TotalEnergy = 0;
+		float HG_TotalEnergy = 0;
+		float LG_TotalEnergy = 0;
+	};
+	static const DSSD_TOTALS DEFAULT_DSSD_TOTALS_STRUCT;
+
 } // namespace ProcessorStruct
 #endif // !__DSSDSTRUCT_HPP__

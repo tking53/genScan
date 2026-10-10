@@ -67,6 +67,7 @@ DSSDProcessor::DSSDProcessor(const std::string& log)
 
 		if (evt->GetSubType().compare("LL") == 0) {
 			this->LL_Mult[this->currDSSD]++;
+			this->TOTALS_DSSDData[this->currDSSD].LL_TotalEnergy += currEnergy;
 			// Beta branch of the LinLogs is expected to be below the LL_Branch_Energy_Split, Ion branch above.
 			if (currEnergy < this->LL_Branch_Energy_Split) {
 				if (DSSD_StripEnergyPlots[this->currDSSD][0] != nullptr) {
@@ -93,6 +94,7 @@ DSSDProcessor::DSSDProcessor(const std::string& log)
 			}
 		} else if (evt->GetSubType().compare("HG") == 0) {
 			this->HG_Mult[this->currDSSD]++;
+			this->TOTALS_DSSDData[this->currDSSD].HG_TotalEnergy += currEnergy;
 			if (DSSD_StripEnergyPlots[this->currDSSD][2] != nullptr) {
 				DSSD_StripEnergyPlots[this->currDSSD][2]->Fill(currEnergy, this->currStrip);
 			}
@@ -105,6 +107,7 @@ DSSDProcessor::DSSDProcessor(const std::string& log)
 			};
 		} else if (evt->GetSubType().compare("LG") == 0) {
 			this->LG_Mult[this->currDSSD]++;
+			this->TOTALS_DSSDData[this->currDSSD].LG_TotalEnergy += currEnergy;
 			if (DSSD_StripEnergyPlots[this->currDSSD][3] != nullptr) {
 				DSSD_StripEnergyPlots[this->currDSSD][3]->Fill(currEnergy, this->currStrip);
 			}
@@ -159,7 +162,14 @@ DSSDProcessor::DSSDProcessor(const std::string& log)
 			summary->AddEventTag("implant"); // rough implant tag
 			hismanager->Fill("DSSD_" + std::to_string(i) + "02", ION_DSSDData_vec[i].front.stripnum, ION_DSSDData_vec[i].back.stripnum); // LL-I
 		}
+		summary->AddEventObservable("DSSD_" + std::to_string(i) + "_LG_TOTAL", TOTALS_DSSDData[i].LG_TotalEnergy);
 	}
+
+	double lg_total_all = 0.0;
+	for (int i = 0; i < this->numDSSDs; ++i) {
+		lg_total_all += TOTALS_DSSDData[i].LG_TotalEnergy;
+	}
+	summary->AddEventObservable("DSSD_LG_TOTAL", lg_total_all);
 
 	Processor::EndProcess();
 	return true;
@@ -188,6 +198,7 @@ void DSSDProcessor::Init(const pugi::xml_node& config) {
 	// Expect uid style: DSSD:<DSSD number>:<strip number>:(preamp-gain)
 	BETA_DSSDData_vec = std::vector<ProcessorStruct::DSSD>(this->numDSSDs, ProcessorStruct::DEFAULT_DSSD_STRUCT);
 	ION_DSSDData_vec  = std::vector<ProcessorStruct::DSSD>(this->numDSSDs, ProcessorStruct::DEFAULT_DSSD_STRUCT);
+	TOTALS_DSSDData = std::vector<ProcessorStruct::DSSD_TOTALS>(this->numDSSDs, ProcessorStruct::DEFAULT_DSSD_TOTALS_STRUCT);
 
 	LL_maxEnEvt = std::vector<std::pair<PhysicsData*, PhysicsData*>>(this->numDSSDs, std::make_pair(nullptr, nullptr));
 	LG_maxEnEvt = std::vector<PhysicsData*>(this->numDSSDs, nullptr);
@@ -228,6 +239,7 @@ void DSSDProcessor::RegisterTree([[maybe_unused]] std::unordered_map<std::string
 	for (int i = 0; i < this->numDSSDs; ++i) {
 		this->OutputTree->Branch(("DSSD_" + std::to_string(i)+ "_ION").c_str(), &(ION_DSSDData_vec.at(i)));
 		this->OutputTree->Branch(("DSSD_" + std::to_string(i)+ "_BETA").c_str(), &(BETA_DSSDData_vec.at(i)));
+		this->OutputTree->Branch(("DSSD_" + std::to_string(i)+ "_Totals").c_str(), &(TOTALS_DSSDData.at(i)));
 	}
 	outputtrees[this->ProcessorName] = this->OutputTree;
 }
@@ -238,6 +250,9 @@ void DSSDProcessor::CleanupTree() {
 	}
 	for (auto& it : BETA_DSSDData_vec) {
 		it = ProcessorStruct::DEFAULT_DSSD_STRUCT;
+	}
+	for (auto& it : TOTALS_DSSDData) {
+		it = ProcessorStruct::DEFAULT_DSSD_TOTALS_STRUCT;
 	}
 }
 

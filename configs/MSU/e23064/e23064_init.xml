@@ -18,13 +18,14 @@
 				<!-- <PSD begin="45" middle="85" end="240" pre="5" post="10" fraction="0.75" /> -->
 			<!-- </settings> -->
 		<!-- </Analyzer> -->
-		<Processor name="DSSDProcessor" NumDSSDs="1" NumStrips="64">
-			<Histogram id="11" nbinsx="6553" xlow="0" xhigh="65536" />
-			<Histogram id="12" nbinsx="6553" xlow="0" xhigh="65536" />
-			<Histogram id="13" nbinsx="6553" xlow="0" xhigh="65536" />
-			<Histogram id="14" nbinsx="6553" xlow="0" xhigh="65536" />
-		</Processor>
-		<Processor name="PidProcessor" TofFlip="true">
+		<Processor name="e23064Processor" RequireAllPins="true" DSSDThreshold="0.0" PinThreshold="0.0" ImplantDSSDIndex="0">
+			<Processor name="DSSDProcessor" NumDSSDs="1" NumStrips="64">
+				<Histogram id="11" nbinsx="6553" xlow="0" xhigh="65536" />
+				<Histogram id="12" nbinsx="6553" xlow="0" xhigh="65536" />
+				<Histogram id="13" nbinsx="6553" xlow="0" xhigh="65536" />
+				<Histogram id="14" nbinsx="6553" xlow="0" xhigh="65536" />
+			</Processor>
+			<Processor name="PidProcessor" TofFlip="true">
 			<!-- <TofShift label="fp1">
 				<Shift id="0" delta="0" />
 				<Shift id="1" delta="0" />
@@ -53,8 +54,9 @@
 
 			<Histogram id="25" xlow="-150" xhigh="-130" ylow="2000" yhigh="6000" />
 			<Histogram id="26" xlow="-150" xhigh="-130" ylow="2000" yhigh="6000" />
+			</Processor>
+			<Processor name="CloverProcessor" />
 		</Processor>
-		<Processor name="CloverProcessor" />
 
 	</DetectorDriver>
 	<Map>

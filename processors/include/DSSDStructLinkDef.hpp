@@ -10,5 +10,9 @@
 #pragma link C++ class std::vector < ProcessorStruct::DSSD> + ;
 #pragma link C++ class ROOT::VecOps::RVec < ProcessorStruct::DSSD> + ;
 
+#pragma link C++ struct ProcessorStruct::DSSD_TOTALS + ;
+#pragma link C++ class std::vector < ProcessorStruct::DSSD_TOTALS> + ;
+#pragma link C++ class ROOT::VecOps::RVec < ProcessorStruct::DSSD_TOTALS> + ;
+
 #endif
 #endif // __DSSD_STRUCT_LINKDEF_HPP

@@ -32,6 +32,8 @@ private:
 
 	std::vector<ProcessorStruct::DSSD> ION_DSSDData_vec;
 	std::vector<ProcessorStruct::DSSD> BETA_DSSDData_vec;
+	
+	std::vector<ProcessorStruct::DSSD_TOTALS> TOTALS_DSSDData;
 
 	std::vector<std::pair<PhysicsData*, PhysicsData*>> LL_maxEnEvt;
 	std::vector<PhysicsData*> LG_maxEnEvt;
