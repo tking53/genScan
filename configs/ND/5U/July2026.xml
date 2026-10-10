@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Configuration>
+	<Author>
+		<Name>T. Ruland</Name>
+		<Date>July 13, 2026</Date>
+		<Email>tnfirebird1979 AT gmail DOT com</Email>
+	</Author>
+
+	<Description>
+		XML for 5U rotational stage setup
+	</Description>
+
+	<Global EventWidth="1.0e-5" EventWidthUnit="s" CorrelationType="rolling-trigger" />
+
+	<DetectorDriver >
+		<Analyzer name="WaveformAnalyzer" included_types="eljen" >
+			<settings Crate="[0]" Module="[1]" Channel="[02468]" CalcDerivative="false" InvertTrace="true">
+				<PreTrigger min="0" max="10" />
+				<PostTrigger min="200" max="240" />
+				<QDC bounds="0,10" />
+				<PSD begin="10" middle="55" end="125" pre="5" post="10" fraction="0.75" />
+			</settings>
+		</Analyzer>
+		<Processor name="RootDevProcessor" included_types="eljen,hpge" />
+	</DetectorDriver>
+
+	<Map>
+		<Crate number="0">
+			<!-- We don't need the Frequency and Firmware for CAEN, but it needs to be defined -->
+			<Module number="1" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="264">
+				<Channel number="0" type="eljen" subtype="301D" group="fixed" tags="fixed">
+					<Calibration model="linear" min="0">	
+						0	1.0
+					</Calibration>
+				</Channel>
+				<Channel number="2" type="eljen" subtype="301D" group="rotational" tags="left">
+					<Calibration model="linear" min="0"> 
+						0	1.0
+					</Calibration>
+				</Channel>
+				<Channel number="4" type="eljen" subtype="301D" group="rotational" tags="center">
+					<Calibration model="linear" min="0">	
+						0	1.0
+					</Calibration>
+				</Channel>
+				<Channel number="6" type="eljen" subtype="301D" group="rotational" tags="right">
+					<Calibration model="linear" min="0">	
+						0	1.0
+					</Calibration>
+				</Channel>
+			</Module>
+			<!-- We don't need the Frequency and Firmware for CAEN, but it needs to be defined -->
+			<Module number="0" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="264">
+				<Channel number="0" type="hpge" subtype="coax" group="fixed" tags="fixed">
+					<Calibration model="linear" min="0"> 
+						0 0.58989413
+					</Calibration>
+				</Channel>
+			</Module>
+		</Crate>
+	</Map>
+</Configuration>

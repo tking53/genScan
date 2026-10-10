@@ -3,57 +3,57 @@
 #include <stdexcept>
 #include <iostream>
 
-RollingWindowCorrelator::RollingWindowCorrelator(const std::string& log,double eventwidth) : Correlator(log,"RollingWindow_Correlator",eventwidth) {
+RollingWindowCorrelator::RollingWindowCorrelator(const std::string& log, double eventwidth)
+	: Correlator(log, "RollingWindow_Correlator", eventwidth) {
 }
 
-
-void RollingWindowCorrelator::Pop(){
+void RollingWindowCorrelator::Pop() {
 	this->MaxHeap.pop();
-	#ifdef CORRELATOR_DEBUG
-	if( !this->gMaxHeap.empty() ){
+#ifdef CORRELATOR_DEBUG
+	if (!this->gMaxHeap.empty()) {
 		this->gMaxHeap.pop();
 	}
-	if( !this->gMinHeap.empty() ){
+	if (!this->gMinHeap.empty()) {
 		this->gMinHeap.pop();
 	}
-	#endif
+#endif
 }
 
-void RollingWindowCorrelator::Clear(){
+void RollingWindowCorrelator::Clear() {
 	this->MaxHeap.clear();
-	#ifdef CORRELATOR_DEBUG
-	if( !this->gMinHeap.empty() ){
+#ifdef CORRELATOR_DEBUG
+	if (!this->gMinHeap.empty()) {
 		this->gMinHeap.clear();
 	}
-	if( !this->gMaxHeap.empty() ){
+	if (!this->gMaxHeap.empty()) {
 		this->gMaxHeap.clear();
 	}
-	#endif
+#endif
 }
 
-bool RollingWindowCorrelator::IsWithinCorrelationWindow(const double& ts,const int& crateID,const int& moduleID,const int& channelID){
-	#ifdef CORRELATOR_DEBUG
+bool RollingWindowCorrelator::IsWithinCorrelationWindow(const double& ts, const int& crateID, const int& moduleID, const int& channelID) {
+#ifdef CORRELATOR_DEBUG
 	this->gMinHeap.push(ts);
 	this->gMaxHeap.push(ts);
-	#endif
-	if( this->MaxHeap.empty() ){
+#endif
+	if (this->MaxHeap.empty()) {
 		this->MaxHeap.push(ts);
 		return true;
-	}else{
-		if( std::abs(ts - this->MaxHeap.top()) < this->Width ){
+	} else {
+		if (std::abs(ts - this->MaxHeap.top()) < this->Width) {
 			this->MaxHeap.push(ts);
 			return true;
-		}else{
-			#ifdef CORRELATOR_DEBUG
-				this->console->debug("Found TS: {:.1f} which is outside the correlation window of {} ns, top before clearing is {:.1f}, delta is {} ns",ts,this->Width,this->MaxHeap.top(),std::abs(ts - this->MaxHeap.top()));
-			#endif
-			//don't push it on it was outside the window
-			//this->MaxHeap.push(ts);
+		} else {
+#ifdef CORRELATOR_DEBUG
+			this->console->debug("Found TS: {:.1f} which is outside the correlation window of {} ns, top before clearing is {:.1f}, delta is {} ns", ts, this->Width, this->MaxHeap.top(), std::abs(ts - this->MaxHeap.top()));
+#endif
+			// don't push it on it was outside the window
+			// this->MaxHeap.push(ts);
 			return false;
 		}
 	}
 }
 
-void RollingWindowCorrelator::DumpSelf() const{
-	this->console->debug("{}",*this);
+void RollingWindowCorrelator::DumpSelf() const {
+	this->console->debug("{}", *this);
 }

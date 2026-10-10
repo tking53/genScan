@@ -21,34 +21,39 @@
 
 #include "PhysicsData.hpp"
 
-class DataParser{
-	public:
-		enum DataFileType{
-			Unknown,
-			CAEN_ROOT,
-			CAEN_BIN,
-			LDF_PIXIE,
-			PLD,
-			EVT_PRESORT,
-			EVT_BUILT
-		};
-		DataParser(DataFileType,const std::string&);
-		~DataParser() = default;
-		void SetInputFiles(std::vector<std::string>&);
-		
-		Translator::TRANSLATORSTATE Parse(boost::container::devector<PhysicsData>&);
+class DataParser {
+public:
+	enum DataFileType {
+		Unknown,
+		CAEN_ROOT,
+		CAEN_BIN_SINGLE_FILE,
+		CAEN_BIN_TIME_SORTED,
+		CAEN_BIN_SINGLE_CHANNEL,
+		LDF_PIXIE,
+		PACMAN_LDF_PIXIE,
+		PLD,
+		EVT_PRESORT,
+		EVT_BUILT,
+		EVT_TO
+	};
+	DataParser(DataFileType, const std::string&);
+	~DataParser() = default;
+	void SetInputFiles(std::vector<std::string>&);
 
-		void SetChannelMap(const std::shared_ptr<ChannelMap>&);
-		void SetCorrelator(const std::shared_ptr<Correlator>&);
-	private:
-		DataFileType DataType;
-		std::shared_ptr<spdlog::logger> console;
-		std::string LogName;
-		std::string ParserName;
+	Translator::TRANSLATORSTATE Parse(boost::container::devector<PhysicsData>&);
 
-		std::unique_ptr<Translator> DataTranslator;
-		std::shared_ptr<ChannelMap> CMap;
-		std::shared_ptr<Correlator> correlator;
+	void SetChannelMap(const std::shared_ptr<ChannelMap>&);
+	void SetCorrelator(const std::shared_ptr<Correlator>&);
+
+private:
+	DataFileType DataType;
+	std::shared_ptr<spdlog::logger> console;
+	std::string LogName;
+	std::string ParserName;
+
+	std::unique_ptr<Translator> DataTranslator;
+	std::shared_ptr<ChannelMap> CMap;
+	std::shared_ptr<Correlator> correlator;
 };
 
 #endif

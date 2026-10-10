@@ -1,0 +1,15 @@
+PID: /user/e21021/TTK/ANALYSIS_OUTPUT/cuts/Ag97.cxx
+RIT:
+  - Gate: 
+      lowerbound: 2800.0
+      upperbound: 12000.0
+ION:
+  lowerbound: 15000.0
+  upperbound: 45000.0
+BETA:
+  lowerbound: 47.0
+  upperbound: 9000.0
+CORRELATION:
+  Forward: 9.0
+  Backward: 9.0
+RADIUS: 0.7

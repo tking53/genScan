@@ -1,0 +1,37 @@
+#programmatically generated using GenPeakFit off EXP_11012
+#This is 1.5 sigma ellipse from a bigauss fit which allows for correlation 
+#-1.5sigma to 1.5sigma gives 86% in the 1D case
+#This gives us ~1190 ions within the ellipse, which should mean we have ~1400 total
+#perhaps need to expand the ellipse a bit to get closer towards that value
+PID: /data42/frib/e21027/Analysis/cuts/Ni78.Cut.cxx
+RIT:
+  #looking at the fully stacked RIT, 30k is either too high or too low, but would need 
+  #to look at PSD of it I think???
+  - Gate: 
+      lowerbound: 30000.0
+      upperbound: 65535.0
+#these are the bounds for a good ion, otherwise we think its a light ion
+#between this and the RIT rejection, we throw away 340 ions
+#should investigate if these are actually from the RIT triggering or 
+#from this cut and it's invalid 
+#From looking at Dynode LG and Dynode HG 15k is not low enough
+#10k looks more appropriate
+ION:
+  lowerbound: 10000.0
+  upperbound: 45000.0
+#based on plots of Dynode (HG) vs MTAS T, we can lower the upper bound to around 6k,
+#still need to set the lowerbound properly though 400 was the online value, lets try 
+#lowering it to 200 and see what happens
+BETA:
+  lowerbound: 200.0
+  upperbound: 6000.0
+#half-life is .1222(51) s
+CORRELATION:
+  Forward: 0.3
+  Backward: 0.3
+#based on plots of Dynode (HG) vs Radius of beta-ion, we can extend this
+#although that is from images that are not aligned
+#this seems to have improved the stats from 
+#0.5 511
+#0.7 854
+RADIUS: 0.7
