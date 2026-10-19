@@ -24,6 +24,7 @@
 #include "HagridProcessor.hpp"
 #include "IonizationChamberProcessor.hpp"
 #include "DSSDProcessor.hpp"
+#include "Super3HenProcessor.hpp"
 #include "MusesProcessor.hpp"
 #include "MtasProcessor.hpp"
 #include "MtasImplantProcessor.hpp"
@@ -134,6 +135,8 @@ void ProcessorList::CreateProc(const std::string& name) {
 		known_processors.push_back(std::make_shared<HagridProcessor>(this->LogName));
 	} else if (name.compare("DSSDProcessor") == 0) {
 		known_processors.push_back(std::make_shared<DSSDProcessor>(this->LogName));
+	} else if (name.compare("Super3HenProcessor") == 0) {
+		known_processors.push_back(std::make_shared<Super3HenProcessor>(this->LogName));
 	} else if (name.compare("IonizationChamberProcessor") == 0) {
 		known_processors.push_back(std::make_shared<IonizationChamberProcessor>(this->LogName));
 	} else if (name.compare("MusesProcessor") == 0) {

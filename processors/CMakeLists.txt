@@ -155,6 +155,16 @@ list(APPEND PROCESSOR_STRUCT_LIBS e23064Struct)
 list(APPEND PROCESSOR_STRUCT_PCM ${CMAKE_CURRENT_BINARY_DIR}/libe23064Struct_root_rdict.pcm)
 list(APPEND PROCESSOR_STRUCT_RMAP ${CMAKE_CURRENT_BINARY_DIR}/libe23064Struct_root.rootmap)
 
+ROOT_GENERATE_DICTIONARY(Super3HenStruct_root
+	Super3HenStruct.hpp ${ROOT_CONTAINER_PATHS}
+	LINKDEF include/Super3HenStructLinkDef.hpp )
+add_library(Super3HenStruct SHARED Super3HenStruct_root.cxx Super3HenStruct_root)
+target_link_libraries(Super3HenStruct ${ROOT_LIBRARIES})
+add_dependencies(Super3HenStruct ${EXTERNAL_PROCESSOR_DEPS} ${EXTERNAL_LOG_DEPS})
+list(APPEND PROCESSOR_STRUCT_LIBS Super3HenStruct)
+list(APPEND PROCESSOR_STRUCT_PCM ${CMAKE_CURRENT_BINARY_DIR}/libSuper3HenStruct_root_rdict.pcm)
+list(APPEND PROCESSOR_STRUCT_RMAP ${CMAKE_CURRENT_BINARY_DIR}/libSuper3HenStruct_root.rootmap)
+
 ROOT_GENERATE_DICTIONARY(EBSSStruct_root
 	EBSSStruct.hpp ${ROOT_CONTAINER_PATHS}
 	LINKDEF include/EBSSStructLinkDef.hpp )

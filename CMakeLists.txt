@@ -470,6 +470,7 @@ target_link_libraries(GenScanor PRIVATE BSMStruct
 					MusesStruct 
 					GroverStruct 
 					DSSDStruct 
+					Super3HenStruct
 					CloverStruct
 					PidStruct 
 					PSPMTStruct 
