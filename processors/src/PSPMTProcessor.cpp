@@ -20,8 +20,20 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log)
 		{2101, {8192, 0, 65536, 8192, 0, 65536}},
 		{2102, {8192, 0, 65536, 8192, 0, 65536}},
 
+		{2003, {30, 0, 30, 5, 0, 5}},
+		{2004, {30, 0, 30, 5, 0, 5}},
+
 		{2201, {16384, 0, 65536, 4, 0, 4}},
 		{2202, {16384, 0, 65536, 4, 0, 4}},
+
+		{2201, {16384, 0, 65536, 4, 0, 4}},
+		{2202, {16384, 0, 65536, 4, 0, 4}},
+
+
+		{2203, {16384, 0, 65536, 1024, 0, 1}},
+		{2204, {16384, 0, 65536, 1024, 0, 1}},
+		{2205, {16384, 0, 65536, 1024, 0, 1}},
+		{2206, {16384, 0, 65536, 1024, 0, 1}},
 
 		{2211, {16384, 0, 65536, 16, 0, 16}},
 		{2212, {16384, 0, 65536, 16, 0, 16}},
@@ -34,10 +46,10 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log)
 	this->NumRequiredHighAnodes = 4;
 	this->NumRequiredLowAnodes = 4;
 
-	this->hgImage = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, {-10.0, -10.0}, 0.0};
-	this->lgImage = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, {-10.0, -10.0}, 0.0};
-	this->hgImageQdc = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, {-10.0, -10.0}, 0.0};
-	this->lgImageQdc = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, {-10.0, -10.0}, 0.0};
+	this->hgImage = {0.0, 0, {-10.0, -10.0}, 0.0,{0.0,false,false}};
+	this->lgImage = {0.0, 0, {-10.0, -10.0}, 0.0,{0.0,false,false}};
+	this->hgImageQdc = {0.0, 0, {-10.0, -10.0}, 0.0,{0.0,false,false}};
+	this->lgImageQdc = {0.0, 0, {-10.0, -10.0}, 0.0,{0.0,false,false}};
 	this->ampdynode = 0.0;
 	this->highgaintag = "highgain";
 	this->lowgaintag = "lowgain";
@@ -69,10 +81,12 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log)
 				if (islowgain) {
 					if (not this->AnodeLowHits[0]) {
 						++this->AnodeLowHits[0];
-						this->lgImage.xa += evt->GetEnergy();
+						this->lgImage.xa.energy += evt->GetEnergy();
+						this->lgImage.xa.saturation = evt->GetSaturation();
+						this->lgImage.xa.pileup = evt->GetPileup();
 						++this->lgImage.numanodes;
 						if (hasQDCs) {
-							this->lgImageQdc.xa += (evt->GetQDCSums()[0] - evt->GetQDCSums()[2]);
+							this->lgImageQdc.xa.energy += (evt->GetQDCSums()[0] - evt->GetQDCSums()[2]);
 							++this->lgImageQdc.numanodes;
 						}
 					} else {
@@ -81,10 +95,12 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log)
 				} else {
 					if (not this->AnodeHighHits[0]) {
 						++this->AnodeHighHits[0];
-						this->hgImage.xa += evt->GetEnergy();
+						this->hgImage.xa.energy += evt->GetEnergy();
+						this->hgImage.xa.saturation = evt->GetSaturation();
+						this->hgImage.xa.pileup = evt->GetPileup();
 						++this->hgImage.numanodes;
 						if (hasQDCs) {
-							this->hgImageQdc.xa += (evt->GetQDCSums()[0] - evt->GetQDCSums()[2]);
+							this->hgImageQdc.xa.energy += (evt->GetQDCSums()[0] - evt->GetQDCSums()[2]);
 							++this->hgImageQdc.numanodes;
 						}
 					} else {
@@ -95,10 +111,12 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log)
 				if (islowgain) {
 					if (not this->AnodeLowHits[1]) {
 						++this->AnodeLowHits[1];
-						this->lgImage.xb += evt->GetEnergy();
+						this->lgImage.xb.energy += evt->GetEnergy();
+						this->lgImage.xb.saturation = evt->GetSaturation();
+						this->lgImage.xb.pileup = evt->GetPileup();
 						++this->lgImage.numanodes;
 						if (hasQDCs) {
-							this->lgImageQdc.xb += (evt->GetQDCSums()[0] - evt->GetQDCSums()[2]);
+							this->lgImageQdc.xb.energy += (evt->GetQDCSums()[0] - evt->GetQDCSums()[2]);
 							++this->lgImageQdc.numanodes;
 						}
 					} else {
@@ -107,10 +125,12 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log)
 				} else {
 					if (not this->AnodeHighHits[1]) {
 						++this->AnodeHighHits[1];
-						this->hgImage.xb += evt->GetEnergy();
+						this->hgImage.xb.energy += evt->GetEnergy();
+						this->hgImage.xb.saturation = evt->GetSaturation();
+						this->hgImage.xb.pileup = evt->GetPileup();
 						++this->hgImage.numanodes;
 						if (hasQDCs) {
-							this->hgImageQdc.xb += (evt->GetQDCSums()[0] - evt->GetQDCSums()[2]);
+							this->hgImageQdc.xb.energy += (evt->GetQDCSums()[0] - evt->GetQDCSums()[2]);
 							++this->hgImageQdc.numanodes;
 						}
 					} else {
@@ -121,10 +141,12 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log)
 				if (islowgain) {
 					if (not this->AnodeLowHits[2]) {
 						++this->AnodeLowHits[2];
-						this->lgImage.ya += evt->GetEnergy();
+						this->lgImage.ya.energy += evt->GetEnergy();
+						this->lgImage.ya.saturation = evt->GetSaturation();
+						this->lgImage.ya.pileup = evt->GetPileup();
 						++this->lgImage.numanodes;
 						if (hasQDCs) {
-							this->lgImageQdc.ya += (evt->GetQDCSums()[0] - evt->GetQDCSums()[2]);
+							this->lgImageQdc.ya.energy += (evt->GetQDCSums()[0] - evt->GetQDCSums()[2]);
 							++this->lgImageQdc.numanodes;
 						}
 					} else {
@@ -133,10 +155,12 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log)
 				} else {
 					if (not this->AnodeHighHits[2]) {
 						++this->AnodeHighHits[2];
-						this->hgImage.ya += evt->GetEnergy();
+						this->hgImage.ya.energy += evt->GetEnergy();
+						this->hgImage.ya.saturation = evt->GetSaturation();
+						this->hgImage.ya.pileup = evt->GetPileup();
 						++this->hgImage.numanodes;
 						if (hasQDCs) {
-							this->hgImageQdc.ya += (evt->GetQDCSums()[0] - evt->GetQDCSums()[2]);
+							this->hgImageQdc.ya.energy += (evt->GetQDCSums()[0] - evt->GetQDCSums()[2]);
 							++this->hgImageQdc.numanodes;
 						}
 					} else {
@@ -147,10 +171,12 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log)
 				if (islowgain) {
 					if (not this->AnodeLowHits[3]) {
 						++this->AnodeLowHits[3];
-						this->lgImage.yb += evt->GetEnergy();
+						this->lgImage.yb.energy += evt->GetEnergy();
+						this->lgImage.yb.saturation = evt->GetSaturation();
+						this->lgImage.yb.pileup = evt->GetPileup();
 						++this->lgImage.numanodes;
 						if (hasQDCs) {
-							this->lgImageQdc.yb += (evt->GetQDCSums()[0] - evt->GetQDCSums()[2]);
+							this->lgImageQdc.yb.energy += (evt->GetQDCSums()[0] - evt->GetQDCSums()[2]);
 							++this->lgImageQdc.numanodes;
 						}
 					} else {
@@ -159,10 +185,12 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log)
 				} else {
 					if (not this->AnodeHighHits[3]) {
 						++this->AnodeHighHits[3];
-						this->hgImage.yb += evt->GetEnergy();
+						this->hgImage.yb.energy += evt->GetEnergy();
+						this->hgImage.yb.saturation = evt->GetSaturation();
+						this->hgImage.yb.pileup = evt->GetPileup();
 						++this->hgImage.numanodes;
 						if (hasQDCs) {
-							this->hgImageQdc.yb += (evt->GetQDCSums()[0] - evt->GetQDCSums()[2]);
+							this->hgImageQdc.yb.energy += (evt->GetQDCSums()[0] - evt->GetQDCSums()[2]);
 							++this->hgImageQdc.numanodes;
 						}
 					} else {
@@ -184,10 +212,12 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log)
 				if (islowgain) {
 					if (not this->DynodeLowHits) {
 						++this->DynodeLowHits;
-						this->lgImage.dynode += evt->GetEnergy();
+						this->lgImage.dynode.energy += evt->GetEnergy();
 						this->lgImage.DynodeTimeStamp = evt->GetTimeStamp();
+						this->lgImage.dynode.saturation = evt->GetSaturation();
+						this->lgImage.dynode.pileup = evt->GetPileup();
 						if (hasQDCs) {
-							this->lgImageQdc.dynode += (evt->GetQDCSums()[0] - evt->GetQDCSums()[2]);
+							this->lgImageQdc.dynode.energy += (evt->GetQDCSums()[0] - evt->GetQDCSums()[2]);
 							this->lgImageQdc.DynodeTimeStamp = evt->GetTimeStamp();
 						}
 					} else {
@@ -196,10 +226,12 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log)
 				} else {
 					if (not this->DynodeHighHits) {
 						++this->DynodeHighHits;
-						this->hgImage.dynode += evt->GetEnergy();
+						this->hgImage.dynode.energy += evt->GetEnergy();
+						this->hgImage.dynode.saturation = evt->GetSaturation();
+						this->hgImage.dynode.pileup = evt->GetPileup();
 						this->hgImage.DynodeTimeStamp = evt->GetTimeStamp();
 						if (hasQDCs) {
-							this->hgImageQdc.dynode += (evt->GetQDCSums()[0] - evt->GetQDCSums()[2]);
+							this->hgImageQdc.dynode.energy += (evt->GetQDCSums()[0] - evt->GetQDCSums()[2]);
 							this->hgImageQdc.DynodeTimeStamp = evt->GetTimeStamp();
 						}
 					} else {
@@ -212,51 +244,72 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log)
 		}
 	}
 
-	this->lgImage.anodesum = this->lgImage.xa + this->lgImage.ya + this->lgImage.xb + this->lgImage.yb;
+	this->lgImage.anodesum = this->lgImage.xa.energy + this->lgImage.ya.energy + this->lgImage.xb.energy + this->lgImage.yb.energy;
+	this->lgImageQdc.anodesum = this->lgImageQdc.xa.energy + this->lgImageQdc.ya.energy + this->lgImageQdc.xb.energy + this->lgImageQdc.yb.energy;
 	hismanager->Fill("PSPMT_2211", this->lgImage.anodesum, this->lgImage.numanodes);
+	hismanager->Fill("PSPMT_2003", this->DynodeLowHits, 0);
+	hismanager->Fill("PSPMT_2003", this->AnodeLowHits[0], 1);
+	hismanager->Fill("PSPMT_2003", this->AnodeLowHits[1], 2);
+	hismanager->Fill("PSPMT_2003", this->AnodeLowHits[2], 3);
+	hismanager->Fill("PSPMT_2003", this->AnodeLowHits[3], 4);
+
 	if (this->lgImage.numanodes == this->NumRequiredLowAnodes) {
 		this->CalculatePosition(this->lgImage, 0.0, 0.0, 0.0, false, this->CurrMethod);
 		this->CalculatePosition(this->lgImageQdc, 0.0, 0.0, 0.0, false, this->CurrMethod);
 		hismanager->Fill("PSPMT_1901", this->lgImage.position.first, this->lgImage.position.second);
 
-		hismanager->Fill("PSPMT_2001", this->lgImage.dynode);
+		hismanager->Fill("PSPMT_2001", this->lgImage.dynode.energy);
 
-		hismanager->Fill("PSPMT_2101", this->lgImage.dynode, this->lgImage.xa);
-		hismanager->Fill("PSPMT_2101", this->lgImage.dynode, this->lgImage.xb);
-		hismanager->Fill("PSPMT_2101", this->lgImage.dynode, this->lgImage.ya);
-		hismanager->Fill("PSPMT_2101", this->lgImage.dynode, this->lgImage.yb);
+		hismanager->Fill("PSPMT_2101", this->lgImage.dynode.energy, this->lgImage.xa.energy);
+		hismanager->Fill("PSPMT_2101", this->lgImage.dynode.energy, this->lgImage.xb.energy);
+		hismanager->Fill("PSPMT_2101", this->lgImage.dynode.energy, this->lgImage.ya.energy);
+		hismanager->Fill("PSPMT_2101", this->lgImage.dynode.energy, this->lgImage.yb.energy);
 
-		hismanager->Fill("PSPMT_2201", this->lgImage.xa, 0);
-		hismanager->Fill("PSPMT_2201", this->lgImage.xb, 1);
-		hismanager->Fill("PSPMT_2201", this->lgImage.ya, 2);
-		hismanager->Fill("PSPMT_2201", this->lgImage.yb, 3);
+		hismanager->Fill("PSPMT_2201", this->lgImage.xa.energy, 0);
+		hismanager->Fill("PSPMT_2201", this->lgImage.xb.energy, 1);
+		hismanager->Fill("PSPMT_2201", this->lgImage.ya.energy, 2);
+		hismanager->Fill("PSPMT_2201", this->lgImage.yb.energy, 3);
 
-		hismanager->Fill("PSPMT_2301", this->lgImage.dynode, this->lgImage.anodesum);
+		hismanager->Fill("PSPMT_2203", this->lgImage.position.first, this->lgImage.dynode.energy);
+		hismanager->Fill("PSPMT_2204", this->lgImage.position.second, this->lgImage.dynode.energy);
+
+		hismanager->Fill("PSPMT_2301", this->lgImage.dynode.energy, this->lgImage.anodesum);
 
 		FillRootStruct(this->lowgain, this->lgImage, this->lgImageQdc);
 	}
 
-	this->hgImage.anodesum = this->hgImage.xa + this->hgImage.ya + this->hgImage.xb + this->hgImage.yb;
+	this->hgImage.anodesum = this->hgImage.xa.energy + this->hgImage.ya.energy + this->hgImage.xb.energy + this->hgImage.yb.energy;
+	this->hgImageQdc.anodesum = this->hgImageQdc.xa.energy + this->hgImageQdc.ya.energy + this->hgImageQdc.xb.energy + this->hgImageQdc.yb.energy;
 	hismanager->Fill("PSPMT_2212", this->hgImage.anodesum, this->hgImage.numanodes);
+	
+	hismanager->Fill("PSPMT_2004", this->DynodeHighHits, 0);
+	hismanager->Fill("PSPMT_2004", this->AnodeHighHits[0], 1);
+	hismanager->Fill("PSPMT_2004", this->AnodeHighHits[1], 2);
+	hismanager->Fill("PSPMT_2004", this->AnodeHighHits[2], 3);
+	hismanager->Fill("PSPMT_2004", this->AnodeHighHits[3], 4);
+	
 	// this->console->info("num anodes : {}",this->hgImage.numanodes);
 	if (this->hgImage.numanodes == this->NumRequiredHighAnodes) {
 		this->CalculatePosition(this->hgImage, 0.0, 0.0, 0.0, false, this->CurrMethod);
 		this->CalculatePosition(this->hgImageQdc, 0.0, 0.0, 0.0, false, this->CurrMethod);
 		hismanager->Fill("PSPMT_1902", this->hgImage.position.first, this->hgImage.position.second);
 
-		hismanager->Fill("PSPMT_2002", this->hgImage.dynode);
+		hismanager->Fill("PSPMT_2002", this->hgImage.dynode.energy);
 
-		hismanager->Fill("PSPMT_2102", this->hgImage.dynode, this->hgImage.xa);
-		hismanager->Fill("PSPMT_2102", this->hgImage.dynode, this->hgImage.xb);
-		hismanager->Fill("PSPMT_2102", this->hgImage.dynode, this->hgImage.ya);
-		hismanager->Fill("PSPMT_2102", this->hgImage.dynode, this->hgImage.yb);
+		hismanager->Fill("PSPMT_2102", this->hgImage.dynode.energy, this->hgImage.xa.energy);
+		hismanager->Fill("PSPMT_2102", this->hgImage.dynode.energy, this->hgImage.xb.energy);
+		hismanager->Fill("PSPMT_2102", this->hgImage.dynode.energy, this->hgImage.ya.energy);
+		hismanager->Fill("PSPMT_2102", this->hgImage.dynode.energy, this->hgImage.yb.energy);
 
-		hismanager->Fill("PSPMT_2202", this->hgImage.xa, 0);
-		hismanager->Fill("PSPMT_2202", this->hgImage.xb, 1);
-		hismanager->Fill("PSPMT_2202", this->hgImage.ya, 2);
-		hismanager->Fill("PSPMT_2202", this->hgImage.yb, 3);
+		hismanager->Fill("PSPMT_2202", this->hgImage.xa.energy, 0);
+		hismanager->Fill("PSPMT_2202", this->hgImage.xb.energy, 1);
+		hismanager->Fill("PSPMT_2202", this->hgImage.ya.energy, 2);
+		hismanager->Fill("PSPMT_2202", this->hgImage.yb.energy, 3);
 
-		hismanager->Fill("PSPMT_2302", this->hgImage.dynode, this->hgImage.anodesum);
+		hismanager->Fill("PSPMT_2205", this->hgImage.position.first, this->hgImage.dynode.energy);
+		hismanager->Fill("PSPMT_2206", this->hgImage.position.second, this->hgImage.dynode.energy);
+
+		hismanager->Fill("PSPMT_2302", this->hgImage.dynode.energy, this->hgImage.anodesum);
 
 		FillRootStruct(this->highgain, this->hgImage, this->hgImageQdc);
 	}
@@ -290,12 +343,15 @@ void PSPMTProcessor::Init(const pugi::xml_node& config) {
 	if (hg) {
 		this->console->info("Found HighGain tag for PSPMTProcessor");
 		this->NumRequiredHighAnodes = hg.attribute("numanodes").as_int(4);
+		this->hgDynodeECuts.first = hg.attribute("dyLowE").as_float(0.0);
+		this->hgDynodeECuts.second = hg.attribute("dyHighE").as_float(65536.0);
 	}
 
 	pugi::xml_node lg = config.child("LowGain");
 	if (lg) {
 		this->console->info("Found LowGain tag for PSPMTProcessor");
 		this->NumRequiredLowAnodes = lg.attribute("numanodes").as_int(4);
+		this->lgDynodeECuts.first = lg.attribute("dyLowE").as_float(0.0);
 	}
 }
 
@@ -311,12 +367,20 @@ void PSPMTProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) {
 
 	hismanager->RegisterPlot<TH1F>("PSPMT_2001", "Low Gain Dynode; Energy (arb.)", this->h1dsettings.at(2001));
 	hismanager->RegisterPlot<TH1F>("PSPMT_2002", "High Gain Dynode; Energy (arb.)", this->h1dsettings.at(2002));
+	hismanager->RegisterPlot<TH2F>("PSPMT_2003", "Low Gain Multiplicities (Dynode, xa, xb, ya, yb); Multiplicity (arb.)", this->h2dsettings.at(2003));
+	hismanager->RegisterPlot<TH2F>("PSPMT_2004", "High Gain Multiplicities (Dynode, xa, xb, ya, yb); Multiplicity (arb.)", this->h2dsettings.at(2004));
 
 	hismanager->RegisterPlot<TH2F>("PSPMT_2101", "Low Gain Anodes vs Low Gain Dynode; Energy (arb.)", this->h2dsettings.at(2101));
 	hismanager->RegisterPlot<TH2F>("PSPMT_2102", "High Gain Anodes vs High Gain Dynode; Energy (arb.)", this->h2dsettings.at(2102));
 
 	hismanager->RegisterPlot<TH2F>("PSPMT_2201", "Inividual Low Gain Anode; Energy (arb.); Position (arb.)", this->h2dsettings.at(2201));
 	hismanager->RegisterPlot<TH2F>("PSPMT_2202", "Inividual High Gain Anode; Energy (arb.); Position (arb.)", this->h2dsettings.at(2201));
+
+	// Babel Plots
+	hismanager->RegisterPlot<TH2F>("PSPMT_2203", "Low Gain Dynode vs Low Gain X position; Position (arb.); Energy (arb.)", this->h2dsettings.at(2203));
+	hismanager->RegisterPlot<TH2F>("PSPMT_2204", "Low Gain Dynode vs Low Gain Y position; Position (arb.); Energy (arb.)", this->h2dsettings.at(2204));
+	hismanager->RegisterPlot<TH2F>("PSPMT_2205", "High Gain Dynode vs High Gain X position; Position (arb.); Energy (arb.)", this->h2dsettings.at(2205));
+	hismanager->RegisterPlot<TH2F>("PSPMT_2206", "High Gain Dynode vs High Gain Y position; Position (arb.); Energy (arb.)", this->h2dsettings.at(2206));
 
 	hismanager->RegisterPlot<TH2F>("PSPMT_2211", "Low Gain Num Anodes vs AnodeSum; Energy (arb.); Mult. (arb.)", this->h2dsettings.at(2211));
 	hismanager->RegisterPlot<TH2F>("PSPMT_2212", "High Gain Num Anodes vs AnodeSum; Energy (arb.); Mult. (arb.)", this->h2dsettings.at(2212));
@@ -345,21 +409,25 @@ void PSPMTProcessor::Reset() {
 	this->hgImage.ResetAnode();
 	this->hgImage.ResetPosition(-10.0, -10.0);
 	this->hgImage.ResetCorners();
+	this->hgImage.ResetAnodeSum();
 
 	this->lgImage.ResetDynode();
 	this->lgImage.ResetAnode();
 	this->lgImage.ResetPosition(-10.0, -10.0);
 	this->lgImage.ResetCorners();
+	this->lgImage.ResetAnodeSum();
 
 	this->hgImageQdc.ResetDynode();
 	this->hgImageQdc.ResetAnode();
 	this->hgImageQdc.ResetPosition(-10.0, -10.0);
 	this->hgImageQdc.ResetCorners();
+	this->hgImageQdc.ResetAnodeSum();
 
 	this->lgImageQdc.ResetDynode();
 	this->lgImageQdc.ResetAnode();
 	this->lgImageQdc.ResetPosition(-10.0, -10.0);
 	this->lgImageQdc.ResetCorners();
+	this->lgImageQdc.ResetAnodeSum();
 
 	this->DynodeHighHits = 0;
 	this->DynodeLowHits = 0;
@@ -375,22 +443,22 @@ void PSPMTProcessor::CalculatePosition(PSPMT::Image& img, double rotation, doubl
 
 	if (method == PSPMTProcessor::IMAGEMETHOD::CORNERS) {
 		if (xflip) {
-			x = (img.ya + img.xb) / img.anodesum;
-			y = (img.xa + img.xb) / img.anodesum;
+			x = (img.ya.energy + img.xb.energy) / img.anodesum;
+			y = (img.xa.energy + img.xb.energy) / img.anodesum;
 		} else {
-			x = (img.yb + img.xa) / img.anodesum;
-			y = (img.xa + img.xb) / img.anodesum;
+			x = (img.yb.energy + img.xa.energy) / img.anodesum;
+			y = (img.xa.energy + img.xb.energy) / img.anodesum;
 		}
 
 		x -= xcenter;
 		y -= ycenter;
 	} else if (method == PSPMTProcessor::IMAGEMETHOD::SIDES) {
 		if (xflip) {
-			x = (img.xa - img.xb) / (img.xa + img.xb);
-			y = (img.ya - img.yb) / (img.ya + img.yb);
+			x = (img.xa.energy - img.xb.energy) / (img.xa.energy + img.xb.energy);
+			y = (img.ya.energy - img.yb.energy) / (img.ya.energy + img.yb.energy);
 		} else {
-			x = (img.xb - img.xa) / (img.xa + img.xb);
-			y = (img.yb - img.ya) / (img.ya + img.yb);
+			x = (img.xb.energy - img.xa.energy) / (img.xa.energy + img.xb.energy);
+			y = (img.yb.energy - img.ya.energy) / (img.ya.energy + img.yb.energy);
 		}
 	}
 
@@ -402,9 +470,26 @@ void PSPMTProcessor::FillRootStruct(ProcessorStruct::PSPMT& Rstruct, const PSPMT
 	Rstruct.ypos = enImage.position.second;
 	Rstruct.xposqdc = qdcImage.position.first;
 	Rstruct.yposqdc = qdcImage.position.second;
-	Rstruct.dynodeen = enImage.dynode;
-	Rstruct.dynodeqdc = qdcImage.dynode;
+	Rstruct.anodesumen = enImage.anodesum;
+	Rstruct.anodesumqdc = qdcImage.anodesum;
+	Rstruct.dynode.energy = enImage.dynode.energy;
+	Rstruct.dynode.qdc = qdcImage.dynode.energy;
 	Rstruct.dynodets = enImage.DynodeTimeStamp;
+	Rstruct.dynode.saturation = enImage.dynode.saturation;
+	Rstruct.dynode.pileup = enImage.dynode.pileup;
+	Rstruct.xa.energy = enImage.xa.energy;
+	Rstruct.xb.energy = enImage.xb.energy;
+	Rstruct.ya.energy = enImage.ya.energy;
+	Rstruct.yb.energy = enImage.yb.energy;
+	Rstruct.xa.saturation = enImage.xa.saturation;
+	Rstruct.xb.saturation = enImage.xb.saturation;
+	Rstruct.ya.saturation = enImage.ya.saturation;
+	Rstruct.yb.saturation = enImage.yb.saturation;
+	Rstruct.xa.pileup = enImage.xa.pileup;
+	Rstruct.xb.pileup = enImage.xb.pileup;
+	Rstruct.ya.pileup = enImage.ya.pileup;
+	Rstruct.yb.pileup = enImage.yb.pileup;
+	
 }
 
 const PSPMT::Image& PSPMTProcessor::GetLowGainImage() const {

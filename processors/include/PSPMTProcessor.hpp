@@ -53,6 +53,9 @@ private:
 	std::string highgaintag;
 	std::string lowgaintag;
 
+	std::pair<float, float> hgDynodeECuts;
+	std::pair<float, float> lgDynodeECuts;
+
 	PSPMT::Image hgImage;
 	PSPMT::Image lgImage;
 	PSPMT::Image hgImageQdc;
