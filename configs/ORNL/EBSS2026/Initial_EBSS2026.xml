@@ -1,0 +1,101 @@
+<?xml version="1.0"?>
+<Configuration>
+	<Author>
+		<Name>T. T. King</Name>
+		<Date>June 19th, 2026</Date>
+	</Author>
+	<Description>
+		XML For EBSS2026
+	</Description>
+	<Global EventWidth="500" EventWidthUnit="ns" CorrelationType="rolling-trigger" />
+	<DetectorDriver>
+		<Processor name="RootDevProcessor" included_types="nai,generic" />
+		<Processor name="EBSSProcessor" />
+	</DetectorDriver>
+	<Map>
+		<Crate number="0">
+			<Module number="0" Revision="F" Frequency="100" Firmware="R37640" TraceDelay="120">
+				<Channel number="0" type="nai" subtype="paddle" group="3" tags="">
+					<Calibration model="linear" min="0">
+						0.0 1.0
+					</Calibration>
+				</Channel>
+				<Channel number="1" type="nai" subtype="paddle" group="4" tags="">
+					<Calibration model="linear" min="0">
+						0.0 1.0
+					</Calibration>
+				</Channel>
+				<Channel number="2" type="nai" subtype="paddle" group="5" tags="">
+					<Calibration model="linear" min="0">
+						0.0 1.0
+					</Calibration>
+				</Channel>
+				<Channel number="3" type="nai" subtype="paddle" group="6" tags="">
+					<Calibration model="linear" min="0">
+						0.0 1.0
+					</Calibration>
+				</Channel>
+				<Channel number="4" type="nai" subtype="paddle" group="7" tags="">
+					<Calibration model="linear" min="0">
+						-28.80618399 1.01679603
+					</Calibration>
+				</Channel>
+				<Channel number="5" type="nai" subtype="paddle" group="8" tags="">
+					<Calibration model="linear" min="0">
+						-34.43329034 1.030697794
+					</Calibration>
+				</Channel>
+				<Channel number="6" type="nai" subtype="paddle" group="9" tags="">
+					<Calibration model="linear" min="0">
+						-28.66651463 1.012416065
+					</Calibration>
+				</Channel>
+				<Channel number="7" type="nai" subtype="paddle" group="10" tags="">
+					<Calibration model="linear" min="0">
+						-26.0989171 0.994647747
+					</Calibration>
+				</Channel>
+				<Channel number="8" type="nai" subtype="paddle" group="11" tags="">
+					<Calibration model="linear" min="0">
+						-38.73745684 0.951422788
+					</Calibration>
+				</Channel>
+				<Channel number="9" type="nai" subtype="paddle" group="12" tags="">
+					<Calibration model="linear" min="0">
+						-22.88409805 1.004525456
+					</Calibration>
+				</Channel>
+				<Channel number="10" type="nai" subtype="paddle" group="13" tags="">
+					<Calibration model="linear" min="0">
+						-54.38188268 1.012416065
+					</Calibration>
+				</Channel>
+				<Channel number="11" type="nai" subtype="paddle" group="14" tags="">
+					<Calibration model="linear" min="0">
+						 -24.76459951 0.926277965
+					</Calibration>
+				</Channel>
+				<Channel number="12" type="nai" subtype="paddle" group="15" tags="">
+					<Calibration model="linear" min="0">
+						-24.49031766 1.015374841
+					</Calibration>
+				</Channel>
+				<Channel number="13" type="nai" subtype="paddle" group="16" tags="">
+					<Calibration model="linear" min="0">
+						-34.37070228 1.083378525
+					</Calibration>
+				</Channel>
+				<Channel number="14" type="nai" subtype="paddle" group="17" tags="">
+					<Calibration model="linear" min="0">
+						-33.7028811 0.943558862
+					</Calibration>
+				</Channel>
+				<Channel number="15" type="nai" subtype="paddle" group="18" tags="">
+					<Calibration model="linear" min="0">
+						-28.51842852 0.907346429
+					</Calibration>
+				</Channel>
+			</Module>
+		</Crate>
+	</Map>
+</Configuration>

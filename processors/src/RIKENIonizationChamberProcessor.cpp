@@ -9,61 +9,61 @@
 #include <string>
 #include <vector>
 
-RIKENIonizationChamberProcessor::RIKENIonizationChamberProcessor(const std::string& log) : Processor(log,"RIKENIonizationChamberProcessor",{"ionchamber"}){
+RIKENIonizationChamberProcessor::RIKENIonizationChamberProcessor(const std::string& log)
+	: Processor(log, "RIKENIonizationChamberProcessor", {"ionchamber"}) {
 	this->FoundFirstEvt = false;
 	this->FirstEvtTime = 0.0;
 }
 
-[[maybe_unused]] bool RIKENIonizationChamberProcessor::PreProcess(EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool RIKENIonizationChamberProcessor::PreProcess(EventHistoryManager* eventhistory, [[maybe_unused]] PLOTS::PlotRegistry* hismanager, [[maybe_unused]] CUTS::CutRegistry* cutmanager) {
 	Processor::PreProcess();
 
-	summary.GetDetectorSummary(this->AllDefaultRegex["ionchamber"],this->SummaryData);
-	for( const auto& evt : this->SummaryData ){
+	eventhistory->GetCurrentEventSummary()->GetDetectorSummary(this->AllDefaultRegex["ionchamber"], this->SummaryData);
+	for (const auto& evt : this->SummaryData) {
 		auto subtype = evt->GetSubType();
-		if( subtype.compare("anode") != 0 ){
+		if (subtype.compare("anode") != 0) {
 			throw std::runtime_error("invalid subtype for ionchamber object, valid is anode");
 		}
 		auto currgroup = evt->GetGroup();
 		int detloc = std::stoi(currgroup);
 		this->CurrEvt.RealEvent = true;
 
-		if( evt->GetPileup() or evt->GetSaturation() ){
-			//ignore the saturated channel, but keep everything else in this current event
-			if( evt->GetPileup() ){
+		if (evt->GetPileup() or evt->GetSaturation()) {
+			// ignore the saturated channel, but keep everything else in this current event
+			if (evt->GetPileup()) {
 				this->CurrEvt.Pileup = true;
 			}
-			if( evt->GetSaturation() ){
+			if (evt->GetSaturation()) {
 				this->CurrEvt.Saturate = true;
 			}
 			continue;
 		}
 		this->CurrEvt.RealEvent = true;
 
-		if( not this->FoundFirstEvt ){
+		if (not this->FoundFirstEvt) {
 			this->FoundFirstEvt = true;
 			this->FirstEvtTime = evt->GetTimeStamp();
 		}
 
-		if( detloc > this->NumAnode ){
+		if (detloc > this->NumAnode) {
 			throw std::runtime_error("found anode group larger than known number of anodes");
-		}else{
-			if( evt->GetEnergy() > std::get<0>(this->IC[detloc]) ){
-				this->IC[detloc] = std::make_tuple(evt->GetEnergy(),evt->GetTimeStamp(),evt->GetCFDTimeStamp());
-				//std::get<0>(this->IC[detloc]) = evt->GetEnergy();
-				//std::get<1>(this->IC[detloc]) = evt->GetTimeStamp();
-				//std::get<2>(this->IC[detloc]) = evt->GetCFDTimeStamp();
-				//this->console->info("{} {}",evt->GetTimeStamp(),evt->GetCFDTimeStamp());
+		} else {
+			if (evt->GetEnergy() > std::get<0>(this->IC[detloc])) {
+				this->IC[detloc] = std::make_tuple(evt->GetEnergy(), evt->GetTimeStamp(), evt->GetCFDTimeStamp());
+				// std::get<0>(this->IC[detloc]) = evt->GetEnergy();
+				// std::get<1>(this->IC[detloc]) = evt->GetTimeStamp();
+				// std::get<2>(this->IC[detloc]) = evt->GetCFDTimeStamp();
+				// this->console->info("{} {}",evt->GetTimeStamp(),evt->GetCFDTimeStamp());
 			}
 		}
-
 	}
 
-	if( (not this->CurrEvt.Saturate) and (not this->CurrEvt.Pileup) ){
+	if ((not this->CurrEvt.Saturate) and (not this->CurrEvt.Pileup)) {
 		int idx = 0;
 		double curranodenum = 0.0;
-		for( const auto& ic : this->IC ){
+		for (const auto& ic : this->IC) {
 			auto erg = std::get<0>(ic);
-			if( erg > 0.0 ){
+			if (erg > 0.0) {
 				this->TimeStamps.push_back(std::get<1>(ic));
 				this->CFDTimeStamps.push_back(std::get<2>(ic));
 				this->CurrEvt.AnodeEnergy[idx] = std::log10(erg);
@@ -71,145 +71,129 @@ RIKENIonizationChamberProcessor::RIKENIonizationChamberProcessor(const std::stri
 				this->CurrEvt.TotalAnodeEnergy += this->CurrEvt.AnodeEnergy[idx];
 				curranodenum += 1.0;
 			}
-			if( erg > this->CurrEvt.MaxAnodeEnergy ){
+			if (erg > this->CurrEvt.MaxAnodeEnergy) {
 				this->CurrEvt.MaxAnodeEnergy = std::log10(erg);
 			}
-			hismanager->Fill("IONCHAMBER_7000",this->CurrEvt.AnodeEnergy[idx],idx);
+			hismanager->Fill("IONCHAMBER_7000", this->CurrEvt.AnodeEnergy[idx], idx);
 			++idx;
 		}
-		this->CurrEvt.AverageEnergy/=curranodenum;
-		this->CurrEvt.AverageEnergy = std::pow(10,this->CurrEvt.AverageEnergy);
+		this->CurrEvt.AverageEnergy /= curranodenum;
+		this->CurrEvt.AverageEnergy = std::pow(10, this->CurrEvt.AverageEnergy);
 
-		this->CurrEvt.FirstTimeStamp = *(std::min_element(this->TimeStamps.begin(),this->TimeStamps.end()));
-		this->CurrEvt.FinalTimeStamp = *(std::max_element(this->TimeStamps.begin(),this->TimeStamps.end()));
-		
-		this->CurrEvt.FirstCFDTimeStamp = *(std::min_element(this->CFDTimeStamps.begin(),this->CFDTimeStamps.end()));
-		this->CurrEvt.FinalCFDTimeStamp = *(std::max_element(this->CFDTimeStamps.begin(),this->CFDTimeStamps.end()));
+		this->CurrEvt.FirstTimeStamp = *(std::min_element(this->TimeStamps.begin(), this->TimeStamps.end()));
+		this->CurrEvt.FinalTimeStamp = *(std::max_element(this->TimeStamps.begin(), this->TimeStamps.end()));
 
-		this->CurrEvt.FirstPSD = this->CurrEvt.AnodeEnergy[0]/this->CurrEvt.TotalAnodeEnergy;
-		this->CurrEvt.MaxPSD = this->CurrEvt.MaxAnodeEnergy/this->CurrEvt.TotalAnodeEnergy;
+		this->CurrEvt.FirstCFDTimeStamp = *(std::min_element(this->CFDTimeStamps.begin(), this->CFDTimeStamps.end()));
+		this->CurrEvt.FinalCFDTimeStamp = *(std::max_element(this->CFDTimeStamps.begin(), this->CFDTimeStamps.end()));
 
-		for( int ii = 0; ii < this->NumAnode; ++ii ){
-			for( int jj = 0; jj < this->NumAnode; ++jj ){
-				if( ii != jj ){
-					hismanager->Fill("IONCHAMBER_7050",this->CurrEvt.AnodeEnergy[ii],this->CurrEvt.AnodeEnergy[jj]);
+		this->CurrEvt.FirstPSD = this->CurrEvt.AnodeEnergy[0] / this->CurrEvt.TotalAnodeEnergy;
+		this->CurrEvt.MaxPSD = this->CurrEvt.MaxAnodeEnergy / this->CurrEvt.TotalAnodeEnergy;
+
+		for (int ii = 0; ii < this->NumAnode; ++ii) {
+			for (int jj = 0; jj < this->NumAnode; ++jj) {
+				if (ii != jj) {
+					hismanager->Fill("IONCHAMBER_7050", this->CurrEvt.AnodeEnergy[ii], this->CurrEvt.AnodeEnergy[jj]);
 				}
 			}
 		}
 
-		hismanager->Fill("IONCHAMBER_7010",this->CurrEvt.TotalAnodeEnergy,this->CurrEvt.FirstPSD);
-		hismanager->Fill("IONCHAMBER_7020",this->CurrEvt.TotalAnodeEnergy,this->CurrEvt.MaxPSD);
-		hismanager->Fill("IONCHAMBER_7030",this->CurrEvt.MaxAnodeEnergy,this->CurrEvt.FirstPSD);
-		hismanager->Fill("IONCHAMBER_7040",this->CurrEvt.MaxAnodeEnergy,this->CurrEvt.MaxPSD);
+		hismanager->Fill("IONCHAMBER_7010", this->CurrEvt.TotalAnodeEnergy, this->CurrEvt.FirstPSD);
+		hismanager->Fill("IONCHAMBER_7020", this->CurrEvt.TotalAnodeEnergy, this->CurrEvt.MaxPSD);
+		hismanager->Fill("IONCHAMBER_7030", this->CurrEvt.MaxAnodeEnergy, this->CurrEvt.FirstPSD);
+		hismanager->Fill("IONCHAMBER_7040", this->CurrEvt.MaxAnodeEnergy, this->CurrEvt.MaxPSD);
 
-		hismanager->Fill("IONCHAMBER_8000",this->CurrEvt.MaxAnodeEnergy);
-		hismanager->Fill("IONCHAMBER_8010",this->CurrEvt.TotalAnodeEnergy);
-		hismanager->Fill("IONCHAMBER_8020",this->CurrEvt.AverageEnergy);
+		hismanager->Fill("IONCHAMBER_8000", this->CurrEvt.MaxAnodeEnergy);
+		hismanager->Fill("IONCHAMBER_8010", this->CurrEvt.TotalAnodeEnergy);
+		hismanager->Fill("IONCHAMBER_8020", this->CurrEvt.AverageEnergy);
 
-		double time_s = (this->CurrEvt.FirstTimeStamp - this->FirstEvtTime)*1.0e-9;
-		double time_m = time_s/60.0;
-		double time_h = time_m/60.0;
-		
-		hismanager->Fill("IONCHAMBER_8000_TIME_S",this->CurrEvt.MaxAnodeEnergy,time_s);
-		hismanager->Fill("IONCHAMBER_8010_TIME_S",this->CurrEvt.TotalAnodeEnergy,time_s);
-		hismanager->Fill("IONCHAMBER_8020_TIME_S",this->CurrEvt.AverageEnergy,time_s);
-		
-		hismanager->Fill("IONCHAMBER_8000_TIME_M",this->CurrEvt.MaxAnodeEnergy,time_m);
-		hismanager->Fill("IONCHAMBER_8010_TIME_M",this->CurrEvt.TotalAnodeEnergy,time_m);
-		hismanager->Fill("IONCHAMBER_8020_TIME_M",this->CurrEvt.AverageEnergy,time_m);
+		double time_s = (this->CurrEvt.FirstTimeStamp - this->FirstEvtTime) * 1.0e-9;
+		double time_m = time_s / 60.0;
+		double time_h = time_m / 60.0;
 
-		hismanager->Fill("IONCHAMBER_8000_TIME_H",this->CurrEvt.MaxAnodeEnergy,time_h);
-		hismanager->Fill("IONCHAMBER_8010_TIME_H",this->CurrEvt.TotalAnodeEnergy,time_h);
-		hismanager->Fill("IONCHAMBER_8020_TIME_H",this->CurrEvt.AverageEnergy,time_h);
+		hismanager->Fill("IONCHAMBER_8000_TIME_S", this->CurrEvt.MaxAnodeEnergy, time_s);
+		hismanager->Fill("IONCHAMBER_8010_TIME_S", this->CurrEvt.TotalAnodeEnergy, time_s);
+		hismanager->Fill("IONCHAMBER_8020_TIME_S", this->CurrEvt.AverageEnergy, time_s);
+
+		hismanager->Fill("IONCHAMBER_8000_TIME_M", this->CurrEvt.MaxAnodeEnergy, time_m);
+		hismanager->Fill("IONCHAMBER_8010_TIME_M", this->CurrEvt.TotalAnodeEnergy, time_m);
+		hismanager->Fill("IONCHAMBER_8020_TIME_M", this->CurrEvt.AverageEnergy, time_m);
+
+		hismanager->Fill("IONCHAMBER_8000_TIME_H", this->CurrEvt.MaxAnodeEnergy, time_h);
+		hismanager->Fill("IONCHAMBER_8010_TIME_H", this->CurrEvt.TotalAnodeEnergy, time_h);
+		hismanager->Fill("IONCHAMBER_8020_TIME_H", this->CurrEvt.AverageEnergy, time_h);
 	}
 
 	Processor::EndProcess();
 	return true;
 }
 
-[[maybe_unused]] bool RIKENIonizationChamberProcessor::Process([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool RIKENIonizationChamberProcessor::Process([[maybe_unused]] EventHistoryManager* eventhistory, [[maybe_unused]] PLOTS::PlotRegistry* hismanager, [[maybe_unused]] CUTS::CutRegistry* cutmanager) {
 	return true;
 }
 
-[[maybe_unused]] bool RIKENIonizationChamberProcessor::PostProcess([[maybe_unused]] EventSummary& summary,[[maybe_unused]] PLOTS::PlotRegistry* hismanager,[[maybe_unused]] CUTS::CutRegistry* cutmanager){
+[[maybe_unused]] bool RIKENIonizationChamberProcessor::PostProcess([[maybe_unused]] EventHistoryManager* eventhistory, [[maybe_unused]] PLOTS::PlotRegistry* hismanager, [[maybe_unused]] CUTS::CutRegistry* cutmanager) {
 	this->Reset();
 
 	return true;
 }
 
-void RIKENIonizationChamberProcessor::Init(const YAML::Node& config){
-	this->console->info("Init called with YAML::Node");
-	this->NumAnode = 6;
-}
-
-void RIKENIonizationChamberProcessor::Init(const Json::Value& config){
-	this->console->info("Init called with Json::Value");
-	this->NumAnode = 6;
-}
-
-void RIKENIonizationChamberProcessor::Init(const pugi::xml_node& config){
+void RIKENIonizationChamberProcessor::Init(const pugi::xml_node& config) {
 	this->console->info("Init called with pugi::xml_node");
 	this->NumAnode = 6;
 }
-		
-void RIKENIonizationChamberProcessor::Finalize(){
+
+void RIKENIonizationChamberProcessor::Finalize() {
 	this->InitHelpers();
-	this->console->info("{} has been finalized, {} Anodes exist",this->ProcessorName,this->NumAnode);
+	this->console->info("{} has been finalized, {} Anodes exist", this->ProcessorName, this->NumAnode);
 }
 
-void RIKENIonizationChamberProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) const{
-	//First Cathode
-	hismanager->RegisterPlot<TH2F>("IONCHAMBER_7000","Anode Position vs Anode Energy; Energy (arb.); Position (arb.)",8192,0,4,this->NumAnode,0,this->NumAnode);
-	hismanager->RegisterPlot<TH2F>("IONCHAMBER_7010","First PSD (A/C) vs Total Anode",8192,0,32,1024,0,1.0);
-	hismanager->RegisterPlot<TH2F>("IONCHAMBER_7020","Max PSD (A/C) vs Total Anode",8192,0,32,1024,0,1.0);
-	hismanager->RegisterPlot<TH2F>("IONCHAMBER_7030","First PSD (A/C) vs Max Anode",8192,0,4,1024,0,1.0);
-	hismanager->RegisterPlot<TH2F>("IONCHAMBER_7040","Max PSD (A/C) vs Max Anode",8192,0,4,1024,0,1.0);
-	hismanager->RegisterPlot<TH2F>("IONCHAMBER_7050","Anode vs Anode; Energy (arb.); Energy (arb.)",8192,0,4,8192,0,4);
+void RIKENIonizationChamberProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) {
+	// First Cathode
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_7000", "Anode Position vs Anode Energy; Energy (arb.); Position (arb.)", 8192, 0, 4, this->NumAnode, 0, this->NumAnode);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_7010", "First PSD (A/C) vs Total Anode", 8192, 0, 32, 1024, 0, 1.0);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_7020", "Max PSD (A/C) vs Total Anode", 8192, 0, 32, 1024, 0, 1.0);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_7030", "First PSD (A/C) vs Max Anode", 8192, 0, 4, 1024, 0, 1.0);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_7040", "Max PSD (A/C) vs Max Anode", 8192, 0, 4, 1024, 0, 1.0);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_7050", "Anode vs Anode; Energy (arb.); Energy (arb.)", 8192, 0, 4, 8192, 0, 4);
 
-	hismanager->RegisterPlot<TH1F>("IONCHAMBER_8000","Max Anode Energy; Energy (arb.)",8192,0,4);
-	hismanager->RegisterPlot<TH1F>("IONCHAMBER_8010","Total Anode Energy; Energy (arb.)",8192,0,32);
-	hismanager->RegisterPlot<TH1F>("IONCHAMBER_8020","Average Anode Energy; Energy (arb.)",8192,0,8192);
+	hismanager->RegisterPlot<TH1F>("IONCHAMBER_8000", "Max Anode Energy; Energy (arb.)", 8192, 0, 4);
+	hismanager->RegisterPlot<TH1F>("IONCHAMBER_8010", "Total Anode Energy; Energy (arb.)", 8192, 0, 32);
+	hismanager->RegisterPlot<TH1F>("IONCHAMBER_8020", "Average Anode Energy; Energy (arb.)", 8192, 0, 8192);
 
-	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8000_TIME_S","Max Anode Energy; Energy (arb.); Time since first evt (s)",8192,0,4,1024,0,1024);
-	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8010_TIME_S","Total Anode Energy; Energy (arb.); Time since first evt (s)",8192,0,32,1024,0,1024);
-	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8020_TIME_S","Average Anode Energy; Energy (arb.); Time since first evt (s)",8192,0,8192,1024,0,1024);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8000_TIME_S", "Max Anode Energy; Energy (arb.); Time since first evt (s)", 8192, 0, 4, 1024, 0, 1024);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8010_TIME_S", "Total Anode Energy; Energy (arb.); Time since first evt (s)", 8192, 0, 32, 1024, 0, 1024);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8020_TIME_S", "Average Anode Energy; Energy (arb.); Time since first evt (s)", 8192, 0, 8192, 1024, 0, 1024);
 
-	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8000_TIME_M","Max Anode Energy; Energy (arb.); Time since first evt (min)",8192,0,4,1024,0,1024);
-	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8010_TIME_M","Total Anode Energy; Energy (arb.); Time since first evt (min)",8192,0,32,1024,0,1024);
-	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8020_TIME_M","Average Anode Energy; Energy (arb.); Time since first evt (min)",8192,0,8192,1024,0,1024);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8000_TIME_M", "Max Anode Energy; Energy (arb.); Time since first evt (min)", 8192, 0, 4, 1024, 0, 1024);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8010_TIME_M", "Total Anode Energy; Energy (arb.); Time since first evt (min)", 8192, 0, 32, 1024, 0, 1024);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8020_TIME_M", "Average Anode Energy; Energy (arb.); Time since first evt (min)", 8192, 0, 8192, 1024, 0, 1024);
 
-	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8000_TIME_H","Max Anode Energy; Energy (arb.); Time since first evt (hr)",8192,0,4,1024,0,1024);
-	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8010_TIME_H","Total Anode Energy; Energy (arb.); Time since first evt (hr)",8192,0,32,1024,0,1024);
-	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8020_TIME_H","Average Anode Energy; Energy (arb.); Time since first evt (hr)",8192,8192,4,1024,0,1024);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8000_TIME_H", "Max Anode Energy; Energy (arb.); Time since first evt (hr)", 8192, 0, 4, 1024, 0, 1024);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8010_TIME_H", "Total Anode Energy; Energy (arb.); Time since first evt (hr)", 8192, 0, 32, 1024, 0, 1024);
+	hismanager->RegisterPlot<TH2F>("IONCHAMBER_8020_TIME_H", "Average Anode Energy; Energy (arb.); Time since first evt (hr)", 8192, 8192, 4, 1024, 0, 1024);
 
 	this->console->info("Finished Declaring Plots");
 }
 
-void RIKENIonizationChamberProcessor::RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>& outputtrees){
+void RIKENIonizationChamberProcessor::RegisterTree([[maybe_unused]] std::unordered_map<std::string, TTree*>& outputtrees) {
 }
 
-void RIKENIonizationChamberProcessor::CleanupTree(){
+void RIKENIonizationChamberProcessor::CleanupTree() {
 }
 
-void RIKENIonizationChamberProcessor::Reset(){
+void RIKENIonizationChamberProcessor::Reset() {
 	this->PrevEvt = this->CurrEvt;
 	this->CurrEvt = this->NewEvt;
-	this->IC = { {0.0,0.0,0.0}
-		    ,{0.0,0.0,0.0}
-		    ,{0.0,0.0,0.0}
-		    ,{0.0,0.0,0.0}
-		    ,{0.0,0.0,0.0}
-		    ,{0.0,0.0,0.0}
-	};
+	this->IC = {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
 	this->TimeStamps.clear();
 	this->CFDTimeStamps.clear();
 }
 
-void RIKENIonizationChamberProcessor::InitHelpers(){
+void RIKENIonizationChamberProcessor::InitHelpers() {
 	this->NewEvt = {
-		.AnodeEnergy = std::vector<double>(this->NumAnode,0.0),
-		.AnodeTimeStamp = std::vector<double>(this->NumAnode,0.0),
-		.AnodeCFDTimeStamp = std::vector<double>(this->NumAnode,0.0),
+		.AnodeEnergy = std::vector<double>(this->NumAnode, 0.0),
+		.AnodeTimeStamp = std::vector<double>(this->NumAnode, 0.0),
+		.AnodeCFDTimeStamp = std::vector<double>(this->NumAnode, 0.0),
 		.TotalAnodeEnergy = 0.0,
 		.MaxAnodeEnergy = 0.0,
 		.AverageEnergy = 0.0,
@@ -221,26 +205,19 @@ void RIKENIonizationChamberProcessor::InitHelpers(){
 		.FinalCFDTimeStamp = 0.0,
 		.Saturate = false,
 		.Pileup = false,
-		.RealEvent = false
-	};
+		.RealEvent = false};
 
 	this->PrevEvt = this->CurrEvt;
 	this->CurrEvt = this->NewEvt;
-	this->IC = { {0.0,0.0,0.0}
-		    ,{0.0,0.0,0.0}
-		    ,{0.0,0.0,0.0}
-		    ,{0.0,0.0,0.0}
-		    ,{0.0,0.0,0.0}
-		    ,{0.0,0.0,0.0}
-	};
+	this->IC = {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
 	this->TimeStamps = std::vector<double>();
 	this->CFDTimeStamps = std::vector<double>();
 }
 
-RIKENIonizationChamberProcessor::EventInfo& RIKENIonizationChamberProcessor::GetCurrEvt(){
+RIKENIonizationChamberProcessor::EventInfo& RIKENIonizationChamberProcessor::GetCurrEvt() {
 	return this->CurrEvt;
 }
 
-RIKENIonizationChamberProcessor::EventInfo& RIKENIonizationChamberProcessor::GetPrevEvt(){
+RIKENIonizationChamberProcessor::EventInfo& RIKENIonizationChamberProcessor::GetPrevEvt() {
 	return this->PrevEvt;
 }

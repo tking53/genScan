@@ -12,32 +12,32 @@
 
 #include "Correlator.hpp"
 
-class AnalogCorrelator : public Correlator{
-	public:
-		AnalogCorrelator(const std::string&,double);
-		~AnalogCorrelator() = default;
+class AnalogCorrelator : public Correlator {
+public:
+	AnalogCorrelator(const std::string&, double);
+	~AnalogCorrelator() = default;
 
-		//switch based on the type of correlation we were constructed with
-		//what's passed in is the timestamp (in ns), crate, module, channel of the last parsed event
-		virtual bool IsWithinCorrelationWindow(const double&,const int&,const int&,const int&) final;
-		
-		virtual void DumpSelf() const final;
+	// switch based on the type of correlation we were constructed with
+	// what's passed in is the timestamp (in ns), crate, module, channel of the last parsed event
+	virtual bool IsWithinCorrelationWindow(const double&, const int&, const int&, const int&) final;
 
-		template<typename OStream>
-		friend OStream& operator<<(OStream& os,const AnalogCorrelator& corr){
-			os << "AnalogCorrelator( Window: " << corr.Width << " ns";
-			os << "\nKnown Analog Triggers: ( Crate | Module | Channel )";
-			size_t ii = 0;
-			for( const auto& trig : corr.Triggers ){
-				os << "\nTrigger " << ii << " : ( " 
-					<< trig.Crate << " | " 
-					<< trig.Module << " | "
-					<< trig.Channel << " ) ";
-				++ii;
-			}
-			os << "\nEnd Known Analog Triggers";
-			return os;
+	virtual void DumpSelf() const final;
+
+	template<typename OStream>
+	friend OStream& operator<<(OStream& os, const AnalogCorrelator& corr) {
+		os << "AnalogCorrelator( Window: " << corr.Width << " ns";
+		os << "\nKnown Analog Triggers: ( Crate | Module | Channel )";
+		size_t ii = 0;
+		for (const auto& trig : corr.Triggers) {
+			os << "\nTrigger " << ii << " : ( "
+			   << trig.Crate << " | "
+			   << trig.Module << " | "
+			   << trig.Channel << " ) ";
+			++ii;
 		}
+		os << "\nEnd Known Analog Triggers";
+		return os;
+	}
 };
 
 #endif

@@ -1,70 +1,49 @@
 #ifndef __WAVEFORM_ANALYZER_HPP__
 #define __WAVEFORM_ANALYZER_HPP__
 
+#include "TFitResult.h"
+#include "TFitResultPtr.h"
+
 #include "Analyzer.hpp"
 
+#include "PSDCalculator.hpp"
+#include "RootFitter.hpp"
+
 class WaveformAnalyzer : public Analyzer {
-	public:
-		WaveformAnalyzer(const std::string&);
-		virtual ~WaveformAnalyzer() = default;
+public:
+	WaveformAnalyzer(const std::string&);
+	virtual ~WaveformAnalyzer();
 
-		virtual bool PreProcess(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
-		virtual bool Process(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
-		virtual bool PostProcess(EventSummary&,PLOTS::PlotRegistry*,CUTS::CutRegistry*);
+	virtual bool PreProcess(EventHistoryManager*, PLOTS::PlotRegistry*, CUTS::CutRegistry*);
+	virtual bool Process(EventHistoryManager*, PLOTS::PlotRegistry*, CUTS::CutRegistry*);
+	virtual bool PostProcess(EventHistoryManager*, PLOTS::PlotRegistry*, CUTS::CutRegistry*);
 
+	virtual void Init([[maybe_unused]] const pugi::xml_node&);
 
-		virtual void Init([[maybe_unused]] const pugi::xml_node&);
-		virtual void Init([[maybe_unused]] const YAML::Node&);
-		virtual void Init([[maybe_unused]] const Json::Value&);
+	virtual void Finalize();
 
-		virtual void Finalize();
+	virtual void DeclarePlots([[maybe_unused]] PLOTS::PlotRegistry*) const;
 
-		virtual void DeclarePlots([[maybe_unused]] PLOTS::PlotRegistry*) const;
+private:
+	boost::regex GenerateRegex(const std::string&, const std::string&, const std::string&);
 
-	private:
-		struct WaveFormParams {
-			std::pair<size_t,size_t> PreTriggerBounds;
-			std::pair<size_t,size_t> PostTriggerBounds;
-			std::vector<size_t> QDCBounds;
+	void InsertAdditionalTypes(const std::string&);
 
-			bool HasPSD;
-			std::tuple<size_t,size_t,size_t> FixedPSDBounds;
-			std::tuple<size_t,size_t,float> FractionalPSDBounds;
+	std::set<int> BannedGCID;
+	std::set<boost::regex> KnownWaveSettings;
+	std::set<boost::regex> KnownTraceSettings;
+	std::vector<std::pair<boost::regex, PSDCalculator>> WaveSettings;
+	std::vector<std::pair<boost::regex, RootFitter>> TraceFitSettings;
 
-			bool CalcDerivative;
+	TFitResultPtr FitResult;
 
-			WaveFormParams(){
-				PreTriggerBounds = {0,0};
-				PostTriggerBounds = {0,0};
-				QDCBounds = {};
-				HasPSD = false;
-				FixedPSDBounds = {0,0,0};
-				FractionalPSDBounds = {0,0,2.0};
-				CalcDerivative = false;
-			}
+	std::chrono::time_point<std::chrono::high_resolution_clock> fit_start_time;
+	std::chrono::time_point<std::chrono::high_resolution_clock> fit_stop_time;
+	double fittime;
 
-			~WaveFormParams() = default;
-
-			WaveFormParams(const WaveFormParams&) = default;
-			WaveFormParams(WaveFormParams&&) = default;
-			WaveFormParams& operator=(const WaveFormParams&) = default;
-			WaveFormParams& operator=(WaveFormParams&&) = default;
-		};
-
-		bool ValidateSettingsString(const std::string&) const;
-
-		void ParsePreTrigger(const pugi::xml_node&,WaveFormParams&);
-		void ParsePostTrigger(const pugi::xml_node&,WaveFormParams&);
-		void ParseQDC(const pugi::xml_node&,WaveFormParams&);
-		void ParsePSD(const pugi::xml_node&,WaveFormParams&);
-
-		boost::regex GenerateRegex(const std::string&,const std::string&,const std::string&);
-
-		void InsertAdditionalTypes(const std::string&);
-
-		std::set<boost::regex> KnownWaveSettings;
-		std::vector<std::pair<boost::regex,WaveFormParams>> WaveSettings;
-
+	int MaxSaveFits;
+	int currsave;
+	int NumTraceFits;
 };
 
 #endif

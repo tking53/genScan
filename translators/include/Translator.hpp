@@ -22,45 +22,50 @@
 #include "Correlator.hpp"
 #include "PhysicsData.hpp"
 
+/// @addtogroup Decoding
+/// @{
+/// @class Translator
+class Translator {
+public:
+	enum TRANSLATORSTATE {
+		PARSING,
+		COMPLETE,
+		UNKNOWN
+	};
+	Translator(const std::string&, const std::string&);
+	virtual ~Translator();
+	virtual bool AddFile(const std::string&);
+	[[noreturn]] virtual TRANSLATORSTATE Parse([[maybe_unused]] boost::container::devector<PhysicsData>&);
+	virtual void FinalizeFiles();
+	virtual bool OpenNextFile();
+	virtual void SetChannelMap(const std::shared_ptr<ChannelMap>&);
+	virtual void SetCorrelator(const std::shared_ptr<Correlator>&);
 
-class Translator{
-	public:
-		enum TRANSLATORSTATE{
-			PARSING,
-			COMPLETE,
-			UNKNOWN
-		};
-		Translator(const std::string&,const std::string&);
-		virtual ~Translator();
-		virtual bool AddFile(const std::string&);
-		[[noreturn]] virtual TRANSLATORSTATE Parse([[maybe_unused]] boost::container::devector<PhysicsData>&);
-		virtual void FinalizeFiles();
-		virtual bool OpenNextFile();
-		virtual void SetChannelMap(const std::shared_ptr<ChannelMap>&);
-		virtual void SetCorrelator(const std::shared_ptr<Correlator>&);
-	protected:
-		std::string LogName;
-		std::string TranslatorName;
+protected:
+	std::string LogName;
+	std::string TranslatorName;
 
-		std::vector<std::string> InputFiles;
-		std::vector<int> FileSizes;
-		std::ifstream CurrentFile;
-		size_t NumTotalFiles;
-		size_t NumFilesRemaining;
-		size_t CurrentFileIndex;
-		bool FinishedCurrentFile;
+	std::vector<std::string> InputFiles;
+	std::vector<std::string> InputStems;
+	std::vector<int> FileSizes;
+	std::ifstream CurrentFile;
+	size_t NumTotalFiles;
+	size_t NumFilesRemaining;
+	size_t CurrentFileIndex;
+	bool FinishedCurrentFile;
 
-		bool LastReadEvtWithin;
-		boost::container::devector<PhysicsData> Leftovers;
-		boost::container::vector<boost::container::deque<PhysicsData>> CustomLeftovers;
+	bool LastReadEvtWithin;
+	boost::container::devector<PhysicsData> Leftovers;
+	boost::container::vector<boost::container::deque<PhysicsData>> CustomLeftovers;
 
-		std::shared_ptr<spdlog::logger> console;
-		std::shared_ptr<ChannelMap> CMap;
-		std::shared_ptr<Correlator> correlator;
+	std::shared_ptr<spdlog::logger> console;
+	std::shared_ptr<ChannelMap> CMap;
+	std::shared_ptr<Correlator> correlator;
 
-		XiaDecoder* CurrDecoder;
+	XiaDecoder* CurrDecoder;
 
-		uint64_t CurrExtTS;
+	uint64_t CurrExtTS;
 };
+/// @}
 
 #endif

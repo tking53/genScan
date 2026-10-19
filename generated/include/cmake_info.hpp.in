@@ -1,0 +1,9 @@
+#ifndef __CMAKE_INFO_HPP__
+#define __CMAKE_INFO_HPP__
+
+#include <string_view>
+
+constexpr std::string_view BUILD_CMAKE_VERSION = "@CMAKE_VERSION@";
+constexpr std::string_view BUILD_CMAKE_COMMAND = "@CMAKE_COMMAND@";
+
+#endif
