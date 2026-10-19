@@ -251,6 +251,23 @@ void ProcessorList::ThreshAndCal(boost::container::devector<PhysicsData>& RawEve
 			throw std::runtime_error(e.what());
 		}
 
+		// calibrating the QDCS can throw two different errors
+		try {
+			auto qdcs = evt.GetQDCSums();
+			std::vector<double> qalias;
+			for (const auto& e : qdcs) {
+				qalias.push_back(this->randNum(this->randGen));
+			}
+			cmap->GetCalibratedQDCSums(evt.GetCrate(), evt.GetModule(), evt.GetChannel(), evt.GetRawQDCSums(), qdcs, qalias);
+			evt.SetQDCSums(qdcs);
+		} catch (const boost::container::out_of_range& e) {
+			this->console->error("Invalid channel map for event {}. Next message is description from boost", evt);
+			throw std::runtime_error(e.what());
+		} catch (const std::runtime_error& e) {
+			this->console->error("QDCS size does not match Raw QDCS for event {}", evt);
+			throw std::runtime_error(e.what());
+		}
+
 		try {
 			cmap->SetChanConfigInfo(evt);
 		} catch (const boost::container::out_of_range& e) {
@@ -388,7 +405,7 @@ void ProcessorList::ProcessRaw(EventHistoryManager* History, PLOTS::PlotRegistry
 
 		Total_Hits->Fill(gBoardID, evt.GetChannel());
 
-		auto qdcs = evt.GetQDCSums();
+		auto qdcs = evt.GetRawQDCSums();
 		for (size_t ii = 0; ii < qdcs.size(); ++ii) {
 			QDCs[ii]->Fill(qdcs[ii], gChanID);
 		}

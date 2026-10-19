@@ -68,7 +68,7 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log)
 		auto group = evt->GetGroup();
 		bool islowgain = evt->HasTag(this->lowgaintag);
 		bool ishighgain = evt->HasTag(this->highgaintag);
-		bool hasQDCs = !evt->GetQDCSums().empty();
+		bool hasQDCs = !evt->GetRawQDCSums().empty();
 
 		if ((ishighgain and islowgain) or (not ishighgain and not islowgain)) {
 			this->console->error("evt: {} in PSPMTProcessor has malformed xml, has both lowgain and highgain tag or neither", *evt);
@@ -86,7 +86,7 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log)
 						this->lgImage.xa.pileup = evt->GetPileup();
 						++this->lgImage.numanodes;
 						if (hasQDCs) {
-							this->lgImageQdc.xa.energy += (evt->GetQDCSums()[0] - evt->GetQDCSums()[2]);
+							this->lgImageQdc.xa.energy += (evt->GetRawQDCSums()[0] - evt->GetRawQDCSums()[2]);
 							++this->lgImageQdc.numanodes;
 						}
 					} else {
@@ -100,7 +100,7 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log)
 						this->hgImage.xa.pileup = evt->GetPileup();
 						++this->hgImage.numanodes;
 						if (hasQDCs) {
-							this->hgImageQdc.xa.energy += (evt->GetQDCSums()[0] - evt->GetQDCSums()[2]);
+							this->hgImageQdc.xa.energy += (evt->GetRawQDCSums()[0] - evt->GetRawQDCSums()[2]);
 							++this->hgImageQdc.numanodes;
 						}
 					} else {
@@ -116,7 +116,7 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log)
 						this->lgImage.xb.pileup = evt->GetPileup();
 						++this->lgImage.numanodes;
 						if (hasQDCs) {
-							this->lgImageQdc.xb.energy += (evt->GetQDCSums()[0] - evt->GetQDCSums()[2]);
+							this->lgImageQdc.xb.energy += (evt->GetRawQDCSums()[0] - evt->GetRawQDCSums()[2]);
 							++this->lgImageQdc.numanodes;
 						}
 					} else {
@@ -130,7 +130,7 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log)
 						this->hgImage.xb.pileup = evt->GetPileup();
 						++this->hgImage.numanodes;
 						if (hasQDCs) {
-							this->hgImageQdc.xb.energy += (evt->GetQDCSums()[0] - evt->GetQDCSums()[2]);
+							this->hgImageQdc.xb.energy += (evt->GetRawQDCSums()[0] - evt->GetRawQDCSums()[2]);
 							++this->hgImageQdc.numanodes;
 						}
 					} else {
@@ -146,7 +146,7 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log)
 						this->lgImage.ya.pileup = evt->GetPileup();
 						++this->lgImage.numanodes;
 						if (hasQDCs) {
-							this->lgImageQdc.ya.energy += (evt->GetQDCSums()[0] - evt->GetQDCSums()[2]);
+							this->lgImageQdc.ya.energy += (evt->GetRawQDCSums()[0] - evt->GetRawQDCSums()[2]);
 							++this->lgImageQdc.numanodes;
 						}
 					} else {
@@ -160,7 +160,7 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log)
 						this->hgImage.ya.pileup = evt->GetPileup();
 						++this->hgImage.numanodes;
 						if (hasQDCs) {
-							this->hgImageQdc.ya.energy += (evt->GetQDCSums()[0] - evt->GetQDCSums()[2]);
+							this->hgImageQdc.ya.energy += (evt->GetRawQDCSums()[0] - evt->GetRawQDCSums()[2]);
 							++this->hgImageQdc.numanodes;
 						}
 					} else {
@@ -176,7 +176,7 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log)
 						this->lgImage.yb.pileup = evt->GetPileup();
 						++this->lgImage.numanodes;
 						if (hasQDCs) {
-							this->lgImageQdc.yb.energy += (evt->GetQDCSums()[0] - evt->GetQDCSums()[2]);
+							this->lgImageQdc.yb.energy += (evt->GetRawQDCSums()[0] - evt->GetRawQDCSums()[2]);
 							++this->lgImageQdc.numanodes;
 						}
 					} else {
@@ -190,7 +190,7 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log)
 						this->hgImage.yb.pileup = evt->GetPileup();
 						++this->hgImage.numanodes;
 						if (hasQDCs) {
-							this->hgImageQdc.yb.energy += (evt->GetQDCSums()[0] - evt->GetQDCSums()[2]);
+							this->hgImageQdc.yb.energy += (evt->GetRawQDCSums()[0] - evt->GetRawQDCSums()[2]);
 							++this->hgImageQdc.numanodes;
 						}
 					} else {
@@ -217,7 +217,7 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log)
 						this->lgImage.dynode.saturation = evt->GetSaturation();
 						this->lgImage.dynode.pileup = evt->GetPileup();
 						if (hasQDCs) {
-							this->lgImageQdc.dynode.energy += (evt->GetQDCSums()[0] - evt->GetQDCSums()[2]);
+							this->lgImageQdc.dynode.energy += (evt->GetRawQDCSums()[0] - evt->GetRawQDCSums()[2]);
 							this->lgImageQdc.DynodeTimeStamp = evt->GetTimeStamp();
 						}
 					} else {
@@ -231,7 +231,7 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log)
 						this->hgImage.dynode.pileup = evt->GetPileup();
 						this->hgImage.DynodeTimeStamp = evt->GetTimeStamp();
 						if (hasQDCs) {
-							this->hgImageQdc.dynode.energy += (evt->GetQDCSums()[0] - evt->GetQDCSums()[2]);
+							this->hgImageQdc.dynode.energy += (evt->GetRawQDCSums()[0] - evt->GetRawQDCSums()[2]);
 							this->hgImageQdc.DynodeTimeStamp = evt->GetTimeStamp();
 						}
 					} else {

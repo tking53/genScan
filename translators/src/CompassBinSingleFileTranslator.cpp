@@ -137,8 +137,8 @@ int CompassBinSingleFileTranslator::ReadNext() {
 
 	if (this->single_file_decoder->HasBit2()) {
 		// store energy_short within the QDC sum
-		this->Leftovers.back().SetRawQDCSumLength(1);
-		this->Leftovers.back().SetQDCValue(0, energy_short);
+		this->Leftovers.back().SetQDCSumLength(1);
+		this->Leftovers.back().SetRawQDCValue(0, energy_short);
 	}
 
 	uint32_t event_flags = 0;

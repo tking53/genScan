@@ -132,8 +132,8 @@ int CompassBinTimeSortedTranslator::ReadNext(boost::container::devector<PhysicsD
 
 	if (this->single_file_decoder->HasBit2()) {
 		// store energy_short within the QDC sum
-		RawEvents.back().SetRawQDCSumLength(1);
-		RawEvents.back().SetQDCValue(0,energy_short);
+		RawEvents.back().SetQDCSumLength(1);
+		RawEvents.back().SetRawQDCValue(0,energy_short);
 		// this->console->info("{}",energy_short);
 	}
 

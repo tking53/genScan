@@ -155,6 +155,7 @@ public:
 	int GetNumChannelsPerBoard() const;
 
 	[[nodiscard]] std::tuple<double, double, double, double, double> GetCalibratedEnergy(int, int, int, double, double, const std::vector<uint16_t>&);
+	void GetCalibratedQDCSums(int, int, int,const std::vector<unsigned int>&,std::vector<double>&,const std::vector<double>&);
 
 	[[nodiscard]] bool SetParams(int, int, int, const std::string&, const std::string&, const std::string&, const std::string&, const std::set<std::string>&, const std::vector<double>&);
 	void SetInternalTrapParams(int, int, int, int, int, int, float, const std::vector<double>&);

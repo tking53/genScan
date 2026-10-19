@@ -452,14 +452,14 @@ void XiaDecoder::DecodeOtherWords(const unsigned int* otherWords, PhysicsData* p
 		extts += extlow;
 		pd->SetExternalTimeStamp(extts);
 	} else if (pd->GetHeaderLength() == 12) {
-		pd->SetRawQDCSumLength(8);
+		pd->SetQDCSumLength(8);
 		for (unsigned int ii = 0; ii < 8; ++ii) {
-			pd->SetQDCValue(ii, this->DecodeQDCSums(otherWords[ii]));
+			pd->SetRawQDCValue(ii, this->DecodeQDCSums(otherWords[ii]));
 		}
 	} else if (pd->GetHeaderLength() == 14) {
-		pd->SetRawQDCSumLength(8);
+		pd->SetQDCSumLength(8);
 		for (unsigned int ii = 0; ii < 8; ++ii) {
-			pd->SetQDCValue(ii, this->DecodeQDCSums(otherWords[ii]));
+			pd->SetRawQDCValue(ii, this->DecodeQDCSums(otherWords[ii]));
 		}
 		auto extlow = this->DecodeExternalTSLow(otherWords[8]);
 		auto exthigh = this->DecodeExternalTSHigh(otherWords[9]);
@@ -472,18 +472,18 @@ void XiaDecoder::DecodeOtherWords(const unsigned int* otherWords, PhysicsData* p
 		pd->SetESumLeading(this->DecodeESumLeading(otherWords[1]));
 		pd->SetESumGap(this->DecodeESumGap(otherWords[2]));
 		pd->SetESumBaseline(this->DecodeBaseline(otherWords[3]));
-		pd->SetRawQDCSumLength(8);
+		pd->SetQDCSumLength(8);
 		for (unsigned int ii = 0; ii < 8; ++ii) {
-			pd->SetQDCValue(ii, this->DecodeQDCSums(otherWords[ii + 4]));
+			pd->SetRawQDCValue(ii, this->DecodeQDCSums(otherWords[ii + 4]));
 		}
 	} else if (pd->GetHeaderLength() == 18) {
 		pd->SetESumTrailing(this->DecodeESumTrailing(otherWords[0]));
 		pd->SetESumLeading(this->DecodeESumLeading(otherWords[1]));
 		pd->SetESumGap(this->DecodeESumGap(otherWords[2]));
 		pd->SetESumBaseline(this->DecodeBaseline(otherWords[3]));
-		pd->SetRawQDCSumLength(8);
+		pd->SetQDCSumLength(8);
 		for (unsigned int ii = 0; ii < 8; ++ii) {
-			pd->SetQDCValue(ii, this->DecodeQDCSums(otherWords[ii + 4]));
+			pd->SetRawQDCValue(ii, this->DecodeQDCSums(otherWords[ii + 4]));
 		}
 		auto extlow = this->DecodeExternalTSLow(otherWords[12]);
 		auto exthigh = this->DecodeExternalTSHigh(otherWords[13]);

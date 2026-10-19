@@ -35,6 +35,7 @@ PhysicsData::PhysicsData(int headerlength, int eventlength, int cratenum, int mo
 	this->ExternalTimestamp = std::numeric_limits<uint64_t>::max();
 
 	this->Trace = TraceHelper<uint16_t, float>();
+	this->RawQDCSums = {};
 	this->QDCSums = {};
 
 	this->Type = "";
@@ -68,8 +69,8 @@ PhysicsData::PhysicsData(const PhysicsData& other)
 	, Saturation(other.Saturation)
 	, Phase(other.Phase)
 	, Trace(other.Trace)
-	, // Assuming TraceHelper has a proper copy constructor
-	QDCSums(other.QDCSums)
+	, RawQDCSums(other.RawQDCSums)
+	, QDCSums(other.QDCSums)
 	, ESumTrailing(other.ESumTrailing)
 	, ESumLeading(other.ESumLeading)
 	, ESumGap(other.ESumGap)
@@ -114,8 +115,8 @@ PhysicsData::PhysicsData(PhysicsData&& other) noexcept
 	, Saturation(other.Saturation)
 	, Phase(other.Phase)
 	, Trace(std::move(other.Trace))
-	, // Assuming TraceHelper has a proper move constructor
-	QDCSums(std::move(other.QDCSums))
+	, RawQDCSums(std::move(other.RawQDCSums))
+	, QDCSums(std::move(other.QDCSums))
 	, ESumTrailing(other.ESumTrailing)
 	, ESumLeading(other.ESumLeading)
 	, ESumGap(other.ESumGap)
@@ -162,6 +163,7 @@ PhysicsData& PhysicsData::operator=(const PhysicsData& other) {
 		Phase = other.Phase;
 		Trace = other.Trace; // Assuming TraceHelper has a proper copy constructor
 		QDCSums = other.QDCSums;
+		RawQDCSums = other.RawQDCSums;
 		ESumTrailing = other.ESumTrailing;
 		ESumLeading = other.ESumLeading;
 		ESumGap = other.ESumGap;
@@ -210,6 +212,7 @@ PhysicsData& PhysicsData::operator=(PhysicsData&& other) noexcept {
 		Phase = other.Phase;
 		Trace = std::move(other.Trace); // Assuming TraceHelper has a proper move constructor
 		QDCSums = std::move(other.QDCSums);
+		RawQDCSums = std::move(other.RawQDCSums);
 		ESumTrailing = other.ESumTrailing;
 		ESumLeading = other.ESumLeading;
 		ESumGap = other.ESumGap;
@@ -406,25 +409,42 @@ std::vector<uint16_t>& PhysicsData::GetRawTraceData() {
 	return this->Trace.GetRawData();
 }
 
-void PhysicsData::SetRawQDCSumLength(const unsigned int value) {
-	this->QDCSums = std::vector<unsigned int>(value);
+void PhysicsData::SetRawQDCValue(const unsigned int& idx, const unsigned int& value) {
+	this->RawQDCSums[idx] = value;
 }
 
-void PhysicsData::SetQDCValue(const unsigned int& idx, const unsigned int& value) {
+void PhysicsData::SetQDCSumLength(const unsigned int value) {
+	this->RawQDCSums = std::vector<unsigned int>(value);
+	this->QDCSums = std::vector<double>(value);
+}
+
+void PhysicsData::SetQDCValue(const unsigned int& idx, const double& value) {
 	this->QDCSums[idx] = value;
 }
 
 // QDC Sums
-void PhysicsData::SetQDCSums(const std::vector<unsigned int>& value) {
+void PhysicsData::SetRawQDCSums(const std::vector<unsigned int>& value) {
+	this->RawQDCSums = value;
+}
+void PhysicsData::SetRawQDCSums(std::vector<unsigned int>&& value) {
+	this->RawQDCSums = std::move(value);
+}
+
+const std::vector<unsigned int>& PhysicsData::GetRawQDCSums() const {
+	return this->RawQDCSums;
+}
+
+void PhysicsData::SetQDCSums(const std::vector<double>& value) {
 	this->QDCSums = value;
 }
-void PhysicsData::SetQDCSums(std::vector<unsigned int>&& value) {
+void PhysicsData::SetQDCSums(std::vector<double>&& value) {
 	this->QDCSums = std::move(value);
 }
 
-const std::vector<unsigned int>& PhysicsData::GetQDCSums() const {
+const std::vector<double>& PhysicsData::GetQDCSums() const {
 	return this->QDCSums;
 }
+
 
 // Type
 void PhysicsData::SetType(const std::string& value) {
@@ -671,6 +691,10 @@ double PhysicsData::GetAliasValue() const {
 	return this->AliasValue;
 }
 
-unsigned int PhysicsData::GetQDC(size_t idx) const {
+unsigned int PhysicsData::GetRawQDC(size_t idx) const {
+	return this->RawQDCSums.at(idx);
+}
+
+double PhysicsData::GetQDC(size_t idx) const {
 	return this->QDCSums.at(idx);
 }

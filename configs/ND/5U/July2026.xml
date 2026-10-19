@@ -30,22 +30,22 @@
 			<Module number="1" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="264">
 				<Channel number="0" type="eljen" subtype="301D" group="fixed" tags="fixed">
 					<Calibration model="linear" min="0">	
-						0	1.0
+						0	4.08
 					</Calibration>
 				</Channel>
 				<Channel number="2" type="eljen" subtype="301D" group="rotational" tags="left">
 					<Calibration model="linear" min="0"> 
-						0	1.0
+						0	6.47
 					</Calibration>
 				</Channel>
 				<Channel number="4" type="eljen" subtype="301D" group="rotational" tags="center">
 					<Calibration model="linear" min="0">	
-						0	1.0
+						0	5.18
 					</Calibration>
 				</Channel>
 				<Channel number="6" type="eljen" subtype="301D" group="rotational" tags="right">
 					<Calibration model="linear" min="0">	
-						0	1.0
+						0	20.9
 					</Calibration>
 				</Channel>
 			</Module>

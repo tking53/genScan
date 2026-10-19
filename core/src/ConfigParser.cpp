@@ -210,7 +210,7 @@ void ConfigParser::ParseMap(ChannelMap* cmap) {
 		}
 		for (; crate; crate = crate.next_sibling("Crate")) {
 			int crid = crate.attribute("number").as_ullong(std::numeric_limits<int>::max());
-			auto crid_result = this->KnownCrates.insert_unique(crid);
+			auto crid_result = this->KnownCrates.insert(crid);
 			if (not crid_result.second) {
 				throw std::runtime_error("Duplicate crate number found for Crate : " + std::to_string(crid));
 			}
@@ -232,7 +232,7 @@ void ConfigParser::ParseMap(ChannelMap* cmap) {
 			}
 			for (; board; board = board.next_sibling("Module")) {
 				int bid = board.attribute("number").as_ullong(std::numeric_limits<int>::max());
-				auto board_result = this->KnownBoardsInCrate.insert_unique(bid);
+				auto board_result = this->KnownBoardsInCrate.insert(bid);
 				if (not board_result.second) {
 					throw std::runtime_error("Duplicate board number : " + std::to_string(bid) + " in Crate : " + std::to_string(crid));
 				}
@@ -295,7 +295,7 @@ void ConfigParser::ParseMap(ChannelMap* cmap) {
 				}
 				for (; channel; channel = channel.next_sibling("Channel")) {
 					int cid = channel.attribute("number").as_ullong(std::numeric_limits<int>::max());
-					auto channel_result = this->KnownChannelsInBoard.insert_unique(cid);
+					auto channel_result = this->KnownChannelsInBoard.insert(cid);
 					if (not channel_result.second) {
 						throw std::runtime_error("Duplicate channel : " + std::to_string(cid) + " in Board : " + std::to_string(bid) + " in Crate : " + std::to_string(crid));
 					}

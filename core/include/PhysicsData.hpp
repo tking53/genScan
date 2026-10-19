@@ -291,15 +291,23 @@ public:
 	const std::vector<uint16_t>& GetRawTraceDerivative() const;
 
 	// QDC Sums
-	void SetQDCSums(const std::vector<unsigned int>&);
-	void SetQDCSums(std::vector<unsigned int>&&);
+	void SetRawQDCSums(const std::vector<unsigned int>&);
+	void SetRawQDCSums(std::vector<unsigned int>&&);
+	
+	const std::vector<unsigned int>& GetRawQDCSums() const;
+	unsigned int GetRawQDC(size_t) const;
 
-	const std::vector<unsigned int>& GetQDCSums() const;
-	unsigned int GetQDC(size_t) const;
+	void SetQDCSums(const std::vector<double>&);
+	void SetQDCSums(std::vector<double>&&);
+
+	const std::vector<double>& GetQDCSums() const;
+	double GetQDC(size_t) const;
 
 	// Make faster update
-	void SetRawQDCSumLength(const unsigned int);
-	void SetQDCValue(const unsigned int&, const unsigned int&);
+	void SetRawQDCValue(const unsigned int&, const unsigned int&);
+	void SetQDCValue(const unsigned int&, const double&);
+	
+	void SetQDCSumLength(const unsigned int);
 
 	// Type
 	void SetType(const std::string&);
@@ -429,7 +437,8 @@ private:
 	bool Saturation;
 	double Phase;
 	TraceHelper<uint16_t, float> Trace;
-	std::vector<unsigned int> QDCSums;
+	std::vector<unsigned int> RawQDCSums;
+	std::vector<double> QDCSums;
 
 	unsigned int ESumTrailing;
 	unsigned int ESumLeading;

@@ -26,7 +26,8 @@ namespace ProcessorStruct {
 		bool saturation = false; // Did the trace go out of the ADC range
 		std::vector<unsigned int> trace = {}; // The trace if present
 		int tracelength = 0;
-		std::vector<unsigned int> qdcSums = {}; // output the onboard qdc sums if present
+		std::vector<double> qdcSums = {}; // output the onboard qdc sums if present
+		std::vector<unsigned int> rawqdcSums = {}; // output the onboard qdc sums if present
 		int qdclength = 0;
 		double tmax = 0.0;
 	};

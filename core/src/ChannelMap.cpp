@@ -137,7 +137,7 @@ ChannelMap::FirmwareVersion ChannelMap::CalcFirmwareEnum(const std::string& type
 	std::string currunique_id = t + ":" + st + ":" + g;
 	for (auto& currtag : tg)
 		currunique_id += ":" + currtag;
-	auto result = this->KnownUID.insert_unique(std::string(currunique_id));
+	auto result = this->KnownUID.insert(currunique_id);
 	if (not result.second) {
 		throw std::runtime_error("Channel : " + std::to_string(cid) +
 					 " Board : " + std::to_string(bid) +
@@ -189,6 +189,42 @@ void ChannelMap::SetIntegralParams(int crid, int bid, int cid, int bl, int bu, i
 	auto& val = this->ChannelConfigMap.at(gcid);
 	val.Integral = IntegrationFilter<uint16_t>(bl, bu, il, iu);
 	val.IntegralParams = ip;
+}
+
+void ChannelMap::GetCalibratedQDCSums(int crid, int bid, int cid, const std::vector<unsigned int>& rqdcs, std::vector<double>& qdcs,const std::vector<double>& alias) {
+	if (qdcs.size() != rqdcs.size()) {
+		std::string mess = "Crate : " + std::to_string(crid) + "Board : " + std::to_string(bid) + " Channel : " + std::to_string(cid) + " does not have same number of raw qdcs as calibrated qdcs";
+		throw std::runtime_error(mess);
+	}
+	auto gcid = this->GetGlobalChanID(crid, bid, cid);
+	auto gbid = this->GetGlobalBoardID(crid, bid);
+	if ((gcid >= MAX_FID) or (gbid >= MAX_BOARDS) or (cid >= MAX_CHANNELS_PER_BOARD)) {
+		std::string mess = "Invalid config file, Crate : " + std::to_string(crid) + "Board : " + std::to_string(bid) + " Channel : " + std::to_string(cid) + " Is Invalid";
+		throw std::runtime_error(mess);
+	}
+	auto c = ChannelConfigMap.at(gcid);
+
+	for (size_t ii = 0; ii < rqdcs.size(); ++ii) {
+		auto erg = rqdcs[ii] + alias[ii];
+		double BoardErg = 0.0;
+		switch (c.Params.size()) {
+		case 1:
+			BoardErg = c.Params[0];
+			break;
+		case 2:
+			BoardErg = c.Params[0] + c.Params[1] * erg;
+			break;
+		case 3:
+			BoardErg = c.Params[0] + c.Params[1] * erg + c.Params[2] * erg * erg;
+			break;
+		default:
+			for (size_t ii = 0; ii < c.Params.size(); ++ii) {
+				BoardErg += c.Params[ii] * std::pow(erg, ii);
+			}
+			break;
+		}
+		qdcs[ii] = BoardErg;
+	}
 }
 
 std::tuple<double, double, double, double, double> ChannelMap::GetCalibratedEnergy(int crid, int bid, int cid, double erg, double alias, const std::vector<uint16_t>& trace) {

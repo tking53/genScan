@@ -152,7 +152,7 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log)
 			++(this->HighGainAnodes[pixelid].hits);
 			this->HighGainAnodes[pixelid].energy += evt->GetEnergy();
 			this->HighGainAnodes[pixelid].timestamp = evt->GetTimeStamp();
-			auto qdc = evt->GetQDC(this->qdc_energy_idx) - evt->GetQDC(this->qdc_baseline_idx);
+			auto qdc = evt->GetRawQDC(this->qdc_energy_idx) - evt->GetRawQDC(this->qdc_baseline_idx);
 			this->HighGainQDCAnodes[pixelid].energy += qdc;
 			this->HighGainQDCAnodes[pixelid].timestamp = evt->GetTimeStamp();
 			++(this->HighGainAnodeHits);
@@ -166,7 +166,7 @@ MtasImplantProcessor::MtasImplantProcessor(const std::string& log)
 			++(this->LowGainAnodes[pixelid].hits);
 			this->LowGainAnodes[pixelid].energy += evt->GetEnergy();
 			this->LowGainAnodes[pixelid].timestamp = evt->GetTimeStamp();
-			auto qdc = evt->GetQDC(this->qdc_energy_idx) - evt->GetQDC(this->qdc_baseline_idx);
+			auto qdc = evt->GetRawQDC(this->qdc_energy_idx) - evt->GetRawQDC(this->qdc_baseline_idx);
 			this->LowGainQDCAnodes[pixelid].energy += qdc;
 			this->LowGainQDCAnodes[pixelid].timestamp = evt->GetTimeStamp();
 			++(this->LowGainAnodeHits);
