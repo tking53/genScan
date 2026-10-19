@@ -30,10 +30,10 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log)
 		{2202, {16384, 0, 65536, 4, 0, 4}},
 
 
-		{2203, {16384, 0, 65536, 1024, 0, 1}},
-		{2204, {16384, 0, 65536, 1024, 0, 1}},
-		{2205, {16384, 0, 65536, 1024, 0, 1}},
-		{2206, {16384, 0, 65536, 1024, 0, 1}},
+		{2203, {1024, 0, 1,16384, 0, 65536}},
+		{2204, {1024, 0, 1,16384, 0, 65536}},
+		{2205, {1024, 0, 1,16384, 0, 65536}},
+		{2206, {1024, 0, 1,16384, 0, 65536}},
 
 		{2211, {16384, 0, 65536, 16, 0, 16}},
 		{2212, {16384, 0, 65536, 16, 0, 16}},
@@ -46,10 +46,10 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log)
 	this->NumRequiredHighAnodes = 4;
 	this->NumRequiredLowAnodes = 4;
 
-	this->hgImage = {0.0, 0, {-10.0, -10.0}, 0.0,{0.0,false,false}};
-	this->lgImage = {0.0, 0, {-10.0, -10.0}, 0.0,{0.0,false,false}};
-	this->hgImageQdc = {0.0, 0, {-10.0, -10.0}, 0.0,{0.0,false,false}};
-	this->lgImageQdc = {0.0, 0, {-10.0, -10.0}, 0.0,{0.0,false,false}};
+	this->hgImage = {0.0, 0, {-10.0, -10.0}, 0.0,{0.0,false,false},{0.0,false,false},{0.0,false,false},{0.0,false,false},{0.0,false,false}};
+	this->lgImage = {0.0, 0, {-10.0, -10.0}, 0.0,{0.0,false,false},{0.0,false,false},{0.0,false,false},{0.0,false,false},{0.0,false,false}};
+	this->hgImageQdc = {0.0, 0, {-10.0, -10.0}, 0.0,{0.0,false,false},{0.0,false,false},{0.0,false,false},{0.0,false,false},{0.0,false,false}};
+	this->lgImageQdc = {0.0, 0, {-10.0, -10.0}, 0.0,{0.0,false,false},{0.0,false,false},{0.0,false,false},{0.0,false,false},{0.0,false,false}};
 	this->ampdynode = 0.0;
 	this->highgaintag = "highgain";
 	this->lowgaintag = "lowgain";
@@ -247,33 +247,63 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log)
 	this->lgImage.anodesum = this->lgImage.xa.energy + this->lgImage.ya.energy + this->lgImage.xb.energy + this->lgImage.yb.energy;
 	this->lgImageQdc.anodesum = this->lgImageQdc.xa.energy + this->lgImageQdc.ya.energy + this->lgImageQdc.xb.energy + this->lgImageQdc.yb.energy;
 	hismanager->Fill("PSPMT_2211", this->lgImage.anodesum, this->lgImage.numanodes);
-	hismanager->Fill("PSPMT_2003", this->DynodeLowHits, 0);
-	hismanager->Fill("PSPMT_2003", this->AnodeLowHits[0], 1);
-	hismanager->Fill("PSPMT_2003", this->AnodeLowHits[1], 2);
-	hismanager->Fill("PSPMT_2003", this->AnodeLowHits[2], 3);
-	hismanager->Fill("PSPMT_2003", this->AnodeLowHits[3], 4);
+	hismanager->Fill("PSPMT_2003_U", this->DynodeLowHits, 0);
+	hismanager->Fill("PSPMT_2003_U", this->AnodeLowHits[0], 1);
+	hismanager->Fill("PSPMT_2003_U", this->AnodeLowHits[1], 2);
+	hismanager->Fill("PSPMT_2003_U", this->AnodeLowHits[2], 3);
+	hismanager->Fill("PSPMT_2003_U", this->AnodeLowHits[3], 4);
+
+	if (not this->lgImage.dynode.saturation && not this->lgImage.dynode.pileup) {
+		hismanager->Fill("PSPMT_2003", this->DynodeLowHits, 0);
+		hismanager->Fill("PSPMT_2003", this->AnodeLowHits[0], 1);
+		hismanager->Fill("PSPMT_2003", this->AnodeLowHits[1], 2);
+		hismanager->Fill("PSPMT_2003", this->AnodeLowHits[2], 3);
+		hismanager->Fill("PSPMT_2003", this->AnodeLowHits[3], 4);
+	}
 
 	if (this->lgImage.numanodes == this->NumRequiredLowAnodes) {
 		this->CalculatePosition(this->lgImage, 0.0, 0.0, 0.0, false, this->CurrMethod);
 		this->CalculatePosition(this->lgImageQdc, 0.0, 0.0, 0.0, false, this->CurrMethod);
-		hismanager->Fill("PSPMT_1901", this->lgImage.position.first, this->lgImage.position.second);
+		//! QDC Plot Fills
+		hismanager->Fill("PSPMT_1903_U", this->lgImageQdc.position.first, this->lgImageQdc.position.second);
+		hismanager->Fill("PSPMT_2303_U", this->lgImageQdc.dynode.energy, this->lgImageQdc.anodesum);
+		hismanager->Fill("PSPMT_2301_U", this->lgImageQdc.dynode.energy, this->lgImageQdc.anodesum);
 
-		hismanager->Fill("PSPMT_2001", this->lgImage.dynode.energy);
-
-		hismanager->Fill("PSPMT_2101", this->lgImage.dynode.energy, this->lgImage.xa.energy);
-		hismanager->Fill("PSPMT_2101", this->lgImage.dynode.energy, this->lgImage.xb.energy);
-		hismanager->Fill("PSPMT_2101", this->lgImage.dynode.energy, this->lgImage.ya.energy);
-		hismanager->Fill("PSPMT_2101", this->lgImage.dynode.energy, this->lgImage.yb.energy);
+		//! Filter Energy Plots
+		hismanager->Fill("PSPMT_1901_U", this->lgImage.position.first, this->lgImage.position.second);
+		hismanager->Fill("PSPMT_2001_U", this->lgImage.dynode.energy);
+		hismanager->Fill("PSPMT_2101_U", this->lgImage.dynode.energy, this->lgImage.xa.energy);
+		hismanager->Fill("PSPMT_2101_U", this->lgImage.dynode.energy, this->lgImage.xb.energy);
+		hismanager->Fill("PSPMT_2101_U", this->lgImage.dynode.energy, this->lgImage.ya.energy);
+		hismanager->Fill("PSPMT_2101_U", this->lgImage.dynode.energy, this->lgImage.yb.energy);
 
 		hismanager->Fill("PSPMT_2201", this->lgImage.xa.energy, 0);
 		hismanager->Fill("PSPMT_2201", this->lgImage.xb.energy, 1);
 		hismanager->Fill("PSPMT_2201", this->lgImage.ya.energy, 2);
 		hismanager->Fill("PSPMT_2201", this->lgImage.yb.energy, 3);
 
-		hismanager->Fill("PSPMT_2203", this->lgImage.position.first, this->lgImage.dynode.energy);
-		hismanager->Fill("PSPMT_2204", this->lgImage.position.second, this->lgImage.dynode.energy);
+		hismanager->Fill("PSPMT_2203_U", this->lgImage.position.first, this->lgImage.dynode.energy);
+		hismanager->Fill("PSPMT_2204_U", this->lgImage.position.second, this->lgImage.dynode.energy);
 
-		hismanager->Fill("PSPMT_2301", this->lgImage.dynode.energy, this->lgImage.anodesum);
+		hismanager->Fill("PSPMT_2301_U", this->lgImage.dynode.energy, this->lgImage.anodesum);
+
+		if (not this->lgImage.dynode.saturation && not this->lgImage.dynode.pileup){
+			hismanager->Fill("PSPMT_1901", this->lgImage.position.first, this->lgImage.position.second);
+			hismanager->Fill("PSPMT_2001", this->lgImage.dynode.energy);
+			hismanager->Fill("PSPMT_2101", this->lgImage.dynode.energy, this->lgImage.xa.energy);
+			hismanager->Fill("PSPMT_2101", this->lgImage.dynode.energy, this->lgImage.xb.energy);
+			hismanager->Fill("PSPMT_2101", this->lgImage.dynode.energy, this->lgImage.ya.energy);
+			hismanager->Fill("PSPMT_2101", this->lgImage.dynode.energy, this->lgImage.yb.energy);
+			hismanager->Fill("PSPMT_2203", this->lgImage.position.first, this->lgImage.dynode.energy);
+			hismanager->Fill("PSPMT_2204", this->lgImage.position.second, this->lgImage.dynode.energy);
+			hismanager->Fill("PSPMT_2301", this->lgImage.dynode.energy, this->lgImage.anodesum);
+
+			//! QDC Plot Fills
+			hismanager->Fill("PSPMT_1903", this->lgImageQdc.position.first, this->lgImageQdc.position.second);
+			hismanager->Fill("PSPMT_2303", this->lgImageQdc.dynode.energy, this->lgImageQdc.anodesum);
+		}
+
+		
 
 		FillRootStruct(this->lowgain, this->lgImage, this->lgImageQdc);
 	}
@@ -282,34 +312,63 @@ PSPMTProcessor::PSPMTProcessor(const std::string& log)
 	this->hgImageQdc.anodesum = this->hgImageQdc.xa.energy + this->hgImageQdc.ya.energy + this->hgImageQdc.xb.energy + this->hgImageQdc.yb.energy;
 	hismanager->Fill("PSPMT_2212", this->hgImage.anodesum, this->hgImage.numanodes);
 	
-	hismanager->Fill("PSPMT_2004", this->DynodeHighHits, 0);
-	hismanager->Fill("PSPMT_2004", this->AnodeHighHits[0], 1);
-	hismanager->Fill("PSPMT_2004", this->AnodeHighHits[1], 2);
-	hismanager->Fill("PSPMT_2004", this->AnodeHighHits[2], 3);
-	hismanager->Fill("PSPMT_2004", this->AnodeHighHits[3], 4);
+	hismanager->Fill("PSPMT_2004_U", this->DynodeHighHits, 0);
+	hismanager->Fill("PSPMT_2004_U", this->AnodeHighHits[0], 1);
+	hismanager->Fill("PSPMT_2004_U", this->AnodeHighHits[1], 2);
+	hismanager->Fill("PSPMT_2004_U", this->AnodeHighHits[2], 3);
+	hismanager->Fill("PSPMT_2004_U", this->AnodeHighHits[3], 4);
+
+	if (not this->hgImage.dynode.saturation && not this->hgImage.dynode.pileup) {
+		hismanager->Fill("PSPMT_2004", this->DynodeHighHits, 0);
+		hismanager->Fill("PSPMT_2004", this->AnodeHighHits[0], 1);
+		hismanager->Fill("PSPMT_2004", this->AnodeHighHits[1], 2);
+		hismanager->Fill("PSPMT_2004", this->AnodeHighHits[2], 3);
+		hismanager->Fill("PSPMT_2004", this->AnodeHighHits[3], 4);
+	}
 	
 	// this->console->info("num anodes : {}",this->hgImage.numanodes);
 	if (this->hgImage.numanodes == this->NumRequiredHighAnodes) {
 		this->CalculatePosition(this->hgImage, 0.0, 0.0, 0.0, false, this->CurrMethod);
 		this->CalculatePosition(this->hgImageQdc, 0.0, 0.0, 0.0, false, this->CurrMethod);
-		hismanager->Fill("PSPMT_1902", this->hgImage.position.first, this->hgImage.position.second);
+		//! QDC Plot Fills
+		hismanager->Fill("PSPMT_1903_U", this->hgImageQdc.position.first, this->hgImageQdc.position.second);
+		hismanager->Fill("PSPMT_2303_U", this->hgImageQdc.dynode.energy, this->hgImageQdc.anodesum);
+		hismanager->Fill("PSPMT_2301_U", this->hgImageQdc.dynode.energy, this->hgImageQdc.anodesum);
 
-		hismanager->Fill("PSPMT_2002", this->hgImage.dynode.energy);
+		//! Filter Energy Plots
+		hismanager->Fill("PSPMT_1902_U", this->hgImage.position.first, this->hgImage.position.second);
+		hismanager->Fill("PSPMT_2002_U", this->hgImage.dynode.energy);
 
-		hismanager->Fill("PSPMT_2102", this->hgImage.dynode.energy, this->hgImage.xa.energy);
-		hismanager->Fill("PSPMT_2102", this->hgImage.dynode.energy, this->hgImage.xb.energy);
-		hismanager->Fill("PSPMT_2102", this->hgImage.dynode.energy, this->hgImage.ya.energy);
-		hismanager->Fill("PSPMT_2102", this->hgImage.dynode.energy, this->hgImage.yb.energy);
+		hismanager->Fill("PSPMT_2102_U", this->hgImage.dynode.energy, this->hgImage.xa.energy);
+		hismanager->Fill("PSPMT_2102_U", this->hgImage.dynode.energy, this->hgImage.xb.energy);
+		hismanager->Fill("PSPMT_2102_U", this->hgImage.dynode.energy, this->hgImage.ya.energy);
+		hismanager->Fill("PSPMT_2102_U", this->hgImage.dynode.energy, this->hgImage.yb.energy);
 
 		hismanager->Fill("PSPMT_2202", this->hgImage.xa.energy, 0);
 		hismanager->Fill("PSPMT_2202", this->hgImage.xb.energy, 1);
 		hismanager->Fill("PSPMT_2202", this->hgImage.ya.energy, 2);
 		hismanager->Fill("PSPMT_2202", this->hgImage.yb.energy, 3);
 
-		hismanager->Fill("PSPMT_2205", this->hgImage.position.first, this->hgImage.dynode.energy);
-		hismanager->Fill("PSPMT_2206", this->hgImage.position.second, this->hgImage.dynode.energy);
+		hismanager->Fill("PSPMT_2205_U", this->hgImage.position.first, this->hgImage.dynode.energy);
+		hismanager->Fill("PSPMT_2206_U", this->hgImage.position.second, this->hgImage.dynode.energy);
 
 		hismanager->Fill("PSPMT_2302", this->hgImage.dynode.energy, this->hgImage.anodesum);
+
+		if (not this->hgImage.dynode.saturation && not this->hgImage.dynode.pileup) {
+			hismanager->Fill("PSPMT_1902", this->hgImage.position.first, this->hgImage.position.second);
+			hismanager->Fill("PSPMT_2002", this->hgImage.dynode.energy);
+			hismanager->Fill("PSPMT_2102", this->hgImage.dynode.energy, this->hgImage.xa.energy);
+			hismanager->Fill("PSPMT_2102", this->hgImage.dynode.energy, this->hgImage.xb.energy);
+			hismanager->Fill("PSPMT_2102", this->hgImage.dynode.energy, this->hgImage.ya.energy);
+			hismanager->Fill("PSPMT_2102", this->hgImage.dynode.energy, this->hgImage.yb.energy);
+
+			hismanager->Fill("PSPMT_2205", this->hgImage.position.first, this->hgImage.dynode.energy);
+			hismanager->Fill("PSPMT_2206", this->hgImage.position.second, this->hgImage.dynode.energy);
+
+			//! QDC Plot Fills
+			hismanager->Fill("PSPMT_1904", this->hgImageQdc.position.first, this->hgImageQdc.position.second);
+			hismanager->Fill("PSPMT_2304", this->hgImageQdc.dynode.energy, this->hgImageQdc.anodesum);
+		}
 
 		FillRootStruct(this->highgain, this->hgImage, this->hgImageQdc);
 	}
@@ -365,13 +424,26 @@ void PSPMTProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) {
 	hismanager->RegisterPlot<TH2F>("PSPMT_1903", "Low Gain QDC::Image; Position (arb.); Position (arb.)", this->h2dsettings.at(1903));
 	hismanager->RegisterPlot<TH2F>("PSPMT_1904", "High Gain QDC::Image; Position (arb.); Position (arb.)", this->h2dsettings.at(1904));
 
+	hismanager->RegisterPlot<TH2F>("PSPMT_1901_U", "Low Gain Image : Ungated; Position (arb.); Position (arb.)", this->h2dsettings.at(1901));
+	hismanager->RegisterPlot<TH2F>("PSPMT_1902_U", "High Gain Image : Ungated; Position (arb.); Position (arb.)", this->h2dsettings.at(1902));
+	hismanager->RegisterPlot<TH2F>("PSPMT_1903_U", "Low Gain QDC::Image : Ungated; Position (arb.); Position (arb.)", this->h2dsettings.at(1903));
+	hismanager->RegisterPlot<TH2F>("PSPMT_1904_U", "High Gain QDC::Image : Ungated; Position (arb.); Position (arb.)", this->h2dsettings.at(1904));
+
 	hismanager->RegisterPlot<TH1F>("PSPMT_2001", "Low Gain Dynode; Energy (arb.)", this->h1dsettings.at(2001));
 	hismanager->RegisterPlot<TH1F>("PSPMT_2002", "High Gain Dynode; Energy (arb.)", this->h1dsettings.at(2002));
 	hismanager->RegisterPlot<TH2F>("PSPMT_2003", "Low Gain Multiplicities (Dynode, xa, xb, ya, yb); Multiplicity (arb.)", this->h2dsettings.at(2003));
 	hismanager->RegisterPlot<TH2F>("PSPMT_2004", "High Gain Multiplicities (Dynode, xa, xb, ya, yb); Multiplicity (arb.)", this->h2dsettings.at(2004));
 
+	hismanager->RegisterPlot<TH1F>("PSPMT_2001_U", "Low Gain Dynode: Ungated; Energy (arb.)", this->h1dsettings.at(2001));
+	hismanager->RegisterPlot<TH1F>("PSPMT_2002_U", "High Gain Dynode: Ungated; Energy (arb.)", this->h1dsettings.at(2002));
+	hismanager->RegisterPlot<TH2F>("PSPMT_2003_U", "Low Gain Multiplicities: Ungated (Dynode, xa, xb, ya, yb); Multiplicity (arb.)", this->h2dsettings.at(2003));
+	hismanager->RegisterPlot<TH2F>("PSPMT_2004_U", "High Gain Multiplicities: Ungated (Dynode, xa, xb, ya, yb); Multiplicity (arb.)", this->h2dsettings.at(2004));
+
 	hismanager->RegisterPlot<TH2F>("PSPMT_2101", "Low Gain Anodes vs Low Gain Dynode; Energy (arb.)", this->h2dsettings.at(2101));
 	hismanager->RegisterPlot<TH2F>("PSPMT_2102", "High Gain Anodes vs High Gain Dynode; Energy (arb.)", this->h2dsettings.at(2102));
+
+	hismanager->RegisterPlot<TH2F>("PSPMT_2101_U", "Low Gain Anodes vs Low Gain Dynode: Ungated; Energy (arb.)", this->h2dsettings.at(2101));
+	hismanager->RegisterPlot<TH2F>("PSPMT_2102_U", "High Gain Anodes vs High Gain Dynode: Ungated; Energy (arb.)", this->h2dsettings.at(2102));
 
 	hismanager->RegisterPlot<TH2F>("PSPMT_2201", "Inividual Low Gain Anode; Energy (arb.); Position (arb.)", this->h2dsettings.at(2201));
 	hismanager->RegisterPlot<TH2F>("PSPMT_2202", "Inividual High Gain Anode; Energy (arb.); Position (arb.)", this->h2dsettings.at(2201));
@@ -382,6 +454,12 @@ void PSPMTProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) {
 	hismanager->RegisterPlot<TH2F>("PSPMT_2205", "High Gain Dynode vs High Gain X position; Position (arb.); Energy (arb.)", this->h2dsettings.at(2205));
 	hismanager->RegisterPlot<TH2F>("PSPMT_2206", "High Gain Dynode vs High Gain Y position; Position (arb.); Energy (arb.)", this->h2dsettings.at(2206));
 
+	hismanager->RegisterPlot<TH2F>("PSPMT_2203_U", "Low Gain Dynode vs Low Gain X position: Ungated; Position (arb.); Energy (arb.)", this->h2dsettings.at(2203));
+	hismanager->RegisterPlot<TH2F>("PSPMT_2204_U", "Low Gain Dynode vs Low Gain Y position: Ungated; Position (arb.); Energy (arb.)", this->h2dsettings.at(2204));
+	hismanager->RegisterPlot<TH2F>("PSPMT_2205_U", "High Gain Dynode vs High Gain X position: Ungated; Position (arb.); Energy (arb.)", this->h2dsettings.at(2205));
+	hismanager->RegisterPlot<TH2F>("PSPMT_2206_U", "High Gain Dynode vs High Gain Y position: Ungated; Position (arb.); Energy (arb.)", this->h2dsettings.at(2206));
+
+
 	hismanager->RegisterPlot<TH2F>("PSPMT_2211", "Low Gain Num Anodes vs AnodeSum; Energy (arb.); Mult. (arb.)", this->h2dsettings.at(2211));
 	hismanager->RegisterPlot<TH2F>("PSPMT_2212", "High Gain Num Anodes vs AnodeSum; Energy (arb.); Mult. (arb.)", this->h2dsettings.at(2212));
 
@@ -389,6 +467,12 @@ void PSPMTProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) {
 	hismanager->RegisterPlot<TH2F>("PSPMT_2302", "High Gain Anodesum vs High Gain Dynode; Energy (arb.)", this->h2dsettings.at(2302));
 	hismanager->RegisterPlot<TH2F>("PSPMT_2303", "Low Gain QDC::Anodesum vs Low Gain QDC::Dynode; Energy (arb.)", this->h2dsettings.at(2303));
 	hismanager->RegisterPlot<TH2F>("PSPMT_2304", "High Gain QDC::Anodesum vs High Gain QDC::Dynode; Energy (arb.)", this->h2dsettings.at(2304));
+	
+	hismanager->RegisterPlot<TH2F>("PSPMT_2301_U", "Low Gain Anodesum vs Low Gain Dynode: Ungated; Energy (arb.)", this->h2dsettings.at(2301));
+	hismanager->RegisterPlot<TH2F>("PSPMT_2302_U", "High Gain Anodesum vs High Gain Dynode: Ungated; Energy (arb.)", this->h2dsettings.at(2302));
+	hismanager->RegisterPlot<TH2F>("PSPMT_2303_U", "Low Gain QDC::Anodesum vs Low Gain QDC::Dynode: Ungated; Energy (arb.)", this->h2dsettings.at(2303));
+	hismanager->RegisterPlot<TH2F>("PSPMT_2304_U", "High Gain QDC::Anodesum vs High Gain QDC::Dynode: Ungated; Energy (arb.)", this->h2dsettings.at(2304));
+
 	this->console->info("Finished Declaring Plots");
 }
 
