@@ -135,7 +135,7 @@ int main(int argc, char* argv[]) {
 		("outputfile,o", boost::program_options::value<std::string>(&outputfile), "configfile to output to")
 		("polyorder,p", boost::program_options::value<int>(&order)->default_value(1), "order to do calibration")
 		("scale,s", boost::program_options::value<bool>(&fixcontstant)->default_value(true), "fix the constant term in the fit")
-		("txtfile,t", boost::program_options::value<std::string>(&txtfile)->default_value("CalMap.txt"), "txt file formatted as crate module channel pars");
+		("txtfile,t", boost::program_options::value<std::string>(&txtfile)->default_value("CalMap.txt"), "txt file formatted as space seperated \"crate module channel pars\"");
 
 	boost::program_options::positional_options_description p;
 	// clang-format on
