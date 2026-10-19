@@ -137,7 +137,7 @@ ChannelMap::FirmwareVersion ChannelMap::CalcFirmwareEnum(const std::string& type
 	std::string currunique_id = t + ":" + st + ":" + g;
 	for (auto& currtag : tg)
 		currunique_id += ":" + currtag;
-	auto result = this->KnownUID.insert_unique(currunique_id);
+	auto result = this->KnownUID.insert_unique(std::string(currunique_id));
 	if (not result.second) {
 		throw std::runtime_error("Channel : " + std::to_string(cid) +
 					 " Board : " + std::to_string(bid) +
