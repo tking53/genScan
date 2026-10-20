@@ -18,6 +18,9 @@ struct PSDCalculator {
 	std::tuple<size_t, size_t, size_t> FixedPSDBounds;
 	std::tuple<size_t, size_t, float> FractionalPSDBounds;
 
+	bool UseCMA;
+	std::tuple<size_t,float> CMAValues;
+
 	bool CalcDerivative;
 	bool InvertTrace;
 
@@ -59,6 +62,11 @@ struct PSDCalculator {
 			this->HasPSD = true;
 			this->FixedPSDBounds = std::make_tuple<size_t, size_t, size_t>(curr.attribute("begin").as_int(0), curr.attribute("middle").as_int(0), curr.attribute("end").as_int(0));
 			this->FractionalPSDBounds = std::make_tuple<size_t, size_t, float>(curr.attribute("pre").as_int(0), curr.attribute("post").as_int(0), curr.attribute("fraction").as_float(2.0));
+		}
+
+		if (pugi::xml_node curr =  settings.child("CMA")) {
+			this->UseCMA = true;
+			this->CMAValues = std::make_tuple<size_t,float>(curr.attribute("halfWidth").as_ullong(10),curr.attribute("rejectThreshold").as_float(3.5));
 		}
 	}
 

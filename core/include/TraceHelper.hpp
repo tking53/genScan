@@ -2,6 +2,7 @@
 #define __TRACE_HELPER_HPP__
 
 #include <algorithm>
+#include <deque>
 #include <stdexcept>
 #include <vector>
 #include <string>
@@ -122,7 +123,7 @@ public:
 		return data.size();
 	}
 
-	void AnalyzeWaveform(const std::pair<size_t, size_t>& PreTrigRegion, const std::pair<size_t, size_t>& PostTrigRegion, const std::vector<size_t>& QDCBounds, const bool& inverttrace) {
+	void AnalyzeWaveform(const std::pair<size_t, size_t>& PreTrigRegion, const std::pair<size_t, size_t>& PostTrigRegion, const std::vector<size_t>& QDCBounds, const bool& inverttrace, const bool& usecma, const std::tuple<size_t, float>& cmaparams) {
 		if (PreTrigRegion.first >= PreTrigRegion.second) {
 			throw std::runtime_error("TraceHelper::AnalyzeWaveform(const std::pair<size_t,size_t>& PreTrigRegion,const std::pair<size_t,size_t>& PostTrigRegion,const std::vector<size_t>& QDCBounds) PreTrigRegion.first > PreTrigRegion.second");
 		}
@@ -145,6 +146,10 @@ public:
 
 		if (PostTrigRegion.second > data.size()) {
 			throw std::runtime_error("TraceHelper::AnalyzeWaveform(const std::pair<size_t,size_t>& PostTrigRegion,const std::pair<size_t,size_t>& PostTrigRegion,const std::vector<size_t>& QDCBounds) PostTrigRegion.second >= data.size()");
+		}
+
+		if (usecma and 2 * std::get<0>(cmaparams) > data.size()) {
+			throw std::runtime_error("TraceHelper::AnalyzeWaveform(const std::pair<size_t,size_t>& PostTrigRegion,const std::pair<size_t,size_t>& PostTrigRegion,const std::vector<size_t>& QDCBounds) CMA.halfWidth >= data.size()");
 		}
 
 		for (size_t ii = 0; ii < QDCBounds.size(); ++ii) {
@@ -172,19 +177,53 @@ public:
 			this->TQDCSums.push_back(sum);
 		}
 
-		auto maxval = (inverttrace) ? std::min_element(this->data.begin(),this->data.end()) : std::max_element(this->data.begin(), this->data.end());
+		auto maxval = (inverttrace) ? std::min_element(this->data.begin(), this->data.end()) : std::max_element(this->data.begin(), this->data.end());
 		this->MaxInfo = std::make_pair(std::distance(this->data.begin(), maxval), *maxval);
 
 		this->data_baselinesub = std::vector<U>(data.size(), 0.0);
-		size_t idx = 0;
-		for (const auto& val : data) {
-			this->data_baselinesub[idx] = (inverttrace) ? this->PreTriggerBaselineInfo.first - static_cast<U>(val)
-								    : static_cast<U>(val) - this->PreTriggerBaselineInfo.first;
-			++idx;
+		if (not usecma) {
+			size_t idx = 0;
+			for (const auto& val : data) {
+				this->data_baselinesub[idx] = (inverttrace) ? this->PreTriggerBaselineInfo.first - static_cast<U>(val)
+									    : static_cast<U>(val) - this->PreTriggerBaselineInfo.first;
+				++idx;
+			}
+		}else{
+			// need to do CMA processing from M.F.
+			auto preload = this->data[0];
+			auto halfWidth = std::get<0>(cmaparams);
+			auto rejectThreshold = std::get<1>(cmaparams);
+			std::deque<float> movingbaseline_filter(halfWidth,preload);
+			float movingbaseline_value = preload * halfWidth;
+			for (size_t ii = 0; ii < halfWidth; ++ii) {
+				if (abs(static_cast<float>(this->data[ii]) - movingbaseline_value / static_cast<float>(movingbaseline_filter.size())) < rejectThreshold) {
+					movingbaseline_filter.push_back(this->data[ii]);
+					movingbaseline_value += this->data[ii];
+				}
+			}
+
+			for (size_t ii = 0; ii < this->data.size(); ++ii) {
+				if (abs(static_cast<float>(this->data[ii]) - movingbaseline_value / static_cast<float>(movingbaseline_filter.size())) < rejectThreshold) {
+					if ( ii + halfWidth < this->data.size() ){
+						if (movingbaseline_filter.size() >= halfWidth * 2 + 1) {
+							movingbaseline_value -= movingbaseline_filter.front();
+							movingbaseline_filter.pop_front();
+						}
+						movingbaseline_filter.push_back(this->data[ii]);
+						movingbaseline_value += this->data[ii];
+					} else {
+						movingbaseline_value -= movingbaseline_filter.front();
+						movingbaseline_filter.pop_front();
+					}
+				}
+				this->data_baselinesub[ii] = movingbaseline_value / static_cast<float>(movingbaseline_filter.size());
+			}
+			for (size_t ii = 0; ii < this->data.size(); ++ii) {
+				this->data_baselinesub[ii] = this->data[ii] - this->data_baselinesub[ii];
+			}
 		}
-
+		// we're going to assume this does not shift from the original position
 		this->BaselineSubMax = this->data_baselinesub[this->MaxInfo.first];
-
 		// std::cout << "bline: (" <<  PreTriggerBaselineInfo.first << ',' << PreTriggerBaselineInfo.second
 		//	  << ") max: (" << MaxInfo.first << ',' << MaxInfo.second
 		//	  << ") maxsub: " << BaselineSubMax
@@ -317,8 +356,7 @@ public:
 		U pre = this->IntegrateBaselineSubtractedTrace(start, mid);
 		U post = this->IntegrateBaselineSubtractedTrace(mid, end);
 
-		auto maxval = (inverttrace) ? std::min_element(this->data.begin() + start, this->data.begin() + end) : 
-					      std::max_element(this->data.begin() + start, this->data.begin() + end);
+		auto maxval = (inverttrace) ? std::min_element(this->data.begin() + start, this->data.begin() + end) : std::max_element(this->data.begin() + start, this->data.begin() + end);
 		this->PSDBoundedMaxInfo = std::make_pair(std::distance(this->data.begin(), maxval), *maxval);
 		this->BaselineSubPSDBoundedMax = this->data_baselinesub[this->PSDBoundedMaxInfo.first];
 

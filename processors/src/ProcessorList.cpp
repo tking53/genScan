@@ -20,6 +20,7 @@
 #include "YAPProcessor.hpp"
 
 #include "BSMProcessor.hpp"
+#include "DeuteratedLiquidScintillatorProcessor.hpp"
 #include "EBSSProcessor.hpp"
 #include "HagridProcessor.hpp"
 #include "IonizationChamberProcessor.hpp"
@@ -131,6 +132,8 @@ void ProcessorList::CreateProc(const std::string& name) {
 		known_processors.push_back(std::make_shared<ribf168Processor>(this->LogName));
 	} else if (name.compare("BSMProcessor") == 0) {
 		known_processors.push_back(std::make_shared<BSMProcessor>(this->LogName));
+	} else if (name.compare("DeuteratedLiquidScintillatorProcessor") == 0) {
+		known_processors.push_back(std::make_shared<DeuteratedLiquidScintillatorProcessor>(this->LogName));
 	} else if (name.compare("HagridProcessor") == 0) {
 		known_processors.push_back(std::make_shared<HagridProcessor>(this->LogName));
 	} else if (name.compare("DSSDProcessor") == 0) {

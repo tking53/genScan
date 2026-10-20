@@ -64,7 +64,7 @@ WaveformAnalyzer::~WaveformAnalyzer() {
 				if (boost::regex_match(evt->GetCMapID(), cmapmatch, s.first, boost::regex_constants::match_continuous)) {
 					try {
 						if (this->BannedGCID.find(evt->GetGlobalChannelID()) == this->BannedGCID.end()) {
-							evt->AnalyzeWaveform(s.second.PreTriggerBounds, s.second.PostTriggerBounds, s.second.QDCBounds, s.second.InvertTrace);
+							evt->AnalyzeWaveform(s.second.PreTriggerBounds, s.second.PostTriggerBounds, s.second.QDCBounds, s.second.InvertTrace, s.second.UseCMA, s.second.CMAValues);
 						} else {
 							continue;
 						}

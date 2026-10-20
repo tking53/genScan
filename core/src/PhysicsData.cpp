@@ -582,8 +582,8 @@ uint64_t PhysicsData::GetExternalTimeStamp() const {
 	return this->ExternalTimestamp;
 }
 
-void PhysicsData::AnalyzeWaveform(const std::pair<size_t, size_t>& pretriggerbounds, const std::pair<size_t, size_t>& posttriggerbounds, const std::vector<size_t>& tqdcbounds, const bool& inverttrace) {
-	this->Trace.AnalyzeWaveform(pretriggerbounds, posttriggerbounds, tqdcbounds, inverttrace);
+void PhysicsData::AnalyzeWaveform(const std::pair<size_t, size_t>& pretriggerbounds, const std::pair<size_t, size_t>& posttriggerbounds, const std::vector<size_t>& tqdcbounds, const bool& inverttrace, const bool& usecma, const std::tuple<size_t,float>& cmaparams) {
+	this->Trace.AnalyzeWaveform(pretriggerbounds, posttriggerbounds, tqdcbounds, inverttrace, usecma, cmaparams);
 }
 
 const std::pair<float, float>& PhysicsData::GetTracePreTriggerBaseline() const {

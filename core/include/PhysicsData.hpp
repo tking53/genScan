@@ -7,6 +7,7 @@
 #define __PHYSICS_DATA_HPP__
 
 #include <string>
+#include <tuple>
 #include <vector>
 #include <utility>
 #include <set>
@@ -380,7 +381,7 @@ public:
 	bool operator==(const PhysicsData&) const;
 	bool operator!=(const PhysicsData&) const;
 
-	void AnalyzeWaveform(const std::pair<size_t, size_t>&, const std::pair<size_t, size_t>&, const std::vector<size_t>&, const bool&);
+	void AnalyzeWaveform(const std::pair<size_t, size_t>&, const std::pair<size_t, size_t>&, const std::vector<size_t>&, const bool&, const bool&, const std::tuple<size_t,float>&);
 	const std::pair<float, float>& GetTracePreTriggerBaseline() const;
 	const std::pair<float, float>& GetTracePostTriggerBaseline() const;
 	const std::pair<size_t, uint16_t>& GetTraceMaxInfo() const;
