@@ -16,5 +16,5 @@ install(PROGRAMS ${CMAKE_BINARY_DIR}/scripts/CalibrateMTASSums DESTINATION scrip
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/GainMatchMTAS.py" GainMatchMTAS @ONLY)
 install(PROGRAMS ${CMAKE_BINARY_DIR}/scripts/GainMatchMTAS DESTINATION scripts)
 
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/SpecTCL_CalibrationRipper.py" SpecTCL_CalibrationRipper @ONLY)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/SpecTCL_CalibrationRipper.py" SpecTCLCalibrationRipper @ONLY)
 install(PROGRAMS ${CMAKE_BINARY_DIR}/scripts/SpecTCLCalibrationRipper DESTINATION scripts)
