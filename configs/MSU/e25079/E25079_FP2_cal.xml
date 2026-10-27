@@ -190,152 +190,152 @@
 				</Channel>
 			</Module>
 			<Module number="3" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
-				<Channel number="0" type="s3hen" subtype="B60" group="B" tags="U">
+				<Channel number="0" type="s3hen" subtype="B60" group="B" tags="U,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.225204 </Calibration>
 				</Channel>
-				<Channel number="1" type="s3hen" subtype="B61" group="B" tags="U">
+				<Channel number="1" type="s3hen" subtype="B61" group="B" tags="U,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.230769 </Calibration>
 				</Channel>
-				<Channel number="2" type="s3hen" subtype="B62" group="B" tags="U">
+				<Channel number="2" type="s3hen" subtype="B62" group="B" tags="U,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.230146 </Calibration>
 				</Channel>
-				<Channel number="3" type="s3hen" subtype="B73" group="B" tags="U">
+				<Channel number="3" type="s3hen" subtype="B73" group="B" tags="U,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.230158 </Calibration>
 				</Channel>
-				<Channel number="4" type="s3hen" subtype="B74" group="B" tags="U">
+				<Channel number="4" type="s3hen" subtype="B74" group="B" tags="U,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.229395 </Calibration>
 				</Channel>
-				<Channel number="5" type="s3hen" subtype="B84" group="B" tags="U">
+				<Channel number="5" type="s3hen" subtype="B84" group="B" tags="U,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.239566 </Calibration>
 				</Channel>
-				<Channel number="6" type="s3hen" subtype="B85" group="B" tags="U">
+				<Channel number="6" type="s3hen" subtype="B85" group="B" tags="U,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.229825 </Calibration>
 				</Channel>
-				<Channel number="7" type="s3hen" subtype="B86" group="B" tags="U">
+				<Channel number="7" type="s3hen" subtype="B86" group="B" tags="U,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.231384 </Calibration>
 				</Channel>
-				<Channel number="8" type="s3hen" subtype="B60" group="R" tags="D">
+				<Channel number="8" type="s3hen" subtype="B60" group="R" tags="D,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.222511 </Calibration>
 				</Channel>
-				<Channel number="9" type="s3hen" subtype="B61" group="R" tags="D">
+				<Channel number="9" type="s3hen" subtype="B61" group="R" tags="D,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.220544 </Calibration>
 				</Channel>
-				<Channel number="10" type="s3hen" subtype="B62" group="R" tags="D">
+				<Channel number="10" type="s3hen" subtype="B62" group="R" tags="D,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.226551 </Calibration>
 				</Channel>
-				<Channel number="11" type="s3hen" subtype="B73" group="R" tags="D">
+				<Channel number="11" type="s3hen" subtype="B73" group="R" tags="D,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.220950 </Calibration>
 				</Channel>
-				<Channel number="12" type="s3hen" subtype="B74" group="R" tags="D">
+				<Channel number="12" type="s3hen" subtype="B74" group="R" tags="D,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.232591 </Calibration>
 				</Channel>
-				<Channel number="13" type="s3hen" subtype="B84" group="R" tags="D">
+				<Channel number="13" type="s3hen" subtype="B84" group="R" tags="D,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.221286 </Calibration>
 				</Channel>
-				<Channel number="14" type="s3hen" subtype="B85" group="R" tags="D">
+				<Channel number="14" type="s3hen" subtype="B85" group="R" tags="D,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.236700 </Calibration>
 				</Channel>
-				<Channel number="15" type="s3hen" subtype="B86" group="R" tags="D">
+				<Channel number="15" type="s3hen" subtype="B86" group="R" tags="D,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.223637 </Calibration>
 				</Channel>
 			</Module>
 			<Module number="4" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
-				<Channel number="0" type="s3hen" subtype="C1" group="B" tags="U">
+				<Channel number="0" type="s3hen" subtype="C1" group="B" tags="U,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.222696 </Calibration>
 				</Channel>
-				<Channel number="1" type="s3hen" subtype="C5" group="B" tags="U">
+				<Channel number="1" type="s3hen" subtype="C5" group="B" tags="U,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.228835 </Calibration>
 				</Channel>
-				<Channel number="2" type="s3hen" subtype="C7" group="B" tags="U">
+				<Channel number="2" type="s3hen" subtype="C7" group="B" tags="U,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.232308 </Calibration>
 				</Channel>
-				<Channel number="3" type="s3hen" subtype="C9" group="B" tags="U">
+				<Channel number="3" type="s3hen" subtype="C9" group="B" tags="U,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.232461 </Calibration>
 				</Channel>
-				<Channel number="4" type="s3hen" subtype="C1" group="R" tags="D">
+				<Channel number="4" type="s3hen" subtype="C1" group="R" tags="D,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.226779 </Calibration>
 				</Channel>
-				<Channel number="5" type="s3hen" subtype="C5" group="R" tags="D">
+				<Channel number="5" type="s3hen" subtype="C5" group="R" tags="D,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.216510 </Calibration>
 				</Channel>
-				<Channel number="6" type="s3hen" subtype="C7" group="R" tags="D">
+				<Channel number="6" type="s3hen" subtype="C7" group="R" tags="D,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.220255 </Calibration>
 				</Channel>
-				<Channel number="7" type="s3hen" subtype="C9" group="R" tags="D">
+				<Channel number="7" type="s3hen" subtype="C9" group="R" tags="D,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.217129 </Calibration>
 				</Channel>
-				<Channel number="8" type="s3hen" subtype="C4" group="A" tags="U">
+				<Channel number="8" type="s3hen" subtype="C4" group="A" tags="U,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.217524 </Calibration>
 				</Channel>
-				<Channel number="9" type="s3hen" subtype="C6" group="A" tags="U">
+				<Channel number="9" type="s3hen" subtype="C6" group="A" tags="U,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.224767 </Calibration>
 				</Channel>
-				<Channel number="10" type="s3hen" subtype="C8" group="A" tags="U">
+				<Channel number="10" type="s3hen" subtype="C8" group="A" tags="U,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.236682 </Calibration>
 				</Channel>
-				<Channel number="11" type="s3hen" subtype="C12" group="A" tags="U">
+				<Channel number="11" type="s3hen" subtype="C12" group="A" tags="U,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.224398 </Calibration>
 				</Channel>
-				<Channel number="12" type="s3hen" subtype="C4" group="Q" tags="D">
+				<Channel number="12" type="s3hen" subtype="C4" group="Q" tags="D,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.229587 </Calibration>
 				</Channel>
-				<Channel number="13" type="s3hen" subtype="C6" group="Q" tags="D">
+				<Channel number="13" type="s3hen" subtype="C6" group="Q" tags="D,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.230227 </Calibration>
 				</Channel>
-				<Channel number="14" type="s3hen" subtype="C8" group="Q" tags="D">
+				<Channel number="14" type="s3hen" subtype="C8" group="Q" tags="D,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.234407 </Calibration>
 				</Channel>
-				<Channel number="15" type="s3hen" subtype="C12" group="Q" tags="D">
+				<Channel number="15" type="s3hen" subtype="C12" group="Q" tags="D,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.226688 </Calibration>
 				</Channel>
 			</Module>
 			<Module number="5" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
-				<Channel number="0" type="s3hen" subtype="B63" group="A" tags="U">
+				<Channel number="0" type="s3hen" subtype="B63" group="A" tags="U,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.220910 </Calibration>
 				</Channel>
-				<Channel number="1" type="s3hen" subtype="B64" group="A" tags="U">
+				<Channel number="1" type="s3hen" subtype="B64" group="A" tags="U,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.228775 </Calibration>
 				</Channel>
-				<Channel number="2" type="s3hen" subtype="B65" group="A" tags="U">
+				<Channel number="2" type="s3hen" subtype="B65" group="A" tags="U,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.225416 </Calibration>
 				</Channel>
-				<Channel number="3" type="s3hen" subtype="B75" group="A" tags="U">
+				<Channel number="3" type="s3hen" subtype="B75" group="A" tags="U,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.229397 </Calibration>
 				</Channel>
-				<Channel number="4" type="s3hen" subtype="B76" group="A" tags="U">
+				<Channel number="4" type="s3hen" subtype="B76" group="A" tags="U,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.223450 </Calibration>
 				</Channel>
-				<Channel number="5" type="s3hen" subtype="B87" group="A" tags="U">
+				<Channel number="5" type="s3hen" subtype="B87" group="A" tags="U,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.230634 </Calibration>
 				</Channel>
-				<Channel number="6" type="s3hen" subtype="B88" group="A" tags="U">
+				<Channel number="6" type="s3hen" subtype="B88" group="A" tags="U,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.230662 </Calibration>
 				</Channel>
-				<Channel number="7" type="s3hen" subtype="B89" group="A" tags="U">
+				<Channel number="7" type="s3hen" subtype="B89" group="A" tags="U,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.216547 </Calibration>
 				</Channel>
-				<Channel number="8" type="s3hen" subtype="B63" group="Q" tags="D">
+				<Channel number="8" type="s3hen" subtype="B63" group="Q" tags="D,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.227516 </Calibration>
 				</Channel>
-				<Channel number="9" type="s3hen" subtype="B64" group="Q" tags="D">
+				<Channel number="9" type="s3hen" subtype="B64" group="Q" tags="D,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.225821 </Calibration>
 				</Channel>
-				<Channel number="10" type="s3hen" subtype="B65" group="Q" tags="D">
+				<Channel number="10" type="s3hen" subtype="B65" group="Q" tags="D,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.234095 </Calibration>
 				</Channel>
-				<Channel number="11" type="s3hen" subtype="B75" group="Q" tags="D">
+				<Channel number="11" type="s3hen" subtype="B75" group="Q" tags="D,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.235925 </Calibration>
 				</Channel>
-				<Channel number="12" type="s3hen" subtype="B76" group="Q" tags="D">
+				<Channel number="12" type="s3hen" subtype="B76" group="Q" tags="D,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.227091 </Calibration>
 				</Channel>
-				<Channel number="13" type="s3hen" subtype="B87" group="Q" tags="D">
+				<Channel number="13" type="s3hen" subtype="B87" group="Q" tags="D,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.235947 </Calibration>
 				</Channel>
-				<Channel number="14" type="s3hen" subtype="B88" group="Q" tags="D">
+				<Channel number="14" type="s3hen" subtype="B88" group="Q" tags="D,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.232359 </Calibration>
 				</Channel>
-				<Channel number="15" type="s3hen" subtype="B89" group="Q" tags="D">
+				<Channel number="15" type="s3hen" subtype="B89" group="Q" tags="D,10atmShort">
 					<Calibration model="linear" min="0">0.0 0.238253 </Calibration>
 				</Channel>
 			</Module>

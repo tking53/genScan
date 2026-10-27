@@ -67,8 +67,11 @@ Super3HenProcessor::Super3HenProcessor(const std::string& log)
             holeTypeIndex = 0;
         } else if (tubeType == TubeType::VPMC) {
             holeTypeIndex = 1;
-        } else if (tubeType == TubeType::TenatmShort || tubeType == TubeType::FRIB4) {
+        } else if (tubeType == TubeType::TenatmShort) {
+            // TenatmShort includes both TenatmShort and FRIB10 tubes
             holeTypeIndex = 2;
+        } else if (tubeType == TubeType::FRIB4) {
+            holeTypeIndex = 3;
         }
         
    
@@ -246,7 +249,8 @@ void Super3HenProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) {
         preampAxis->SetBinLabel(bin, label);
     }
     
-    const std::array<const char*, 5> typeLabels = {"2in", "VPMC", "10atmShort", "FRIB", ""};
+    // Make sure to update the S3H_12 bin labels if new tube types are added to Super3HenProcessor::ClassifyTube()
+    const std::array<const char*, 5> typeLabels = {"2inch", "VPMC", "10atm-short", "4atm-short", "Unknown"};
     auto* typeAxis = (hismanager->GetPlot<TH2*>("S3H_12"))->GetYaxis();
     for (int i = 0; i < 5; ++i) {
         typeAxis->SetBinLabel(i + 1, typeLabels[i]);
@@ -266,6 +270,7 @@ void Super3HenProcessor::CleanupTree() {
 
 
 std::pair<Super3HenProcessor::TubeType, std::string> Super3HenProcessor::ClassifyTube(const PhysicsData& evt) const {
+    // Make sure to update the S3H_12 bin labels if new tube types are added here
     if (evt.HasTag("2in")) {
         return {TubeType::TwoIn, "2in"};
     }

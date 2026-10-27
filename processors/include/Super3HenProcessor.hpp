@@ -127,13 +127,13 @@ class Super3HenProcessor : public Processor {
     double PeakThresholdLow = 0.0;
     double PeakThresholdHigh = 65536.0;
     std::map<HoleKey, int> HoleBins;
-    // const std::array<HoleBinRange, 3> HoleTypeBinRanges = {{{0, 68}, {68, 116}, {184, 64}}};
-    const std::array<HoleBinRange, 3> HoleTypeBinRanges = {{
+    const std::array<HoleBinRange, 4> HoleTypeBinRanges = {{
         {0, TwoInBinCapacity},
         {TwoInBinCapacity, VPMCBinCapacity},
-        {TwoInBinCapacity + VPMCBinCapacity, TenAtmShortBinCapacity + FRIBBinCapacity}
+        {TwoInBinCapacity + VPMCBinCapacity, TenAtmShortBinCapacity},
+        {TwoInBinCapacity + VPMCBinCapacity + TenAtmShortBinCapacity, FRIBBinCapacity}
     }};
-    std::array<std::map<std::string, HoleMultiplicity>, 3> HoleMultiplicitiesByType;
+    std::array<std::map<std::string, HoleMultiplicity>, 4> HoleMultiplicitiesByType;
     std::map<std::string, HolePosition> MechanicalHolePositions;
     std::array<int, TubeTypeCount> HoleBinCounts{};
     TH2Poly* S3H_100 = nullptr;
