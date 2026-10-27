@@ -149,6 +149,15 @@ Super3HenProcessor::Super3HenProcessor(const std::string& log)
                 this->S3H_102->Fill(position->second.x, position->second.y, 1.0);
             }
         }
+        if (position != this->MechanicalHolePositions.end()) {
+            this->S3H_110->Fill(position->second.x, position->second.y, 1.0);
+            if (energy >= this->CoarseThreshold) {
+                this->S3H_111->Fill(position->second.x, position->second.y, 1.0);
+            }
+            if (energy >= this->PeakThresholdLow && energy <= this->PeakThresholdHigh) {
+                this->S3H_112->Fill(position->second.x, position->second.y, 1.0);
+            }
+        }
         
         S3H_12->Fill(energy, typeIndex);
 
@@ -218,9 +227,12 @@ void Super3HenProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) {
     hismanager->RegisterPlot<TH2F>("S3H_15", "3He peak-window hit multiplicity by moderator hole; Hole ID / Direction; Hits per event", this->h2dsettings.at(15));
     
 	
-    this->S3H_100 = hismanager->RegisterPlot("S3H_100", "3Hen hit map; X (drawing units); Y (drawing units)");
-	this->S3H_101 = hismanager->RegisterPlot("S3H_101", "3Hen coarse-window hit multiplicity by detector position; X (drawing units); Y (drawing units)");
-	this->S3H_102 = hismanager->RegisterPlot("S3H_102", "3Hen peak-window hit multiplicity by detector position; X (drawing units); Y (drawing units)");
+    this->S3H_100 = hismanager->RegisterPlot("S3H_100", "3Hen hit map (Downstream only); X (drawing units); Y (drawing units)");
+	this->S3H_101 = hismanager->RegisterPlot("S3H_101", "3Hen coarse-window hit multiplicity by detector position (Downstream only); X (drawing units); Y (drawing units)");
+	this->S3H_102 = hismanager->RegisterPlot("S3H_102", "3Hen peak-window hit multiplicity by detector position (Downstream only); X (drawing units); Y (drawing units)");
+    this->S3H_110 = hismanager->RegisterPlot("S3H_110", "3Hen Complete hit map; X (drawing units); Y (drawing units)");
+    this->S3H_111 = hismanager->RegisterPlot("S3H_111", "3Hen Complete coarse-window hit map; X (drawing units); Y (drawing units)");
+    this->S3H_112 = hismanager->RegisterPlot("S3H_112", "3Hen Complete peak-window hit map; X (drawing units); Y (drawing units)");
     constexpr int polygonVertices = 24;
     const double pi = TMath::Pi();
     for (const auto& row : this->MechanicalHoleRows) {
@@ -238,6 +250,9 @@ void Super3HenProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) {
             this->S3H_100->AddBin(polygonVertices, polygonX.data(), polygonY.data());
 			this->S3H_101->AddBin(polygonVertices, polygonX.data(), polygonY.data()); 
 			this->S3H_102->AddBin(polygonVertices, polygonX.data(), polygonY.data());   
+            this->S3H_110->AddBin(polygonVertices, polygonX.data(), polygonY.data());
+            this->S3H_111->AddBin(polygonVertices, polygonX.data(), polygonY.data());
+            this->S3H_112->AddBin(polygonVertices, polygonX.data(), polygonY.data());
             this->MechanicalHolePositions.emplace(holeID, HolePosition{centerX, row.y});
         }
     }

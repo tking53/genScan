@@ -139,6 +139,9 @@ class Super3HenProcessor : public Processor {
     TH2Poly* S3H_100 = nullptr;
     TH2Poly* S3H_101 = nullptr;
     TH2Poly* S3H_102 = nullptr;
+    TH2Poly* S3H_110 = nullptr;
+    TH2Poly* S3H_111 = nullptr;
+    TH2Poly* S3H_112 = nullptr;
     std::vector<ProcessorStruct::S3H> s3h_vec;
 };
 
