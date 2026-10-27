@@ -11,6 +11,7 @@
 #include "Super3HenStruct.hpp"
 
 class TH2Poly;
+class TGraph;
 
 class Super3HenProcessor : public Processor {
     public:
@@ -142,6 +143,7 @@ class Super3HenProcessor : public Processor {
     TH2Poly* S3H_110 = nullptr;
     TH2Poly* S3H_111 = nullptr;
     TH2Poly* S3H_112 = nullptr;
+    std::array<std::map<std::string, TGraph*>, 6> EmptyHoleOutlines;
     std::vector<ProcessorStruct::S3H> s3h_vec;
 };
 

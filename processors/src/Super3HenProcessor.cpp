@@ -4,9 +4,12 @@
 #include "HistogramManager.hpp"
 
 #include <TAxis.h>
+#include <TColor.h>
+#include <TGraph.h>
 #include <TH2.h>
 #include <TH2F.h>
 #include <TH2Poly.h>
+#include <TList.h>
 #include <TMath.h>
 #include <TTree.h>
 
@@ -51,6 +54,17 @@ Super3HenProcessor::Super3HenProcessor(const std::string& log)
     auto S3H_14 = hismanager->GetPlot<TH2*>("S3H_14");
     auto S3H_15 = hismanager->GetPlot<TH2*>("S3H_15");
     auto S3H_12 = hismanager->GetPlot<TH2*>("S3H_12");
+
+    const auto removeEmptyOutline = [](TH2Poly* histogram,
+                                       std::map<std::string, TGraph*>& outlines,
+                                       const std::string& holeID) {
+        const auto outline = outlines.find(holeID);
+        if (outline != outlines.end()) {
+            histogram->GetListOfFunctions()->Remove(outline->second);
+            delete outline->second;
+            outlines.erase(outline);
+        }
+    };
     
     ProcessorStruct::S3H rootstruct = ProcessorStruct::DEFAULT_S3H_STRUCT;
 
@@ -142,20 +156,26 @@ Super3HenProcessor::Super3HenProcessor(const std::string& log)
         const auto position = this->MechanicalHolePositions.find(holeID);
         if (!evt->HasTag("U") && position != this->MechanicalHolePositions.end()) {
             this->S3H_100->Fill(position->second.x, position->second.y, 1.0);
+            removeEmptyOutline(this->S3H_100, this->EmptyHoleOutlines[0], holeID);
             if (energy >= this->CoarseThreshold) {
                 this->S3H_101->Fill(position->second.x, position->second.y, 1.0);
+                removeEmptyOutline(this->S3H_101, this->EmptyHoleOutlines[1], holeID);
             }
             if (energy >= this->PeakThresholdLow && energy <= this->PeakThresholdHigh) {
                 this->S3H_102->Fill(position->second.x, position->second.y, 1.0);
+                removeEmptyOutline(this->S3H_102, this->EmptyHoleOutlines[2], holeID);
             }
         }
         if (position != this->MechanicalHolePositions.end()) {
             this->S3H_110->Fill(position->second.x, position->second.y, 1.0);
+            removeEmptyOutline(this->S3H_110, this->EmptyHoleOutlines[3], holeID);
             if (energy >= this->CoarseThreshold) {
                 this->S3H_111->Fill(position->second.x, position->second.y, 1.0);
+                removeEmptyOutline(this->S3H_111, this->EmptyHoleOutlines[4], holeID);
             }
             if (energy >= this->PeakThresholdLow && energy <= this->PeakThresholdHigh) {
                 this->S3H_112->Fill(position->second.x, position->second.y, 1.0);
+                removeEmptyOutline(this->S3H_112, this->EmptyHoleOutlines[5], holeID);
             }
         }
         
@@ -233,6 +253,10 @@ void Super3HenProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) {
     this->S3H_110 = hismanager->RegisterPlot("S3H_110", "3Hen Complete hit map; X (drawing units); Y (drawing units)");
     this->S3H_111 = hismanager->RegisterPlot("S3H_111", "3Hen Complete coarse-window hit map; X (drawing units); Y (drawing units)");
     this->S3H_112 = hismanager->RegisterPlot("S3H_112", "3Hen Complete peak-window hit map; X (drawing units); Y (drawing units)");
+    const std::array<TH2Poly*, 6> spatialMaps = {
+        this->S3H_100, this->S3H_101, this->S3H_102,
+        this->S3H_110, this->S3H_111, this->S3H_112
+    };
     constexpr int polygonVertices = 24;
     const double pi = TMath::Pi();
     for (const auto& row : this->MechanicalHoleRows) {
@@ -254,6 +278,25 @@ void Super3HenProcessor::DeclarePlots(PLOTS::PlotRegistry* hismanager) {
             this->S3H_111->AddBin(polygonVertices, polygonX.data(), polygonY.data());
             this->S3H_112->AddBin(polygonVertices, polygonX.data(), polygonY.data());
             this->MechanicalHolePositions.emplace(holeID, HolePosition{centerX, row.y});
+
+            std::array<double, polygonVertices + 1> outlineX{};
+            std::array<double, polygonVertices + 1> outlineY{};
+            for (int vertex = 0; vertex <= polygonVertices; ++vertex) {
+                const double angle = 2.0 * pi * vertex / polygonVertices;
+                outlineX[vertex] = centerX + radius * std::cos(angle);
+                outlineY[vertex] = row.y + radius * std::sin(angle);
+            }
+            for (size_t plotIndex = 0; plotIndex < this->EmptyHoleOutlines.size(); ++plotIndex) {
+                auto* outline = new TGraph(polygonVertices + 1, outlineX.data(), outlineY.data());
+                const std::string outlineName = "Empty_" + std::to_string(plotIndex) + "_" + holeID;
+                outline->SetName(outlineName.c_str());
+                outline->SetFillColor(kWhite);
+                outline->SetFillStyle(1001);
+                outline->SetLineColor(kBlack);
+                outline->SetLineWidth(1);
+                (spatialMaps[plotIndex])->GetListOfFunctions()->Add(outline, "FL");
+                this->EmptyHoleOutlines[plotIndex].emplace(holeID, outline);
+            }
         }
     }
     
