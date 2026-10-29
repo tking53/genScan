@@ -25,6 +25,9 @@ target_compile_definitions(GenSet2Root PRIVATE USE_ROOT_OUTPUT)
 target_link_libraries(GenSet2Root PRIVATE ${ROOT_LIBRARIES})
 list(APPEND EXE_LIST GenSet2Root)
 
+add_executable(GenResetDelayTest src/resetdelay_test.cpp)
+list(APPEND EXE_LIST GenResetDelayTest)
+
 if( EXTERNAL_DEPS )
 	foreach(CURREXE ${EXE_LIST})
 		add_dependencies(${CURREXE} ${EXTERNAL_DEPS})	
