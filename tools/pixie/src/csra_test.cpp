@@ -92,7 +92,8 @@ bool Test(unsigned int input_) {
 		     << input_ << ")";
 	spdlog::info("{}", input_stream.str());
 	if (!csra_txt.empty()) {
-		spdlog::info("  Bit  On?  Value       Total\t  Bit Function");
+		spdlog::info("  {:>3} {:>3}  {:<12} {:<10} {}", "Bit", "On?",
+			     "Value", "Total", "Bit Function");
 	} else {
 		spdlog::info("  Bit   On?\tValue\t   Total");
 	}
@@ -105,8 +106,8 @@ bool Test(unsigned int input_) {
 			bit_function = "";
 		}
 
-		const auto line = fmt::format("  {:02}\t{}   {:<12}{:<10}{}",
-					      i,
+		const auto line = fmt::format("  {:>3} {:>3}  {:<12} {:<10} {}",
+					      fmt::format("{:02}", i),
 					      active_bits[i] ? 1 : 0,
 					      bit_values[i],
 					      running_total[i],
