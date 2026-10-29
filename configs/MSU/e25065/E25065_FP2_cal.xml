@@ -1,0 +1,1005 @@
+<?xml version="1.0"?>
+<Configuration>
+	<Author>
+		<Name>T. T. King</Name>
+		<Date>October 27th, 2026</Date>
+		<Email>default AT gmail</Email>
+	</Author>
+	<Description> Initial XML for E25065 FP2 channel map</Description>
+	<Global EventWidth="2" EventWidthUnit="us" CorrelationType="rolling-trigger" />
+	<DetectorDriver>
+		<Processor name="PidProcessor" TofFlip="true">
+			<!-- <Histogram id="01" nbinx="2000" xlow="-200" xhigh="0" /> -->
+			<!-- <Histogram id="02" nbinx="2000" xlow="-200" xhigh="0" /> -->
+			<!-- <Histogram id="03" nbinx="2000" xlow="-200" xhigh="0" /> -->
+			<!-- <Histogram id="04" nbinx="2000" xlow="-200" xhigh="0" /> -->
+			<!-- <Histogram id="05" nbinx="2000" xlow="-200" xhigh="0" /> -->
+			<!-- <Histogram id="06" nbinx="2000" xlow="-200" xhigh="0" /> -->
+			<!-- <Histogram id="07" nbinx="2000" xlow="-200" xhigh="0" /> -->
+			<!-- <Histogram id="08" nbinx="2000" xlow="-200" xhigh="0" /> -->
+			<!-- <Histogram id="09" xlow="-150" xhigh="-145" ylow="10000" yhigh="13000" nbinsx="50" nbinsy="6000" /> -->
+			<!-- <Histogram id="10" xlow="-150" xhigh="-145" ylow="0" yhigh="17000" nbinsx="50" nbinsy="17000" /> -->
+			<!-- <Histogram id="11" xlow="-150" xhigh="-145" ylow="0" yhigh="13000" nbinsx="50" nbinsy="13000" /> -->
+			<!-- <Histogram id="12" xlow="-150" xhigh="-145" ylow="0" yhigh="13000" nbinsx="50" nbinsy="13000" /> -->
+			<!-- <Histogram id="13" xlow="-152" xhigh="-147" ylow="10000" yhigh="13000" nbinsx="50" nbinsy="6000" /> -->
+			<!-- <Histogram id="14" xlow="-152" xhigh="-147" ylow="0" yhigh="17000" nbinsx="50" nbinsy="17000" /> -->
+			<!-- <Histogram id="15" xlow="-152" xhigh="-147" ylow="0" yhigh="13000" nbinsx="50" nbinsy="13000" /> -->
+			<!-- <Histogram id="16" xlow="-152" xhigh="-147" ylow="0" yhigh="17000" nbinsx="50" nbinsy="17000" /> -->
+			<!-- <Histogram id="17" xlow="-143" xhigh="-138" ylow="10000" yhigh="13000" nbinsx="50" nbinsy="6000" /> -->
+			<!-- <Histogram id="18" xlow="-143" xhigh="-138" ylow="0" yhigh="17000" nbinsx="50" nbinsy="17000" /> -->
+			<!-- <Histogram id="19" xlow="-143" xhigh="-138" ylow="0" yhigh="13000" nbinsx="50" nbinsy="13000" /> -->
+			<!-- <Histogram id="20" xlow="-143" xhigh="-138" ylow="0" yhigh="17000" nbinsx="50" nbinsy="17000" /> -->
+			<!-- <Histogram id="21" xlow="-143" xhigh="-138" ylow="10000" yhigh="13000" nbinsx="50" nbinsy="6000" /> -->
+			<!-- <Histogram id="22" xlow="-143" xhigh="-138" ylow="0" yhigh="17000" nbinsx="50" nbinsy="17000" /> -->
+			<!-- <Histogram id="23" xlow="-143" xhigh="-138" ylow="0" yhigh="13000" nbinsx="50" nbinsy="13000" /> -->
+			<!-- <Histogram id="24" xlow="-143" xhigh="-138" ylow="0" yhigh="17000" nbinsx="50" nbinsy="17000" /> -->
+			<!-- <Histogram id="3000" xlow="-20" xhigh="20" ylow="-20" yhigh="20" nbinsx="400" nbinsy="400" /> -->
+			<!-- <Histogram id="3010" xlow="-20" xhigh="20" ylow="-20" yhigh="20" nbinsx="400" nbinsy="400" /> -->
+			<!-- <Histogram id="4000" xlow="-20" xhigh="20" ylow="-20" yhigh="20" nbinsx="400" nbinsy="400" /> -->
+			<!-- <Histogram id="4010" xlow="-20" xhigh="20" ylow="-20" yhigh="20" nbinsx="400" nbinsy="400" /> -->
+		</Processor>
+		<Processor name="PSPMTProcessor" method="corners" >
+			<HighGain dyLow="30" dyHigh="65536"/>
+			<LowGain dyLow="0" dyHigh="65536"/>
+		</Processor>
+
+		<Processor name="CloverProcessor" />
+		<Processor name="Super3HenProcessor" coarse_n_threshold="180" peak_threshold_low="700" peak_threshold_high="800" >
+			<Histgram id="01" nbinsx="10000" xlow="0" xhigh="10000" />
+		</Processor>
+	</DetectorDriver>
+	<Map>
+		<Crate number="0">
+			<Module number="0" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
+				<Channel number="0" type="pspmt" subtype="dynode" tags="highgain">
+					<Calibration model="unknown" min="0"> 0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="1" type="pspmt" subtype="dynode" tags="lowgain">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="2" type="pid" subtype="ppac" group="0" tags="db4,left,tas">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="3" type="pid" subtype="ppac" group="0" tags="db4,right,tas">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="4" type="pid" subtype="ppac" group="0" tags="db4,up,tas">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="5" type="pid" subtype="ppac" group="0" tags="db4,down,tas">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="6" type="pid" subtype="scint" group="0" tags="db3,left,tas">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="7" type="pid" subtype="scint" group="0" tags="db3,right,tas">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="8" type="pid" subtype="ppac" group="0" tags="db3,anode,tas">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<!-- This channel was replaced with the DB5 Scint signal at the level of the DataU patch panel -->
+				<!-- <Channel number="9" type="pid" subtype="ppac" group="1" tags="db3,anode,tas"> -->
+				<!-- 	<Calibration model="linear" min="0">0.0 1.0</Calibration> -->
+				<!-- </Channel> -->
+				<Channel number="9" type="pid" subtype="scint" group="0" tags="db5,up,tas">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+					</Channel>
+				<Channel number="10" type="pid" subtype="scint" group="" tags="fp2,left,tas">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="11" type="pid" subtype="scint" group="" tags="fp2,right,tas">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="12" type="veto" subtype="fit" group="0" tags="L">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="13" type="veto" subtype="fit" group="1" tags="R">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="14" type="veto" subtype="rit" group="0" tags="">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="15" type="generic" subtype="pulser" group="" tags="">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+			</Module>
+			<Module number="1" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
+				<Channel number="0" type="pspmt" subtype="anode" group="xb" tags="highgain">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="1" type="pspmt" subtype="anode" group="ya" tags="highgain">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="2" type="pspmt" subtype="anode" group="yb" tags="highgain">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="3" type="pspmt" subtype="anode" group="xa" tags="highgain">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="4" type="pspmt" subtype="anode" group="xb" tags="lowgain">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="5" type="pspmt" subtype="anode" group="ya" tags="lowgain">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="6" type="pspmt" subtype="anode" group="yb" tags="lowgain">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="7" type="pspmt" subtype="anode" group="xa" tags="lowgain">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="8" type="pid" subtype="ppac" group="0" tags="db3,left,tas">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="9" type="pid" subtype="ppac" group="0" tags="db3,right,tas">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="10" type="pid" subtype="ppac" group="0" tags="db3,up,tas">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="11" type="pid" subtype="ppac" group="0" tags="db3,down,tas">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="12" type="pid" subtype="ppac" group="1" tags="db3,left,tas">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="13" type="pid" subtype="ppac" group="1" tags="db3,right,tas">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="14" type="pid" subtype="ppac" group="1" tags="db3,up,tas">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="15" type="pid" subtype="ppac" group="1" tags="db3,down,tas">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+			</Module>
+			<Module number="2" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
+				<Channel number="0" type="clover" subtype="1" group="U" tags="">
+					<Calibration model="linear" min="0">-0.411474 0.196786</Calibration>
+				</Channel>
+				<Channel number="1" type="clover" subtype="1" group="B" tags="">
+					<Calibration model="linear" min="0">-0.454916 0.196378</Calibration>
+				</Channel>
+				<Channel number="2" type="clover" subtype="1" group="G" tags="">
+					<Calibration model="linear" min="0">-0.267937 0.195167</Calibration>
+				</Channel>
+				<Channel number="3" type="clover" subtype="1" group="R" tags="">
+					<Calibration model="linear" min="0">-1.7939 0.19579</Calibration>
+				</Channel>
+				<Channel number="4" type="clover" subtype="2" group="U" tags="">
+					<Calibration model="linear" min="0">-2.22456 0.193924</Calibration>
+				</Channel>
+				<Channel number="5" type="clover" subtype="2" group="B" tags="">
+					<Calibration model="linear" min="0">0.203156 0.196296</Calibration>
+				</Channel>
+				<Channel number="6" type="clover" subtype="2" group="G" tags="">
+					<Calibration model="linear" min="0">1.74152 0.188913</Calibration>
+				</Channel>
+				<Channel number="7" type="clover" subtype="2" group="R" tags="">
+					<Calibration model="linear" min="0">-1.20176 0.193462</Calibration>
+				</Channel>
+				<!-- These pins will likely not be used, however they are cabled up so there might be a random noise hit-->
+				<Channel number="12" type="pid" subtype="pin" group="1" tags="fp1,tas">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="13" type="pid" subtype="pin" group="2" tags="fp1,tas">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="14" type="pid" subtype="pin" group="1" tags="fp2,tas"> 
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="15" type="pid" subtype="pin" group="2" tags="fp2,tas">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+			</Module>
+			<Module number="3" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
+				<Channel number="0" type="s3hen" subtype="B60" group="B" tags="U,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.225204 </Calibration>
+				</Channel>
+				<Channel number="1" type="s3hen" subtype="B61" group="B" tags="U,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.230769 </Calibration>
+				</Channel>
+				<Channel number="2" type="s3hen" subtype="B62" group="B" tags="U,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.230146 </Calibration>
+				</Channel>
+				<Channel number="3" type="s3hen" subtype="B73" group="B" tags="U,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.230158 </Calibration>
+				</Channel>
+				<Channel number="4" type="s3hen" subtype="B74" group="B" tags="U,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.229395 </Calibration>
+				</Channel>
+				<Channel number="5" type="s3hen" subtype="B84" group="B" tags="U,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.239566 </Calibration>
+				</Channel>
+				<Channel number="6" type="s3hen" subtype="B85" group="B" tags="U,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.229825 </Calibration>
+				</Channel>
+				<Channel number="7" type="s3hen" subtype="B86" group="B" tags="U,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.231384 </Calibration>
+				</Channel>
+				<Channel number="8" type="s3hen" subtype="B60" group="R" tags="D,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.222511 </Calibration>
+				</Channel>
+				<Channel number="9" type="s3hen" subtype="B61" group="R" tags="D,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.220544 </Calibration>
+				</Channel>
+				<Channel number="10" type="s3hen" subtype="B62" group="R" tags="D,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.226551 </Calibration>
+				</Channel>
+				<Channel number="11" type="s3hen" subtype="B73" group="R" tags="D,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.220950 </Calibration>
+				</Channel>
+				<Channel number="12" type="s3hen" subtype="B74" group="R" tags="D,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.232591 </Calibration>
+				</Channel>
+				<Channel number="13" type="s3hen" subtype="B84" group="R" tags="D,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.221286 </Calibration>
+				</Channel>
+				<Channel number="14" type="s3hen" subtype="B85" group="R" tags="D,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.236700 </Calibration>
+				</Channel>
+				<Channel number="15" type="s3hen" subtype="B86" group="R" tags="D,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.223637 </Calibration>
+				</Channel>
+			</Module>
+			<Module number="4" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
+				<Channel number="0" type="s3hen" subtype="C1" group="B" tags="U,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.222696 </Calibration>
+				</Channel>
+				<Channel number="1" type="s3hen" subtype="C5" group="B" tags="U,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.228835 </Calibration>
+				</Channel>
+				<Channel number="2" type="s3hen" subtype="C7" group="B" tags="U,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.232308 </Calibration>
+				</Channel>
+				<Channel number="3" type="s3hen" subtype="C9" group="B" tags="U,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.232461 </Calibration>
+				</Channel>
+				<Channel number="4" type="s3hen" subtype="C1" group="R" tags="D,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.226779 </Calibration>
+				</Channel>
+				<Channel number="5" type="s3hen" subtype="C5" group="R" tags="D,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.216510 </Calibration>
+				</Channel>
+				<Channel number="6" type="s3hen" subtype="C7" group="R" tags="D,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.220255 </Calibration>
+				</Channel>
+				<Channel number="7" type="s3hen" subtype="C9" group="R" tags="D,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.217129 </Calibration>
+				</Channel>
+				<Channel number="8" type="s3hen" subtype="C4" group="A" tags="U,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.217524 </Calibration>
+				</Channel>
+				<Channel number="9" type="s3hen" subtype="C6" group="A" tags="U,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.224767 </Calibration>
+				</Channel>
+				<Channel number="10" type="s3hen" subtype="C8" group="A" tags="U,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.236682 </Calibration>
+				</Channel>
+				<Channel number="11" type="s3hen" subtype="C12" group="A" tags="U,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.224398 </Calibration>
+				</Channel>
+				<Channel number="12" type="s3hen" subtype="C4" group="Q" tags="D,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.229587 </Calibration>
+				</Channel>
+				<Channel number="13" type="s3hen" subtype="C6" group="Q" tags="D,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.230227 </Calibration>
+				</Channel>
+				<Channel number="14" type="s3hen" subtype="C8" group="Q" tags="D,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.234407 </Calibration>
+				</Channel>
+				<Channel number="15" type="s3hen" subtype="C12" group="Q" tags="D,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.226688 </Calibration>
+				</Channel>
+			</Module>
+			<Module number="5" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
+				<Channel number="0" type="s3hen" subtype="B63" group="A" tags="U,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.220910 </Calibration>
+				</Channel>
+				<Channel number="1" type="s3hen" subtype="B64" group="A" tags="U,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.228775 </Calibration>
+				</Channel>
+				<Channel number="2" type="s3hen" subtype="B65" group="A" tags="U,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.225416 </Calibration>
+				</Channel>
+				<Channel number="3" type="s3hen" subtype="B75" group="A" tags="U,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.229397 </Calibration>
+				</Channel>
+				<Channel number="4" type="s3hen" subtype="B76" group="A" tags="U,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.223450 </Calibration>
+				</Channel>
+				<Channel number="5" type="s3hen" subtype="B87" group="A" tags="U,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.230634 </Calibration>
+				</Channel>
+				<Channel number="6" type="s3hen" subtype="B88" group="A" tags="U,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.230662 </Calibration>
+				</Channel>
+				<Channel number="7" type="s3hen" subtype="B89" group="A" tags="U,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.216547 </Calibration>
+				</Channel>
+				<Channel number="8" type="s3hen" subtype="B63" group="Q" tags="D,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.227516 </Calibration>
+				</Channel>
+				<Channel number="9" type="s3hen" subtype="B64" group="Q" tags="D,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.225821 </Calibration>
+				</Channel>
+				<Channel number="10" type="s3hen" subtype="B65" group="Q" tags="D,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.234095 </Calibration>
+				</Channel>
+				<Channel number="11" type="s3hen" subtype="B75" group="Q" tags="D,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.235925 </Calibration>
+				</Channel>
+				<Channel number="12" type="s3hen" subtype="B76" group="Q" tags="D,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.227091 </Calibration>
+				</Channel>
+				<Channel number="13" type="s3hen" subtype="B87" group="Q" tags="D,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.235947 </Calibration>
+				</Channel>
+				<Channel number="14" type="s3hen" subtype="B88" group="Q" tags="D,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.232359 </Calibration>
+				</Channel>
+				<Channel number="15" type="s3hen" subtype="B89" group="Q" tags="D,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.238253 </Calibration>
+				</Channel>
+			</Module>
+			<Module number="6" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
+				<Channel number="0" type="pid" subtype="ppac" group="0" tags="db5,left,tas">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="1" type="pid" subtype="ppac" group="0" tags="db5,right,tas">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="2" type="pid" subtype="ppac" group="0" tags="db5,up,tas">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="3" type="pid" subtype="ppac" group="0" tags="db5,down,tas">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="4" type="pid" subtype="ppac" group="1" tags="db5,left,tas">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="5" type="pid" subtype="ppac" group="1" tags="db5,right,tas">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="6" type="pid" subtype="ppac" group="1" tags="db5,up,tas">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="7" type="pid" subtype="ppac" group="1" tags="db5,down,tas">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+			</Module>
+		</Crate>
+		<Crate number="1">
+			<Module number="0" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
+				<Channel number="0" type="s3hen" subtype="A3" group="D" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.104430 </Calibration>
+				</Channel>
+				<Channel number="1" type="s3hen" subtype="A4" group="D" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.096601 </Calibration>
+				</Channel>
+				<Channel number="2" type="s3hen" subtype="A7" group="D" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.104423 </Calibration>
+				</Channel>
+				<Channel number="3" type="s3hen" subtype="A8" group="D" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.108939 </Calibration>
+				</Channel>
+				<Channel number="4" type="s3hen" subtype="A11" group="D" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.096911 </Calibration>
+				</Channel>
+				<Channel number="5" type="s3hen" subtype="A13" group="D" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.096244 </Calibration>
+				</Channel>
+				<Channel number="6" type="s3hen" subtype="A14" group="D" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.096183 </Calibration>
+				</Channel>
+				<Channel number="7" type="s3hen" subtype="A17" group="D" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.095890 </Calibration>
+				</Channel>
+				<Channel number="8" type="s3hen" subtype="A18" group="D" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.096983 </Calibration>
+				</Channel>
+				<Channel number="9" type="s3hen" subtype="A19" group="D" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.098259 </Calibration>
+				</Channel>
+				<Channel number="10" type="s3hen" subtype="A23" group="D" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.109943 </Calibration>
+				</Channel>
+				<Channel number="11" type="s3hen" subtype="A24" group="D" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.098548 </Calibration>
+				</Channel>
+				<Channel number="12" type="s3hen" subtype="A25" group="D" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.099677 </Calibration>
+				</Channel>
+				<Channel number="13" type="s3hen" subtype="A29" group="D" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.099311 </Calibration>
+				</Channel>
+				<Channel number="14" type="s3hen" subtype="A30" group="D" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.097631 </Calibration>
+				</Channel>
+				<Channel number="15" type="s3hen" subtype="A31" group="D" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.097971 </Calibration>
+				</Channel>
+			</Module>
+			<Module number="1" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
+				<Channel number="0" type="s3hen" subtype="A5" group="E" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.096774 </Calibration>
+				</Channel>
+				<Channel number="1" type="s3hen" subtype="A6" group="E" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.095206 </Calibration>
+				</Channel>
+				<Channel number="2" type="s3hen" subtype="A9" group="E" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.093602 </Calibration>
+				</Channel>
+				<Channel number="3" type="s3hen" subtype="A10" group="E" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.106236 </Calibration>
+				</Channel>
+				<Channel number="4" type="s3hen" subtype="A12" group="E" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.104107 </Calibration>
+				</Channel>
+				<Channel number="5" type="s3hen" subtype="A15" group="E" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.100853 </Calibration>
+				</Channel>
+				<Channel number="6" type="s3hen" subtype="A16" group="E" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.104456 </Calibration>
+				</Channel>
+				<Channel number="7" type="s3hen" subtype="A20" group="E" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.097488 </Calibration>
+				</Channel>
+				<Channel number="8" type="s3hen" subtype="A21" group="E" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.100158 </Calibration>
+				</Channel>
+				<Channel number="9" type="s3hen" subtype="A22" group="E" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.096546 </Calibration>
+				</Channel>
+				<Channel number="10" type="s3hen" subtype="A26" group="E" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.097608 </Calibration>
+				</Channel>
+				<Channel number="11" type="s3hen" subtype="A27" group="E" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.097021 </Calibration>
+				</Channel>
+				<Channel number="12" type="s3hen" subtype="A28" group="E" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.097104 </Calibration>
+				</Channel>
+				<Channel number="13" type="s3hen" subtype="A32" group="E" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.098303 </Calibration>
+				</Channel>
+				<Channel number="14" type="s3hen" subtype="A33" group="E" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.094541 </Calibration>
+				</Channel>
+				<Channel number="15" type="s3hen" subtype="A34" group="E" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.093606 </Calibration>
+				</Channel>
+			</Module>
+			<Module number="2" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
+				<Channel number="0" type="s3hen" subtype="A35" group="F" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.101226 </Calibration>
+				</Channel>
+				<Channel number="1" type="s3hen" subtype="A36" group="F" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.099436 </Calibration>
+				</Channel>
+				<Channel number="2" type="s3hen" subtype="A37" group="F" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.097550 </Calibration>
+				</Channel>
+				<Channel number="3" type="s3hen" subtype="A41" group="F" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.101093 </Calibration>
+				</Channel>
+				<Channel number="4" type="s3hen" subtype="A42" group="F" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.110146 </Calibration>
+				</Channel>
+				<Channel number="5" type="s3hen" subtype="A43" group="F" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.099503 </Calibration>
+				</Channel>
+				<Channel number="6" type="s3hen" subtype="A47" group="F" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.099367 </Calibration>
+				</Channel>
+				<Channel number="7" type="s3hen" subtype="A48" group="F" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.098750 </Calibration>
+				</Channel>
+				<Channel number="8" type="s3hen" subtype="A49" group="F" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.100614 </Calibration>
+				</Channel>
+				<Channel number="9" type="s3hen" subtype="A53" group="F" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.102522 </Calibration>
+				</Channel>
+				<Channel number="10" type="s3hen" subtype="A54" group="F" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.100422 </Calibration>
+				</Channel>
+				<Channel number="11" type="s3hen" subtype="A57" group="F" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.099875 </Calibration>
+				</Channel>
+				<Channel number="12" type="s3hen" subtype="A59" group="F" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.099515 </Calibration>
+				</Channel>
+				<Channel number="13" type="s3hen" subtype="A60" group="F" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.099321 </Calibration>
+				</Channel>
+				<Channel number="14" type="s3hen" subtype="A63" group="F" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.118395 </Calibration>
+				</Channel>
+				<Channel number="15" type="s3hen" subtype="A64" group="F" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.100144 </Calibration>
+				</Channel>
+			</Module>
+			<Module number="3" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
+				<Channel number="0" type="s3hen" subtype="A38" group="G" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.095480 </Calibration>
+				</Channel>
+				<Channel number="1" type="s3hen" subtype="A39" group="G" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.095362 </Calibration>
+				</Channel>
+				<Channel number="2" type="s3hen" subtype="A40" group="G" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.094335 </Calibration>
+				</Channel>
+				<Channel number="3" type="s3hen" subtype="A44" group="G" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.099051 </Calibration>
+				</Channel>
+				<Channel number="4" type="s3hen" subtype="A45" group="G" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.096308 </Calibration>
+				</Channel>
+				<Channel number="5" type="s3hen" subtype="A46" group="G" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.099277 </Calibration>
+				</Channel>
+				<Channel number="6" type="s3hen" subtype="A50" group="G" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.094729 </Calibration>
+				</Channel>
+				<Channel number="7" type="s3hen" subtype="A51" group="G" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.096308 </Calibration>
+				</Channel>
+				<Channel number="8" type="s3hen" subtype="A52" group="G" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.098423 </Calibration>
+				</Channel>
+				<Channel number="9" type="s3hen" subtype="A55" group="G" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.095809 </Calibration>
+				</Channel>
+				<Channel number="10" type="s3hen" subtype="A56" group="G" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.094707 </Calibration>
+				</Channel>
+				<Channel number="11" type="s3hen" subtype="A58" group="G" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.097493 </Calibration>
+				</Channel>
+				<Channel number="12" type="s3hen" subtype="A61" group="G" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.097234 </Calibration>
+				</Channel>
+				<Channel number="13" type="s3hen" subtype="A62" group="G" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.093482 </Calibration>
+				</Channel>
+				<Channel number="14" type="s3hen" subtype="A65" group="G" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.098386 </Calibration>
+				</Channel>
+				<Channel number="15" type="s3hen" subtype="A66" group="G" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.092310 </Calibration>
+				</Channel>
+			</Module>
+			<Module number="4" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
+				<Channel number="0" type="s3hen" subtype="B1" group="J" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.378271 </Calibration>
+				</Channel>
+				<Channel number="1" type="s3hen" subtype="B2" group="J" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.381905 </Calibration>
+				</Channel>
+				<Channel number="2" type="s3hen" subtype="B5" group="J" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.378354 </Calibration>
+				</Channel>
+				<Channel number="3" type="s3hen" subtype="B6" group="J" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.381024 </Calibration>
+				</Channel>
+				<Channel number="4" type="s3hen" subtype="B7" group="J" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.373154 </Calibration>
+				</Channel>
+				<Channel number="5" type="s3hen" subtype="B11" group="J" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.373199 </Calibration>
+				</Channel>
+				<Channel number="6" type="s3hen" subtype="B12" group="J" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.374200 </Calibration>
+				</Channel>
+				<Channel number="7" type="s3hen" subtype="B15" group="J" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.381951 </Calibration>
+				</Channel>
+				<Channel number="8" type="s3hen" subtype="B16" group="J" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.390084 </Calibration>
+				</Channel>
+				<Channel number="9" type="s3hen" subtype="B17" group="J" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.383643 </Calibration>
+				</Channel>
+				<Channel number="10" type="s3hen" subtype="B21" group="J" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.384429 </Calibration>
+				</Channel>
+				<Channel number="11" type="s3hen" subtype="B22" group="J" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.382303 </Calibration>
+				</Channel>
+				<Channel number="12" type="s3hen" subtype="B27" group="J" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.379627 </Calibration>
+				</Channel>
+				<Channel number="14" type="generic" subtype="pulser" group="J" tags="">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+				</Channel>
+				<Channel number="15" type="s3hen" subtype="A1" group="H" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.099239 </Calibration>
+				</Channel>
+			</Module>
+			<Module number="5" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
+				<Channel number="0" type="s3hen" subtype="B3" group="I" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.364461 </Calibration>
+				</Channel>
+				<Channel number="1" type="s3hen" subtype="B4" group="I" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.344625 </Calibration>
+				</Channel>
+				<Channel number="2" type="s3hen" subtype="B8" group="I" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.336401 </Calibration>
+				</Channel>
+				<Channel number="3" type="s3hen" subtype="B9" group="I" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.334782 </Calibration>
+				</Channel>
+				<Channel number="4" type="s3hen" subtype="B10" group="I" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.358817 </Calibration>
+				</Channel>
+				<Channel number="5" type="s3hen" subtype="B13" group="I" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.351249 </Calibration>
+				</Channel>
+				<Channel number="6" type="s3hen" subtype="B14" group="I" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.354246 </Calibration>
+				</Channel>
+				<Channel number="7" type="s3hen" subtype="B18" group="I" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.357157 </Calibration>
+				</Channel>
+				<Channel number="8" type="s3hen" subtype="B19" group="I" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.347276 </Calibration>
+				</Channel>
+				<Channel number="9" type="s3hen" subtype="B20" group="I" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.344353 </Calibration>
+				</Channel>
+				<Channel number="10" type="s3hen" subtype="B23" group="I" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.346122 </Calibration>
+				</Channel>
+				<Channel number="11" type="s3hen" subtype="B24" group="I" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.343001 </Calibration>
+				</Channel>
+				<Channel number="12" type="s3hen" subtype="B28" group="I" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.333518 </Calibration>
+				</Channel>
+				<Channel number="15" type="s3hen" subtype="A2" group="H" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.099947 </Calibration>
+				</Channel>
+			</Module>
+			<Module number="6" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
+				<Channel number="0" type="s3hen" subtype="B25" group="L" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.342213 </Calibration>
+				</Channel>
+				<Channel number="1" type="s3hen" subtype="B26" group="L" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.351105 </Calibration>
+				</Channel>
+				<Channel number="2" type="s3hen" subtype="B31" group="L" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.357827 </Calibration>
+				</Channel>
+				<Channel number="3" type="s3hen" subtype="B32" group="L" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.348786 </Calibration>
+				</Channel>
+				<Channel number="4" type="s3hen" subtype="B35" group="L" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.344355 </Calibration>
+				</Channel>
+				<Channel number="5" type="s3hen" subtype="B36" group="L" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.342012 </Calibration>
+				</Channel>
+				<Channel number="6" type="s3hen" subtype="B37" group="L" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.341058 </Calibration>
+				</Channel>
+				<Channel number="7" type="s3hen" subtype="B41" group="L" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.337030 </Calibration>
+				</Channel>
+				<Channel number="8" type="s3hen" subtype="B42" group="L" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.339845 </Calibration>
+				</Channel>
+				<Channel number="9" type="s3hen" subtype="B45" group="L" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.349110 </Calibration>
+				</Channel>
+				<Channel number="10" type="s3hen" subtype="B46" group="L" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.342201 </Calibration>
+				</Channel>
+				<Channel number="11" type="s3hen" subtype="B47" group="L" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.360939 </Calibration>
+				</Channel>
+				<Channel number="12" type="s3hen" subtype="B48" group="L" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.339524 </Calibration>
+				</Channel>
+				<Channel number="13" type="s3hen" subtype="B49" group="L" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.353449 </Calibration>
+				</Channel>
+				<Channel number="14" type="s3hen" subtype="B50" group="L" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.346853 </Calibration>
+				</Channel>
+				<Channel number="15" type="s3hen" subtype="C2" group="L" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.365135 </Calibration>
+				</Channel>
+			</Module>
+			<Module number="7" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
+				<Channel number="0" type="s3hen" subtype="B29" group="K" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.343544 </Calibration>
+				</Channel>
+				<Channel number="1" type="s3hen" subtype="B30" group="K" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.354360 </Calibration>
+				</Channel>
+				<Channel number="2" type="s3hen" subtype="B33" group="K" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.330551 </Calibration>
+				</Channel>
+				<Channel number="3" type="s3hen" subtype="B34" group="K" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.349744 </Calibration>
+				</Channel>
+				<Channel number="4" type="s3hen" subtype="B38" group="K" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.343992 </Calibration>
+				</Channel>
+				<Channel number="5" type="s3hen" subtype="B39" group="K" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.361804 </Calibration>
+				</Channel>
+				<Channel number="6" type="s3hen" subtype="B40" group="K" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.345672 </Calibration>
+				</Channel>
+				<Channel number="7" type="s3hen" subtype="B43" group="K" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.342401 </Calibration>
+				</Channel>
+				<Channel number="8" type="s3hen" subtype="B44" group="K" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.360332 </Calibration>
+				</Channel>
+				<Channel number="9" type="s3hen" subtype="B51" group="K" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.345018 </Calibration>
+				</Channel>
+				<Channel number="10" type="s3hen" subtype="B52" group="K" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.346444 </Calibration>
+				</Channel>
+				<Channel number="11" type="s3hen" subtype="B53" group="K" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.362300 </Calibration>
+				</Channel>
+				<Channel number="12" type="s3hen" subtype="B54" group="K" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.358297 </Calibration>
+				</Channel>
+				<Channel number="13" type="s3hen" subtype="B55" group="K" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.365591 </Calibration>
+				</Channel>
+				<Channel number="14" type="s3hen" subtype="B56" group="K" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.363747 </Calibration>
+				</Channel>
+				<Channel number="15" type="s3hen" subtype="C3" group="K" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.346508 </Calibration>
+				</Channel>
+			</Module>
+			<Module number="8" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
+				<Channel number="0" type="s3hen" subtype="B93" group="N" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.357636 </Calibration>
+				</Channel>
+				<Channel number="1" type="s3hen" subtype="B94" group="N" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.346045 </Calibration>
+				</Channel>
+				<Channel number="2" type="s3hen" subtype="B95" group="N" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.349907 </Calibration>
+				</Channel>
+				<Channel number="3" type="s3hen" subtype="B96" group="N" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.333942 </Calibration>
+				</Channel>
+				<Channel number="4" type="s3hen" subtype="B97" group="N" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.346423 </Calibration>
+				</Channel>
+				<Channel number="5" type="s3hen" subtype="B98" group="N" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.355427 </Calibration>
+				</Channel>
+				<Channel number="6" type="s3hen" subtype="B105" group="N" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.324747 </Calibration>
+				</Channel>
+				<Channel number="7" type="s3hen" subtype="B106" group="N" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.354063 </Calibration>
+				</Channel>
+				<Channel number="8" type="s3hen" subtype="B109" group="N" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.345413 </Calibration>
+				</Channel>
+				<Channel number="9" type="s3hen" subtype="B110" group="N" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.342947 </Calibration>
+				</Channel>
+				<Channel number="10" type="s3hen" subtype="B111" group="N" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.338134 </Calibration>
+				</Channel>
+				<Channel number="11" type="s3hen" subtype="B115" group="N" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.346425 </Calibration>
+				</Channel>
+				<Channel number="12" type="s3hen" subtype="B116" group="N" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.348008 </Calibration>
+				</Channel>
+				<Channel number="13" type="s3hen" subtype="B119" group="N" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.335302 </Calibration>
+				</Channel>
+				<Channel number="14" type="s3hen" subtype="B120" group="N" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.354254 </Calibration>
+				</Channel>
+				<Channel number="15" type="s3hen" subtype="C10" group="N" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.348824 </Calibration>
+				</Channel>
+			</Module>
+			<Module number="9" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
+				<Channel number="0" type="s3hen" subtype="B99" group="M" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.382214 </Calibration>
+				</Channel>
+				<Channel number="1" type="s3hen" subtype="B100" group="M" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.383502 </Calibration>
+				</Channel>
+				<Channel number="2" type="s3hen" subtype="B101" group="M" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.382934 </Calibration>
+				</Channel>
+				<Channel number="3" type="s3hen" subtype="B102" group="M" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.385415 </Calibration>
+				</Channel>
+				<Channel number="4" type="s3hen" subtype="B103" group="M" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.381799 </Calibration>
+				</Channel>
+				<Channel number="5" type="s3hen" subtype="B104" group="M" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.389268 </Calibration>
+				</Channel>
+				<Channel number="6" type="s3hen" subtype="B107" group="M" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.376785 </Calibration>
+				</Channel>
+				<Channel number="7" type="s3hen" subtype="B108" group="M" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.387751 </Calibration>
+				</Channel>
+				<Channel number="8" type="s3hen" subtype="B112" group="M" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.383467 </Calibration>
+				</Channel>
+				<Channel number="9" type="s3hen" subtype="B113" group="M" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.381658 </Calibration>
+				</Channel>
+				<Channel number="10" type="s3hen" subtype="B114" group="M" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.382334 </Calibration>
+				</Channel>
+				<Channel number="11" type="s3hen" subtype="B117" group="M" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.381835 </Calibration>
+				</Channel>
+				<Channel number="12" type="s3hen" subtype="B118" group="M" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.378185 </Calibration>
+				</Channel>
+				<Channel number="13" type="s3hen" subtype="B123" group="M" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.384146 </Calibration>
+				</Channel>
+				<Channel number="14" type="s3hen" subtype="B124" group="M" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.378106 </Calibration>
+				</Channel>
+				<Channel number="15" type="s3hen" subtype="C11" group="M" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.386358 </Calibration>
+				</Channel>
+			</Module>
+			<Module number="10" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
+				<Channel number="0" type="s3hen" subtype="B121" group="P" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.374503 </Calibration>
+				</Channel>
+				<Channel number="1" type="s3hen" subtype="B125" group="P" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.365131 </Calibration>
+				</Channel>
+				<Channel number="2" type="s3hen" subtype="B126" group="P" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.358489 </Calibration>
+				</Channel>
+				<Channel number="3" type="s3hen" subtype="B129" group="P" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.355581 </Calibration>
+				</Channel>
+				<Channel number="4" type="s3hen" subtype="B130" group="P" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.368297 </Calibration>
+				</Channel>
+				<Channel number="5" type="s3hen" subtype="B131" group="P" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.348995 </Calibration>
+				</Channel>
+				<Channel number="6" type="s3hen" subtype="B135" group="P" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.359783 </Calibration>
+				</Channel>
+				<Channel number="7" type="s3hen" subtype="B136" group="P" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.357678 </Calibration>
+				</Channel>
+				<Channel number="8" type="s3hen" subtype="B139" group="P" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.349940 </Calibration>
+				</Channel>
+				<Channel number="9" type="s3hen" subtype="B140" group="P" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.358682 </Calibration>
+				</Channel>
+				<Channel number="10" type="s3hen" subtype="B141" group="P" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.366730 </Calibration>
+				</Channel>
+				<Channel number="11" type="s3hen" subtype="B145" group="P" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.347900 </Calibration>
+				</Channel>
+				<Channel number="12" type="s3hen" subtype="B146" group="P" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.366890 </Calibration>
+				</Channel>
+				<Channel number="15" type="s3hen" subtype="A67" group="H" tags="2in">
+					<Calibration model="linear" min="0">0.0 0.107197 </Calibration>
+				</Channel>
+			</Module>
+			<Module number="11" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
+				<Channel number="0" type="s3hen" subtype="B122" group="O" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.373169 </Calibration>
+				</Channel>
+				<Channel number="1" type="s3hen" subtype="B127" group="O" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.374809 </Calibration>
+				</Channel>
+				<Channel number="2" type="s3hen" subtype="B128" group="O" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.373494 </Calibration>
+				</Channel>
+				<Channel number="3" type="s3hen" subtype="B132" group="O" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.370701 </Calibration>
+				</Channel>
+				<Channel number="4" type="s3hen" subtype="B133" group="O" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.362326 </Calibration>
+				</Channel>
+				<Channel number="5" type="s3hen" subtype="B134" group="O" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.376707 </Calibration>
+				</Channel>
+				<Channel number="6" type="s3hen" subtype="B137" group="O" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.364267 </Calibration>
+				</Channel>
+				<Channel number="7" type="s3hen" subtype="B138" group="O" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.373690 </Calibration>
+				</Channel>
+				<Channel number="8" type="s3hen" subtype="B142" group="O" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.359510 </Calibration>
+				</Channel>
+				<Channel number="9" type="s3hen" subtype="B143" group="O" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.377385 </Calibration>
+				</Channel>
+				<Channel number="10" type="s3hen" subtype="B144" group="O" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.330746 </Calibration>
+				</Channel>
+				<Channel number="11" type="s3hen" subtype="B147" group="O" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.387903 </Calibration>
+				</Channel>
+				<Channel number="12" type="s3hen" subtype="B148" group="O" tags="VPMC">
+					<Calibration model="linear" min="0">0.0 0.370608 </Calibration>
+				</Channel>
+				<Channel number="15" type="s3hen" subtype="A68" group="H" tags="2in">
+					<Calibration model="linear" min="0">0.0 1.000000 </Calibration>
+				</Channel>
+			</Module>
+			<Module number="12" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
+				<Channel number="0" type="s3hen" subtype="B59" group="C" tags="U,FRIB4">
+					<Calibration model="linear" min="0">0.0 0.187 </Calibration>
+				</Channel>
+				<Channel number="1" type="s3hen" subtype="B71" group="C" tags="U,FRIB4">
+					<Calibration model="linear" min="0">0.0 0.195909 </Calibration>
+				</Channel>
+				<Channel number="2" type="s3hen" subtype="B83" group="C" tags="U,FRIB4">
+					<Calibration model="linear" min="0">0.0 0.188955 </Calibration>
+				</Channel>
+				<Channel number="3" type="s3hen" subtype="B59" group="C" tags="D,FRIB4">
+					<Calibration model="linear" min="0">0.0 0.199204 </Calibration>
+				</Channel>
+				<Channel number="4" type="s3hen" subtype="B71" group="C" tags="D,FRIB4">
+					<Calibration model="linear" min="0">0.0 0.190442 </Calibration>
+				</Channel>
+				<Channel number="5" type="s3hen" subtype="B83" group="C" tags="D,FRIB4">
+					<Calibration model="linear" min="0">0.0 0.196314 </Calibration>
+				</Channel>
+				<Channel number="6" type="s3hen" subtype="B66" group="C" tags="U,FRIB4">
+					<Calibration model="linear" min="0">0.0 0.186 </Calibration>
+				</Channel>
+				<Channel number="7" type="s3hen" subtype="B78" group="C" tags="U,FRIB4">
+					<Calibration model="linear" min="0">0.0 0.180 </Calibration>
+				</Channel>
+				<Channel number="8" type="s3hen" subtype="B90" group="C" tags="U,FRIB4">
+					<Calibration model="linear" min="0">0.0 0.170501 </Calibration>
+				</Channel>
+				<Channel number="9" type="s3hen" subtype="B66" group="C" tags="D,FRIB4">
+					<Calibration model="linear" min="0">0.0 0.178594 </Calibration>
+				</Channel>
+				<Channel number="10" type="s3hen" subtype="B78" group="C" tags="D,FRIB4">
+					<Calibration model="linear" min="0">0.0 0.176541 </Calibration>
+				</Channel>
+				<Channel number="11" type="s3hen" subtype="B90" group="C" tags="D,FRIB4">
+					<Calibration model="linear" min="0">0.0 0.175687 </Calibration>
+				</Channel>
+				<Channel number="12" type="s3hen" subtype="B77" group="A" tags="U,FRIB10">
+					<Calibration model="linear" min="0">0.0 0.403 </Calibration>
+				</Channel>
+				<Channel number="13" type="s3hen" subtype="B72" group="B" tags="U,FRIB10">
+					<Calibration model="linear" min="0">0.0 0.401 </Calibration>
+				</Channel>
+				<Channel number="14" type="s3hen" subtype="B77" group="Q" tags="D,FRIB10">
+					<Calibration model="linear" min="0">0.0 0.431 </Calibration>
+				</Channel>
+				<Channel number="15" type="s3hen" subtype="B72" group="R" tags="D,10atmShort">
+					<Calibration model="linear" min="0">0.0 0.229 </Calibration>
+				</Channel>
+			</Module>
+		</Crate>
+	</Map>
+</Configuration>
