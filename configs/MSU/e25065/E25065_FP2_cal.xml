@@ -85,6 +85,7 @@
 				<Channel number="9" type="pid" subtype="scint" group="0" tags="db5,up,tas">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 					</Channel>
+				<!-- Scint is actually mounted in FP1 but called FP2 for plotting reasons-->
 				<Channel number="10" type="pid" subtype="scint" group="" tags="fp2,left,tas">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
@@ -179,17 +180,17 @@
 				<Channel number="7" type="clover" subtype="2" group="R" tags="">
 					<Calibration model="linear" min="0">-1.20176 0.193462</Calibration>
 				</Channel>
-				<!-- These pins will likely not be used, however they are cabled up so there might be a random noise hit-->
-				<Channel number="12" type="pid" subtype="pin" group="1" tags="fp1,tas">
+				<!-- Oleg wants a Pin in vacuum so we insert FP1:Pin1-->
+				<Channel number="12" type="pid" subtype="pin" group="1" tags="fp2,tas">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 				<Channel number="13" type="pid" subtype="pin" group="2" tags="fp1,tas">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="14" type="pid" subtype="pin" group="1" tags="fp2,tas"> 
+				<Channel number="14" type="pid" subtype="pin" group="2" tags="fp2,tas"> 
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
-				<Channel number="15" type="pid" subtype="pin" group="2" tags="fp2,tas">
+				<Channel number="15" type="pid" subtype="pin" group="3" tags="fp2,tas">
 					<Calibration model="linear" min="0">0.0 1.0</Calibration>
 				</Channel>
 			</Module>
