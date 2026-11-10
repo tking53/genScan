@@ -109,7 +109,7 @@ void PrintUsage(const char* prog) {
 
 	spdlog::info("EXAMPLES:");
 	spdlog::info("  {} --encode 5", prog);
-	spdlog::info("  {} -e 5 -s off", prog);
+	spdlog::info("  {} -e 5 -b off", prog);
 	spdlog::info("  {} -e 1.5 -f 500 -r F", prog);
 	spdlog::info("  {} --decode 66161", prog);
 	spdlog::info("  {} -d 0x10271", prog);
