@@ -511,3 +511,7 @@ install(TARGETS GenScanor DESTINATION bin)
 #Configure and install the module file
 configure_file("modulefiles/genScan" modulefiles/genScan @ONLY)
 install(DIRECTORY ${CMAKE_BINARY_DIR}/modulefiles  DESTINATION ${CMAKE_INSTALL_PREFIX})
+
+
+#THIS MUST ALWAYS BE LAST
+install(SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/PostInstall.cmake")
