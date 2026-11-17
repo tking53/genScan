@@ -10,6 +10,10 @@ add_executable(GenCaenBinDump src/caenbindump.cpp)
 target_link_libraries(GenCaenBinDump PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES})
 list(APPEND EXE_LIST GenCaenBinDump)
 
+add_executable(GenCaenBinMerge src/caenbinmerge.cpp)
+target_link_libraries(GenCaenBinMerge PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES})
+list(APPEND EXE_LIST GenCaenBinMerge)
+
 if( EXTERNAL_DEPS )
 	foreach(CURREXE ${EXE_LIST})
 		add_dependencies(${CURREXE} ${EXTERNAL_DEPS})	
