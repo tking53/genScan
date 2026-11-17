@@ -121,6 +121,7 @@ int CompassBinTimeSortedTranslator::ReadNext(boost::container::devector<PhysicsD
 		// no-op
 	}
 
+	// this->console->info("{} {} {} {} {}",board,channel,raw_energy,timestamp,energy_short);
 	double TimeStampInNS = timestamp * 1.0e-3;
 	RawEvents.push_back(PhysicsData(0, 0, 0, board, channel,
 					this->CMap->GetGlobalBoardID(0, board),
@@ -191,6 +192,7 @@ Translator::TRANSLATORSTATE CompassBinTimeSortedTranslator::Parse(boost::contain
 		}
 		this->single_file_decoder.reset(new CaenDecoder());
 		this->single_file_decoder->SetBits(header);
+		// this->console->info("{} {} {} {}",this->single_file_decoder->HasBit0(),this->single_file_decoder->HasBit1(),this->single_file_decoder->HasBit2(),this->single_file_decoder->HasBit3());
 	}
 	do {
 		if (not this->Leftovers.empty()) {

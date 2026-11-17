@@ -273,7 +273,7 @@ int main(int argc, char* argv[]) {
 
 		// Open all input files and verify their headers.
 		for (std::size_t i = 0; i < num_inputs; ++i) {
-			const std::filesystem::path input_path(argv[i + 1]);
+			const std::filesystem::path input_path(input_files[i]);
 
 			if (std::filesystem::absolute(input_path).lexically_normal() == std::filesystem::absolute(output_path).lexically_normal()) {
 				throw std::runtime_error(
@@ -331,6 +331,21 @@ int main(int argc, char* argv[]) {
 			const auto idx = current.input_index;
 
 			// Write the earliest event.
+			// std::uint16_t raw_energy = 0;
+
+			// if (events[idx].bytes.size() >= 14) {
+			// 	std::memcpy(
+			// 		&raw_energy,
+			// 		events[idx].bytes.data() + 12,
+			// 		sizeof(raw_energy));
+			// }
+
+			// spdlog::info(
+			// 	"Event {}: timestamp={}, energy={}, event size={}",
+			// 	written,
+			// 	events[idx].timestamp,
+			// 	raw_energy,
+			// 	events[idx].bytes.size());
 			write_event(output, events[idx]);
 			++written;
 
