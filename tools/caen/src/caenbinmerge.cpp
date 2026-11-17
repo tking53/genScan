@@ -11,6 +11,15 @@
 #include <string>
 #include <vector>
 
+#include <spdlog/common.h>
+#include <spdlog/spdlog.h>
+#include <spdlog/cfg/env.h>
+#include <spdlog/fmt/ostr.h>
+#include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+
+#include <boost/program_options.hpp>
+
 namespace {
 
 	struct Event {
@@ -171,82 +180,195 @@ namespace {
 } // namespace
 
 int main(int argc, char* argv[]) {
-	if (argc != 4 || std::string(argv[1]) == "--help" || std::string(argv[1]) == "-h") {
-		std::cout
-			<< "Usage: " << argv[0]
-			<< " <input1.bin> <input2.bin> <output.bin>\n\n"
-			<< "Merge two time-sorted CoMPASS binary files into one "
-			   "time-sorted binary file.\n";
-		return (argc == 4) ? 0 : 1;
+	namespace po = boost::program_options;
+
+	std::vector<std::string> input_files;
+	std::string output_file;
+
+	po::options_description options("CoMPASS Binary Merger Options");
+
+	// clang-format off
+	options.add_options()("help,h","Display this help message")
+			     ("input,i",po::value<std::vector<std::string>>(&input_files)->multitoken()->required(),"Input binary files to merge")
+			     ("output,o",po::value<std::string>(&output_file)->required(),"Output binary file");
+	// clang-format on
+
+	po::positional_options_description positional;
+	positional.add("input", -1);
+
+	try {
+		po::variables_map vm;
+
+		po::store(
+			po::command_line_parser(argc, argv)
+				.options(options)
+				.positional(positional)
+				.run(),
+			vm);
+
+		if (vm.count("help")) {
+			std::cout << options << '\n';
+			return EXIT_SUCCESS;
+		}
+
+		po::notify(vm);
+
+		if (input_files.empty()) {
+			throw std::runtime_error("No input files specified");
+		}
+
+		if (input_files.size() < 2) {
+			throw std::runtime_error(
+				"At least two input files are required");
+		}
+
+	} catch (const po::error& e) {
+		spdlog::error("Command line error: {}", e.what());
+		std::cerr << options << '\n';
+		return EXIT_FAILURE;
+
+	} catch (const std::exception& e) {
+		spdlog::error("{}", e.what());
+		return EXIT_FAILURE;
 	}
 
 	try {
-		const std::filesystem::path input1_path(argv[1]);
-		const std::filesystem::path input2_path(argv[2]);
-		const std::filesystem::path output_path(argv[3]);
+		const std::filesystem::path output_path(output_file);
 
-		if (input1_path == output_path || input2_path == output_path) {
-			throw std::runtime_error("Output file must not be either input file");
+		const std::size_t num_inputs = input_files.size();
+
+		// Continue with the existing k-way merge implementation...
+
+		// Each input file maintains its own event buffer.
+		std::vector<std::unique_ptr<CaenInput>> inputs;
+		std::vector<Event> events(num_inputs);
+
+		inputs.reserve(num_inputs);
+
+		std::uint16_t header = 0;
+
+		// Priority queue entry.
+		struct QueueEntry {
+			std::uint64_t timestamp;
+			std::size_t input_index;
+		};
+
+		// Minimum timestamp has highest priority.
+		struct CompareEvents {
+			bool operator()(const QueueEntry& a,
+					const QueueEntry& b) const {
+				if (a.timestamp != b.timestamp) {
+					return a.timestamp > b.timestamp;
+				}
+
+				return a.input_index > b.input_index;
+			}
+		};
+
+		std::priority_queue<
+			QueueEntry,
+			std::vector<QueueEntry>,
+			CompareEvents>
+			queue;
+
+		// Open all input files and verify their headers.
+		for (std::size_t i = 0; i < num_inputs; ++i) {
+			const std::filesystem::path input_path(argv[i + 1]);
+
+			if (std::filesystem::absolute(input_path).lexically_normal() == std::filesystem::absolute(output_path).lexically_normal()) {
+				throw std::runtime_error(
+					"Output file must not be an input file: " + input_path.string());
+			}
+
+			auto input = std::make_unique<CaenInput>(input_path);
+
+			if (i == 0) {
+				header = input->header();
+			} else if (input->header() != header) {
+				throw std::runtime_error(
+					"Input files have different CoMPASS headers: " + input_path.string());
+			}
+
+			spdlog::info("Opened input: {}", input_path.string());
+
+			inputs.push_back(std::move(input));
 		}
 
-		CaenInput input1(input1_path);
-		CaenInput input2(input2_path);
+		// Create output file.
+		std::ofstream output(
+			output_path,
+			std::ios::binary | std::ios::trunc);
 
-		if (input1.header() != input2.header()) {
-			throw std::runtime_error(
-				"The input files have different CoMPASS headers (" + std::to_string(input1.header()) + " versus " + std::to_string(input2.header()) + "). Their event formats are not identical.");
-		}
-
-		std::ofstream output(output_path, std::ios::binary | std::ios::trunc);
 		if (!output) {
-			throw std::runtime_error("Cannot create output file: " + output_path.string());
+			throw std::runtime_error(
+				"Cannot create output file: " + output_path.string());
 		}
 
-		// A merged file has one format header, followed by all event records.
-		const std::uint16_t header = input1.header();
-		output.write(reinterpret_cast<const char*>(&header), sizeof(header));
+		// Write the common CoMPASS header once.
+		output.write(
+			reinterpret_cast<const char*>(&header),
+			sizeof(header));
+
 		if (!output) {
 			throw std::runtime_error("Failed to write output header");
 		}
 
-		Event event1;
-		Event event2;
-		bool has1 = input1.read_event(event1);
-		bool has2 = input2.read_event(event2);
+		// Read the first event from each input file.
+		for (std::size_t i = 0; i < num_inputs; ++i) {
+			if (inputs[i]->read_event(events[i])) {
+				queue.push({events[i].timestamp,
+					    i});
+			}
+		}
 
 		std::uint64_t written = 0;
 
-		while (has1 || has2) {
-			// On equal timestamps, input 1 is written first.
-			if (has1 && (!has2 || event1.timestamp <= event2.timestamp)) {
-				write_event(output, event1);
-				++written;
-				has1 = input1.read_event(event1);
-			} else {
-				write_event(output, event2);
-				++written;
-				has2 = input2.read_event(event2);
+		// Perform the k-way merge.
+		while (!queue.empty()) {
+			const auto current = queue.top();
+			queue.pop();
+
+			const auto idx = current.input_index;
+
+			// Write the earliest event.
+			write_event(output, events[idx]);
+			++written;
+
+			// Read the next event from the same input file.
+			if (inputs[idx]->read_event(events[idx])) {
+				queue.push({events[idx].timestamp,
+					    idx});
 			}
 
 			if (written % 1'000'000 == 0) {
-				std::cout << "Merged " << written << " events...\n";
+				spdlog::info("Merged {} events...", written);
 			}
 		}
 
 		output.close();
+
 		if (!output) {
-			throw std::runtime_error("Failed to finalize output file");
+			throw std::runtime_error(
+				"Failed to finalize output file");
 		}
 
-		std::cout << "\nMerge complete.\n"
-			  << "Input 1 events: " << input1.event_count() << '\n'
-			  << "Input 2 events: " << input2.event_count() << '\n'
-			  << "Total events:   " << written << '\n'
-			  << "Output file:    " << output_path << '\n';
+		// Print statistics.
+		spdlog::info("Merge complete.");
+
+		for (std::size_t i = 0; i < num_inputs; ++i) {
+			spdlog::info(
+				"Input {}: {} events",
+				i + 1,
+				inputs[i]->event_count());
+		}
+
+		spdlog::info("Total events: {}", written);
+		spdlog::info("Output file: {}", output_path.string());
 
 		return 0;
+
 	} catch (const std::exception& error) {
-		std::cerr << "Error: " << error.what() << '\n';
+		spdlog::error("{}", error.what());
 		return 1;
 	}
 }
