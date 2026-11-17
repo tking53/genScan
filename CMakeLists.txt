@@ -463,6 +463,7 @@ if( EXTERNAL_DEPS )
 endif()
 target_link_libraries(GenScanor PRIVATE BSMStruct 
 					EBSSStruct
+					DeuteratedLiquidScintStruct
 					e23064Struct
 					VetoStruct 
 					MtasImplantStruct 

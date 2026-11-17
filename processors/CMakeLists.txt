@@ -174,6 +174,15 @@ list(APPEND PROCESSOR_STRUCT_LIBS EBSSStruct)
 list(APPEND PROCESSOR_STRUCT_PCM ${CMAKE_CURRENT_BINARY_DIR}/libEBSSStruct_root_rdict.pcm)
 list(APPEND PROCESSOR_STRUCT_RMAP ${CMAKE_CURRENT_BINARY_DIR}/libEBSSStruct_root.rootmap)
 
+ROOT_GENERATE_DICTIONARY(DeuteratedLiquidScintStruct_root 
+	DeuteratedLiquidScintStruct.hpp ${ROOT_CONTAINER_PATHS}
+	LINKDEF include/DeuteratedLiquidScintStructLinkDef.hpp )
+add_library(DeuteratedLiquidScintStruct SHARED DeuteratedLiquidScintStruct_root.cxx DeuteratedLiquidScintStruct_root)
+target_link_libraries(DeuteratedLiquidScintStruct ${ROOT_LIBRARIES})
+list(APPEND PROCESSOR_STRUCT_LIBS DeuteratedLiquidScintStruct)
+list(APPEND PROCESSOR_STRUCT_PCM ${CMAKE_CURRENT_BINARY_DIR}/libDeuteratedLiquidScintStruct_root_rdict.pcm)
+list(APPEND PROCESSOR_STRUCT_RMAP ${CMAKE_CURRENT_BINARY_DIR}/libDeuteratedLiquidScintStruct_root.rootmap)
+
 add_library(GenScanProcessors ${src_files})
 target_link_libraries(GenScanProcessors PUBLIC ${ROOT_LIBRARIES} GenScanFitters GenScanUtility pugixml)
 target_include_directories(GenScanProcessors PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

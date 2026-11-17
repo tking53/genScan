@@ -1,5 +1,6 @@
 #include "DeuteratedLiquidScintillatorProcessor.hpp"
 #include "CutManager.hpp"
+#include "DeuteratedLiquidScintStruct.hpp"
 #include "EventSummary.hpp"
 #include "HistogramManager.hpp"
 #include <TTree.h>
@@ -32,9 +33,13 @@ DeuteratedLiquidScintillatorProcessor::DeuteratedLiquidScintillatorProcessor(con
 		auto detpos = std::stoi(evt->GetGroup());
 		// should set the PSD to be based on the relevant portions of the baseline subtracted trace ....
 		// but fall back to the values from digitizer?
-		this->data[detpos] = {(1.0 - evt->GetQDC(this->psd_idx) / evt->GetEnergy()),evt->GetEnergy(),evt->GetTimeStamp(), std::abs(evt->GetBaselineSubtractedPSDBoundedMaxValue()), evt->GetSaturation(), evt->GetPileup()};
+		this->data[detpos] = {(1.0 - evt->GetQDC(this->psd_idx) / evt->GetEnergy()),evt->GetEnergy(),evt->GetTimeStamp(), std::abs(evt->GetBaselineSubtractedPSDBoundedMaxValue()), evt->GetSaturation(), evt->GetPileup(), evt->GetSubType(), evt->GetGroup(), evt->GetTags()};
 	}
 
+	// quick transfer to root
+	for (const auto& e : this->data) {
+		this->rdata.push_back(e);
+	}
 	for (size_t ii = 0; ii < this->data.size(); ++ii) {
 		hismanager->Fill("DLS_1000", this->data[ii].energy, ii);
 		hismanager->Fill("DLS_2000", this->data[ii].psd, ii);
@@ -62,13 +67,14 @@ void DeuteratedLiquidScintillatorProcessor::Init(const pugi::xml_node& config) {
 
 	this->NumScintillator = config.attribute("number").as_int(1);
 	this->psd_idx = config.attribute("psd_idx").as_ullong(0);
+	this->rdata = std::vector<ProcessorStruct::DLS>(this->NumScintillator,ProcessorStruct::DEFAULT_DLS_STRUCT);
 
 	this->LoadHistogramSettings(config);
 	this->LoadCustomCuts(config);
 }
 
 void DeuteratedLiquidScintillatorProcessor::Finalize() {
-	this->data = std::vector<DLSData>(this->NumScintillator,{-999.0,0.0,-1.0,false,false});
+	this->data = std::vector<ProcessorStruct::DLS>(this->NumScintillator,ProcessorStruct::DEFAULT_DLS_STRUCT);
 	this->console->info("{} has been finalized", this->ProcessorName);
 }
 
@@ -97,9 +103,13 @@ void DeuteratedLiquidScintillatorProcessor::DeclarePlots(PLOTS::PlotRegistry* hi
 }
 
 void DeuteratedLiquidScintillatorProcessor::RegisterTree([[maybe_unused]] std::unordered_map<std::string, TTree*>& outputtrees) {
+	this->OutputTree = new TTree("DeutLS", "DeuteratedLiquidScintillator Processor output");
+	this->OutputTree->Branch("arr", &(this->rdata));
+	outputtrees[this->ProcessorName] = this->OutputTree;
 }
 
 void DeuteratedLiquidScintillatorProcessor::CleanupTree() {
+	this->rdata.clear();
 }
 
 void DeuteratedLiquidScintillatorProcessor::Reset() {

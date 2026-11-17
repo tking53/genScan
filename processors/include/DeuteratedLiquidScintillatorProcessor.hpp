@@ -2,6 +2,7 @@
 #define __DEUTERATED_LIQUID_SCINTILLATOR_PROCESSOR_HPP__
 
 #include "Processor.hpp"
+#include "DeuteratedLiquidScintStruct.hpp"
 
 class DeuteratedLiquidScintillatorProcessor : public Processor {
 public:
@@ -28,18 +29,10 @@ public:
 	int GetNumScintillators() const;
 
 private:
-	struct DLSData {
-		double psd = -999.0;
-		double energy = 0.0;
-		double ts = -999.0;
-		double tmax = -1.0;
-		bool saturate = false;
-		bool pileup = false;
-	};
-
 	void Reset();
 
-	std::vector<DLSData> data;
+	std::vector<ProcessorStruct::DLS> data;
+	std::vector<ProcessorStruct::DLS> rdata;
 	int NumScintillator;
 	size_t psd_idx;
 };
