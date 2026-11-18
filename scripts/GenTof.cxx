@@ -262,11 +262,10 @@ using h2d_model = std::tuple<ROOT::RDF::TH2DModel, std::string, std::string>;
 using RVecDLS = ROOT::RVec<ProcessorStruct::DLS>;
 using RVecRootDev = ROOT::RVec<ProcessorStruct::RootDev>;
 
-void GenTof(const std::string& config,const std::string& outputprefix) {
+void GenTof(const std::string& config,const std::string& inputfile,const std::string& outputprefix) {
 	// inputs from config file
 	
 	YAML::Node doc = YAML::LoadFile(config);
-	auto inputfile = doc["inputfile"].as<std::string>();
 	std::string outputfile = outputprefix;
 	auto dist = doc["distance"].as<double>();
 	auto offset = doc["offset"].as<double>();
