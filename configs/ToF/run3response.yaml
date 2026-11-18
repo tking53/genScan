@@ -1,0 +1,10 @@
+distance: 7.86
+offset: 46.596
+psd:
+  low: 0.15
+  high: 0.45 
+light:
+  low: 100.0
+tdiff:
+  low: 95.0
+  high: 988.0
