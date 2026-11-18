@@ -2,6 +2,7 @@
 #include <vector>
 #include <map>
 #include <utility>
+#include <random>
 
 #include <TFile.h>
 #include <TTree.h>
@@ -268,6 +269,7 @@ void GenTof(const std::string& config,const std::string& inputfile,const std::st
 	YAML::Node doc = YAML::LoadFile(config);
 	std::string outputfile = outputprefix;
 	auto dist = doc["distance"].as<double>();
+	auto delta_dist = doc["length"].as<double>();
 	auto offset = doc["offset"].as<double>();
 	auto psd_high = doc["psd"]["high"].as<double>();
 	auto psd_low = doc["psd"]["low"].as<double>();
@@ -289,6 +291,10 @@ void GenTof(const std::string& config,const std::string& inputfile,const std::st
 	std::string beamtree = "RootDev";
 	double mass = 939.56542194; // MeV / c^2
 	double c = 0.299792458; // m / ns
+			
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_real_distribution<float> uniform(-delta_dist,delta_dist);
 
 	std::map<std::string,h1_info> h1_singles_map {
 		{"tdiff",{HisHelper<ROOT::RDF::TH1DModel>("tdiff","tdiff Neutron - #gamma; Time Difference (ns)",3000,-1500,1500),"tdiff"}},
@@ -338,16 +344,29 @@ void GenTof(const std::string& config,const std::string& inputfile,const std::st
 		return tdiff - offset;
 	};	
 
-	auto beta = [&](const double& tof) {
-		return dist / (c * tof);
+	// let's do something stupid
+	// let's alias the distance based on the half-lenfth of the detector
+	// we could probably also add in an angle alias based on the radius 
+	// and then solve for the new "distance" of interaction
+	// Ideally this isn't uniformly sampled across the length it has an exponential 
+	// modulation based on the length and the cross section but then we 
+	// would need to know the energy apriori, but if we assume our interaction volume 
+	// is much less than the path length across the entire energy range, then we 
+	// can assume it's a flat bias 
+	auto distance = [&]() {
+		return dist + uniform(gen);
+	};
+
+	auto beta = [&](const double& tof,const double& distr) {
+		return distr / (c * tof);
 	};
 
 	auto gamma = [&](const double& beta) {
 		return 1.0 / TMath::Sqrt(1.0 - beta * beta);
 	};
 
-	auto nerg_classical = [&](const double& tof) {
-		return 0.5 * mass * (dist / tof) * (dist / tof) / (c * c);
+	auto nerg_classical = [&](const double& tof,const double& distr) {
+		return 0.5 * mass * (distr / tof) * (distr / tof) / (c * c);
 	};
 
 	auto nerg_relativistic = [&](const double& gamma) {
@@ -362,11 +381,11 @@ void GenTof(const std::string& config,const std::string& inputfile,const std::st
 
 	auto df_neutrons = df_filter.Filter(neutrons,{"light","psd","tdiff"}) // Filter out to just the neutrons
 				    .Define("tof",tof,{"tdiff"}) // Define the tof for the neutrons
-				    .Define("beta",beta,{"tof"}) // Define beta helper to get the relativistic ToF
+				    .Define("distance",distance,{}) // Define distance we will use
+				    .Define("beta",beta,{"tof","distance"}) // Define beta helper to get the relativistic ToF
 				    .Define("gamma",gamma,{"beta"}) // Define gamma helper to get the relativistic ToF
-				    .Define("nerg_classical",nerg_classical,{"tof"}) // Define the neutron energy classically
+				    .Define("nerg_classical",nerg_classical,{"tof","distance"}) // Define the neutron energy classically
 				    .Define("nerg_relativistic",nerg_relativistic,{"gamma"}); // Define the neutron energy relativistically
-
 
 	ROOT::RDF::Experimental::AddProgressBar(df);
 
@@ -468,5 +487,5 @@ void GenTof(const std::string& config,const std::string& inputfile,const std::st
 	// std::cout << "Writing slimmed tree" << std::endl;
 	// ROOT::RDF::RSnapshotOptions options;
 	// options.fMode = "UPDATE";
-	// df_neutrons.Snapshot("response",outputfile,{"tdiff","tof","beta","gamma","light","psd","nerg_classical","nerg_relativistic"},options);
+	// df_neutrons.Snapshot("response",outputfile,{"tdiff","tof","beta","gamma","distance","light","psd","nerg_classical","nerg_relativistic"},options);
 }
