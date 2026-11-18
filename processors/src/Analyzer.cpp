@@ -204,3 +204,7 @@ void Analyzer::LoadHistogramSettings(const pugi::xml_node& config) {
 		}
 	}
 }
+
+boost::regex Analyzer::GenerateRegex(const std::string& cratestr, const std::string& modstr, const std::string& channelstr) {
+	return boost::regex("^" + cratestr + ":" + modstr + ":" + channelstr + "$");
+}

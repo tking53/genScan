@@ -298,7 +298,7 @@ void WaveformAnalyzer::InsertAdditionalTypes(const std::string& typestring) {
 }
 
 boost::regex WaveformAnalyzer::GenerateRegex(const std::string& cratestr, const std::string& modstr, const std::string& channelstr) {
-	boost::regex re("^" + cratestr + ":" + modstr + ":" + channelstr + "$");
+	auto re = Analyzer::GenerateRegex(cratestr, modstr, channelstr);
 	auto result = this->KnownWaveSettings.insert(re);
 	if (result.first == this->KnownWaveSettings.end()) {
 		this->console->error("duplicate settings tag found for Crate=\"{}\" Module=\"{}\" Channel=\"{}\"", cratestr, modstr, channelstr);

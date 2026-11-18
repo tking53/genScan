@@ -42,6 +42,7 @@
 #include "SingleGroverProcessor.hpp"
 #include "VetoProcessor.hpp"
 
+#include "TimingAnalyzer.hpp"
 #include "WaveformAnalyzer.hpp"
 
 ProcessorList::ProcessorList(const std::string& log, PLOTS::PlotRegistry* HistogramManager) {
@@ -186,6 +187,8 @@ void ProcessorList::CreateProc(const std::string& name) {
 void ProcessorList::CreateAnal(const std::string& name) {
 	if (name.compare("GenericAnalyzer") == 0) {
 		known_analyzers.push_back(std::make_shared<GenericAnalyzer>(this->LogName));
+	} else if (name.compare("TimingAnalyzer") == 0) {
+		known_analyzers.push_back(std::make_shared<TimingAnalyzer>(this->LogName));
 	} else if (name.compare("WaveformAnalyzer") == 0) {
 		known_analyzers.push_back(std::make_shared<WaveformAnalyzer>(this->LogName));
 	} else {
@@ -244,6 +247,12 @@ void ProcessorList::ThreshAndCal(boost::container::devector<PhysicsData>& RawEve
 		evt.SetAliasValue(alias);
 		auto raw = evt.GetRawEnergy();
 		auto erg = raw + alias;
+		// we're going to hack this into the data stream
+		// technically this is wrong for some boards in xia, but we shouldn't use this technique
+		// it is just for simplified trace sampling that's not easy to setup  
+		// currently only the TimingAnalyzer uses this feature to adjust the timestamp
+		auto freq = cmap->GetBoardFrequency(evt.GetCrate(), evt.GetModule());
+		evt.SetNSPerSample(1000.0 / static_cast<double>(freq));
 		try {
 			const auto [cal, iraw, ical, iiraw, iical] = cmap->GetCalibratedEnergy(evt.GetCrate(), evt.GetModule(), evt.GetChannel(), erg, alias, evt.GetRawTrace());
 			evt.SetFilterEnergy(erg, cal);

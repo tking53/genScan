@@ -59,6 +59,7 @@ public:
 
 protected:
 	virtual void LoadHistogramSettings(const pugi::xml_node&) final;
+	virtual boost::regex GenerateRegex(const std::string&, const std::string&, const std::string&);
 
 	enum STEP {
 		PREPROCESS,

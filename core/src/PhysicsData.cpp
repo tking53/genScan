@@ -88,7 +88,8 @@ PhysicsData::PhysicsData(const PhysicsData& other)
 	, InternalFilterEnergy(other.InternalFilterEnergy)
 	, InternalIntegralRaw(other.InternalIntegralRaw)
 	, InternalIntegralEnergy(other.InternalIntegralEnergy)
-	, AliasValue(other.AliasValue) {
+	, AliasValue(other.AliasValue) 
+	, NSPerSample(other.NSPerSample) {
 }
 
 PhysicsData::PhysicsData(PhysicsData&& other) noexcept
@@ -134,7 +135,8 @@ PhysicsData::PhysicsData(PhysicsData&& other) noexcept
 	, InternalFilterEnergy(other.InternalFilterEnergy)
 	, InternalIntegralRaw(other.InternalIntegralRaw)
 	, InternalIntegralEnergy(other.InternalIntegralEnergy)
-	, AliasValue(other.AliasValue) {
+	, AliasValue(other.AliasValue) 
+	, NSPerSample(other.NSPerSample) {
 }
 
 PhysicsData& PhysicsData::operator=(const PhysicsData& other) {
@@ -182,6 +184,7 @@ PhysicsData& PhysicsData::operator=(const PhysicsData& other) {
 		InternalIntegralRaw = other.InternalIntegralRaw;
 		InternalIntegralEnergy = other.InternalIntegralEnergy;
 		AliasValue = other.AliasValue;
+		NSPerSample = other.NSPerSample;
 	}
 	return *this;
 }
@@ -231,6 +234,7 @@ PhysicsData& PhysicsData::operator=(PhysicsData&& other) noexcept {
 		InternalIntegralRaw = other.InternalIntegralRaw;
 		InternalIntegralEnergy = other.InternalIntegralEnergy;
 		AliasValue = other.AliasValue;
+		NSPerSample = other.NSPerSample;
 	}
 	return *this;
 }
@@ -697,4 +701,16 @@ unsigned int PhysicsData::GetRawQDC(size_t idx) const {
 
 double PhysicsData::GetQDC(size_t idx) const {
 	return this->QDCSums.at(idx);
+}
+
+void PhysicsData::AdjustTimeStamp(float fraction) {
+	this->TimeStamp += fraction * NSPerSample;
+}
+
+size_t PhysicsData::GetNSPerSample() const {
+	return this->NSPerSample;
+}
+
+void PhysicsData::SetNSPerSample(size_t ns) {
+	this->NSPerSample = ns;
 }

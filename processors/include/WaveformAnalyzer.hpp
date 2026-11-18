@@ -25,7 +25,7 @@ public:
 	virtual void DeclarePlots([[maybe_unused]] PLOTS::PlotRegistry*) const;
 
 private:
-	boost::regex GenerateRegex(const std::string&, const std::string&, const std::string&);
+	virtual boost::regex GenerateRegex(const std::string&, const std::string&, const std::string&);
 
 	void InsertAdditionalTypes(const std::string&);
 

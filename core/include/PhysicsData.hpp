@@ -407,6 +407,10 @@ public:
 	double GetInternalIntegralEnergy() const;
 	double GetAliasValue() const;
 
+	void AdjustTimeStamp(float);
+	void SetNSPerSample(size_t);
+	size_t GetNSPerSample() const;
+
 private:
 	// this is info decoded from the data files
 	int HeaderLength; /**< decoded length of event header (4/8/12/16) */
@@ -468,6 +472,8 @@ private:
 	double InternalIntegralEnergy;
 
 	double AliasValue;
+
+	size_t NSPerSample;
 
 	// Trace Helper, should probably hide this from end user though
 	// and only expose what it can determine
