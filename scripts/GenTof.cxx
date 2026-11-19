@@ -270,12 +270,22 @@ void GenTof(const std::string& config,const std::string& inputfile,const std::st
 	std::string outputfile = outputprefix;
 	auto dist = doc["distance"].as<double>();
 	auto delta_dist = doc["length"].as<double>();
+	auto delta_radius = doc["radius"].as<double>();
 	auto offset = doc["offset"].as<double>();
 	auto psd_high = doc["psd"]["high"].as<double>();
 	auto psd_low = doc["psd"]["low"].as<double>();
 	auto light_low = doc["light"]["low"].as<double>();
 	auto tdiff_high = doc["tdiff"]["high"].as<double>();
 	auto tdiff_low = doc["tdiff"]["low"].as<double>();
+
+	auto ebins = doc["axis"]["energy"]["bins"].as<int>();
+	auto emin = doc["axis"]["energy"]["min"].as<double>();
+	auto emax = doc["axis"]["energy"]["max"].as<double>();
+	
+	auto lbins = doc["axis"]["light"]["bins"].as<int>();
+	auto lmin = doc["axis"]["light"]["min"].as<double>();
+	auto lmax = doc["axis"]["light"]["max"].as<double>();
+
 	// std::string inputfile = "/Users/truland/run3merged.root";
 	// std::string outputfile = "/Users/truland/run3response.root";
 	// double dist = 7.86; // m 
@@ -294,7 +304,9 @@ void GenTof(const std::string& config,const std::string& inputfile,const std::st
 			
 	std::random_device rd;
 	std::mt19937 gen(rd());
-	std::uniform_real_distribution<float> uniform(-delta_dist,delta_dist);
+	std::uniform_real_distribution<float> uniform_h(-delta_dist,delta_dist);
+	std::uniform_real_distribution<float> uniform_r(0,delta_radius);
+	std::uniform_real_distribution<float> uniform_t(0,2.0*TMath::Pi());
 
 	std::map<std::string,h1_info> h1_singles_map {
 		{"tdiff",{HisHelper<ROOT::RDF::TH1DModel>("tdiff","tdiff Neutron - #gamma; Time Difference (ns)",3000,-1500,1500),"tdiff"}},
@@ -305,11 +317,11 @@ void GenTof(const std::string& config,const std::string& inputfile,const std::st
 	};
 
 	std::map<std::string,h2_info> h2_singles_map {
-		{"bands",{HisHelper<ROOT::RDF::TH2DModel>("bands","bands; Light (keVee); PSD (arb.)",6000,0,6000,1000,0,1),"light","psd"}},
+		{"bands",{HisHelper<ROOT::RDF::TH2DModel>("bands","bands; Light (keVee); PSD (arb.)",5000,0,5000,1000,0,1),"light","psd"}},
 	};
 	std::map<std::string,h2_info> h2_neutrons_map {
-		{"response_classical",{HisHelper<ROOT::RDF::TH2DModel>("response_classical","response classical; Light (keVee); Energy (MeV);",6000,0,6000,12000,0,12),"light","nerg_classical"}},
-		{"response_relativistic",{HisHelper<ROOT::RDF::TH2DModel>("response_relativistic","response relativistic; Light (keVee); Energy (MeV);",6000,0,6000,12000,0,12),"light","nerg_relativistic"}},
+		{"response_classical",{HisHelper<ROOT::RDF::TH2DModel>("response_classical","response classical; Light (keVee); Energy (MeV);",lbins,lmin,lmax,ebins,emin,emax),"light","nerg_classical"}},
+		{"response_relativistic",{HisHelper<ROOT::RDF::TH2DModel>("response_relativistic","response relativistic; Light (keVee); Energy (MeV);",lbins,lmin,lmax,ebins,emin,emax),"light","nerg_relativistic"}},
 	};
 
 	auto input = TFile::Open(inputfile.c_str(),"READ");
@@ -354,7 +366,13 @@ void GenTof(const std::string& config,const std::string& inputfile,const std::st
 	// is much less than the path length across the entire energy range, then we 
 	// can assume it's a flat bias 
 	auto distance = [&]() {
-		return dist + uniform(gen);
+		auto t = uniform_t(gen);
+		auto r = uniform_r(gen);
+		auto z = dist + uniform_h(gen);
+		auto x = TMath::Sqrt(r)*TMath::Cos(t);
+		auto y = TMath::Sqrt(r)*TMath::Sin(t);
+		return TMath::Sqrt(x*x + y*y + z*z);
+		return dist;
 	};
 
 	auto beta = [&](const double& tof,const double& distr) {
