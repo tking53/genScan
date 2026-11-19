@@ -10,6 +10,10 @@ add_executable(GenDev src/devmain.cpp)
 target_link_libraries(GenDev PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES})
 list(APPEND EXE_LIST GenDev)
 
+add_executable(GenHMerge src/MergeHis.cpp)
+target_link_libraries(GenHMerge PRIVATE pugixml GenScanUtility ${ROOT_LIBRARIES})
+list(APPEND EXE_LIST GenHMerge)
+
 add_executable(GenKeyPrint src/keyprint.cpp)
 target_link_libraries(GenKeyPrint PRIVATE ${ROOT_LIBRARIES})
 list(APPEND EXE_LIST GenKeyPrint)
