@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<Configuration>
+	<Author>
+		<Name>GenConfig</Name>
+		<Date>Today</Date>
+		<Email>default AT gmail DOT com</Email>
+	</Author>
+	<Description>Automatically Generated xml by GenConfig</Description>
+	<Global EventWidth="500" EventWidthUnit="ns" CorrelationType="rolling-trigger" />
+	<DetectorDriver >
+		<!-- <Processor name="RootDevProcessor" included_types="bsm,hpge" /> -->
+		<Processor name="KClComptonProcessor">
+			<Processor name="BSMProcessor"/>
+			<Processor name="SimpleHPGeProcessor"/>
+		</Processor>
+	</DetectorDriver >
+	<Map>
+		<Crate number="0">
+			<Module number="0" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
+				<Channel number="0" type="bsm" subtype="bsm" group="1" tags="front">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+					<TrapFilter len="8" gap="8" blen="10" tau="0.08">
+						<Calibration >0.0 1.0e-2</Calibration>
+					</TrapFilter>
+				</Channel>
+				<Channel number="1" type="bsm" subtype="bsm" group="1" tags="back">
+					<Calibration model="linear" min="0">0.0 1.0</Calibration>
+					<TrapFilter len="8" gap="8" blen="10" tau="0.08">
+						<Calibration >0.0 1.0e-2</Calibration>
+					</TrapFilter>
+				</Channel>
+				<!-- This is where things are before KClComton_012.ldf -->
+				<Channel number="2" type="hpge" subtype="gammax" group="0" tags="original">
+					<Calibration model="linear" min="0">0.0 0.32141728</Calibration>
+				</Channel>
+			</Module>
+			<Module number="1" Revision="F" Frequency="250" Firmware="R42950" TraceDelay="120">
+				<Channel number="0" type="hpge" subtype="gammax" group="0" tags="new">
+					<Calibration model="linear" min="0">0.0 0.32141728</Calibration>
+				</Channel>
+			</Module>
+		</Crate>
+	</Map>
+</Configuration>

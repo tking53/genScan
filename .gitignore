@@ -31,6 +31,9 @@
 *.out
 *.app
 
+#configured options
+generated/include/*.hpp
+
 install/*
 build/*
 .cache/*

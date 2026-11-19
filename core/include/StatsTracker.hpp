@@ -16,37 +16,38 @@
 #include "ChannelMap.hpp"
 #include "PhysicsData.hpp"
 
-class StatsTracker{
-	public:
-		StatsTracker(const std::string&);
-		~StatsTracker();
+class StatsTracker {
+public:
+	StatsTracker(const std::string&);
+	~StatsTracker();
 
-		void Init(ChannelMap*);
-		void IncrementStats(const boost::container::devector<PhysicsData>&);
+	void Init(ChannelMap*);
+	void IncrementStats(const boost::container::devector<PhysicsData>&);
 
-		struct StatsObject{
-			unsigned long long Hits = 0;
-			unsigned long long PileupHits = 0;
-			unsigned long long SaturationHits = 0;
+	struct StatsObject {
+		unsigned long long Hits = 0;
+		unsigned long long PileupHits = 0;
+		unsigned long long SaturationHits = 0;
 
-			void IncrementHit(){
-				++Hits;
-			}
+		void IncrementHit() {
+			++Hits;
+		}
 
-			void IncrementPileup(){
-				++PileupHits;
-			}
+		void IncrementPileup() {
+			++PileupHits;
+		}
 
-			void IncrementSaturation(){
-				++SaturationHits;
-			}
-		};
-	private:
-		std::string LogName;
+		void IncrementSaturation() {
+			++SaturationHits;
+		}
+	};
 
-		std::shared_ptr<spdlog::logger> console;
-		
-		boost::container::flat_map<int,StatsObject> StatsInfo;
+private:
+	std::string LogName;
+
+	std::shared_ptr<spdlog::logger> console;
+
+	boost::container::flat_map<int, StatsObject> StatsInfo;
 };
 
 #endif

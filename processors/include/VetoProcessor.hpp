@@ -1,63 +1,50 @@
 #ifndef __VETO_PROCESSOR_HPP__
 #define __VETO_PROCESSOR_HPP__
 
+#include "Gates.hpp"
 #include "Processor.hpp"
+#include "VetoStruct.hpp"
+#include <vector>
 
-class VetoProcessor : public Processor{
-	public:
-		VetoProcessor(const std::string&);
-		virtual ~VetoProcessor() = default;
-		[[maybe_unused]] virtual bool PreProcess([[maybe_unused]] EventSummary&,[[maybe_unused]] PLOTS::PlotRegistry*,[[maybe_unused]] CUTS::CutRegistry*) final;
-		[[maybe_unused]] virtual bool Process(EventSummary&,[[maybe_unused]] PLOTS::PlotRegistry*,[[maybe_unused]] CUTS::CutRegistry*) final;
-		[[maybe_unused]] virtual bool PostProcess([[maybe_unused]] EventSummary&,[[maybe_unused]] PLOTS::PlotRegistry*,[[maybe_unused]] CUTS::CutRegistry*) final;
+class VetoProcessor : public Processor {
+public:
+	VetoProcessor(const std::string&);
+	virtual ~VetoProcessor() = default;
+	[[maybe_unused]] virtual bool PreProcess([[maybe_unused]] EventHistoryManager*, [[maybe_unused]] PLOTS::PlotRegistry*, [[maybe_unused]] CUTS::CutRegistry*) final;
+	[[maybe_unused]] virtual bool Process(EventHistoryManager*, [[maybe_unused]] PLOTS::PlotRegistry*, [[maybe_unused]] CUTS::CutRegistry*) final;
+	[[maybe_unused]] virtual bool PostProcess([[maybe_unused]] EventHistoryManager*, [[maybe_unused]] PLOTS::PlotRegistry*, [[maybe_unused]] CUTS::CutRegistry*) final;
 
-		virtual void Finalize() final;
+	virtual void Finalize() final;
 
-		virtual void Init(const YAML::Node&);
-		virtual void Init(const Json::Value&);
-		virtual void Init(const pugi::xml_node&);
+	virtual void Init(const pugi::xml_node&);
 
-		virtual void DeclarePlots(PLOTS::PlotRegistry*) const;
-		virtual void RegisterTree([[maybe_unused]] std::unordered_map<std::string,TTree*>&) final;
-		virtual void CleanupTree() final;
+	virtual void DeclarePlots(PLOTS::PlotRegistry*);
+	virtual void RegisterTree([[maybe_unused]] std::unordered_map<std::string, TTree*>&) final;
+	virtual void CleanupTree() final;
 
-		struct EventInfo{
-			std::vector<double> FrontErg;
-			std::vector<double> FrontTimeStamp;
-			std::vector<double> FrontCFDTimeStamp;
-			std::vector<double> RearErg;
-			std::vector<double> RearTimeStamp;
-			std::vector<double> RearCFDTimeStamp;
-			double MaxFrontErg;
-			double MaxFrontTimeStamp;
-			double MaxFrontCFDTimeStamp;
-			double MaxRearErg;
-			double MaxRearTimeStamp;
-			double MaxRearCFDTimeStamp;
-			bool Pileup;
-			bool Saturate;
-			bool RealEvent;
-		};
+	const double& GetRIT() const;
+	const double& GetFIT() const;
 
-		EventInfo& GetCurrEvt();
-		EventInfo& GetPrevEvt();
+private:
+	void Reset();
 
-	private:
-		void Reset();
+	enum SUBTYPE {
+		FIT,
+		RIT,
+		UNKNOWN
+	};
 
-		EventInfo NewEvt;
-		EventInfo CurrEvt;
-		EventInfo PrevEvt;
+	SUBTYPE currsubtype;
+	double rit;
+	double rit_psd;
+	double fit;
+	double fit_psd;
 
-		enum SUBTYPE{
-			FIT,
-			RIT,
-			UNKNOWN 
-		};
+	std::vector<Gate<double>> FitReject;
+	std::vector<Gate<double>> RitReject;
 
-		SUBTYPE currsubtype;
-		std::vector<std::tuple<double,double,double>> HighestFit;
-		std::vector<std::tuple<double,double,double>> HighestRit;
+	ProcessorStruct::Veto fit_root;
+	ProcessorStruct::Veto rit_root;
 };
 
 #endif
